@@ -1,0 +1,87 @@
+/* ===================================================================
+   DEVICE FRAME — 모바일 기기 목업 외형
+   =================================================================== */
+
+.device-frame {
+  width: 393px;
+  height: 852px;
+  background-color: var(--dialer-bg);
+  border-radius: 40px;
+  overflow: hidden;
+  box-shadow: 0 0 0 3px #1a1a1a, 0 0 0 4px #333, 0 20px 40px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  /* 모바일 화면에서는 스케일을 줄여 화면에 맞추거나 보더 안보이게 처리 등 */
+  .device-frame {
+    transform: scale(min(100vw / 393, 100vh / 852));
+    transform-origin: top center;
+    border-radius: 0;
+    box-shadow: none;
+    margin: 0 auto;
+    background-color: var(--surface, #FFFFFF);
+  }
+  .notch {
+    display: none;
+  }
+}
+
+
+.canvas {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  color: var(--text);
+  position: relative;
+  background: transparent;
+}
+
+/* 노치(Notch) 및 안전 영역 설정 */
+.notch {
+  position: absolute;
+  top: 11px;
+  /* 기기 프레임 상단으로부터의 간격 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 126px;
+  height: 37px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 500;
+}
+
+.home-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 5px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 100px;
+  z-index: 100;
+}
+
+.header {
+  padding: 12px 24px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.header h1 {
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+}
+
+.content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 80px;
+}
+

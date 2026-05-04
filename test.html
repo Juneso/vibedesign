@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html><body>
+<div class="lab-page active" data-page="ai-entrance">
+  <div class="dialer-number">
+    <h1 class="dialer-display">1588-</h1>
+  </div>
+  <div class="dialer-keypad-area">
+    <div class="key"><span class="num">1</span></div>
+  </div>
+</div>
+<script>
+  // mock animate
+  const animate = () => ({ finished: Promise.resolve() });
+  const spring = {};
+  const lottie = { loadAnimation: () => ({ goToAndPlay: () => {} }) };
+
+  const setupDialer = (pageSelector, animConfig) => {
+    const page = document.querySelector(pageSelector);
+    if (!page) { console.log("no page", pageSelector); return; }
+
+    const dialerDisplay = page.querySelector('.dialer-number h1');
+    const keys = page.querySelectorAll('.dialer-keypad-area .key');
+    if (!dialerDisplay) { console.log("no display"); return; }
+    console.log("Attached to", pageSelector, keys.length, "keys");
+
+    let currentNumber = '1588-';
+    const updateDisplay = () => {
+      dialerDisplay.textContent = currentNumber;
+      console.log("updateDisplay", currentNumber);
+    };
+
+    if (keys) {
+      keys.forEach(key => {
+        key.addEventListener('click', () => {
+          const numSpan = key.querySelector('.num');
+          if (!numSpan) return;
+
+          currentNumber += numSpan.textContent;
+          updateDisplay();
+        });
+      });
+    }
+  };
+
+  setupDialer('.lab-page', {});
+  document.querySelector('.key').click();
+  console.log(document.querySelector('.dialer-display').textContent);
+</script>
+</body></html>

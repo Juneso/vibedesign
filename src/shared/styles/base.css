@@ -1,0 +1,31 @@
+.safe-area-padding-top {
+  padding-top: calc(var(--total-top-padding) + var(--web-layout-shift)) !important;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--lab-bg);
+  height: 100vh;
+  /* 모바일 브라우저의 주소창 문제를 방지하기 위해 dvh 사용 */
+  height: 100dvh;
+  overflow: hidden;
+  margin: 0;
+  -webkit-text-size-adjust: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ─── 공통 인터랙션 유틸리티 ─── */
+.is-disabled {
+  pointer-events: none;
+}
+

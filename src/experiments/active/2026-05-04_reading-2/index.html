@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>0504 2 — LLM Wiki Reader</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <link rel="stylesheet" href="../../../shared/styles/tokens.css" />
+  <link rel="stylesheet" href="../../../shared/styles/base.css" />
+  <link rel="stylesheet" href="../../../shared/styles/device.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-theme="">
+  <div class="device-frame">
+    <div class="notch"></div>
+
+    <div class="canvas-content" data-inspect="canvas-root">
+      <div class="status-bar">
+        <span class="sb-time">9:41</span>
+        <span class="sb-icons">
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><path d="M1 11h2V7H1v4zm4 0h2V5H5v6zm4 0h2V3H9v8zm4 0h2V1h-2v10z" fill="currentColor"/></svg>
+        </span>
+      </div>
+
+      <!-- ───────────── HOME ───────────── -->
+      <section class="view view-home active" data-view="home">
+        <header class="home-header">
+          <h1 class="home-title">내 서재</h1>
+          <p class="home-sub">탭하면 메모를 시작합니다</p>
+        </header>
+
+        <div class="book-card-wrap">
+          <div class="book-card">
+            <div class="book-cover">
+              <img src="/assets/nexus-cover.jpg" alt="넥서스 표지" />
+              <button class="fab-memo" data-action="open-chat" aria-label="메모 작성">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 20h9"/>
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                </svg>
+              </button>
+            </div>
+            <div class="book-meta">
+              <h2 class="book-title">넥서스</h2>
+              <p class="book-author">유발 하라리</p>
+            </div>
+          </div>
+
+          <button class="notes-link" data-action="open-notes-from-home">
+            <span>나의 위키 보기</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ───────────── CHAT ───────────── -->
+      <section class="view view-chat" data-view="chat">
+        <header class="chat-topbar">
+          <div class="chat-topbar-meta">
+            <span class="chat-topbar-title">넥서스 메모 세션</span>
+            <span class="chat-topbar-sub">위키에 자동 저장돼요</span>
+          </div>
+          <button class="end-btn" data-action="end-chat">대화 종료</button>
+        </header>
+
+        <div class="chat-scroll" id="chat-scroll">
+          <div class="chat-messages" id="chat-messages"></div>
+        </div>
+
+        <!-- AI가 던진 질문에 대한 빠른 응답 칩 (상황에 따라 동적으로 채움) -->
+        <div class="chat-suggestions" id="chat-suggestions" hidden></div>
+
+        <form class="chat-input-bar" id="chat-form" autocomplete="off">
+          <button type="button" class="chat-input-plus" aria-label="더보기">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="chat-input-pill">
+            <input type="text" id="chat-input" class="chat-input" placeholder="넥서스에 대해 적어보세요" />
+            <button type="submit" class="chat-send" aria-label="보내기">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="6"  y1="10" x2="6"  y2="14"/>
+                <line x1="10" y1="7"  x2="10" y2="17"/>
+                <line x1="14" y1="9"  x2="14" y2="15"/>
+                <line x1="18" y1="11" x2="18" y2="13"/>
+              </svg>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ───────────── WIKI (Notes) ───────────── -->
+      <section class="view view-notes" data-view="notes">
+        <header class="notes-topbar">
+          <button class="icon-btn" data-action="back-home" aria-label="홈">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="notes-topbar-meta">
+            <span class="notes-topbar-title">넥서스 위키</span>
+            <span class="notes-topbar-sub" id="wiki-sub">방금 세션 반영 · 페이지 갱신됨</span>
+          </div>
+          <button class="icon-btn" data-action="toggle-graph" aria-label="그래프 보기" id="graph-toggle-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="18" r="2"/>
+              <line x1="7.4" y1="7" x2="10.6" y2="17"/><line x1="16.6" y1="7" x2="13.4" y2="17"/>
+            </svg>
+          </button>
+        </header>
+
+        <div class="notes-scroll" id="notes-scroll">
+          <!-- 그래프 카드 (메인) -->
+          <article class="wiki-card" id="wiki-graph-card">
+            <div class="wiki-card-header">
+              <span class="ai-pill"><span class="ai-dot"></span> Graph view</span>
+              <span class="wiki-hint">노드를 끌어 옮겨보세요</span>
+            </div>
+            <h3 class="wiki-card-title">페이지 연결</h3>
+            <div class="wiki-canvas" id="wiki-canvas">
+              <svg class="wiki-edges" id="wiki-edges"></svg>
+              <div class="wiki-nodes" id="wiki-nodes"></div>
+            </div>
+          </article>
+
+          <!-- 이번 세션 업데이트 요약 -->
+          <article class="session-card">
+            <span class="ai-pill"><span class="ai-dot"></span> 이번 세션 정리</span>
+            <h3 class="session-title">방금 대화에서 위키가 이렇게 바뀌었어요</h3>
+            <ul class="session-diff" id="session-diff">
+              <li><b class="diff-new">+ 새 페이지</b> <span>알고리즘 권력</span></li>
+              <li><b class="diff-up">~ 갱신</b> <span>정보 네트워크</span> — '신경계' 비유 추가</li>
+              <li><b class="diff-up">~ 갱신</b> <span>관료제 vs 신화</span> — AI 시대 항목 보강</li>
+              <li><b class="diff-link">↔ 연결</b> <span>알고리즘 권력</span> ↔ <span>자기수정</span></li>
+            </ul>
+          </article>
+
+          <!-- 위키 인덱스 (사용자가 만든 페이지들) -->
+          <div class="wiki-section-head">
+            <h3 class="wiki-section-title">내 페이지</h3>
+            <span class="wiki-count" id="wiki-count">0개</span>
+          </div>
+          <ul class="wiki-pages" id="wiki-pages"></ul>
+
+          <!-- 로그 -->
+          <div class="wiki-section-head">
+            <h3 class="wiki-section-title">로그</h3>
+            <span class="wiki-hint">log.md</span>
+          </div>
+          <ul class="wiki-log" id="wiki-log"></ul>
+
+          <div class="scroll-bottom-pad"></div>
+        </div>
+      </section>
+
+      <!-- ───────────── PAGE DETAIL (모달) ───────────── -->
+      <section class="view view-page-detail" data-view="page-detail">
+        <header class="notes-topbar">
+          <button class="icon-btn" data-action="back-notes" aria-label="뒤로">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="notes-topbar-meta">
+            <span class="notes-topbar-title">페이지</span>
+            <span class="notes-topbar-sub">넥서스 위키</span>
+          </div>
+          <span class="icon-btn placeholder"></span>
+        </header>
+        <div class="notes-scroll">
+          <article class="page-detail" id="page-detail-body"></article>
+          <div class="scroll-bottom-pad"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>

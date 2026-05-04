@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>0504 1 — 책 브리핑</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <link rel="stylesheet" href="../../../shared/styles/tokens.css" />
+  <link rel="stylesheet" href="../../../shared/styles/base.css" />
+  <link rel="stylesheet" href="../../../shared/styles/device.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-theme="">
+  <div class="device-frame">
+    <div class="notch"></div>
+
+    <div class="canvas-content" data-inspect="canvas-root">
+      <!-- ─── Status bar (공통) ─── -->
+      <div class="status-bar">
+        <span class="sb-time">9:41</span>
+        <span class="sb-icons">
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><path d="M1 11h2V7H1v4zm4 0h2V5H5v6zm4 0h2V3H9v8zm4 0h2V1h-2v10z" fill="currentColor"/></svg>
+        </span>
+      </div>
+
+      <!-- ───────────── HOME ───────────── -->
+      <section class="view view-home active" data-view="home">
+        <header class="home-header">
+          <h1 class="home-title">내 서재</h1>
+          <p class="home-sub">읽고 있는 책</p>
+        </header>
+
+        <button class="book-card" data-action="open-briefing">
+          <div class="book-cover">
+            <img src="/assets/nexus-cover.jpg" alt="넥서스 표지" />
+          </div>
+          <div class="book-meta">
+            <h2 class="book-title">넥서스</h2>
+            <p class="book-author">유발 하라리</p>
+            <span class="book-tag">AI 브리핑 준비됨</span>
+          </div>
+        </button>
+      </section>
+
+      <!-- ───────────── BRIEFING ───────────── -->
+      <section class="view view-briefing" data-view="briefing">
+        <header class="brief-topbar">
+          <button class="icon-btn" data-action="back-home" aria-label="뒤로">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <span class="brief-topbar-title">브리핑</span>
+          <span class="icon-btn placeholder"></span>
+        </header>
+
+        <div class="brief-scroll">
+          <!-- Hero -->
+          <div class="brief-hero">
+            <div class="brief-hero-cover">
+              <img src="/assets/nexus-cover.jpg" alt="" />
+            </div>
+            <div class="brief-hero-meta">
+              <h2 class="brief-title">넥서스</h2>
+              <p class="brief-author">유발 하라리 · 2024</p>
+              <p class="brief-tags">정보 네트워크 · 인공지능 · 역사</p>
+            </div>
+          </div>
+
+          <!-- AI 브리핑 카드 -->
+          <article class="ai-card">
+            <div class="ai-card-label">
+              <span class="ai-dot"></span> AI 브리핑
+            </div>
+            <h3 class="ai-card-title">이 책은 어떤 책인가요</h3>
+            <p class="ai-card-body">
+              『넥서스』는 석기시대의 이야기 공동체부터 현대의 인공지능까지, 인류가 만들어 온
+              '정보 네트워크'의 역사를 추적합니다. 하라리는 정보가 단순한 진실의 도구가 아니라
+              사회를 묶고 권력을 분배하는 신경계라고 봅니다. 이 책의 진짜 질문은 'AI 시대에
+              우리는 어떤 정보 네트워크를 설계해야 하는가'입니다.
+            </p>
+
+            <h3 class="ai-card-subtitle">독서 전략</h3>
+            <ul class="ai-card-list">
+              <li><b>1부는 빠르게.</b> 사례 중심이라 흐름만 잡고 넘기세요.</li>
+              <li><b>2부는 정독.</b> '관료제'와 '신화'의 대비가 책의 척추입니다.</li>
+              <li><b>3부는 메모하며.</b> AI 관련 주장은 본인 직무와 연결해 메모하면 좋습니다.</li>
+            </ul>
+          </article>
+
+          <!-- 배경 지식 -->
+          <article class="bg-card">
+            <h3 class="section-title">미리 알면 좋은 배경</h3>
+            <div class="bg-item">
+              <div class="bg-item-key">저자</div>
+              <div class="bg-item-val">『사피엔스』 『호모 데우스』의 저자. 거시 역사와 미래 담론을 결합하는 스타일.</div>
+            </div>
+            <div class="bg-item">
+              <div class="bg-item-key">전작 맥락</div>
+              <div class="bg-item-val">『호모 데우스』가 '인간이 신이 되려는 미래'였다면, 『넥서스』는 '그 신을 누가 통제하는가'의 책.</div>
+            </div>
+            <div class="bg-item">
+              <div class="bg-item-key">키워드</div>
+              <div class="bg-item-val">정보 네트워크 · 자기수정 메커니즘 · 알고리즘 권력</div>
+            </div>
+          </article>
+
+          <!-- 목표 설정 -->
+          <article class="goal-card">
+            <h3 class="section-title">이 책에서 무엇을 얻고 싶나요</h3>
+            <p class="goal-sub">AI가 추천한 목표를 골라보거나 직접 적어보세요</p>
+
+            <div class="goal-chips">
+              <button class="chip" data-chip>AI 시대의 정보 권력 이해</button>
+              <button class="chip" data-chip>업무에 적용할 통찰 3가지</button>
+              <button class="chip" data-chip>하라리의 핵심 논지 정리</button>
+              <button class="chip" data-chip>토론용 메모 만들기</button>
+              <button class="chip" data-chip>역사 흐름 한 줄 요약</button>
+            </div>
+
+            <label class="goal-input-wrap">
+              <span class="goal-input-label">나의 목표</span>
+              <textarea class="goal-input" placeholder="예: 알고리즘이 어떻게 권력이 되는지 설명할 수 있게 되기" rows="3"></textarea>
+            </label>
+
+            <button class="cta-primary" data-action="confirm-goal">목표 저장하고 읽기 시작</button>
+          </article>
+
+          <div class="scroll-bottom-pad"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>

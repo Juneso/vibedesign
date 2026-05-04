@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Code Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: #1e1e1e; /* VS Code dark background */
+      color: #d4d4d4;
+      font-family: 'Consolas', 'Courier New', monospace;
+      overflow: auto;
+    }
+    #loader {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      font-size: 14px;
+      color: #888;
+    }
+    pre {
+      margin: 0;
+      padding: 20px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    code {
+      font-family: 'Consolas', 'Courier New', monospace !important;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div id="loader">Loading file...</div>
+  <pre style="display:none;"><code id="code-block"></code></pre>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const fileUrl = params.get('file');
+
+    if (!fileUrl) {
+      document.getElementById('loader').innerText = 'No file specified.';
+    } else {
+      fetch(fileUrl)
+        .then(response => {
+          if (!response.ok) throw new Error('File not found');
+          return response.text();
+        })
+        .then(text => {
+          const codeBlock = document.getElementById('code-block');
+          codeBlock.textContent = text;
+          
+          let extension = fileUrl.split('.').pop().toLowerCase();
+          if (extension === 'js') extension = 'javascript';
+          
+          if (extension) {
+            codeBlock.className = `language-${extension}`;
+          }
+
+          document.getElementById('loader').style.display = 'none';
+          document.querySelector('pre').style.display = 'block';
+          hljs.highlightElement(codeBlock);
+        })
+        .catch(err => {
+          document.getElementById('loader').innerText = 'Error loading file: ' + err.message;
+        });
+    }
+  </script>
+</body>
+</html>

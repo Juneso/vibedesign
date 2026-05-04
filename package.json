@@ -1,0 +1,21 @@
+{
+  "name": "motion-canvas",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.2",
+    "tailwindcss": "^4.2.2",
+    "vite": "^8.0.2"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "jsdom": "^29.0.2",
+    "motion": "^12.38.0"
+  }
+}

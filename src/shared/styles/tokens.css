@@ -1,0 +1,969 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+@import "tailwindcss";
+
+:root {
+  /* 🎨 1. 글로벌 테마 변수 (라이트모드) */
+  --bg-color: #ffffff;
+  --surface-bg: #f5f5f5;
+  --card-bg: #ffffff;
+  --text-primary: #1a1a1a;
+  --text-secondary: #888d96;
+  --text-tertiary: #a0a0a0;
+  --card-border: #ebebeb;
+  --ai-card-shadow: 0px 2px 30px 0px rgba(46, 149, 218, 0.2), 0px 0px 100px 0px rgba(106, 218, 255, 0.2);
+  --accent-blue: #4263eb;
+  --icon-color: #26282b;
+  --icon-invert: #ECEEF3;
+  --dialer-bg: #ffffff;
+  --dialer-surface: #f8f9fa;
+  --toast-page-bg: #ffffff;
+  --icon-filter: none;
+  --btn-video-img: url('/assets/044193b46e9718bb044e9d6bc1b19cfeb5772bed.svg');
+  --btn-video-border: none;
+
+  /* 🧪 랩(Lab) 환경 전용 변수 (데스크톱 프리뷰용) */
+  --lab-bg: #0a0a0f;
+  --sidebar-bg: #111118;
+  --sidebar-w: 220px;
+
+  /* 모바일 안전 영역(Safe Area) 및 상단 여백 */
+  --safe-area-inset-top: 12px;
+  --content-gap-top: 0px;
+  --web-layout-shift: 50px;
+  --total-top-padding: calc(var(--safe-area-inset-top) + var(--content-gap-top));
+
+  /* 그라디언트 애니메이션 모션 소스 */
+  --toast-rotation-gradient: conic-gradient(from 180deg at 50% 50%, rgba(66, 201, 235, 0.7) 0%, rgba(0, 199, 116, 0.7) 33%, rgba(41, 181, 203, 0.7) 66%, rgba(66, 201, 235, 0.7) 100%);
+  --card-rotation-gradient: conic-gradient(from 180deg at 50% 50%, rgba(234, 249, 255, 1) 0deg, rgba(234, 249, 255, 1) 72deg, rgba(97, 207, 179, 1) 144deg, rgba(41, 181, 203, 1) 180deg, rgba(65, 144, 240, 1) 216deg, rgba(234, 249, 255, 1) 288deg, rgba(234, 249, 255, 1) 360deg);
+  --card-title-gradient: linear-gradient(90deg, #32446E 0%, #4778E9 50%, #29B5CB 100%);
+  --ai-top-gradient-bg: radial-gradient(74.91% 81.4% at 50% 79.63%, rgba(95, 209, 154, 0.00) 62.42%, rgba(94, 209, 155, 0.01) 66.96%, rgba(93, 207, 157, 0.03) 70.87%, rgba(90, 205, 160, 0.06) 74.22%, rgba(86, 203, 164, 0.11) 77.1%, rgba(82, 199, 169, 0.16) 79.58%, rgba(77, 196, 175, 0.23) 81.74%, rgba(72, 191, 181, 0.30) 83.66%, rgba(66, 187, 188, 0.37) 85.43%, rgba(60, 182, 196, 0.45) 87.12%, rgba(53, 178, 203, 0.53) 88.8%, rgba(47, 173, 210, 0.61) 90.57%, rgba(41, 168, 218, 0.69) 92.49%, rgba(35, 164, 225, 0.76) 94.65%, rgba(29, 159, 232, 0.83) 97.13%, rgba(24, 156, 238, 0.90) 100%);
+}
+
+body[data-theme="dark"] {
+  /* 🎨 2. 글로벌 테마 변수 (다크모드 오버라이드) */
+  --bg-color: #191A1C;
+  --surface-bg: #191A1C;
+  --card-bg: #191A1C;
+  --text-primary: #ECEEF3;
+  --text-secondary: rgba(236, 238, 243, 0.8);
+  --text-tertiary: rgba(236, 238, 243, 0.6);
+  --card-border: #3C3D41;
+  --ai-card-shadow: 0px 0px 30px 0px rgba(0, 0, 0, 0.5), 0px 2px 30px 0px rgba(38, 55, 85, 0.2), 0px 8px 100px 0px rgba(62, 143, 168, 0.2);
+  --accent-blue: #598AFB;
+  --icon-color: #ECEEF3;
+  --icon-invert: #26282b;
+  --dialer-bg: #121214;
+  --dialer-surface: #26282B;
+  --toast-page-bg: #1a1a1a;
+  --icon-filter: brightness(0) invert(1);
+  --btn-video-img: none;
+  --btn-video-border: 1px solid var(--card-border);
+
+  --card-title-gradient: linear-gradient(93deg, #ADCAFF 2.33%, #7DC2FF 54.77%, #2ECFBE 97.67%);
+  --toast-rotation-gradient: conic-gradient(from 180deg at 50% 50%, #4D6499 0%, #4D8699 33%, #3D6655 66%, #4D6499 100%);
+  --card-rotation-gradient: conic-gradient(from 180deg at 50% 50%, rgba(21, 53, 66, 0.60) 0deg, rgba(21, 53, 65, 0.60) 72deg, rgba(46, 103, 84, 0.60) 144deg, rgba(71, 101, 157, 0.60) 180deg, rgba(54, 136, 155, 0.60) 216deg, rgba(21, 53, 65, 0.60) 288deg, rgba(21, 53, 65, 0.60) 360deg);
+  --ai-top-gradient-bg: radial-gradient(74.91% 81.4% at 50% 79.63%, rgba(17, 217, 166, 0.00) 62.42%, rgba(17, 216, 166, 0.01) 66.99%, rgba(18, 214, 168, 0.03) 70.99%, rgba(20, 210, 170, 0.06) 74.48%, rgba(22, 204, 172, 0.11) 77.52%, rgba(25, 198, 175, 0.16) 80.17%, rgba(28, 191, 179, 0.23) 82.51%, rgba(32, 183, 183, 0.30) 84.6%, rgba(35, 174, 187, 0.37) 86.5%, rgba(39, 165, 191, 0.45) 88.28%, rgba(43, 156, 196, 0.53) 89.99%, rgba(47, 147, 200, 0.61) 91.72%, rgba(51, 138, 204, 0.69) 93.52%, rgba(55, 129, 209, 0.76) 95.46%, rgba(58, 121, 213, 0.83) 97.59%, rgba(61, 113, 216, 0.90) 100%);
+}
+
+/* 🍞 토스트 등장 모션의 회전 궤적 (Toast Rotation) */
+.ft-glow,
+.ft-border::before {
+  background: var(--toast-rotation-gradient) !important;
+  will-change: transform;
+}
+
+/* 📱 그라디언트 카드 모션의 회전 궤적 (Card Rotation) */
+.mcp-card::before,
+.mcp-card-glow::before {
+  background: var(--card-rotation-gradient) !important;
+  opacity: var(--card-rotation-opacity, 1) !important;
+}
+
+
+
+/* ════════════════════════════════════════════════════════════════
+   🎨 Figma Tokens
+   /colorupdate 스킬이 관리하는 영역. 수동 편집 금지 — 다음 동기화 시 덮어씌워짐.
+   토큰 추가/수정은 Figma에서 → /colorupdate 실행.
+   ════════════════════════════════════════════════════════════════ */
+
+/* @figma-tokens-start */
+:root {
+  /* onsurface-gray */
+  --fig-onsurface-gray-on-gray-100: #000000;
+  --fig-onsurface-gray-on-gray-70: #646A74;
+
+  /* onsurface-ocean */
+  --fig-onsurface-ocean-call-ocean-00: #1F4266;
+  --fig-onsurface-ocean-call-ocean-10: #0F67BF;
+  --fig-onsurface-ocean-call-ocean-100: #00C774;
+  --fig-onsurface-ocean-call-ocean-40: #4190F0;
+  --fig-onsurface-ocean-call-ocean-65: #42C9EB;
+  --fig-onsurface-ocean-call-ocean-70: #1AB0C8;
+  --fig-onsurface-ocean-call-ocean-80: #1AB0C8;
+  --fig-onsurface-ocean-call-ocean-90: #11D9A6;
+  --fig-onsurface-ocean-call-ocean-alpha-01: #4190F04D;
+  --fig-onsurface-ocean-call-ocean-alpha-02: #4190F026;
+  --fig-onsurface-ocean-call-ocean-alpha-03: #4190F000;
+  --fig-onsurface-ocean-call-ocean-alpha-04: #EAF9FFB3;
+  --fig-onsurface-ocean-call-ocean-alpha-05: #61CFB3B3;
+  --fig-onsurface-ocean-call-ocean-alpha-06: #29B5CBB3;
+  --fig-onsurface-ocean-call-ocean-alpha-07: #4190F0B3;
+  --fig-onsurface-ocean-call-ocean-alpha-08: #42C9EBB2;
+  --fig-onsurface-ocean-call-ocean-alpha-09: #00C774B3;
+  --fig-onsurface-ocean-call-ocean-alpha-10: #29B5CBB3;
+  --fig-onsurface-ocean-call-ocean-alpha-11: #2E95DA33;
+  --fig-onsurface-ocean-call-ocean-alpha-12: #6ADAFF33;
+  --fig-onsurface-ocean-call-ocean-alpha-13: #25DDFF33;
+  --fig-onsurface-ocean-call-ocean-alpha-14: #0098E04D;
+  --fig-onsurface-ocean-call-ocean-alpha-15: #309EF2;
+  --fig-onsurface-ocean-call-ocean-alpha-16: #1BCAB6;
+  --fig-onsurface-ocean-call-ocean-alpha-17: #6ADAFF33;
+
+  /* onsurface-universal */
+  --fig-onsurface-universal-call-call-on-universal-green: #00C774;
+
+  /* primitives-ocean */
+  --fig-primitives-ocean-call-call-ocean-00: #1F4266;
+  --fig-primitives-ocean-call-call-ocean-01: #4D6499;
+  --fig-primitives-ocean-call-call-ocean-02: #4D8699;
+  --fig-primitives-ocean-call-call-ocean-03: #3D6655;
+  --fig-primitives-ocean-call-call-ocean-10: #0F67BF;
+  --fig-primitives-ocean-call-call-ocean-100: #00C774;
+  --fig-primitives-ocean-call-call-ocean-20: #8CC0FF;
+  --fig-primitives-ocean-call-call-ocean-30: #B2C9FF;
+  --fig-primitives-ocean-call-call-ocean-40: #4190F0;
+  --fig-primitives-ocean-call-call-ocean-50: #73B2FA;
+  --fig-primitives-ocean-call-call-ocean-55: #309EF2;
+  --fig-primitives-ocean-call-call-ocean-60: #3EACFB;
+  --fig-primitives-ocean-call-call-ocean-65: #42C9EB;
+  --fig-primitives-ocean-call-call-ocean-70: #1AB0C8;
+  --fig-primitives-ocean-call-call-ocean-80: #66CCBE;
+  --fig-primitives-ocean-call-call-ocean-90: #11D9A6;
+  --fig-primitives-ocean-call-call-ocean-95-x: #28B887;
+
+  /* surface-black */
+  --fig-surface-black-call-call-surface-black-50: #00000000;
+
+  /* surface-opal */
+  --fig-surface-opal-call-call-surface-opal-04: #0000000A;
+  --fig-surface-opal-call-call-surface-opal-100: #FFFFFF;
+  --fig-surface-opal-call-call-surface-opal-60: #FFFFFF99;
+  --fig-surface-opal-call-call-surface-opal-70: #FFFFFFB2;
+  --fig-surface-opal-call-call-surface-opal-75: #FFFFFFB2;
+  --fig-surface-opal-call-call-surface-opal-98: #F2F6FA;
+
+  /* surface-white */
+  --fig-surface-white-call-call-surface-white-00: #FFFFFF00;
+  --fig-surface-white-call-call-surface-white-30: #FFFFFF4D;
+
+  /* transparent-ocean */
+  --fig-transparent-ocean-call-call-ocean-alpha-01: #4190F04D;
+  --fig-transparent-ocean-call-call-ocean-alpha-03: #4190F000;
+  --fig-transparent-ocean-call-call-ocean-alpha-04: #EAF9FFB2;
+  --fig-transparent-ocean-call-call-ocean-alpha-05: #61CFB3B2;
+  --fig-transparent-ocean-call-call-ocean-alpha-06: #29B5CBB2;
+  --fig-transparent-ocean-call-call-ocean-alpha-07: #4190F0B2;
+  --fig-transparent-ocean-call-call-ocean-alpha-08: #15354299;
+  --fig-transparent-ocean-call-call-ocean-alpha-09: #2E675499;
+  --fig-transparent-ocean-call-call-ocean-alpha-10: #47659D99;
+  --fig-transparent-ocean-call-call-ocean-alpha-11: #36889B99;
+  --fig-transparent-ocean-call-call-ocean-alpha-12: #2E95DA33;
+  --fig-transparent-ocean-call-call-ocean-alpha-13: #6ADAFF33;
+  --fig-transparent-ocean-call-call-ocean-alpha-14: #26375533;
+  --fig-transparent-ocean-call-call-ocean-alpha-15: #3E8FA833;
+  --fig-transparent-ocean-call-call-ocean-alpha-16: #42C9EBB2;
+  --fig-transparent-ocean-call-call-ocean-alpha-17: #00C774B2;
+  --fig-transparent-ocean-call-call-ocean-alpha-18: #25DDFF33;
+  --fig-transparent-ocean-call-call-ocean-alpha-19: #0098E04D;
+  --fig-transparent-ocean-call-call-ocean-alpha-20: #427CCD4D;
+  --fig-transparent-ocean-call-call-ocean-alpha-21: #0091AB33;
+  --fig-transparent-ocean-call-call-ocean-alpha-22: #73ADFFCC;
+  --fig-transparent-ocean-call-call-ocean-alpha-23: #29CCB6CC;
+  --fig-transparent-ocean-call-call-ocean-alpha-24: #6ADAFF14;
+  /* primitives-blue */
+  --fig-primitives-blue-60: #598AFB;
+  --fig-primitives-blue-70: #4778E9;
+  --fig-primitives-blue-80: #4372E0;
+  --fig-primitives-blue-90: #356AE3;
+
+  /* primitives-gray */
+  --fig-primitives-gray-0-white: #FFFFFF;
+  --fig-primitives-gray-05: #F4F6F9;
+  --fig-primitives-gray-10: #F2F3F8;
+  --fig-primitives-gray-100-black: #121214;
+  --fig-primitives-gray-15: #ECEEF3;
+  --fig-primitives-gray-20: #E2E7F0;
+  --fig-primitives-gray-25: #D3DBE5;
+  --fig-primitives-gray-40: #CED1D9;
+  --fig-primitives-gray-60: #81889C;
+  --fig-primitives-gray-70: #646A74;
+  --fig-primitives-gray-80: #4A4D53;
+  --fig-primitives-gray-85: #3C3D41;
+  --fig-primitives-gray-90: #26282B;
+  --fig-primitives-gray-95: #191A1C;
+  --fig-primitives-gray-call-call-gray-02: #F5F7FA;
+  --fig-primitives-gray-call-call-gray-03: #F2F6FA;
+  --fig-primitives-gray-call-call-gray-16: #E9EBF0;
+  --fig-primitives-gray-call-call-gray-75: #202124;
+
+  /* primitives-green */
+  --fig-primitives-green-call-call-green-70: #00C774;
+  --fig-primitives-green-call-call-green-80: #00A865;
+
+  /* primitives-red */
+  --fig-primitives-red-70: #FA5252;
+  --fig-primitives-red-80: #F03E3E;
+  --fig-primitives-red-call-call-red-100: #2D1616;
+  --fig-primitives-red-call-call-red-90: #601919;
+  --fig-primitives-red-call-call-red-95: #401F20;
+
+  /* transparent-black */
+  --fig-transparent-black-call-call-black-05pct: #0000000D;
+  --fig-transparent-black-call-call-black-08pct: #00000014;
+  --fig-transparent-black-call-call-black-0pct: #00000000;
+
+  /* transparent-blue */
+  --fig-transparent-blue-call-call-blue-09pct: #B2CAFF17;
+  --fig-transparent-blue-call-call-blue-10pct: #3370FF1A;
+
+  /* transparent-gray */
+  --fig-transparent-gray-call-call-gray-100-0pct: #12121400;
+  --fig-transparent-gray-call-call-gray-100-85pct: #121214D9;
+
+  /* transparent-green */
+  --fig-transparent-green-call-call-green-20pct: #00FF3C40;
+  --fig-transparent-green-call-call-green-35pct: #00CC7059;
+  --fig-transparent-green-call-call-green-50pct: #00E63C80;
+  --fig-transparent-green-call-call-green-70pct: #00E578B3;
+
+  /* transparent-white */
+  --fig-transparent-white-call-call-white-04pct: #FFFFFF0A;
+  --fig-transparent-white-call-call-white-06pct: #FFFFFF0F;
+  --fig-transparent-white-call-call-white-08pct: #FFFFFF14;
+  --fig-transparent-white-call-call-white-0pct: #FFFFFF00;
+
+  /* onsurface-accent */
+  --fig-onsurface-accent-call-call-on-accent-green: #00A865;
+  --fig-onsurface-accent-call-on-accent-red: #F03E3E;
+
+  /* onsurface-gray */
+  --fig-onsurface-gray-call-call-on-gray-00: #FFFFFF;
+  --fig-onsurface-gray-on-gray-30: #BFC4CC;
+  --fig-onsurface-gray-on-gray-40: #A3A6B0;
+  --fig-onsurface-gray-on-gray-90-base: #2E3034;
+
+  /* onsurface-point */
+  --fig-onsurface-point-on-point-70-base: #4778E9;
+  --fig-onsurface-point-on-point-90: #356AE3;
+
+  /* onsurface-universal */
+  --fig-onsurface-universal-call-call-on-universal-gray-00: #FFFFFF;
+  --fig-onsurface-universal-call-call-on-universal-gray-05: #F4F6F9;
+  --fig-onsurface-universal-call-call-on-universal-gray-100: #121214;
+  --fig-onsurface-universal-call-call-on-universal-gray-100-85pct: #121214D9;
+  --fig-onsurface-universal-call-call-on-universal-gray-70: #646A74;
+  --fig-onsurface-universal-call-call-on-universal-gray-75: #202124;
+  --fig-onsurface-universal-call-call-on-universal-gray-90: #26282B;
+  --fig-onsurface-universal-call-call-on-universal-red-100: #2D1616;
+  --fig-onsurface-universal-call-call-on-universal-red-90: #601919;
+  --fig-onsurface-universal-call-call-on-universal-red-95: #401F20;
+  --fig-onsurface-universal-on-universal-gray-00-base: #FFFFFF;
+  --fig-onsurface-universal-on-universal-gray-20: #E2E7F0;
+  --fig-onsurface-universal-on-universal-gray-85: #3C3D41;
+
+  /* surface-background */
+  --fig-surface-background-gradient-call-call-surface-bgalpha-gray-100-0pct: #12121400;
+  --fig-surface-background-gradient-call-call-surface-bgalpha-gray-100-100pct: #121214;
+
+  /* surface-black */
+  --fig-surface-black-call-call-surface-black-05: #00000008;
+  --fig-surface-black-call-call-surface-black-08: #00000014;
+
+  /* surface-blue */
+  --fig-surface-blue-call-call-surface-blue-10: #3370FF1A;
+
+  /* surface-dim */
+  --fig-surface-dim-screendim-call-call-surface-screendim-85pct: #FFFFFFD9;
+
+  /* surface-gray */
+  --fig-surface-gray-call-call-surface-gray-00: #FFFFFF;
+  --fig-surface-gray-call-call-surface-gray-01: #FFFFFF;
+  --fig-surface-gray-call-call-surface-gray-02: #F5F7FA;
+  --fig-surface-gray-call-call-surface-gray-03: #F2F6FA;
+  --fig-surface-gray-call-call-surface-gray-05: #F4F6F9;
+  --fig-surface-gray-call-call-surface-gray-16: #E9EBF0;
+  --fig-surface-gray-call-call-surface-gray-20: #E2E7F0;
+  --fig-surface-gray-call-call-surface-gray-80: #4A4D53;
+  --fig-surface-gray-surface-gray-05: #F4F6F9;
+  --fig-surface-gray-surface-gray-10: #F2F3F8;
+
+  /* surface-green */
+  --fig-surface-green-call-call-surface-green-20: #00FF3C40;
+  --fig-surface-green-call-call-surface-green-50: #00E63C80;
+
+  /* buttons-fill (3뎁스 alias) */
+  --fig-buttons-fill-secondary-sub-surface-call-enabled: var(--fig-surface-gray-surface-gray-05);
+  --fig-buttons-fill-secondary-sub-surface-call-pressed: var(--fig-surface-gray-surface-gray-10);
+  --fig-buttons-fill-secondary-sub-surface-call-disabled: var(--fig-surface-gray-surface-gray-05);
+  --fig-buttons-fill-secondary-sub-label-call-enabled: var(--fig-onsurface-gray-on-gray-70);
+  --fig-buttons-fill-secondary-sub-label-call-pressed: var(--fig-onsurface-gray-on-gray-90);
+  --fig-buttons-fill-secondary-sub-label-call-disabled: var(--fig-onsurface-gray-on-gray-40);
+  --fig-buttons-fill-negative-surface-call-enabled: var(--fig-surface-gray-surface-gray-05);
+  --fig-buttons-fill-negative-surface-call-pressed: var(--fig-surface-gray-surface-gray-10);
+  --fig-buttons-fill-negative-surface-call-disabled: var(--fig-surface-gray-surface-gray-05);
+  --fig-buttons-fill-negative-label-call-enabled: var(--fig-onsurface-accent-call-on-accent-red);
+  --fig-buttons-fill-negative-label-call-pressed: var(--fig-onsurface-universal-on-universal-gray-20);
+  --fig-buttons-fill-negative-label-call-disabled: var(--fig-onsurface-gray-on-gray-40);
+  --fig-buttons-fill-primary-surface-call-enabled: var(--fig-onsurface-point-on-point-70-base);
+  --fig-buttons-fill-primary-surface-call-pressed: var(--fig-onsurface-point-on-point-90);
+  --fig-buttons-fill-primary-surface-call-disabled: var(--fig-onsurface-universal-call-call-on-universal-gray-75);
+  --fig-buttons-fill-primary-label-call-enabled: var(--fig-onsurface-universal-on-universal-gray-00-base);
+  --fig-buttons-fill-primary-label-call-pressed: var(--fig-onsurface-universal-on-universal-gray-20);
+  --fig-buttons-fill-primary-label-call-disabled: var(--fig-onsurface-universal-on-universal-gray-85);
+  --fig-buttons-fill-positive-surface-call-enabled: var(--fig-onsurface-ocean-call-ocean-alpha-05);
+  --fig-buttons-fill-positive-surface-call-pressed: var(--fig-onsurface-ocean-call-ocean-alpha-04);
+  --fig-buttons-fill-positive-surface-call-disabled: var(--fig-surface-gray-surface-gray-05);
+  --fig-buttons-fill-positive-label-call-enabled: var(--fig-buttons-fill-primary-surface-call-enabled);
+  --fig-buttons-fill-positive-label-call-pressed: var(--fig-buttons-fill-primary-surface-call-enabled);
+  --fig-buttons-fill-positive-label-call-disabled: var(--fig-onsurface-gray-on-gray-40);
+
+  /* selectioncontrols-point (3뎁스 alias) */
+  --fig-selectioncontrols-point-surface-call-enabled: var(--fig-onsurface-universal-call-call-on-universal-gray-70);
+  --fig-selectioncontrols-point-surface-call-selected: var(--fig-surface-surface-blue-70);
+  --fig-selectioncontrols-point-surface-call-disabled: var(--fig-onsurface-universal-call-call-on-universal-gray-75);
+  --fig-selectioncontrols-point-label-call-enabled: var(--fig-onsurface-universal-on-universal-gray-00-base);
+  --fig-selectioncontrols-point-label-call-selected: var(--fig-onsurface-universal-on-universal-gray-00-base);
+  --fig-selectioncontrols-point-label-call-disabled: var(--fig-onsurface-universal-on-universal-gray-85);
+
+  /* sliders-knob (3뎁스 alias) */
+  --fig-sliders-knob-enabled: var(--fig-onsurface-universal-on-universal-gray-00-base);
+  --fig-sliders-knob-disabled: var(--fig-onsurface-gray-on-gray-30);
+}
+body[data-theme="dark"] {
+  /* 🎨 2. 글로벌 테마 변수 (다크모드 오버라이드) */
+  --bg-color: #191A1C;
+  --surface-bg: #191A1C;
+  --card-bg: #191A1C;
+  --text-primary: #ECEEF3;
+  --text-secondary: rgba(236, 238, 243, 0.8);
+  --text-tertiary: rgba(236, 238, 243, 0.6);
+  --card-border: #3C3D41;
+  --ai-card-shadow: 0px 0px 30px 0px rgba(0, 0, 0, 0.5), 0px 2px 30px 0px rgba(38, 55, 85, 0.2), 0px 8px 100px 0px rgba(62, 143, 168, 0.2);
+  --accent-blue: #598AFB;
+  --icon-color: #ECEEF3;
+  --icon-invert: #26282b;
+  --dialer-bg: #121214;
+  --dialer-surface: #26282B;
+  --toast-page-bg: #1a1a1a;
+  --icon-filter: brightness(0) invert(1);
+  --btn-video-img: none;
+  --btn-video-border: 1px solid var(--card-border);
+
+  --card-title-gradient: linear-gradient(93deg, #ADCAFF 2.33%, #7DC2FF 54.77%, #2ECFBE 97.67%);
+  --toast-rotation-gradient: conic-gradient(from 180deg at 50% 50%, #4D6499 0%, #4D8699 33%, #3D6655 66%, #4D6499 100%);
+  --card-rotation-gradient: conic-gradient(from 180deg at 50% 50%, rgba(21, 53, 66, 0.60) 0deg, rgba(21, 53, 65, 0.60) 72deg, rgba(46, 103, 84, 0.60) 144deg, rgba(71, 101, 157, 0.60) 180deg, rgba(54, 136, 155, 0.60) 216deg, rgba(21, 53, 65, 0.60) 288deg, rgba(21, 53, 65, 0.60) 360deg);
+  --ai-top-gradient-bg: radial-gradient(74.91% 81.4% at 50% 79.63%, rgba(17, 217, 166, 0.00) 62.42%, rgba(17, 216, 166, 0.01) 66.99%, rgba(18, 214, 168, 0.03) 70.99%, rgba(20, 210, 170, 0.06) 74.48%, rgba(22, 204, 172, 0.11) 77.52%, rgba(25, 198, 175, 0.16) 80.17%, rgba(28, 191, 179, 0.23) 82.51%, rgba(32, 183, 183, 0.30) 84.6%, rgba(35, 174, 187, 0.37) 86.5%, rgba(39, 165, 191, 0.45) 88.28%, rgba(43, 156, 196, 0.53) 89.99%, rgba(47, 147, 200, 0.61) 91.72%, rgba(51, 138, 204, 0.69) 93.52%, rgba(55, 129, 209, 0.76) 95.46%, rgba(58, 121, 213, 0.83) 97.59%, rgba(61, 113, 216, 0.90) 100%);
+}
+
+/* 🍞 토스트 등장 모션의 회전 궤적 (Toast Rotation) */
+.ft-glow,
+.ft-border::before {
+  background: var(--toast-rotation-gradient) !important;
+  will-change: transform;
+}
+
+/* 📱 그라디언트 카드 모션의 회전 궤적 (Card Rotation) */
+.mcp-card::before,
+.mcp-card-glow::before {
+  background: var(--card-rotation-gradient) !important;
+  opacity: var(--card-rotation-opacity, 1) !important;
+}
+
+
+
+/* ════════════════════════════════════════════════════════════════
+   🎨 Figma Tokens
+   /colorupdate 스킬이 관리하는 영역. 수동 편집 금지 — 다음 동기화 시 덮어씌워짐.
+   토큰 추가/수정은 Figma에서 → /colorupdate 실행.
+   ════════════════════════════════════════════════════════════════ */
+
+/* @figma-tokens-start */
+:root {
+  /* onsurface-gray */
+  --fig-onsurface-gray-on-gray-100: #000000;
+  --fig-onsurface-gray-on-gray-70: #646A74;
+
+  /* onsurface-ocean */
+  --fig-onsurface-ocean-call-ocean-00: #1F4266;
+  --fig-onsurface-ocean-call-ocean-10: #0F67BF;
+  --fig-onsurface-ocean-call-ocean-100: #00C774;
+  --fig-onsurface-ocean-call-ocean-40: #4190F0;
+  --fig-onsurface-ocean-call-ocean-65: #42C9EB;
+  --fig-onsurface-ocean-call-ocean-70: #1AB0C8;
+  --fig-onsurface-ocean-call-ocean-80: #1AB0C8;
+  --fig-onsurface-ocean-call-ocean-90: #11D9A6;
+  --fig-onsurface-ocean-call-ocean-alpha-01: #4190F04D;
+  --fig-onsurface-ocean-call-ocean-alpha-02: #4190F026;
+  --fig-onsurface-ocean-call-ocean-alpha-03: #4190F000;
+  --fig-onsurface-ocean-call-ocean-alpha-04: #EAF9FFB3;
+  --fig-onsurface-ocean-call-ocean-alpha-05: #61CFB3B3;
+  --fig-onsurface-ocean-call-ocean-alpha-06: #29B5CBB3;
+  --fig-onsurface-ocean-call-ocean-alpha-07: #4190F0B3;
+  --fig-onsurface-ocean-call-ocean-alpha-08: #42C9EBB2;
+  --fig-onsurface-ocean-call-ocean-alpha-09: #00C774B3;
+  --fig-onsurface-ocean-call-ocean-alpha-10: #29B5CBB3;
+  --fig-onsurface-ocean-call-ocean-alpha-11: #2E95DA33;
+  --fig-onsurface-ocean-call-ocean-alpha-12: #6ADAFF33;
+  --fig-onsurface-ocean-call-ocean-alpha-13: #25DDFF33;
+  --fig-onsurface-ocean-call-ocean-alpha-14: #0098E04D;
+  --fig-onsurface-ocean-call-ocean-alpha-15: #309EF2;
+  --fig-onsurface-ocean-call-ocean-alpha-16: #1BCAB6;
+  --fig-onsurface-ocean-call-ocean-alpha-17: #6ADAFF33;
+
+  /* onsurface-universal */
+  --fig-onsurface-universal-call-call-on-universal-green: #00C774;
+
+  /* primitives-ocean */
+  --fig-primitives-ocean-call-call-ocean-00: #1F4266;
+  --fig-primitives-ocean-call-call-ocean-01: #4D6499;
+  --fig-primitives-ocean-call-call-ocean-02: #4D8699;
+  --fig-primitives-ocean-call-call-ocean-03: #3D6655;
+  --fig-primitives-ocean-call-call-ocean-10: #0F67BF;
+  --fig-primitives-ocean-call-call-ocean-100: #00C774;
+  --fig-primitives-ocean-call-call-ocean-20: #8CC0FF;
+  --fig-primitives-ocean-call-call-ocean-30: #B2C9FF;
+  --fig-primitives-ocean-call-call-ocean-40: #4190F0;
+  --fig-primitives-ocean-call-call-ocean-50: #73B2FA;
+  --fig-primitives-ocean-call-call-ocean-55: #309EF2;
+  --fig-primitives-ocean-call-call-ocean-60: #3EACFB;
+  --fig-primitives-ocean-call-call-ocean-65: #42C9EB;
+  --fig-primitives-ocean-call-call-ocean-70: #1AB0C8;
+  --fig-primitives-ocean-call-call-ocean-80: #66CCBE;
+  --fig-primitives-ocean-call-call-ocean-90: #11D9A6;
+  --fig-primitives-ocean-call-call-ocean-95-x: #28B887;
+
+  /* surface-black */
+  --fig-surface-black-call-call-surface-black-50: #00000000;
+
+  /* surface-opal */
+  --fig-surface-opal-call-call-surface-opal-04: #0000000A;
+  --fig-surface-opal-call-call-surface-opal-100: #FFFFFF;
+  --fig-surface-opal-call-call-surface-opal-60: #FFFFFF99;
+  --fig-surface-opal-call-call-surface-opal-70: #FFFFFFB2;
+  --fig-surface-opal-call-call-surface-opal-75: #FFFFFFB2;
+  --fig-surface-opal-call-call-surface-opal-98: #F2F6FA;
+
+  /* surface-white */
+  --fig-surface-white-call-call-surface-white-00: #FFFFFF00;
+  --fig-surface-white-call-call-surface-white-30: #FFFFFF4D;
+
+  /* transparent-ocean */
+  --fig-transparent-ocean-call-call-ocean-alpha-01: #4190F04D;
+  --fig-transparent-ocean-call-call-ocean-alpha-03: #4190F000;
+  --fig-transparent-ocean-call-call-ocean-alpha-04: #EAF9FFB2;
+  --fig-transparent-ocean-call-call-ocean-alpha-05: #61CFB3B2;
+  --fig-transparent-ocean-call-call-ocean-alpha-06: #29B5CBB2;
+  --fig-transparent-ocean-call-call-ocean-alpha-07: #4190F0B2;
+  --fig-transparent-ocean-call-call-ocean-alpha-08: #15354299;
+  --fig-transparent-ocean-call-call-ocean-alpha-09: #2E675499;
+  --fig-transparent-ocean-call-call-ocean-alpha-10: #47659D99;
+  --fig-transparent-ocean-call-call-ocean-alpha-11: #36889B99;
+  --fig-transparent-ocean-call-call-ocean-alpha-12: #2E95DA33;
+  --fig-transparent-ocean-call-call-ocean-alpha-13: #6ADAFF33;
+  --fig-transparent-ocean-call-call-ocean-alpha-14: #26375533;
+  --fig-transparent-ocean-call-call-ocean-alpha-15: #3E8FA833;
+  --fig-transparent-ocean-call-call-ocean-alpha-16: #42C9EBB2;
+  --fig-transparent-ocean-call-call-ocean-alpha-17: #00C774B2;
+  --fig-transparent-ocean-call-call-ocean-alpha-18: #25DDFF33;
+  --fig-transparent-ocean-call-call-ocean-alpha-19: #0098E04D;
+  --fig-transparent-ocean-call-call-ocean-alpha-20: #427CCD4D;
+  --fig-transparent-ocean-call-call-ocean-alpha-21: #0091AB33;
+  --fig-transparent-ocean-call-call-ocean-alpha-22: #73ADFFCC;
+  --fig-transparent-ocean-call-call-ocean-alpha-23: #29CCB6CC;
+  --fig-transparent-ocean-call-call-ocean-alpha-24: #6ADAFF14;
+  /* primitives-blue */
+  --fig-primitives-blue-60: #598AFB;
+  --fig-primitives-blue-70: #4778E9;
+  --fig-primitives-blue-80: #4372E0;
+  --fig-primitives-blue-90: #356AE3;
+
+  /* primitives-gray */
+  --fig-primitives-gray-0-white: #FFFFFF;
+  --fig-primitives-gray-05: #F4F6F9;
+  --fig-primitives-gray-10: #F2F3F8;
+  --fig-primitives-gray-100-black: #121214;
+  --fig-primitives-gray-15: #ECEEF3;
+  --fig-primitives-gray-20: #E2E7F0;
+  --fig-primitives-gray-25: #D3DBE5;
+  --fig-primitives-gray-40: #CED1D9;
+  --fig-primitives-gray-60: #81889C;
+  --fig-primitives-gray-70: #646A74;
+  --fig-primitives-gray-80: #4A4D53;
+  --fig-primitives-gray-85: #3C3D41;
+  --fig-primitives-gray-90: #26282B;
+  --fig-primitives-gray-95: #191A1C;
+  --fig-primitives-gray-call-call-gray-02: #F5F7FA;
+  --fig-primitives-gray-call-call-gray-03: #F2F6FA;
+  --fig-primitives-gray-call-call-gray-16: #E9EBF0;
+  --fig-primitives-gray-call-call-gray-75: #202124;
+
+  /* primitives-green */
+  --fig-primitives-green-call-call-green-70: #00C774;
+  --fig-primitives-green-call-call-green-80: #00A865;
+
+  /* primitives-red */
+  --fig-primitives-red-70: #FA5252;
+  --fig-primitives-red-80: #F03E3E;
+  --fig-primitives-red-call-call-red-100: #2D1616;
+  --fig-primitives-red-call-call-red-90: #601919;
+  --fig-primitives-red-call-call-red-95: #401F20;
+
+  /* transparent-black */
+  --fig-transparent-black-call-call-black-05pct: #0000000D;
+  --fig-transparent-black-call-call-black-08pct: #00000014;
+  --fig-transparent-black-call-call-black-0pct: #00000000;
+
+  /* transparent-blue */
+  --fig-transparent-blue-call-call-blue-09pct: #B2CAFF17;
+  --fig-transparent-blue-call-call-blue-10pct: #3370FF1A;
+
+  /* transparent-gray */
+  --fig-transparent-gray-call-call-gray-100-0pct: #12121400;
+  --fig-transparent-gray-call-call-gray-100-85pct: #121214D9;
+
+  /* transparent-green */
+  --fig-transparent-green-call-call-green-20pct: #00FF3C40;
+  --fig-transparent-green-call-call-green-35pct: #00CC7059;
+  --fig-transparent-green-call-call-green-50pct: #00E63C80;
+  --fig-transparent-green-call-call-green-70pct: #00E578B3;
+
+  /* transparent-white */
+  --fig-transparent-white-call-call-white-04pct: #FFFFFF0A;
+  --fig-transparent-white-call-call-white-06pct: #FFFFFF0F;
+  --fig-transparent-white-call-call-white-08pct: #FFFFFF14;
+  --fig-transparent-white-call-call-white-0pct: #FFFFFF00;
+
+  /* onsurface-accent */
+  --fig-onsurface-accent-call-call-on-accent-green: #00A865;
+  --fig-onsurface-accent-call-on-accent-red: #F03E3E;
+
+  /* onsurface-gray */
+  --fig-onsurface-gray-call-call-on-gray-00: #FFFFFF;
+  --fig-onsurface-gray-on-gray-30: #BFC4CC;
+  --fig-onsurface-gray-on-gray-40: #A3A6B0;
+  --fig-onsurface-gray-on-gray-90-base: #2E3034;
+
+  /* onsurface-point */
+  --fig-onsurface-point-on-point-70-base: #4778E9;
+  --fig-onsurface-point-on-point-90: #356AE3;
+
+  /* onsurface-universal */
+  --fig-onsurface-universal-call-call-on-universal-gray-00: #FFFFFF;
+  --fig-onsurface-universal-call-call-on-universal-gray-05: #F4F6F9;
+  --fig-onsurface-universal-call-call-on-universal-gray-100: #121214;
+  --fig-onsurface-universal-call-call-on-universal-gray-100-85pct: #121214D9;
+  --fig-onsurface-universal-call-call-on-universal-gray-70: #646A74;
+  --fig-onsurface-universal-call-call-on-universal-gray-75: #202124;
+  --fig-onsurface-universal-call-call-on-universal-gray-90: #26282B;
+  --fig-onsurface-universal-call-call-on-universal-red-100: #2D1616;
+  --fig-onsurface-universal-call-call-on-universal-red-90: #601919;
+  --fig-onsurface-universal-call-call-on-universal-red-95: #401F20;
+  --fig-onsurface-universal-on-universal-gray-00-base: #FFFFFF;
+  --fig-onsurface-universal-on-universal-gray-20: #E2E7F0;
+  --fig-onsurface-universal-on-universal-gray-85: #3C3D41;
+
+  /* surface-background */
+  --fig-surface-background-gradient-call-call-surface-bgalpha-gray-100-0pct: #12121400;
+  --fig-surface-background-gradient-call-call-surface-bgalpha-gray-100-100pct: #121214;
+
+  /* surface-black */
+  --fig-surface-black-call-call-surface-black-05: #00000008;
+  --fig-surface-black-call-call-surface-black-08: #00000014;
+
+  /* surface-blue */
+  --fig-surface-blue-call-call-surface-blue-10: #3370FF1A;
+
+  /* surface-dim */
+  --fig-surface-dim-screendim-call-call-surface-screendim-85pct: #FFFFFFD9;
+
+  /* surface-gray */
+  --fig-surface-gray-call-call-surface-gray-00: #FFFFFF;
+  --fig-surface-gray-call-call-surface-gray-01: #FFFFFF;
+  --fig-surface-gray-call-call-surface-gray-02: #F5F7FA;
+  --fig-surface-gray-call-call-surface-gray-03: #F2F6FA;
+  --fig-surface-gray-call-call-surface-gray-05: #F4F6F9;
+  --fig-surface-gray-call-call-surface-gray-16: #E9EBF0;
+  --fig-surface-gray-call-call-surface-gray-20: #E2E7F0;
+  --fig-surface-gray-call-call-surface-gray-80: #4A4D53;
+  --fig-surface-gray-surface-gray-05: #F4F6F9;
+  --fig-surface-gray-surface-gray-10: #F2F3F8;
+
+  /* surface-green */
+  --fig-surface-green-call-call-surface-green-20: #00FF3C40;
+  --fig-surface-green-call-call-surface-green-50: #00E63C80;
+}
+body[data-theme="dark"] {
+  /* 🎨 2. 글로벌 테마 변수 (다크모드 오버라이드) */
+  --bg-color: #191A1C;
+  --surface-bg: #191A1C;
+  --card-bg: #191A1C;
+  --text-primary: #ECEEF3;
+  --text-secondary: rgba(236, 238, 243, 0.8);
+  --text-tertiary: rgba(236, 238, 243, 0.6);
+  --card-border: #3C3D41;
+  --ai-card-shadow: 0px 0px 30px 0px rgba(0, 0, 0, 0.5), 0px 2px 30px 0px rgba(38, 55, 85, 0.2), 0px 8px 100px 0px rgba(62, 143, 168, 0.2);
+  --accent-blue: #598AFB;
+  --icon-color: #ECEEF3;
+  --icon-invert: #26282b;
+  --dialer-bg: #121214;
+  --dialer-surface: #26282B;
+  --toast-page-bg: #1a1a1a;
+  --icon-filter: brightness(0) invert(1);
+  --btn-video-img: none;
+  --btn-video-border: 1px solid var(--card-border);
+
+  --card-title-gradient: linear-gradient(93deg, #ADCAFF 2.33%, #7DC2FF 54.77%, #2ECFBE 97.67%);
+  --toast-rotation-gradient: conic-gradient(from 180deg at 50% 50%, #4D6499 0%, #4D8699 33%, #3D6655 66%, #4D6499 100%);
+  --card-rotation-gradient: conic-gradient(from 180deg at 50% 50%, rgba(21, 53, 66, 0.60) 0deg, rgba(21, 53, 65, 0.60) 72deg, rgba(46, 103, 84, 0.60) 144deg, rgba(71, 101, 157, 0.60) 180deg, rgba(54, 136, 155, 0.60) 216deg, rgba(21, 53, 65, 0.60) 288deg, rgba(21, 53, 65, 0.60) 360deg);
+  --ai-top-gradient-bg: radial-gradient(74.91% 81.4% at 50% 79.63%, rgba(17, 217, 166, 0.00) 62.42%, rgba(17, 216, 166, 0.01) 66.99%, rgba(18, 214, 168, 0.03) 70.99%, rgba(20, 210, 170, 0.06) 74.48%, rgba(22, 204, 172, 0.11) 77.52%, rgba(25, 198, 175, 0.16) 80.17%, rgba(28, 191, 179, 0.23) 82.51%, rgba(32, 183, 183, 0.30) 84.6%, rgba(35, 174, 187, 0.37) 86.5%, rgba(39, 165, 191, 0.45) 88.28%, rgba(43, 156, 196, 0.53) 89.99%, rgba(47, 147, 200, 0.61) 91.72%, rgba(51, 138, 204, 0.69) 93.52%, rgba(55, 129, 209, 0.76) 95.46%, rgba(58, 121, 213, 0.83) 97.59%, rgba(61, 113, 216, 0.90) 100%);
+}
+
+/* 🍞 토스트 등장 모션의 회전 궤적 (Toast Rotation) */
+.ft-glow,
+.ft-border::before {
+  background: var(--toast-rotation-gradient) !important;
+  will-change: transform;
+}
+
+/* 📱 그라디언트 카드 모션의 회전 궤적 (Card Rotation) */
+.mcp-card::before,
+.mcp-card-glow::before {
+  background: var(--card-rotation-gradient) !important;
+  opacity: var(--card-rotation-opacity, 1) !important;
+}
+
+
+
+/* ════════════════════════════════════════════════════════════════
+   🎨 Figma Tokens
+   /colorupdate 스킬이 관리하는 영역. 수동 편집 금지 — 다음 동기화 시 덮어씌워짐.
+   토큰 추가/수정은 Figma에서 → /colorupdate 실행.
+   ════════════════════════════════════════════════════════════════ */
+
+/* @figma-tokens-start */
+:root {
+  /* onsurface-gray */
+  --fig-onsurface-gray-on-gray-100: #000000;
+  --fig-onsurface-gray-on-gray-70: #646A74;
+
+  /* onsurface-ocean */
+  --fig-onsurface-ocean-call-ocean-00: #1F4266;
+  --fig-onsurface-ocean-call-ocean-10: #0F67BF;
+  --fig-onsurface-ocean-call-ocean-100: #00C774;
+  --fig-onsurface-ocean-call-ocean-40: #4190F0;
+  --fig-onsurface-ocean-call-ocean-65: #42C9EB;
+  --fig-onsurface-ocean-call-ocean-70: #1AB0C8;
+  --fig-onsurface-ocean-call-ocean-80: #1AB0C8;
+  --fig-onsurface-ocean-call-ocean-90: #11D9A6;
+  --fig-onsurface-ocean-call-ocean-alpha-01: #4190F04D;
+  --fig-onsurface-ocean-call-ocean-alpha-02: #4190F026;
+  --fig-onsurface-ocean-call-ocean-alpha-03: #4190F000;
+  --fig-onsurface-ocean-call-ocean-alpha-04: #EAF9FFB3;
+  --fig-onsurface-ocean-call-ocean-alpha-05: #61CFB3B3;
+  --fig-onsurface-ocean-call-ocean-alpha-06: #29B5CBB3;
+  --fig-onsurface-ocean-call-ocean-alpha-07: #4190F0B3;
+  --fig-onsurface-ocean-call-ocean-alpha-08: #42C9EBB2;
+  --fig-onsurface-ocean-call-ocean-alpha-09: #00C774B3;
+  --fig-onsurface-ocean-call-ocean-alpha-10: #29B5CBB3;
+  --fig-onsurface-ocean-call-ocean-alpha-11: #2E95DA33;
+  --fig-onsurface-ocean-call-ocean-alpha-12: #6ADAFF33;
+  --fig-onsurface-ocean-call-ocean-alpha-13: #25DDFF33;
+  --fig-onsurface-ocean-call-ocean-alpha-14: #0098E04D;
+  --fig-onsurface-ocean-call-ocean-alpha-15: #309EF2;
+  --fig-onsurface-ocean-call-ocean-alpha-16: #1BCAB6;
+  --fig-onsurface-ocean-call-ocean-alpha-17: #6ADAFF33;
+
+  /* onsurface-universal */
+  --fig-onsurface-universal-call-call-on-universal-green: #00C774;
+
+  /* primitives-ocean */
+  --fig-primitives-ocean-call-call-ocean-00: #1F4266;
+  --fig-primitives-ocean-call-call-ocean-01: #4D6499;
+  --fig-primitives-ocean-call-call-ocean-02: #4D8699;
+  --fig-primitives-ocean-call-call-ocean-03: #3D6655;
+  --fig-primitives-ocean-call-call-ocean-10: #0F67BF;
+  --fig-primitives-ocean-call-call-ocean-100: #00C774;
+  --fig-primitives-ocean-call-call-ocean-20: #8CC0FF;
+  --fig-primitives-ocean-call-call-ocean-30: #B2C9FF;
+  --fig-primitives-ocean-call-call-ocean-40: #4190F0;
+  --fig-primitives-ocean-call-call-ocean-50: #73B2FA;
+  --fig-primitives-ocean-call-call-ocean-55: #309EF2;
+  --fig-primitives-ocean-call-call-ocean-60: #3EACFB;
+  --fig-primitives-ocean-call-call-ocean-65: #42C9EB;
+  --fig-primitives-ocean-call-call-ocean-70: #1AB0C8;
+  --fig-primitives-ocean-call-call-ocean-80: #66CCBE;
+  --fig-primitives-ocean-call-call-ocean-90: #11D9A6;
+  --fig-primitives-ocean-call-call-ocean-95-x: #28B887;
+
+  /* surface-black */
+  --fig-surface-black-call-call-surface-black-50: #00000000;
+
+  /* surface-opal */
+  --fig-surface-opal-call-call-surface-opal-04: #0000000A;
+  --fig-surface-opal-call-call-surface-opal-100: #FFFFFF;
+  --fig-surface-opal-call-call-surface-opal-60: #FFFFFF99;
+  --fig-surface-opal-call-call-surface-opal-70: #FFFFFFB2;
+  --fig-surface-opal-call-call-surface-opal-75: #FFFFFFB2;
+  --fig-surface-opal-call-call-surface-opal-98: #F2F6FA;
+
+  /* surface-white */
+  --fig-surface-white-call-call-surface-white-00: #FFFFFF00;
+  --fig-surface-white-call-call-surface-white-30: #FFFFFF4D;
+
+  /* transparent-ocean */
+  --fig-transparent-ocean-call-call-ocean-alpha-01: #4190F04D;
+  --fig-transparent-ocean-call-call-ocean-alpha-03: #4190F000;
+  --fig-transparent-ocean-call-call-ocean-alpha-04: #EAF9FFB2;
+  --fig-transparent-ocean-call-call-ocean-alpha-05: #61CFB3B2;
+  --fig-transparent-ocean-call-call-ocean-alpha-06: #29B5CBB2;
+  --fig-transparent-ocean-call-call-ocean-alpha-07: #4190F0B2;
+  --fig-transparent-ocean-call-call-ocean-alpha-08: #15354299;
+  --fig-transparent-ocean-call-call-ocean-alpha-09: #2E675499;
+  --fig-transparent-ocean-call-call-ocean-alpha-10: #47659D99;
+  --fig-transparent-ocean-call-call-ocean-alpha-11: #36889B99;
+  --fig-transparent-ocean-call-call-ocean-alpha-12: #2E95DA33;
+  --fig-transparent-ocean-call-call-ocean-alpha-13: #6ADAFF33;
+  --fig-transparent-ocean-call-call-ocean-alpha-14: #26375533;
+  --fig-transparent-ocean-call-call-ocean-alpha-15: #3E8FA833;
+  --fig-transparent-ocean-call-call-ocean-alpha-16: #42C9EBB2;
+  --fig-transparent-ocean-call-call-ocean-alpha-17: #00C774B2;
+  --fig-transparent-ocean-call-call-ocean-alpha-18: #25DDFF33;
+  --fig-transparent-ocean-call-call-ocean-alpha-19: #0098E04D;
+  --fig-transparent-ocean-call-call-ocean-alpha-20: #427CCD4D;
+  --fig-transparent-ocean-call-call-ocean-alpha-21: #0091AB33;
+  --fig-transparent-ocean-call-call-ocean-alpha-22: #73ADFFCC;
+  --fig-transparent-ocean-call-call-ocean-alpha-23: #29CCB6CC;
+  --fig-transparent-ocean-call-call-ocean-alpha-24: #6ADAFF14;
+  /* primitives-blue */
+  --fig-primitives-blue-60: #598AFB;
+  --fig-primitives-blue-70: #4778E9;
+  --fig-primitives-blue-80: #4372E0;
+  --fig-primitives-blue-90: #356AE3;
+
+  /* primitives-gray */
+  --fig-primitives-gray-0-white: #FFFFFF;
+  --fig-primitives-gray-05: #F4F6F9;
+  --fig-primitives-gray-10: #F2F3F8;
+  --fig-primitives-gray-100-black: #121214;
+  --fig-primitives-gray-15: #ECEEF3;
+  --fig-primitives-gray-20: #E2E7F0;
+  --fig-primitives-gray-25: #D3DBE5;
+  --fig-primitives-gray-40: #CED1D9;
+  --fig-primitives-gray-60: #81889C;
+  --fig-primitives-gray-70: #646A74;
+  --fig-primitives-gray-80: #4A4D53;
+  --fig-primitives-gray-85: #3C3D41;
+  --fig-primitives-gray-90: #26282B;
+  --fig-primitives-gray-95: #191A1C;
+  --fig-primitives-gray-call-call-gray-02: #F5F7FA;
+  --fig-primitives-gray-call-call-gray-03: #F2F6FA;
+  --fig-primitives-gray-call-call-gray-16: #E9EBF0;
+  --fig-primitives-gray-call-call-gray-75: #202124;
+
+  /* primitives-green */
+  --fig-primitives-green-call-call-green-70: #00C774;
+  --fig-primitives-green-call-call-green-80: #00A865;
+
+  /* primitives-red */
+  --fig-primitives-red-70: #FA5252;
+  --fig-primitives-red-80: #F03E3E;
+  --fig-primitives-red-call-call-red-100: #2D1616;
+  --fig-primitives-red-call-call-red-90: #601919;
+  --fig-primitives-red-call-call-red-95: #401F20;
+
+  /* transparent-black */
+  --fig-transparent-black-call-call-black-05pct: #0000000D;
+  --fig-transparent-black-call-call-black-08pct: #00000014;
+  --fig-transparent-black-call-call-black-0pct: #00000000;
+
+  /* transparent-blue */
+  --fig-transparent-blue-call-call-blue-09pct: #B2CAFF17;
+  --fig-transparent-blue-call-call-blue-10pct: #3370FF1A;
+
+  /* transparent-gray */
+  --fig-transparent-gray-call-call-gray-100-0pct: #12121400;
+  --fig-transparent-gray-call-call-gray-100-85pct: #121214D9;
+
+  /* transparent-green */
+  --fig-transparent-green-call-call-green-20pct: #00FF3C40;
+  --fig-transparent-green-call-call-green-35pct: #00CC7059;
+  --fig-transparent-green-call-call-green-50pct: #00E63C80;
+  --fig-transparent-green-call-call-green-70pct: #00E578B3;
+
+  /* transparent-white */
+  --fig-transparent-white-call-call-white-04pct: #FFFFFF0A;
+  --fig-transparent-white-call-call-white-06pct: #FFFFFF0F;
+  --fig-transparent-white-call-call-white-08pct: #FFFFFF14;
+  --fig-transparent-white-call-call-white-0pct: #FFFFFF00;
+
+}
+body[data-theme="dark"] {
+  /* onsurface-ocean */
+  --fig-onsurface-ocean-call-ocean-00: #B2C9FF;
+  --fig-onsurface-ocean-call-ocean-10: #8CC0FF;
+  --fig-onsurface-ocean-call-ocean-100: #66CCBE;
+  --fig-onsurface-ocean-call-ocean-40: #3EACFB;
+  --fig-onsurface-ocean-call-ocean-70: #73B2FA;
+  --fig-onsurface-ocean-call-ocean-80: #66CCBE;
+  --fig-onsurface-ocean-call-ocean-alpha-04: #15354299;
+  --fig-onsurface-ocean-call-ocean-alpha-05: #2E675499;
+  --fig-onsurface-ocean-call-ocean-alpha-06: #47659D99;
+  --fig-onsurface-ocean-call-ocean-alpha-07: #36889B99;
+  --fig-onsurface-ocean-call-ocean-alpha-09: #4D8699;
+  --fig-onsurface-ocean-call-ocean-alpha-10: #3D6655;
+  --fig-onsurface-ocean-call-ocean-alpha-11: #26375533;
+  --fig-onsurface-ocean-call-ocean-alpha-12: #3E8FA833;
+  --fig-onsurface-ocean-call-ocean-alpha-13: #427CCD4D;
+  --fig-onsurface-ocean-call-ocean-alpha-14: #0091AB33;
+  --fig-onsurface-ocean-call-ocean-alpha-15: #6E97FF73;
+  --fig-onsurface-ocean-call-ocean-alpha-16: #30CCF266;
+  --fig-onsurface-ocean-call-ocean-alpha-17: #6ADAFF14;
+
+  /* surface-black */
+  --fig-surface-black-call-call-surface-black-50: #00000080;
+
+  /* surface-opal */
+  --fig-surface-opal-call-call-surface-opal-04: #FFFFFF0F;
+  --fig-surface-opal-call-call-surface-opal-60: #FFFFFF0F;
+  --fig-surface-opal-call-call-surface-opal-70: #FFFFFF14;
+  --fig-surface-opal-call-call-surface-opal-75: #FFFFFF0A;
+  --fig-surface-opal-call-call-surface-opal-98: #FFFFFF0A;
+
+  /* surface-white */
+  --fig-surface-white-call-call-surface-white-30: #FFFFFF14;
+
+  /* onsurface-accent */
+  --fig-onsurface-accent-call-call-on-accent-green: #00C774;
+  --fig-onsurface-accent-call-on-accent-red: #FA5252;
+
+  /* onsurface-gray */
+  --fig-onsurface-gray-call-call-on-gray-00: #26282B;
+  --fig-onsurface-gray-on-gray-30: #646A74;
+  --fig-onsurface-gray-on-gray-40: #727780;
+  --fig-onsurface-gray-on-gray-70: #BFC4CC;     /* Figma 32753:127022 — $primitives/gray/30 (다크 alias) */
+  --fig-onsurface-gray-on-gray-90-base: #ECEEF3;
+
+  /* onsurface-point */
+  --fig-onsurface-point-on-point-70-base: #598AFB;
+  --fig-onsurface-point-on-point-90: #4372E0;
+
+  /* onsurface-universal */
+  --fig-onsurface-universal-on-universal-gray-00-base: #F5F5F5;
+  --fig-onsurface-universal-on-universal-gray-20: #ECEEF3;
+
+  /* surface-black */
+  --fig-surface-black-call-call-surface-black-05: #FFFFFF14;
+  --fig-surface-black-call-call-surface-black-08: #FFFFFF14;
+
+  /* surface-blue */
+  --fig-surface-blue-call-call-surface-blue-10: #B2CAFF17;
+
+  /* surface-dim */
+  --fig-surface-dim-screendim-call-call-surface-screendim-85pct: #000000D9;
+
+  /* surface-gray */
+  --fig-surface-gray-call-call-surface-gray-00: #3C3D41;
+  --fig-surface-gray-call-call-surface-gray-01: #202124;
+  --fig-surface-gray-call-call-surface-gray-02: #191A1C;
+  --fig-surface-gray-call-call-surface-gray-03: #121214;
+  --fig-surface-gray-call-call-surface-gray-05: #202124;
+  --fig-surface-gray-call-call-surface-gray-16: #26282B;
+  --fig-surface-gray-call-call-surface-gray-20: #3C3D41;
+  --fig-surface-gray-call-call-surface-gray-80: #BFC4CC;
+  --fig-surface-gray-surface-gray-05: #26282B;
+  --fig-surface-gray-surface-gray-10: #3C3D41;
+
+  /* surface-green */
+  --fig-surface-green-call-call-surface-green-20: #00CC7059;
+  --fig-surface-green-call-call-surface-green-50: #00E578B3;
+
+  /* buttons-fill (3뎁스 dark — explicit hex로 alias chain 회피) */
+  --fig-buttons-fill-secondary-sub-surface-call-enabled: #26282B;
+  --fig-buttons-fill-secondary-sub-surface-call-pressed: #3C3D41;
+  --fig-buttons-fill-secondary-sub-surface-call-disabled: #26282B;
+  --fig-buttons-fill-secondary-sub-label-call-enabled: #D3DBE5;
+  --fig-buttons-fill-secondary-sub-label-call-pressed: #ECEEF3;
+  --fig-buttons-fill-secondary-sub-label-call-disabled: #727780;
+  --fig-buttons-fill-negative-surface-call-enabled: #26282B;
+  --fig-buttons-fill-negative-surface-call-pressed: #3C3D41;
+  --fig-buttons-fill-negative-surface-call-disabled: #26282B;
+  --fig-buttons-fill-negative-label-call-enabled: #FA5252;
+  --fig-buttons-fill-negative-label-call-pressed: #ECEEF3;
+  --fig-buttons-fill-negative-label-call-disabled: #727780;
+  --fig-buttons-fill-primary-surface-call-enabled: #598AFB;
+  --fig-buttons-fill-primary-surface-call-pressed: #4372E0;
+  --fig-buttons-fill-primary-surface-call-disabled: #202124;
+  --fig-buttons-fill-primary-label-call-enabled: #F5F5F5;
+  --fig-buttons-fill-primary-label-call-pressed: #ECEEF3;
+  --fig-buttons-fill-primary-label-call-disabled: #3C3D41;
+  --fig-buttons-fill-positive-surface-call-enabled: #2E675499;
+  --fig-buttons-fill-positive-surface-call-pressed: #15354299;
+  --fig-buttons-fill-positive-surface-call-disabled: #26282B;
+  --fig-buttons-fill-positive-label-call-enabled: #8CC0FF;
+  --fig-buttons-fill-positive-label-call-pressed: #8CC0FF;
+  --fig-buttons-fill-positive-label-call-disabled: #727780;
+
+  /* selectioncontrols-point (3뎁스 dark) */
+  --fig-selectioncontrols-point-surface-call-enabled: #646A74;
+  --fig-selectioncontrols-point-surface-call-selected: #598AFB;
+  --fig-selectioncontrols-point-surface-call-disabled: #202124;
+  --fig-selectioncontrols-point-label-call-enabled: #F5F5F5;
+  --fig-selectioncontrols-point-label-call-selected: #F5F5F5;
+  --fig-selectioncontrols-point-label-call-disabled: #3C3D41;
+
+  /* sliders-knob (3뎁스 dark) */
+  --fig-sliders-knob-enabled: #F5F5F5;
+  --fig-sliders-knob-disabled: #646A74;
+}
+/* @figma-tokens-end */
+
+/* ════════════════════════════════════════════════════════════════
+   🎨 Figma Gradient Tokens
+   ════════════════════════════════════════════════════════════════ */
+/* @figma-gradients-start */
+:root {
+  --fig-grad-ocean-text: linear-gradient(112.28deg, var(--fig-onsurface-ocean-call-ocean-00, rgb(31, 66, 102)) 2.33%, var(--fig-onsurface-ocean-call-ocean-10, rgb(15, 103, 191)) 50%, var(--fig-onsurface-ocean-call-ocean-80, rgb(26, 176, 200)) 97.67%);
+  --fig-grad-callview-button-fill: linear-gradient(152.57deg, var(--fig-onsurface-ocean-call-ocean-alpha-15, rgb(48, 158, 242)) 0%, var(--fig-onsurface-ocean-call-ocean-alpha-16, rgb(27, 202, 182)) 100%);
+  --fig-grad-callview-button-stroke: linear-gradient(177.19deg, var(--fig-surface-white-call-call-surface-white-30, rgba(255, 255, 255, 0.3)) 14.84%, var(--fig-surface-white-call-call-surface-white-00, rgba(255, 255, 255, 0)) 58.85%);
+  --fig-grad-aiLayer-border: conic-gradient(from 90deg, var(--fig-onsurface-ocean-call-ocean-alpha-04, rgba(234, 249, 255, 0.7)) 0%, var(--fig-onsurface-ocean-call-ocean-alpha-04, rgba(234, 249, 255, 0.7)) 20%, rgba(165, 228, 217, 0.7) 30%, var(--fig-onsurface-ocean-call-ocean-alpha-05, rgba(97, 207, 179, 0.7)) 40%, rgba(69, 194, 191, 0.7) 45%, var(--fig-onsurface-ocean-call-ocean-alpha-06, rgba(41, 181, 203, 0.7)) 50%, var(--fig-onsurface-ocean-call-ocean-alpha-07, rgba(65, 144, 240, 0.7)) 60%, rgba(107, 170, 244, 0.7) 65%, rgba(150, 197, 248, 0.7) 70%, var(--fig-onsurface-ocean-call-ocean-alpha-04, rgba(234, 249, 255, 0.7)) 80%, var(--fig-onsurface-ocean-call-ocean-alpha-04, rgba(234, 249, 255, 0.7)) 100%);
+  --fig-grad-aiChip-border: conic-gradient(from 90deg, var(--fig-onsurface-ocean-call-ocean-alpha-08, rgba(66, 201, 235, 0.7)) 0%, rgba(33, 200, 176, 0.7) 16.5%, rgba(17, 200, 146, 0.7) 24.75%, var(--fig-onsurface-ocean-call-ocean-alpha-09, rgba(0, 199, 116, 0.7)) 33%, rgba(21, 190, 160, 0.7) 49.5%, var(--fig-onsurface-ocean-call-ocean-alpha-10, rgba(41, 181, 203, 0.7)) 66%, var(--fig-onsurface-ocean-call-ocean-alpha-08, rgba(66, 201, 235, 0.7)) 100%);
+  --fig-grad-aiList-highlight: linear-gradient(182.66deg, var(--fig-onsurface-ocean-call-ocean-alpha-03, rgba(65, 144, 240, 0)) 17.91%, var(--fig-onsurface-ocean-call-ocean-alpha-02, rgba(65, 144, 240, 0.15)) 57.65%, var(--fig-onsurface-ocean-call-ocean-alpha-12, rgba(106, 218, 255, 0.2)) 96.64%);
+  --fig-grad-spiner-indicator: conic-gradient(from 90deg, var(--fig-onsurface-ocean-call-ocean-alpha-03, rgba(65, 144, 240, 0)) 0%, var(--fig-onsurface-ocean-call-ocean-alpha-03, rgba(65, 144, 240, 0)) 75%, rgba(66, 173, 238, 0.35) 81.25%, var(--fig-onsurface-ocean-call-ocean-alpha-08, rgba(66, 201, 235, 0.7)) 87.5%, var(--fig-onsurface-ocean-call-ocean-80, rgb(26, 176, 200)) 94.71%, var(--fig-onsurface-ocean-call-ocean-80, rgb(26, 176, 200)) 100%);
+}
+
+body[data-theme="dark"] {
+  --fig-grad-ocean-text: linear-gradient(112.28deg, var(--fig-onsurface-ocean-call-ocean-00, rgb(178, 201, 255)) 2.33%, var(--fig-onsurface-ocean-call-ocean-10, rgb(140, 192, 255)) 50%, var(--fig-onsurface-ocean-call-ocean-80, rgb(102, 204, 190)) 97.67%);
+  --fig-grad-callview-button-fill: linear-gradient(166.36deg, var(--fig-onsurface-ocean-call-ocean-alpha-15, rgba(115, 173, 255, 0.8)) 0%, var(--fig-onsurface-ocean-call-ocean-alpha-16, rgba(41, 204, 182, 0.8)) 100%);
+  --fig-grad-callview-button-stroke: linear-gradient(177.19deg, var(--fig-surface-white-call-call-surface-white-30, rgba(255, 255, 255, 0.1)) 14.84%, var(--fig-surface-white-call-call-surface-white-00, rgba(255, 255, 255, 0)) 58.85%);
+  --fig-grad-aiLayer-border: conic-gradient(from 90deg, var(--fig-onsurface-ocean-call-ocean-alpha-04, rgba(21, 53, 66, 0.6)) 0%, var(--fig-onsurface-ocean-call-ocean-alpha-04, rgba(21, 53, 66, 0.6)) 20%, var(--fig-onsurface-ocean-call-ocean-alpha-05, rgba(46, 103, 84, 0.6)) 40%, var(--fig-onsurface-ocean-call-ocean-alpha-06, rgba(71, 101, 157, 0.6)) 50%, var(--fig-onsurface-ocean-call-ocean-alpha-07, rgba(54, 136, 155, 0.6)) 60%, rgba(38, 95, 111, 0.6) 70%, var(--fig-onsurface-ocean-call-ocean-alpha-04, rgba(21, 53, 66, 0.6)) 80%, var(--fig-onsurface-ocean-call-ocean-alpha-04, rgba(21, 53, 66, 0.6)) 100%);
+  --fig-grad-aiChip-border: conic-gradient(from 90deg, var(--fig-onsurface-ocean-call-ocean-alpha-08, rgb(77, 100, 153)) 0%, var(--fig-onsurface-ocean-call-ocean-alpha-09, rgb(77, 134, 153)) 33%, rgb(69, 118, 119) 49.5%, var(--fig-onsurface-ocean-call-ocean-alpha-10, rgb(61, 102, 85)) 66%, rgb(69, 101, 119) 83%, var(--fig-onsurface-ocean-call-ocean-alpha-08, rgb(77, 100, 153)) 100%);
+  --fig-grad-aiList-highlight: linear-gradient(182.66deg, var(--fig-onsurface-ocean-call-ocean-alpha-03, rgba(65, 144, 240, 0)) 17.91%, var(--fig-onsurface-ocean-call-ocean-alpha-02, rgba(65, 144, 240, 0.15)) 57.65%, var(--fig-onsurface-ocean-call-ocean-alpha-12, rgba(62, 143, 168, 0.2)) 96.64%);
+  --fig-grad-spiner-indicator: conic-gradient(from 90deg, var(--fig-onsurface-ocean-call-ocean-alpha-03, rgba(65, 144, 240, 0)) 0%, var(--fig-onsurface-ocean-call-ocean-alpha-03, rgba(65, 144, 240, 0)) 75%, rgba(68, 133, 218, 0.25) 78.13%, rgba(71, 122, 197, 0.5) 81.25%, rgba(74, 111, 175, 0.75) 84.38%, var(--fig-onsurface-ocean-call-ocean-alpha-08, rgb(77, 100, 153)) 87.5%, rgb(89, 152, 172) 91.11%, var(--fig-onsurface-ocean-call-ocean-80, rgb(102, 204, 190)) 94.71%, var(--fig-onsurface-ocean-call-ocean-80, rgb(102, 204, 190)) 100%);
+}
+/* @figma-gradients-end */
+
+/* ════════════════════════════════════════════════════════════════
+   🎨 Figma Shadow Tokens
+   ════════════════════════════════════════════════════════════════ */
+/* @figma-shadows-start */
+:root {
+  --fig-shadow-aiLayer-border: 0px 4px 30px 0px var(--fig-surface-black-call-call-surface-black-50, rgba(0,0,0,0)), 0px 2px 30px 0px var(--fig-onsurface-ocean-call-ocean-alpha-11, rgba(46,149,218,0.2)), 0px 8px 100px 0px var(--fig-onsurface-ocean-call-ocean-alpha-12, rgba(106,218,255,0.2));
+  --fig-shadow-aiChip-border: 0px 2px 50px 0px var(--fig-onsurface-ocean-call-ocean-alpha-13, rgba(37,221,255,0.2)), 0px 2px 20px 0px var(--fig-onsurface-ocean-call-ocean-alpha-14, rgba(0,152,224,0.3));
+}
+
+body[data-theme="dark"] {
+  --fig-shadow-aiLayer-border: 0px 4px 30px 0px var(--fig-surface-black-call-call-surface-black-50, rgba(0,0,0,0.5)), 0px 2px 30px 0px var(--fig-onsurface-ocean-call-ocean-alpha-11, rgba(38,55,85,0.2)), 0px 8px 100px 0px var(--fig-onsurface-ocean-call-ocean-alpha-12, rgba(62,143,168,0.2));
+  --fig-shadow-aiChip-border: 0px 2px 50px 0px var(--fig-onsurface-ocean-call-ocean-alpha-13, rgba(66,124,205,0.3)), 0px 2px 20px 0px var(--fig-onsurface-ocean-call-ocean-alpha-14, rgba(0,145,171,0.2));
+}
+/* @figma-shadows-end */

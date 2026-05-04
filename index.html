@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#FFFFFF" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>실험실</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+
+  <!-- 공통 Shell CSS -->
+  <link rel="stylesheet" href="src/shared/styles/tokens.css" />
+  <link rel="stylesheet" href="src/shared/styles/base.css" />
+  <link rel="stylesheet" href="src/shared/styles/shell.css" />
+
+</head>
+
+<body>
+
+  <div class="lab-layout">
+    <!-- ---- 왼쪽 사이드바 (데스크톱 전용) ---- -->
+    <nav class="lab-sidebar">
+      <div class="lab-sidebar-header">
+        <h1 class="lab-title"></h1>
+        <button id="mobile-nav-close" class="mobile-nav-close" aria-label="메뉴 닫기">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- 메뉴 동적 렌더링 영역 -->
+      <div class="lab-nav">
+      </div>
+
+      <div class="lab-sidebar-footer">
+        <button id="tokens-page-btn" class="theme-toggle-btn">Colors</button>
+        <div class="lab-footer-row">
+          <span class="lab-version">v1.3.0</span>
+          <button id="theme-toggle" class="lab-theme-switch" aria-label="테마 전환" type="button">
+            <span class="lab-theme-switch__thumb">
+              <svg class="lab-theme-switch__icon lab-theme-switch__icon--sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.5M8 13v1.5M14.5 8h-1.5M3 8h-1.5M12.6 3.4l-1.06 1.06M4.46 11.54l-1.06 1.06M12.6 12.6l-1.06-1.06M4.46 4.46l-1.06-1.06"/></svg>
+              <svg class="lab-theme-switch__icon lab-theme-switch__icon--moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 9.5A6 6 0 0 1 6.5 2.5a6 6 0 1 0 7 7z"/></svg>
+            </span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ---- 뷰포트 (Iframe으로 실험 로드) ---- -->
+    <main class="lab-viewport">
+
+      <iframe id="experiment-frame" class="lab-iframe"
+        style="width:100%; height:100%; border:none; background:transparent;"></iframe>
+
+      <!-- ---- Variation 모드: 3분할 (기본 hidden) ---- -->
+      <div class="variation-grid" id="variation-grid" hidden>
+        <!-- 3개 컬럼 동적 생성 (script에서 채움) -->
+      </div>
+
+      <!-- ---- 가계도 패널 (alt 후보 ≥ 2 일 때 자동 노출) ---- -->
+      <aside class="lab-family-tree" id="family-tree" hidden>
+        <div class="ftree-header">Family</div>
+        <div class="ftree-body" id="family-tree-body"></div>
+      </aside>
+
+      <!-- 모바일 좌측 하단 네비게이션 트리거 버튼 -->
+      <button id="mobile-nav-toggle" class="mobile-nav-toggle" aria-label="메뉴 열기">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </main>
+
+    <!-- ---- 우측 인스펙터 패널 ---- -->
+    <aside class="lab-inspector" id="inspector-panel">
+      <div class="ins-header">
+        <span class="ins-header-title">Inspector</span>
+        <div id="inspector-fmt-toggle"></div>
+      </div>
+      <div class="inspector-body">
+        <div id="inspector-content">
+          <!-- 인스펙터 호버 내용 동적 주입 -->
+        </div>
+      </div>
+
+      <!-- ---- 프롬프트 제조기 패널 ---- -->
+      <div class="prompt-builder" id="prompt-builder">
+        <div class="pb-header">
+          <span class="pb-title">Prompt table</span>
+          <div class="pb-actions">
+            <button class="pb-btn" id="pb-variation" title="Variation" type="button">
+              <!-- git-branch 스타일 — 3 분기 -->
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="6" cy="3" r="2"/>
+                <circle cx="6" cy="21" r="2"/>
+                <circle cx="18" cy="6" r="2"/>
+                <path d="M6 5v14"/>
+                <path d="M6 12c0-3 3-6 6-6h4"/>
+              </svg>
+            </button>
+            <button class="pb-btn" id="pb-copy" title="Copy" type="button">
+              <svg class="pb-icon-default" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <svg class="pb-icon-flash" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </button>
+            <button class="pb-btn" id="pb-clear" title="Clear" type="button">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+            <button class="pb-btn" id="pb-toggle" title="Toggle" type="button">
+              <svg class="pb-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="pb-body" id="prompt-builder-body" contenteditable="true" data-placeholder="row를 클릭해 프롬프트를 구성해보세요"></div>
+
+        <!-- 최근 수정 히스토리 — Vite가 파일 변경 감지해서 채워줌 (빈 상태에선 숨김) -->
+        <div class="pb-history is-empty" id="pb-history" hidden>
+          <div class="pb-history-list" id="pb-history-list"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+
+
+  <script type="module">
+    import { initRouter } from './src/shared/js/router.js';
+
+    import { initIframeThemeListener, toggleTheme } from './src/shared/js/theme.js';
+    import { initInspector } from './src/shared/js/inspector.js';
+    import { initMobileNav } from './src/shared/js/mobile-nav.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initRouter();
+
+      initInspector();
+      initMobileNav();
+
+      // Tokens 페이지 버튼
+      const tokensBtn = document.getElementById('tokens-page-btn');
+      if (tokensBtn) {
+        tokensBtn.addEventListener('click', () => {
+          const iframe = document.getElementById('experiment-frame');
+          if (iframe) iframe.src = 'src/shared/viewer/tokens.html?v=' + Date.now();
+          document.querySelectorAll('.nav-group-title, .lab-nav-item').forEach(el => el.classList.remove('active'));
+          tokensBtn.classList.add('active');
+        });
+      }
+
+      // Iframe이 초기 로드될 때 부모의 테마 상태를 전송하는 이벤트
+      // 메인 iframe뿐 아니라 variation 모드의 iframe들도 자기 자신에게 응답받도록 e.source로 회신
+      window.addEventListener('message', (e) => {
+        if (e.data && e.data.type === 'REQUEST_INITIAL_THEME') {
+          const isDark = document.body.getAttribute('data-theme') === 'dark';
+          if (e.source && typeof e.source.postMessage === 'function') {
+            e.source.postMessage({ type: 'THEME_CHANGE', isDark }, '*');
+          }
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

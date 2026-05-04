@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tokens</title>
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px 20px 32px;
+      background: var(--bg-color);
+      color: var(--text-primary);
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      min-height: 100vh;
+      height: auto;
+      display: block;
+      overflow: auto;
+      align-items: stretch;
+      justify-content: flex-start;
+    }
+    .tk-header { display: block; width: 100%; margin-bottom: 8px; }
+    .tk-header h1 { font-size: 14px; font-weight: 700; margin: 0 0 2px; letter-spacing: -0.2px; }
+    .tk-meta-line { font-size: 10px; color: var(--text-tertiary); }
+
+    .tk-table {
+      display: grid;
+      grid-template-columns: 240px 130px 130px 1fr;
+      column-gap: 12px;
+      row-gap: 0;
+    }
+    .tk-group-header {
+      grid-column: 1 / -1;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-primary);
+      padding: 16px 4px 6px;
+      border-bottom: 1.5px solid var(--text-secondary);
+      margin-top: 12px;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .tk-group-header:first-child { margin-top: 0; }
+    .tk-group-header .tk-group-count {
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      padding: 2px 8px;
+      background: var(--surface-bg);
+      border-radius: 8px;
+      letter-spacing: 0;
+    }
+    .tk-group-header .tk-group-desc {
+      font-size: 9px;
+      font-weight: 400;
+      color: var(--text-tertiary);
+      letter-spacing: 0;
+    }
+    .tk-thead { display: contents; }
+    .tk-thead > div {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 6px 4px;
+      border-bottom: 1px solid var(--card-border);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .tk-row { display: contents; }
+    .tk-row > .tk-cell {
+      padding: 4px 4px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      min-height: 26px;
+    }
+    .tk-row:hover > .tk-cell { background: var(--surface-bg); }
+
+    .tk-name-pill {
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: 8px;
+      font-weight: 500;
+      color: var(--text-primary);
+      background: var(--surface-bg);
+      padding: 3px 6px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.15s;
+      line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
+    }
+    .tk-name-pill:hover { background: var(--card-border); }
+
+    /* Inline swatch + value */
+    .tk-swatch {
+      width: 16px; height: 16px; flex-shrink: 0;
+      border-radius: 3px;
+      background-image:
+        linear-gradient(45deg, rgba(0,0,0,0.06) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(0,0,0,0.06) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.06) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.06) 75%);
+      background-size: 6px 6px;
+      background-position: 0 0, 0 3px, 3px -3px, -3px 0;
+      position: relative; overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .tk-swatch::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--swatch-color);
+    }
+    .tk-swatch.is-grad { width: 28px; }
+    .tk-swatch.is-shadow {
+      width: 24px;
+      background: white;
+      box-shadow: var(--swatch-color);
+      border: none;
+    }
+    body[data-theme="dark"] .tk-swatch.is-shadow { background: #2A2D32; }
+    .tk-swatch.is-shadow::after { display: none; }
+
+    .tk-value {
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: 9px;
+      color: var(--text-tertiary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+      min-width: 0;
+    }
+    .tk-empty-cell {
+      font-size: 9px;
+      color: var(--text-tertiary);
+      font-style: italic;
+    }
+
+    /* Usage cell */
+    .tk-usage {
+      font-size: 9px;
+      line-height: 1.4;
+      color: var(--text-secondary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
+    }
+    .tk-usage-empty {
+      font-size: 9px;
+      color: var(--text-tertiary);
+      font-style: italic;
+    }
+    .tk-usage-exp { color: var(--text-primary); font-weight: 500; }
+    .tk-usage-sel { color: var(--text-tertiary); font-family: 'SF Mono', Menlo, monospace; }
+    .tk-usage-sep { color: var(--text-tertiary); margin: 0 4px; }
+
+    .tk-empty {
+      grid-column: 1 / -1;
+      padding: 24px 16px;
+      color: var(--text-tertiary);
+      text-align: center;
+      border: 1.5px dashed var(--card-border);
+      border-radius: 8px;
+      font-size: 11px;
+      margin-top: 8px;
+    }
+    .tk-empty strong { color: var(--text-secondary); display: block; margin-bottom: 2px; font-size: 12px; }
+    .tk-empty code { font-family: monospace; background: var(--surface-bg); padding: 1px 4px; border-radius: 3px; font-size: 10px; }
+
+    .tk-toast {
+      position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+      background: var(--text-primary); color: var(--bg-color);
+      padding: 6px 12px; border-radius: 16px; font-size: 11px;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 100;
+    }
+    .tk-toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="tk-header">
+    <h1>Figma Tokens</h1>
+    <div id="meta" class="tk-meta-line">로드 중…</div>
+  </div>
+
+  <div id="tableHost"></div>
+  <div id="toast" class="tk-toast">복사됨</div>
+
+  <script type="module">
+    window.addEventListener('error', (e) => {
+      document.body.insertAdjacentHTML('afterbegin',
+        `<div style="background:#fee;color:#900;padding:8px;font:11px monospace;">JS 에러: ${e.message} @ ${e.filename}:${e.lineno}</div>`);
+    });
+
+    const docEl = document.documentElement;
+    const bodyEl = document.body;
+
+    // ─── Figma path 변환 ───
+    // grad/shadow는 figma 원본 이름 매핑
+    const FIGMA_NAME_MAP = {
+      'grad-ocean-text': 'ocean_gradient_text',
+      'grad-callview-button-fill': 'ocean_gradient_callview_button_fill',
+      'grad-callview-button-stroke': 'gradient_callview_button_stroke',
+      'grad-aiLayer-border': 'ocean_gradient_aiLayer_border',
+      'grad-aiChip-border': 'ocean_gradient_aiChip_border',
+      'grad-aiList-highlight': 'ocean_gradient_aiList_highlight',
+      'grad-spiner-indicator': 'ocean_gradient_spiner_indicator',
+      'shadow-aiLayer-border': 'shadow_aiLayer_Border',
+      'shadow-aiChip-border': 'shadow_aiChip_Border',
+    };
+    const CAT_CASE = { onsurface: 'onSurface', surface: 'surface', primitives: 'primitives', transparent: 'transparent' };
+
+    const toFigmaPath = (varName) => {
+      const stripped = varName.replace(/^--fig-/, '');
+      if (stripped.startsWith('grad-') || stripped.startsWith('shadow-')) {
+        return FIGMA_NAME_MAP[stripped] || stripped;
+      }
+      const parts = stripped.split('-');
+      const cat = CAT_CASE[parts[0]] || parts[0];
+      const callIdx = parts.indexOf('call');
+      if (callIdx === -1) {
+        // 1뎁스 short-index (예: primitives-blue-60, primitives-gray-0-white)
+        // → cat/sub/{rest_with_underscore}
+        const sub = parts[1];
+        const tail = parts.slice(2).join('_');
+        return tail ? `${cat}/${sub}/${tail}` : `${cat}/${sub}`;
+      }
+      const head = [cat, ...parts.slice(1, callIdx + 1)].join('/');
+      const tail = parts.slice(callIdx + 1).join('_');
+      return tail ? `${head}/${tail}` : head;
+    };
+
+    // ─── 1) tokens.css → 변수 + 값 ───
+    const cssRes = await fetch('../styles/tokens.css?v=' + Date.now());
+    const cssText = await cssRes.text();
+    const allNames = Array.from(new Set(
+      Array.from(cssText.matchAll(/--fig-[\w-]+/g)).map(m => m[0])
+    ));
+
+    const initialTheme = bodyEl.getAttribute('data-theme');
+    const lightVals = new Map();
+    const darkVals = new Map();
+
+    // getPropertyValue는 var() 체인을 resolve하지 않음 (alias는 literal "var(--x)" 반환).
+    // 토큰마다 별도 probe 요소를 만들어 각각 고정 inline style로 적용 → 테마 토글 시 cascade가
+    // 자동 재계산되므로 read 시점에 항상 최신 값. (단일 probe + 루프 inline 변경은 재계산 누락 케이스 발생)
+    const probeContainer = document.createElement('div');
+    probeContainer.style.cssText = 'position:absolute;left:-9999px;top:0;width:1px;height:1px;pointer-events:none;visibility:hidden;';
+    const probes = allNames.map(n => {
+      const p = document.createElement('div');
+      if (n.startsWith('--fig-shadow-')) p.style.boxShadow = `var(${n})`;
+      else if (n.startsWith('--fig-grad-')) p.style.backgroundImage = `var(${n})`;
+      else p.style.color = `var(${n})`;
+      probeContainer.appendChild(p);
+      return p;
+    });
+    bodyEl.appendChild(probeContainer);
+
+    const readAll = (target) => {
+      void bodyEl.offsetHeight;
+      probes.forEach((p, i) => {
+        const n = allNames[i];
+        const cs = getComputedStyle(p);
+        let v;
+        if (n.startsWith('--fig-shadow-')) v = cs.boxShadow;
+        else if (n.startsWith('--fig-grad-')) v = cs.backgroundImage;
+        else v = cs.color;
+        if (v === 'none') v = '';
+        target.set(n, (v || '').trim());
+      });
+    };
+    bodyEl.removeAttribute('data-theme');
+    readAll(lightVals);
+    bodyEl.setAttribute('data-theme', 'dark');
+    readAll(darkVals);
+    if (initialTheme) bodyEl.setAttribute('data-theme', initialTheme);
+    else bodyEl.removeAttribute('data-theme');
+    probeContainer.remove();
+
+    // 그룹 분류
+    const classifyGroup = (name) => {
+      if (name.startsWith('--fig-grad-') || name.startsWith('--fig-shadow-')) return 'call-style';
+      // 3뎁스: component / sliders / selectionControls / buttons
+      if (name.startsWith('--fig-buttons-') || name.startsWith('--fig-sliders-') || name.startsWith('--fig-selectioncontrols-') || name.startsWith('--fig-component-')) return '3depth';
+      // 1뎁스
+      if (name.startsWith('--fig-primitives-ocean-') || name.startsWith('--fig-transparent-ocean-')) return '1depth-ocean';
+      if (name.startsWith('--fig-primitives-') || name.startsWith('--fig-transparent-')) return '1depth-original';
+      // 2뎁스
+      if (name.startsWith('--fig-onsurface-ocean-')) return '2depth-ocean';
+      // onsurface/{gray,universal,accent,point}, surface/* → original
+      return '2depth-original';
+    };
+    const classifyKind = (name) => {
+      if (name.startsWith('--fig-grad-')) return 'grad';
+      if (name.startsWith('--fig-shadow-')) return 'shadow';
+      return 'solid';
+    };
+    const tokens = allNames.map(name => ({
+      name,
+      figmaPath: toFigmaPath(name),
+      group: classifyGroup(name),
+      kind: classifyKind(name),
+      light: lightVals.get(name),
+      dark: lightVals.get(name) === darkVals.get(name) ? null : darkVals.get(name),
+    })).filter(t => t.light);
+
+    // ─── 2) 사용처 + 셀렉터 추출 ───
+    // usage[tokenName] = [{exp, file, selector}]
+    const usage = new Map();
+    try {
+      const reg = await import('../../experiments/registry.js?v=' + Date.now());
+      const exps = reg.experiments || [];
+      const fileNames = ['style.css', 'script.js', 'config.js', 'tokens.css'];
+
+      const fetchText = async (path) => {
+        try {
+          const r = await fetch('/' + path + '?v=' + Date.now());
+          if (!r.ok) return null;
+          return await r.text();
+        } catch { return null; }
+      };
+
+      const tasks = [];
+      for (const exp of exps) {
+        for (const fname of (exp.files || fileNames)) {
+          if (!fname.match(/\.(css|js)$/)) continue;
+          tasks.push((async () => {
+            const text = await fetchText(`${exp.folder}/${fname}`);
+            return { exp, fname, text };
+          })());
+        }
+      }
+      const results = await Promise.all(tasks);
+
+      // CSS rule 파싱: simple {selector}{body} 매칭 (nested 없음)
+      const ruleRe = /([^{}]+)\{([^{}]*)\}/g;
+
+      for (const { exp, fname, text } of results) {
+        if (!text) continue;
+        const isCss = fname.endsWith('.css');
+
+        if (isCss) {
+          let m;
+          while ((m = ruleRe.exec(text))) {
+            const sel = m[1].trim().replace(/\s+/g, ' ');
+            const body = m[2];
+            for (const t of tokens) {
+              if (body.includes(t.name)) {
+                if (!usage.has(t.name)) usage.set(t.name, []);
+                usage.get(t.name).push({ exp: exp.title, file: fname, selector: sel });
+              }
+            }
+          }
+        } else {
+          // JS: 파일에 var(--fig-xxx) 또는 직접 이름 등장 — 셀렉터 없음
+          for (const t of tokens) {
+            if (text.includes(t.name)) {
+              if (!usage.has(t.name)) usage.set(t.name, []);
+              usage.get(t.name).push({ exp: exp.title, file: fname, selector: null });
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('사용처 스캔 실패:', e);
+    }
+
+    // ─── 3) Render ───
+    const groupCount = { '3depth': 0, '2depth-ocean': 0, '2depth-original': 0, '1depth-ocean': 0, '1depth-original': 0, 'call-style': 0 };
+    tokens.forEach(t => groupCount[t.group]++);
+    let usedCount = 0;
+    usage.forEach(() => usedCount++);
+    document.getElementById('meta').textContent =
+      `Total ${tokens.length} · 3뎁스 ${groupCount['3depth']} · 2뎁스 O ${groupCount['2depth-ocean']}/G ${groupCount['2depth-original']} · 1뎁스 O ${groupCount['1depth-ocean']}/G ${groupCount['1depth-original']} · call_style ${groupCount['call-style']} · 사용 중 ${usedCount}`;
+
+    const showToast = (msg) => {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1200);
+    };
+
+    const formatUsage = (entries) => {
+      if (!entries || entries.length === 0) return `<span class="tk-usage-empty">미사용</span>`;
+      // group by exp → list of selectors
+      const byExp = new Map();
+      for (const e of entries) {
+        if (!byExp.has(e.exp)) byExp.set(e.exp, new Set());
+        if (e.selector) byExp.get(e.exp).add(e.selector);
+      }
+      const parts = [];
+      for (const [exp, selSet] of byExp.entries()) {
+        const sels = Array.from(selSet);
+        const selText = sels.length > 0 ? `<span class="tk-usage-sel"> ${sels.join(', ')}</span>` : '';
+        parts.push(`<span class="tk-usage-exp">${exp}</span>${selText}`);
+      }
+      return parts.join(`<span class="tk-usage-sep">·</span>`);
+    };
+
+    const host = document.getElementById('tableHost');
+    if (tokens.length === 0) {
+      host.innerHTML = `<div class="tk-empty"><strong>아직 토큰이 없어요</strong><code>/colorupdate</code> 실행해서 Figma에서 가져오세요.</div>`;
+    } else {
+      const renderCell = (val, kind) => {
+        if (!val) return `<div class="tk-cell"><span class="tk-empty-cell">— light와 동일</span></div>`;
+        const cls = kind === 'grad' ? 'tk-swatch is-grad' : kind === 'shadow' ? 'tk-swatch is-shadow' : 'tk-swatch';
+        return `<div class="tk-cell">
+          <div class="${cls}" style="--swatch-color: ${val}"></div>
+          <span class="tk-value" title="${val.replace(/"/g, '&quot;')}">${val}</span>
+        </div>`;
+      };
+
+      const renderRow = (t) => {
+        const entries = usage.get(t.name) || [];
+        const usageHtml = formatUsage(entries);
+        const usageTooltip = entries.map(e => `${e.exp} / ${e.file}${e.selector ? ' { ' + e.selector + ' }' : ''}`).join('\n');
+        return `
+          <div class="tk-row">
+            <div class="tk-cell"><span class="tk-name-pill" data-name="${t.name}" title="클릭해서 var(${t.name}) 복사">${t.figmaPath}</span></div>
+            ${renderCell(t.light, t.kind)}
+            ${renderCell(t.dark || t.light, t.kind)}
+            <div class="tk-cell"><span class="tk-usage" title="${usageTooltip.replace(/"/g, '&quot;')}">${usageHtml}</span></div>
+          </div>`;
+      };
+
+      const groupOrder = [
+        { id: '3depth',          label: '3뎁스 — Component',         desc: 'state-based aliases (buttons · sliders · selectionControls)' },
+        { id: '2depth-ocean',    label: '2뎁스 — Semantic Ocean',    desc: 'theme-aware ocean (onSurface/ocean)' },
+        { id: '2depth-original', label: '2뎁스 — Semantic Original', desc: 'theme-aware (onSurface/{gray,universal,accent,point} · surface/*)' },
+        { id: '1depth-ocean',    label: '1뎁스 — Ocean',             desc: 'ocean palette (primitives · transparent)' },
+        { id: '1depth-original', label: '1뎁스 — Original',          desc: 'blue · gray · green · red · transparent (call/black/white/blue/gray/green)' },
+        { id: 'call-style',      label: 'Call Style',                desc: 'gradient · shadow' },
+      ];
+
+      const groupedHtml = groupOrder.map(g => {
+        const items = tokens.filter(t => t.group === g.id);
+        if (items.length === 0) return '';
+        const rows = items.map(renderRow).join('');
+        return `
+          <div class="tk-group-header">
+            ${g.label}
+            <span class="tk-group-count">${items.length}</span>
+            <span class="tk-group-desc">${g.desc}</span>
+          </div>
+          <div class="tk-thead">
+            <div>Token (Figma path)</div>
+            <div>Light</div>
+            <div>Dark</div>
+            <div>사용처 (실험 · 셀렉터)</div>
+          </div>
+          ${rows}
+        `;
+      }).join('');
+
+      host.innerHTML = `<div class="tk-table">${groupedHtml}</div>`;
+
+      host.querySelectorAll('.tk-name-pill').forEach(el => {
+        el.addEventListener('click', () => {
+          const text = `var(${el.dataset.name})`;
+          navigator.clipboard.writeText(text).then(() => showToast(`${text} 복사됨`));
+        });
+      });
+    }
+  </script>
+</body>
+</html>
