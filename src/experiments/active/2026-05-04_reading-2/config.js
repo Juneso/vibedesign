@@ -201,3 +201,47 @@ export const wikiGraph = {
     ['quotes','algorithmic-power'],
   ],
 };
+
+// ============================================================
+// 앱 셸 — 시드 데이터 (첫 실행 시 localStorage에 기본 책/인용 채움)
+// ============================================================
+
+export const seedBooks = [
+  {
+    id: 'nexus-default',                 // 기본 등록 책 (홈/위키 데모와 연동)
+    title: '넥서스',
+    subtitle: '석기시대부터 AI까지의 정보 네트워크 역사',
+    authors: ['유발 하라리'],
+    cover: '/assets/nexus-cover.jpg',     // 로컬 표지
+    publisher: '김영사',
+    publishedDate: '2024',
+    pageCount: 656,
+    description: '하라리는 정보를 단순한 진실의 도구가 아니라 사회를 묶고 권력을 분배하는 신경계로 본다.',
+    isCurrent: true,
+  },
+];
+
+export const seedQuotes = [
+  {
+    bookId: 'nexus-default',
+    text: '정보의 결정적인 특징은 재현이 아니라 연결이며, 따라서 정보란 서로 다른 지점들을 네트워크로 연결하는 무언가다.',
+    page: '37',
+    memo: '책 전체의 척추가 되는 문장. 정보 = 연결이라는 정의.',
+    createdAt: Date.now() - 1000 * 60 * 60 * 8,  // 8시간 전
+  },
+  {
+    bookId: 'nexus-default',
+    text: '강한 정보 네트워크는 진실 그 자체가 아니라 오류를 발견하고 고치는 능력에 의해 결정된다.',
+    page: '142',
+    memo: '자기수정 메커니즘 — 회사 의사결정에도 그대로 적용 가능.',
+    createdAt: Date.now() - 1000 * 60 * 60 * 30, // 어제
+  },
+];
+
+// 현재 사용자 (프로필) — 데모용
+export const currentUser = {
+  name: '준서',
+  handle: '@junseo',
+  initial: '준',
+  joinedAt: '2026-01',
+};

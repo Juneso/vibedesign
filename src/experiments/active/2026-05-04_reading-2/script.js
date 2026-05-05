@@ -1,44 +1,205 @@
+// 0504 2 — Reading App (앱 셸 + 챗봇 + 위키)
+// 메인 라우터 + 기존 chat/wiki 유지 + 새 탭(library/profile)·모달(book-search/quote-add) 진입점.
+
 import {
   config, openingPrompts, quickReplies, aiReplies, quoteReply,
   wikiPages, wikiLog, wikiGraph,
+  seedBooks, seedQuotes,
 } from './config.js';
 
-const root = document.querySelector('.canvas-content');
+import { Books, Quotes, onChange } from './services/storage.js';
+
+import * as homeView    from './views/home.js';
+import * as libraryView from './views/library.js';
+import * as quoteView   from './views/quote.js';
+import * as profileView from './views/profile.js';
+
+const root  = document.querySelector('.canvas-content');
 const views = root.querySelectorAll('.view');
+const bnav  = root.querySelector('#bnav');
 
-const chatScroll   = root.querySelector('#chat-scroll');
-const chatMessages = root.querySelector('#chat-messages');
-const chatForm     = root.querySelector('#chat-form');
-const chatInput    = root.querySelector('#chat-input');
-const suggestionsEl = root.querySelector('#chat-suggestions');
+// ── 시드 데이터 (첫 실행 시) ──────────────────
+Books.seedIfEmpty(seedBooks);
+Quotes.seedIfEmpty(seedQuotes);
 
-// ── 대화 상태 ─────────────────────────────────
-const userAnswers = { why: '', goal: '' };
-let chatPhase = 'greeting'; // 'greeting' | 'askWhy' | 'askGoal' | 'free'
-let chatStarted = false;
-let aiReplyIndex = 0;
+// ── 현재 컨텍스트 (어떤 책으로 채팅/위키 진입했는지) ──
+let activeBookId = (Books.all().find((b) => b.isCurrent) || Books.all()[0])?.id || null;
 
-// ── view routing ─────────────────────────────
-const switchView = (target) => {
+// 모듈 init은 한 번만, 진입할 때마다 update 호출
+const moduleState = { home: false, library: false, profile: false, quote: false };
+
+// 뷰 모듈에 넘겨주는 의존성 — 모듈끼리 직접 import 안 하도록 람다로 감쌈
+const deps = {
+  switchTab,
+  switchView,
+  openChat:        (bookId) => { activeBookId = bookId || activeBookId; openChat(); },
+  openNotes:       (bookId) => { activeBookId = bookId || activeBookId; openNotes(); },
+  openQuoteAdd:    (preset) => openQuoteAdd(preset),
+  openBookSearch:  ()       => openBookSearch(),
+  closeModal:      ()       => switchTab(currentTab),
+  getActiveBookId: ()       => activeBookId,
+};
+
+// ── 탭 전환 (홈/서재/내정보) ──────────────────
+let currentTab = 'home';
+function switchTab(tabName) {
+  currentTab = tabName;
+  switchView(tabName);
+  // bnav 활성 칩
+  bnav.querySelectorAll('.bnav-item').forEach((b) => {
+    b.classList.toggle('active', b.dataset.tab === tabName);
+  });
+  showBnav(true);
+}
+
+// ── 뷰 전환 (모든 view) ──────────────────────
+function switchView(target) {
   views.forEach((v) => v.classList.toggle('active', v.dataset.view === target));
+
+  // 메인 탭 모듈 라이프사이클
+  if (target === 'home') {
+    if (!moduleState.home) { homeView.init(deps); moduleState.home = true; }
+    else homeView.update(deps);
+  }
+  if (target === 'library') {
+    if (!moduleState.library) { libraryView.init(deps); moduleState.library = true; }
+    else libraryView.update(deps);
+  }
+  if (target === 'profile') {
+    if (!moduleState.profile) { profileView.init(deps); moduleState.profile = true; }
+    else profileView.update(deps);
+  }
+
+  // bnav 보일지 결정 — 메인 탭만 노출
+  const isMainTab = ['home', 'library', 'profile'].includes(target);
+  showBnav(isMainTab);
+
+  // 챗 / 노트 진입 시 처리
   if (target === 'chat' && !chatStarted) {
     chatStarted = true;
+    setChatTitleFromBook();
     startChatFlow();
   }
   if (target === 'notes') {
+    setWikiTitleFromBook();
     renderWiki();
     const ns = root.querySelector('#notes-scroll');
     if (ns) ns.scrollTop = 0;
-    initGraph();
+    if (!graphInited) initGraph();
     root.querySelector('#graph-toggle-btn')?.classList.add('active');
   }
-};
+}
 
-// ── chat 시작 시퀀스 (자연스러운 도입) ────────
+function showBnav(visible) { bnav.classList.toggle('hidden', !visible); }
+
+// ── 챗/위키 진입 헬퍼 ────────────────────────
+function openChat() { switchView('chat'); }
+function openNotes() { switchView('notes'); }
+function openBookSearch() {
+  switchView('book-search');
+  if (!moduleState.library) { libraryView.init(deps); moduleState.library = true; }
+  libraryView.openSearch?.(deps);
+}
+function openQuoteAdd(preset) {
+  switchView('quote-add');
+  if (!moduleState.quote) { quoteView.init(deps); moduleState.quote = true; }
+  quoteView.open?.({ ...deps, preset, defaultBookId: activeBookId });
+}
+
+function setChatTitleFromBook() {
+  const b = Books.get(activeBookId);
+  const el = root.querySelector('#chat-book-title');
+  if (el && b) el.textContent = `${b.title} 메모 세션`;
+}
+function setWikiTitleFromBook() {
+  const b = Books.get(activeBookId);
+  const el = root.querySelector('#wiki-book-title');
+  if (el && b) el.textContent = `${b.title} 위키`;
+}
+
+// ── 액션 라우팅 ─────────────────────────────
+root.addEventListener('click', (e) => {
+  // data-tab → 탭 전환
+  const tabEl = e.target.closest('[data-tab]');
+  if (tabEl) {
+    e.preventDefault();
+    const bookEl = e.target.closest('[data-book-id]');
+    if (bookEl?.dataset.action === 'open-chat') {
+      activeBookId = bookEl.dataset.bookId;
+      openChat();
+      return;
+    }
+    switchTab(tabEl.dataset.tab);
+    return;
+  }
+
+  const actionEl = e.target.closest('[data-action]');
+  if (!actionEl) return;
+  const action = actionEl.dataset.action;
+  const bookId = actionEl.dataset.bookId;
+
+  switch (action) {
+    case 'open-chat':
+      if (bookId) activeBookId = bookId;
+      openChat();
+      break;
+    case 'end-chat':
+      openNotes();
+      break;
+    case 'end-chat-back':
+      switchTab(currentTab);
+      break;
+    case 'notes-back':
+      switchTab(currentTab);
+      break;
+    case 'back-notes':
+      openNotes();
+      break;
+    case 'open-notes-from-home':
+      if (bookId) activeBookId = bookId;
+      openNotes();
+      break;
+    case 'open-quote-add':
+      openQuoteAdd();
+      break;
+    case 'open-book-search':
+      openBookSearch();
+      break;
+    case 'back-from-book-search':
+    case 'back-from-quote-add':
+      switchTab(currentTab);
+      break;
+    case 'toggle-graph':
+      toggleGraph();
+      break;
+  }
+});
+
+// ── 데이터 변경 시 홈 갱신 ────────────────────
+onChange(() => {
+  if (moduleState.home && root.querySelector('.view-home').classList.contains('active')) {
+    homeView.update(deps);
+  }
+});
+
+// ============================================================
+// 이하: 기존 chat / wiki / graph 로직 (그대로 유지)
+// ============================================================
+
+const chatScroll    = root.querySelector('#chat-scroll');
+const chatMessages  = root.querySelector('#chat-messages');
+const chatForm      = root.querySelector('#chat-form');
+const chatInput     = root.querySelector('#chat-input');
+const suggestionsEl = root.querySelector('#chat-suggestions');
+
+const userAnswers = { why: '', goal: '' };
+let chatPhase = 'greeting';
+let chatStarted = false;
+let aiReplyIndex = 0;
+
 function startChatFlow() {
   setTimeout(() => {
     appendMessage('ai', openingPrompts.greeting);
-    // 인사 끝나는 시점 = 글자 수 * 100ms
     const greetingDuration = openingPrompts.greeting.length * config.chat.typingMsPerChar;
     setTimeout(() => {
       appendMessage('ai', openingPrompts.askWhy);
@@ -48,7 +209,6 @@ function startChatFlow() {
   }, config.chat.seedDelayMs);
 }
 
-// ── 메시지 렌더 ─────────────────────────────
 function appendMessage(role, text, meta) {
   const wrap = document.createElement('div');
   wrap.className = `msg-wrap ${role}`;
@@ -56,10 +216,7 @@ function appendMessage(role, text, meta) {
   el.className = `msg ${role}`;
   if (role === 'ai') {
     [...text].forEach((ch, i) => {
-      if (ch === '\n') {
-        el.appendChild(document.createElement('br'));
-        return;
-      }
+      if (ch === '\n') { el.appendChild(document.createElement('br')); return; }
       const span = document.createElement('span');
       span.className = 'typing-char';
       span.textContent = ch;
@@ -71,7 +228,6 @@ function appendMessage(role, text, meta) {
   }
   wrap.appendChild(el);
 
-  // AI 메시지 하단에 "위키 저장됨" 메타 배지
   if (role === 'ai' && meta?.savedTo?.length) {
     const badge = document.createElement('div');
     badge.className = 'msg-saved';
@@ -86,7 +242,6 @@ function appendMessage(role, text, meta) {
   requestAnimationFrame(() => { chatScroll.scrollTop = chatScroll.scrollHeight; });
 }
 
-// ── suggestion chips ─────────────────────────
 function showSuggestions(items) {
   suggestionsEl.innerHTML = '';
   items.forEach((label) => {
@@ -104,7 +259,6 @@ function hideSuggestions() {
   suggestionsEl.innerHTML = '';
 }
 
-// ── 사용자 발화 ───────────────────────────────
 function sendUserText(text) {
   if (!text) return;
   appendMessage('user', text);
@@ -136,7 +290,6 @@ function handleUserReply(text) {
     }, config.chat.aiReplyDelayMs);
     return;
   }
-
   if (chatPhase === 'askGoal') {
     userAnswers.goal = text;
     patchMetaPage('reading-goal', text);
@@ -151,13 +304,12 @@ function handleUserReply(text) {
     }, config.chat.aiReplyDelayMs);
     return;
   }
-
-  // 'free' — 메모 모드
   setTimeout(() => {
-    // 긴 글(인용 포함 가능성) 이면 본문 인용 + 반응 톤으로 응답
     if (text.length > 80) {
       const excerpt = pickExcerpt(text);
       appendMessage('ai', quoteReply({ excerpt }), { savedTo: ['인용'] });
+      // 위키 자동 저장 — 인용 페이지에 추가
+      Quotes.add({ bookId: activeBookId, text, page: '', memo: '' });
       return;
     }
     const reply = aiReplies[aiReplyIndex % aiReplies.length];
@@ -166,11 +318,9 @@ function handleUserReply(text) {
   }, config.chat.aiReplyDelayMs);
 }
 
-// 인용 문단에서 가장 중심에 가까운 한 문장을 발췌 — 데모용 휴리스틱
 function pickExcerpt(text) {
   const sentences = text.split(/(?<=[.다요죠임함])\s+/).filter((s) => s.trim().length > 12);
   if (sentences.length === 0) return text.slice(0, 80);
-  // 중간쯤 있는 문장이 보통 핵심
   const mid = sentences[Math.floor(sentences.length / 2)] || sentences[0];
   return mid.length > 120 ? mid.slice(0, 120) + '…' : mid;
 }
@@ -183,21 +333,6 @@ function patchMetaPage(id, text) {
     id === 'why-i-read' ? '- [[이 책에서 얻고 싶은 것]]' : '- [[내가 이 책을 읽는 이유]]'
   }`;
 }
-
-// ── 액션 라우팅 ─────────────────────────────
-root.addEventListener('click', (e) => {
-  const actionEl = e.target.closest('[data-action]');
-  if (!actionEl) return;
-  const action = actionEl.dataset.action;
-  switch (action) {
-    case 'open-chat': switchView('chat'); break;
-    case 'end-chat': switchView('notes'); break;
-    case 'back-home': switchView('home'); break;
-    case 'back-notes': switchView('notes'); break;
-    case 'open-notes-from-home': switchView('notes'); break;
-    case 'toggle-graph': toggleGraph(); break;
-  }
-});
 
 // ── wiki render ──────────────────────────────
 function renderWiki() {
@@ -346,8 +481,6 @@ function redrawEdges(nodeMap, svg) {
 
 function enableDrag(el, nodeMap, id, canvas, svg) {
   let startX, startY, origX, origY, moved = false;
-
-  // 이 노드의 이웃을 깊이 2까지 BFS — 1단계는 강하게, 2단계는 절반 세기로 당김
   const adj = {};
   wikiGraph.edges.forEach(([a, b]) => {
     (adj[a] ??= new Set()).add(b);
@@ -359,10 +492,7 @@ function enableDrag(el, nodeMap, id, canvas, svg) {
     const cur = queue.shift();
     if (depth.get(cur) >= 2) continue;
     (adj[cur] || []).forEach((nid) => {
-      if (!depth.has(nid)) {
-        depth.set(nid, depth.get(cur) + 1);
-        queue.push(nid);
-      }
+      if (!depth.has(nid)) { depth.set(nid, depth.get(cur) + 1); queue.push(nid); }
     });
   }
   const neighbors = [];
@@ -370,7 +500,6 @@ function enableDrag(el, nodeMap, id, canvas, svg) {
     if (d === 0) return;
     const node = nodeMap[nid];
     if (!node) return;
-    // 1단계 0.06, 2단계 0.025
     neighbors.push({ node, ratio: d === 1 ? 0.06 : 0.025 });
   });
 
@@ -385,19 +514,15 @@ function enableDrag(el, nodeMap, id, canvas, svg) {
     ny = Math.max(12, Math.min(rect.height - 28, ny));
     nodeMap[id].x = nx; nodeMap[id].y = ny;
     el.style.left = `${nx}px`; el.style.top = `${ny}px`;
-
-    // 1·2단계 이웃을 거리에 따라 다른 세기로 끌어당김
     neighbors.forEach(({ node, ratio }) => {
       const ox = (nx - origX) * ratio;
       const oy = (ny - origY) * ratio;
       node.el.style.transform = `translate(calc(-50% + ${ox}px), calc(-50% + ${oy}px)) scale(1)`;
     });
-
     redrawEdges(nodeMap, svg);
   };
   const onUp = () => {
     el.classList.remove('dragging');
-    // 이웃들 transform 리셋 → CSS spring transition으로 튕기듯 복귀
     neighbors.forEach(({ node }) => { node.el.style.transform = ''; });
     window.removeEventListener('pointermove', onMove);
     window.removeEventListener('pointerup', onUp);
@@ -419,3 +544,6 @@ function enableDrag(el, nodeMap, id, canvas, svg) {
     if (el.dataset.suppressClick) e.stopPropagation();
   }, true);
 }
+
+// ── 부팅 ─────────────────────────────────────
+switchTab('home');

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>0504 2 — LLM Wiki Reader</title>
+  <title>0504 2 — Reading App</title>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
   <link rel="stylesheet" href="../../../shared/styles/tokens.css" />
   <link rel="stylesheet" href="../../../shared/styles/base.css" />
@@ -22,42 +22,111 @@
         </span>
       </div>
 
-      <!-- ───────────── HOME ───────────── -->
-      <section class="view view-home active" data-view="home">
-        <header class="home-header">
-          <h1 class="home-title">내 서재</h1>
-          <p class="home-sub">탭하면 메모를 시작합니다</p>
-        </header>
+      <!-- ============================================================
+           앱 셸 — 탭 뷰 (홈/서재/내정보)
+           아래 탭들은 bottom-nav가 보이는 메인 탭 화면
+           ============================================================ -->
 
-        <div class="book-card-wrap">
-          <div class="book-card">
-            <div class="book-cover">
-              <img src="/assets/nexus-cover.jpg" alt="넥서스 표지" />
-              <button class="fab-memo" data-action="open-chat" aria-label="메모 작성">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 20h9"/>
-                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                </svg>
-              </button>
-            </div>
-            <div class="book-meta">
-              <h2 class="book-title">넥서스</h2>
-              <p class="book-author">유발 하라리</p>
-            </div>
-          </div>
+      <!-- ───────────── HOME (탭) ───────────── -->
+      <section class="view view-home active main-tab" data-view="home">
+        <div class="tab-scroll">
+          <header class="tab-header">
+            <h1 class="tab-title">오늘의 독서</h1>
+            <p class="tab-sub" id="home-greeting">반가워요. 어떤 페이지를 펼쳐볼까요?</p>
+          </header>
 
-          <button class="notes-link" data-action="open-notes-from-home">
-            <span>나의 위키 보기</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
+          <!-- 현재 읽는 책 카드 (대표 한 권) -->
+          <section class="home-section" id="home-current">
+            <div class="section-head">
+              <h2 class="section-title">지금 읽는 책</h2>
+            </div>
+            <div class="current-book" id="current-book"></div>
+          </section>
+
+          <!-- 최근 인용 (스크롤) -->
+          <section class="home-section" id="home-quotes">
+            <div class="section-head">
+              <h2 class="section-title">최근 인용</h2>
+              <button class="section-link" data-action="open-quote-add">+ 추가</button>
+            </div>
+            <ul class="recent-quotes" id="recent-quotes"></ul>
+          </section>
+
+          <!-- 다른 서재 책들 (가로 스크롤) -->
+          <section class="home-section" id="home-shelf">
+            <div class="section-head">
+              <h2 class="section-title">서재</h2>
+              <button class="section-link" data-tab="library">전체 보기</button>
+            </div>
+            <div class="shelf-row" id="home-shelf-row"></div>
+          </section>
+
+          <div class="tab-bottom-pad"></div>
         </div>
       </section>
+
+      <!-- ───────────── LIBRARY (서재 탭) ─────────────
+           views/library.js 가 #library-root 안에 렌더링 -->
+      <section class="view view-library main-tab" data-view="library">
+        <div class="tab-scroll" id="library-root">
+          <!-- views/library.js init() 진입 시 채움 -->
+        </div>
+      </section>
+
+      <!-- ───────────── PROFILE (내정보 탭) ─────────────
+           views/profile.js 가 #profile-root 안에 렌더링 -->
+      <section class="view view-profile main-tab" data-view="profile">
+        <div class="tab-scroll" id="profile-root">
+          <!-- views/profile.js init() 진입 시 채움 -->
+        </div>
+      </section>
+
+      <!-- ============================================================
+           모달 / 풀스크린 플로우 — bottom-nav 숨김
+           ============================================================ -->
+
+      <!-- ───────────── BOOK SEARCH (서재 → +) ─────────────
+           views/library.js 가 #book-search-root 안에 검색 UI 렌더 -->
+      <section class="view view-book-search" data-view="book-search">
+        <header class="modal-topbar">
+          <button class="icon-btn" data-action="back-from-book-search" aria-label="닫기">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <span class="modal-title">책 추가</span>
+          <span class="icon-btn placeholder"></span>
+        </header>
+        <div class="modal-scroll" id="book-search-root">
+          <!-- views/library.js 가 채움 -->
+        </div>
+      </section>
+
+      <!-- ───────────── QUOTE ADD (Quote+) ─────────────
+           views/quote.js 가 #quote-add-root 안에 폼 렌더 -->
+      <section class="view view-quote-add" data-view="quote-add">
+        <header class="modal-topbar">
+          <button class="icon-btn" data-action="back-from-quote-add" aria-label="닫기">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <span class="modal-title">인용 추가</span>
+          <button class="modal-cta" id="quote-save-btn" disabled>저장</button>
+        </header>
+        <div class="modal-scroll" id="quote-add-root">
+          <!-- views/quote.js 가 채움 -->
+        </div>
+      </section>
+
+      <!-- ============================================================
+           기존 챗봇 + 위키 플로우 — 그대로 유지
+           ============================================================ -->
 
       <!-- ───────────── CHAT ───────────── -->
       <section class="view view-chat" data-view="chat">
         <header class="chat-topbar">
+          <button class="icon-btn icon-btn--chat-back" data-action="end-chat-back" aria-label="닫기">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
           <div class="chat-topbar-meta">
-            <span class="chat-topbar-title">넥서스 메모 세션</span>
+            <span class="chat-topbar-title" id="chat-book-title">메모 세션</span>
             <span class="chat-topbar-sub">위키에 자동 저장돼요</span>
           </div>
           <button class="end-btn" data-action="end-chat">대화 종료</button>
@@ -67,7 +136,6 @@
           <div class="chat-messages" id="chat-messages"></div>
         </div>
 
-        <!-- AI가 던진 질문에 대한 빠른 응답 칩 (상황에 따라 동적으로 채움) -->
         <div class="chat-suggestions" id="chat-suggestions" hidden></div>
 
         <form class="chat-input-bar" id="chat-form" autocomplete="off">
@@ -75,7 +143,7 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
           <div class="chat-input-pill">
-            <input type="text" id="chat-input" class="chat-input" placeholder="넥서스에 대해 적어보세요" />
+            <input type="text" id="chat-input" class="chat-input" placeholder="이 책에 대해 적어보세요" />
             <button type="submit" class="chat-send" aria-label="보내기">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="6"  y1="10" x2="6"  y2="14"/>
@@ -91,11 +159,11 @@
       <!-- ───────────── WIKI (Notes) ───────────── -->
       <section class="view view-notes" data-view="notes">
         <header class="notes-topbar">
-          <button class="icon-btn" data-action="back-home" aria-label="홈">
+          <button class="icon-btn" data-action="notes-back" aria-label="뒤로">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
           <div class="notes-topbar-meta">
-            <span class="notes-topbar-title">넥서스 위키</span>
+            <span class="notes-topbar-title" id="wiki-book-title">위키</span>
             <span class="notes-topbar-sub" id="wiki-sub">방금 세션 반영 · 페이지 갱신됨</span>
           </div>
           <button class="icon-btn" data-action="toggle-graph" aria-label="그래프 보기" id="graph-toggle-btn">
@@ -107,7 +175,6 @@
         </header>
 
         <div class="notes-scroll" id="notes-scroll">
-          <!-- 그래프 카드 (메인) -->
           <article class="wiki-card" id="wiki-graph-card">
             <div class="wiki-card-header">
               <span class="ai-pill"><span class="ai-dot"></span> Graph view</span>
@@ -120,7 +187,6 @@
             </div>
           </article>
 
-          <!-- 이번 세션 업데이트 요약 -->
           <article class="session-card">
             <span class="ai-pill"><span class="ai-dot"></span> 이번 세션 정리</span>
             <h3 class="session-title">방금 대화에서 위키가 이렇게 바뀌었어요</h3>
@@ -132,14 +198,12 @@
             </ul>
           </article>
 
-          <!-- 위키 인덱스 (사용자가 만든 페이지들) -->
           <div class="wiki-section-head">
             <h3 class="wiki-section-title">내 페이지</h3>
             <span class="wiki-count" id="wiki-count">0개</span>
           </div>
           <ul class="wiki-pages" id="wiki-pages"></ul>
 
-          <!-- 로그 -->
           <div class="wiki-section-head">
             <h3 class="wiki-section-title">로그</h3>
             <span class="wiki-hint">log.md</span>
@@ -150,7 +214,7 @@
         </div>
       </section>
 
-      <!-- ───────────── PAGE DETAIL (모달) ───────────── -->
+      <!-- ───────────── PAGE DETAIL ───────────── -->
       <section class="view view-page-detail" data-view="page-detail">
         <header class="notes-topbar">
           <button class="icon-btn" data-action="back-notes" aria-label="뒤로">
@@ -158,7 +222,7 @@
           </button>
           <div class="notes-topbar-meta">
             <span class="notes-topbar-title">페이지</span>
-            <span class="notes-topbar-sub">넥서스 위키</span>
+            <span class="notes-topbar-sub">위키</span>
           </div>
           <span class="icon-btn placeholder"></span>
         </header>
@@ -167,6 +231,36 @@
           <div class="scroll-bottom-pad"></div>
         </div>
       </section>
+
+      <!-- ============================================================
+           BOTTOM NAV — 메인 탭(.main-tab) 활성 시에만 노출
+           ============================================================ -->
+      <nav class="bnav" id="bnav">
+        <button class="bnav-item" data-tab="home" aria-label="홈">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>
+          </svg>
+          <span>홈</span>
+        </button>
+        <button class="bnav-item" data-tab="library" aria-label="서재">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h4v16H4z"/><path d="M10 4h4v16h-4z"/><path d="M16 6l4 1-3 14-4-1z"/>
+          </svg>
+          <span>서재</span>
+        </button>
+        <button class="bnav-fab" data-action="open-quote-add" aria-label="인용 추가">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21c0-3 2-5 5-5h0V5H3v9c0 1 .5 2 2 2"/>
+            <path d="M13 21c0-3 2-5 5-5h0V5h-5v9c0 1 .5 2 2 2"/>
+          </svg>
+        </button>
+        <button class="bnav-item" data-tab="profile" aria-label="내정보">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/>
+          </svg>
+          <span>내정보</span>
+        </button>
+      </nav>
     </div>
   </div>
 
