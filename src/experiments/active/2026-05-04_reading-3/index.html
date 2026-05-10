@@ -308,8 +308,12 @@
             <!-- OCR용 숨김 canvas -->
             <canvas id="capture-canvas" style="display:none;"></canvas>
 
-            <!-- 선택 박스 -->
-            <div class="selection-box" id="selection-box"></div>
+            <!-- 형광펜 stroke 컨테이너 -->
+            <div id="hl-layer" style="position:absolute;inset:0;pointer-events:none;"></div>
+
+            <!-- OCR 실행 버튼 -->
+            <button class="hl-confirm-btn" id="hl-confirm-btn">텍스트 인식하기</button>
+            <button class="hl-reset-btn" id="hl-reset-btn">다시 그리기</button>
 
             <div class="vf-topbar">
               <button class="vf-close" data-action="go-home">
@@ -319,7 +323,7 @@
             </div>
 
             <div class="vf-hint">
-              <p>기록하고 싶은 텍스트 영역을 드래그하세요</p>
+              <p>기록할 줄 위를 좌→우로 밑줄 치세요</p>
             </div>
           </div>
         </div>

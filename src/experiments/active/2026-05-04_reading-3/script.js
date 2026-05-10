@@ -114,91 +114,111 @@ function stopCamera() {
   video.srcObject = null;
 }
 
-// ── 드래그 선택 ─────────────────────────────────────────
-const viewfinder = root.querySelector('#viewfinder');
-const selBox = root.querySelector('#selection-box');
-const canvas = root.querySelector('#capture-canvas');
+// ── 형광펜 드래그 ────────────────────────────────────────
+const viewfinder  = root.querySelector('#viewfinder');
+const hlLayer     = root.querySelector('#hl-layer');
+const confirmBtn  = root.querySelector('#hl-confirm-btn');
+const resetBtn    = root.querySelector('#hl-reset-btn');
+const canvas      = root.querySelector('#capture-canvas');
+
+// 완성된 strokes: [{top, height}]
+let strokes = [];
 let dragging = false;
-let startX = 0, startY = 0;
+let strokeEl = null;
+let strokeStartY = 0;
+let vfRect = null;
 
 function getRelPos(e, rect) {
   const src = e.touches ? e.touches[0] : e;
   return { x: src.clientX - rect.left, y: src.clientY - rect.top };
 }
 
-viewfinder.addEventListener('mousedown', onDragStart);
-viewfinder.addEventListener('touchstart', onDragStart, { passive: true });
+viewfinder.addEventListener('mousedown', onStrokeStart);
+viewfinder.addEventListener('touchstart', onStrokeStart, { passive: true });
 
-function onDragStart(e) {
-  // 버튼 클릭은 드래그 시작 무시
+function onStrokeStart(e) {
   if (e.target.closest('button')) return;
-  const rect = viewfinder.getBoundingClientRect();
-  const pos = getRelPos(e, rect);
-  startX = pos.x; startY = pos.y;
+  vfRect = viewfinder.getBoundingClientRect();
+  const pos = getRelPos(e, vfRect);
+  strokeStartY = pos.y;
   dragging = true;
-  selBox.style.cssText = `left:${startX}px;top:${startY}px;width:0;height:0;`;
-  selBox.classList.add('visible');
+
+  strokeEl = document.createElement('div');
+  strokeEl.className = 'hl-stroke';
+  strokeEl.style.top = strokeStartY + 'px';
+  strokeEl.style.height = '2px';
+  strokeEl.style.width = '100%';  // 가로는 항상 전체
+  hlLayer.appendChild(strokeEl);
 }
 
-root.addEventListener('mousemove', onDragMove);
-root.addEventListener('touchmove', onDragMove, { passive: true });
+root.addEventListener('mousemove', onStrokeMove);
+root.addEventListener('touchmove', onStrokeMove, { passive: true });
 
-function onDragMove(e) {
-  if (!dragging) return;
-  const rect = viewfinder.getBoundingClientRect();
-  const pos = getRelPos(e, rect);
-  const x = Math.min(startX, pos.x);
-  const y = Math.min(startY, pos.y);
-  const w = Math.abs(pos.x - startX);
-  const h = Math.abs(pos.y - startY);
-  selBox.style.left = x + 'px';
-  selBox.style.top = y + 'px';
-  selBox.style.width = w + 'px';
-  selBox.style.height = h + 'px';
+function onStrokeMove(e) {
+  if (!dragging || !strokeEl) return;
+  const pos = getRelPos(e, vfRect);
+  const top = Math.min(strokeStartY, pos.y);
+  const h   = Math.max(4, Math.abs(pos.y - strokeStartY));
+  strokeEl.style.top    = top + 'px';
+  strokeEl.style.height = h + 'px';
 }
 
-root.addEventListener('mouseup', onDragEnd);
-root.addEventListener('touchend', onDragEnd);
+root.addEventListener('mouseup', onStrokeEnd);
+root.addEventListener('touchend', onStrokeEnd);
 
-async function onDragEnd() {
-  if (!dragging) return;
+function onStrokeEnd() {
+  if (!dragging || !strokeEl) return;
   dragging = false;
-  const w = parseFloat(selBox.style.width);
-  const h = parseFloat(selBox.style.height);
-  if (w < 30 || h < 15) {
-    selBox.classList.remove('visible');
+  const h = parseFloat(strokeEl.style.height);
+  if (h < 8) {
+    strokeEl.remove();
+    strokeEl = null;
     return;
   }
-  await runOCR();
+  const top = parseFloat(strokeEl.style.top);
+  strokes.push({ top, height: h });
+  strokeEl = null;
+  updateConfirmBtn();
 }
+
+function updateConfirmBtn() {
+  const hasStrokes = strokes.length > 0;
+  confirmBtn.classList.toggle('visible', hasStrokes);
+  resetBtn.classList.toggle('visible', hasStrokes);
+}
+
+confirmBtn.addEventListener('click', async () => {
+  await runOCR();
+});
+
+resetBtn.addEventListener('click', () => {
+  hlLayer.innerHTML = '';
+  strokes = [];
+  updateConfirmBtn();
+});
 
 // ── OCR ─────────────────────────────────────────────────
 async function runOCR() {
-  const vfRect = viewfinder.getBoundingClientRect();
-  const selRect = {
-    x: parseFloat(selBox.style.left),
-    y: parseFloat(selBox.style.top),
-    w: parseFloat(selBox.style.width),
-    h: parseFloat(selBox.style.height),
-  };
+  const rect = viewfinder.getBoundingClientRect();
 
-  // 화면 좌표 → 비디오 실제 픽셀 좌표 변환
-  const scaleX = (video.videoWidth || vfRect.width) / vfRect.width;
-  const scaleY = (video.videoHeight || vfRect.height) / vfRect.height;
+  // 모든 strokes의 bounding box 계산
+  const minTop = Math.min(...strokes.map(s => s.top));
+  const maxBot = Math.max(...strokes.map(s => s.top + s.height));
+  const selTop = minTop;
+  const selH   = maxBot - minTop;
 
-  const srcW = video.videoWidth || vfRect.width;
-  const srcH = video.videoHeight || vfRect.height;
+  const scaleX = (video.videoWidth  || rect.width)  / rect.width;
+  const scaleY = (video.videoHeight || rect.height) / rect.height;
 
-  canvas.width = Math.round(selRect.w * scaleX);
-  canvas.height = Math.round(selRect.h * scaleY);
+  canvas.width  = Math.round(rect.width * scaleX);
+  canvas.height = Math.round(selH * scaleY);
 
   const ctx = canvas.getContext('2d');
 
-  // 카메라 스트림 있으면 video에서 crop, 없으면 fallback DOM을 html2canvas 없이 그냥 빈 캔버스
   if (cameraStream && video.readyState >= 2) {
     ctx.drawImage(
       video,
-      Math.round(selRect.x * scaleX), Math.round(selRect.y * scaleY),
+      0, Math.round(selTop * scaleY),
       canvas.width, canvas.height,
       0, 0, canvas.width, canvas.height
     );
@@ -253,11 +273,14 @@ function showResult() {
 function showViewfinder() {
   root.querySelector('#result-step').style.display = 'none';
   root.querySelector('#viewfinder-step').style.display = 'flex';
-  selBox.classList.remove('visible');
 }
 
 function resetCaptureUI() {
   showViewfinder();
+  // 형광펜 strokes 초기화
+  hlLayer.innerHTML = '';
+  strokes = [];
+  updateConfirmBtn();
   root.querySelectorAll('[data-capture-tag].selected').forEach(t => t.classList.remove('selected'));
   root.querySelector('#ocr-text').value = '';
   showOcrLoading(false);
