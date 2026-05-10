@@ -1,0 +1,11 @@
+{
+  "id": "2026-05-07_reading-rn",
+  "title": "0507 RN",
+  "version": "v0.1",
+  "status": "active",
+  "notes": [
+    "0504-2를 React Native로 포팅 → react-native-web으로 브라우저에서 미리보기",
+    "iOS/Android 실 빌드는 native/ 폴더 참고 (Expo)",
+    "인스펙터: data-rn 어트리뷰트로 컴포넌트명 노출"
+  ]
+}

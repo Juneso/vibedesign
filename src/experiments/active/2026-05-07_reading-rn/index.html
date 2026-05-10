@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>0507 RN — Reading App (RN→Web)</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <link rel="stylesheet" href="../../../shared/styles/tokens.css" />
+  <link rel="stylesheet" href="../../../shared/styles/base.css" />
+  <link rel="stylesheet" href="../../../shared/styles/device.css" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body data-theme="">
+  <!-- 디바이스 목업 프레임은 다른 실험과 동일하게 HTML로 유지.
+       프레임 안의 캔버스(.canvas-content)에만 RN 앱이 렌더링됨. -->
+  <div class="device-frame">
+    <div class="notch"></div>
+    <div class="canvas-content" data-inspect="canvas-root">
+      <div id="rn-root" style="position:absolute; inset:0;"></div>
+    </div>
+  </div>
+
+  <!-- Inspector compatibility (Shift+클릭) -->
+  <script type="module" src="../../../shared/js/animation.js"></script>
+  <!-- RN→Web 인스펙터 어댑터: data-rn 속성을 className에 미러링 -->
+  <script type="module" src="./inspector-rn-adapter.js"></script>
+  <!-- React 앱 부트 -->
+  <script type="module" src="./main.jsx"></script>
+</body>
+</html>

@@ -90,8 +90,25 @@ export default defineConfig({
   ],
   assetsInclude: ['**/*.lottie'],
   base: './',
+  resolve: {
+    alias: {
+      'react-native': 'react-native-web',
+      'expo-linear-gradient': resolve(__dirname, 'src/shared/web-shims/linear-gradient.jsx'),
+      'react-native-svg': resolve(__dirname, 'src/shared/web-shims/react-native-svg.jsx'),
+    },
+    extensions: ['.web.js', '.js', '.jsx', '.json'],
+  },
+  esbuild: { jsx: 'automatic', jsxImportSource: 'react' },
+  optimizeDeps: {
+    esbuildOptions: { jsx: 'automatic', jsxImportSource: 'react' },
+    include: ['react', 'react-dom', 'react-dom/client', 'react-native-web'],
+  },
+  define: {
+    __DEV__: 'true',
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+  },
   server: {
-    port: 5174, 
+    port: 5174,
   },
   build: {
     rollupOptions: {
