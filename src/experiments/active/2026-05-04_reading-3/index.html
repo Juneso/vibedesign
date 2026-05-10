@@ -291,7 +291,10 @@
           <div class="viewfinder"
                id="viewfinder"
                data-step="viewfinder">
-            <div class="mock-page">
+            <!-- 실제 카메라 스트림 -->
+            <video id="camera-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+            <!-- 카메라 불가 시 fallback -->
+            <div class="mock-page" id="camera-fallback" style="display:none;">
               <div class="mock-book-page">
                 <p class="mock-chapter">제4장. 두려움과 선택</p>
                 <p class="mock-body">
@@ -302,6 +305,8 @@
               </div>
               <p class="mock-hint">드래그로 텍스트 영역을 선택하세요</p>
             </div>
+            <!-- OCR용 숨김 canvas -->
+            <canvas id="capture-canvas" style="display:none;"></canvas>
 
             <!-- 선택 박스 -->
             <div class="selection-box" id="selection-box"></div>
@@ -334,8 +339,14 @@
             </div>
 
             <div class="result-body">
+              <!-- OCR 로딩 -->
+              <div class="ocr-loading" id="ocr-loading">
+                <div class="ocr-spinner"></div>
+                <span class="ocr-loading-text">텍스트 인식 중...</span>
+                <span class="ocr-progress" id="ocr-progress"></span>
+              </div>
               <p class="result-label">인식된 텍스트</p>
-              <textarea class="result-textarea" id="ocr-text" rows="4">불안은 선택이다. 우리가 두려워하는 것들은 대부분 우리 마음이 만들어낸 미래다.</textarea>
+              <textarea class="result-textarea" id="ocr-text" rows="4" placeholder="텍스트 인식 결과가 여기에 표시됩니다"></textarea>
 
               <p class="result-label mt">책 정보</p>
               <div class="book-inputs">
@@ -517,6 +528,9 @@
     </div><!-- /canvas-content -->
   </div><!-- /device-frame -->
 
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script type="module" src="script.js"></script>
+  <!-- Inspector client (Shift+클릭으로 레이어 검사) -->
+  <script type="module" src="../../../shared/js/animation.js"></script>
 </body>
 </html>

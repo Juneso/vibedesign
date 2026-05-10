@@ -10,8 +10,8 @@ function switchView(target) {
   views.forEach(v => v.classList.toggle('active', v.dataset.view === target));
   navTabs.forEach(t => t.classList.toggle('active', t.dataset.nav === target));
 
-  // 캡처 탭 진입 시 뷰파인더 초기 상태로 리셋
-  if (target === 'capture') resetCapture();
+  if (target === 'capture') initCapture();
+  else stopCamera();
 }
 
 // ── 내 생각 전송 버튼 활성화 ────────────────────────────
@@ -27,11 +27,9 @@ root.addEventListener('click', e => {
   const actionEl = e.target.closest('[data-action]');
   if (actionEl) handleAction(actionEl.dataset.action, actionEl);
 
-  // 바텀 네비
   const navTab = e.target.closest('[data-nav]');
   if (navTab) switchView(navTab.dataset.nav);
 
-  // 캡처 태그 토글
   const captureTag = e.target.closest('[data-capture-tag]');
   if (captureTag) captureTag.classList.toggle('selected');
 });
@@ -55,8 +53,6 @@ function handleAction(action, el) {
     case 'go-home':
       switchView('home');
       break;
-
-    // 서재 — 책 상세
     case 'open-book': {
       const btn = el.closest('[data-action="open-book"]');
       const detail = root.querySelector('#book-detail');
@@ -72,13 +68,9 @@ function handleAction(action, el) {
     case 'close-book':
       root.querySelector('#book-detail').classList.remove('active');
       break;
-
-    // 캡처 — 결과 → 뷰파인더
     case 'back-to-viewfinder':
       showViewfinder();
       break;
-
-    // 캡처 — 저장
     case 'save-capture': {
       const btn = root.querySelector('#save-btn');
       btn.classList.add('saved');
@@ -93,44 +85,65 @@ function handleAction(action, el) {
   }
 }
 
-// ── 캡처 뷰파인더 드래그 선택 ───────────────────────────
+// ── 카메라 ──────────────────────────────────────────────
+const video = root.querySelector('#camera-video');
+const fallback = root.querySelector('#camera-fallback');
+let cameraStream = null;
+
+async function initCapture() {
+  resetCaptureUI();
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+    });
+    video.srcObject = cameraStream;
+    video.style.display = 'block';
+    fallback.style.display = 'none';
+  } catch {
+    // 카메라 권한 거부 or 미지원 → fallback
+    video.style.display = 'none';
+    fallback.style.display = 'flex';
+  }
+}
+
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+  }
+  video.srcObject = null;
+}
+
+// ── 드래그 선택 ─────────────────────────────────────────
 const viewfinder = root.querySelector('#viewfinder');
 const selBox = root.querySelector('#selection-box');
+const canvas = root.querySelector('#capture-canvas');
 let dragging = false;
 let startX = 0, startY = 0;
 
-const sampleTexts = [
-  '불안은 선택이다. 우리가 두려워하는 것들은 대부분 우리 마음이 만들어낸 미래다.',
-  '현재에 집중하는 것만이 유일한 해답이다. 지금 이 순간이 전부다.',
-  '두려움은 항상 미래의 투영이다.',
-];
-
 function getRelPos(e, rect) {
-  if (e.touches && e.touches[0]) {
-    return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
-  }
-  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  const src = e.touches ? e.touches[0] : e;
+  return { x: src.clientX - rect.left, y: src.clientY - rect.top };
 }
 
-viewfinder.addEventListener('mousedown', startDrag);
-viewfinder.addEventListener('touchstart', startDrag, { passive: true });
+viewfinder.addEventListener('mousedown', onDragStart);
+viewfinder.addEventListener('touchstart', onDragStart, { passive: true });
 
-function startDrag(e) {
+function onDragStart(e) {
+  // 버튼 클릭은 드래그 시작 무시
+  if (e.target.closest('button')) return;
   const rect = viewfinder.getBoundingClientRect();
   const pos = getRelPos(e, rect);
   startX = pos.x; startY = pos.y;
   dragging = true;
-  selBox.style.left = startX + 'px';
-  selBox.style.top = startY + 'px';
-  selBox.style.width = '0';
-  selBox.style.height = '0';
+  selBox.style.cssText = `left:${startX}px;top:${startY}px;width:0;height:0;`;
   selBox.classList.add('visible');
 }
 
-root.addEventListener('mousemove', moveDrag);
-root.addEventListener('touchmove', moveDrag, { passive: true });
+root.addEventListener('mousemove', onDragMove);
+root.addEventListener('touchmove', onDragMove, { passive: true });
 
-function moveDrag(e) {
+function onDragMove(e) {
   if (!dragging) return;
   const rect = viewfinder.getBoundingClientRect();
   const pos = getRelPos(e, rect);
@@ -144,23 +157,93 @@ function moveDrag(e) {
   selBox.style.height = h + 'px';
 }
 
-root.addEventListener('mouseup', endDrag);
-root.addEventListener('touchend', endDrag);
+root.addEventListener('mouseup', onDragEnd);
+root.addEventListener('touchend', onDragEnd);
 
-function endDrag() {
+async function onDragEnd() {
   if (!dragging) return;
   dragging = false;
-  const w = parseInt(selBox.style.width);
-  const h = parseInt(selBox.style.height);
-  if (w > 30 && h > 15) {
-    const picked = sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
-    root.querySelector('#ocr-text').value = picked;
-    showResult();
-  } else {
+  const w = parseFloat(selBox.style.width);
+  const h = parseFloat(selBox.style.height);
+  if (w < 30 || h < 15) {
     selBox.classList.remove('visible');
+    return;
+  }
+  await runOCR();
+}
+
+// ── OCR ─────────────────────────────────────────────────
+async function runOCR() {
+  const vfRect = viewfinder.getBoundingClientRect();
+  const selRect = {
+    x: parseFloat(selBox.style.left),
+    y: parseFloat(selBox.style.top),
+    w: parseFloat(selBox.style.width),
+    h: parseFloat(selBox.style.height),
+  };
+
+  // 화면 좌표 → 비디오 실제 픽셀 좌표 변환
+  const scaleX = (video.videoWidth || vfRect.width) / vfRect.width;
+  const scaleY = (video.videoHeight || vfRect.height) / vfRect.height;
+
+  const srcW = video.videoWidth || vfRect.width;
+  const srcH = video.videoHeight || vfRect.height;
+
+  canvas.width = Math.round(selRect.w * scaleX);
+  canvas.height = Math.round(selRect.h * scaleY);
+
+  const ctx = canvas.getContext('2d');
+
+  // 카메라 스트림 있으면 video에서 crop, 없으면 fallback DOM을 html2canvas 없이 그냥 빈 캔버스
+  if (cameraStream && video.readyState >= 2) {
+    ctx.drawImage(
+      video,
+      Math.round(selRect.x * scaleX), Math.round(selRect.y * scaleY),
+      canvas.width, canvas.height,
+      0, 0, canvas.width, canvas.height
+    );
+  } else {
+    // fallback: 흰 배경 + 안내 텍스트 (실제 OCR 동작 시연용)
+    ctx.fillStyle = '#f8f6f1';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#1a1a1a';
+    ctx.font = '20px sans-serif';
+    ctx.fillText('불안은 선택이다. 우리가 두려워하는 것들은', 10, 40);
+    ctx.fillText('대부분 우리 마음이 만들어낸 미래다.', 10, 70);
+  }
+
+  showResult();
+  showOcrLoading(true);
+
+  try {
+    const { createWorker } = Tesseract;
+    const worker = await createWorker('kor+eng', 1, {
+      logger: m => {
+        if (m.status === 'recognizing text') {
+          const pct = Math.round((m.progress || 0) * 100);
+          const el = root.querySelector('#ocr-progress');
+          if (el) el.textContent = pct + '%';
+        }
+      },
+    });
+    const { data: { text } } = await worker.recognize(canvas);
+    await worker.terminate();
+
+    root.querySelector('#ocr-text').value = text.trim();
+  } catch (err) {
+    root.querySelector('#ocr-text').value = '(텍스트 인식 실패 — 다시 시도해주세요)';
+    console.error('OCR error:', err);
+  } finally {
+    showOcrLoading(false);
   }
 }
 
+function showOcrLoading(on) {
+  root.querySelector('#ocr-loading').classList.toggle('visible', on);
+  root.querySelector('#ocr-text').style.opacity = on ? '0.4' : '1';
+}
+
+// ── 단계 전환 ────────────────────────────────────────────
 function showResult() {
   root.querySelector('#viewfinder-step').style.display = 'none';
   const rs = root.querySelector('#result-step');
@@ -173,8 +256,9 @@ function showViewfinder() {
   selBox.classList.remove('visible');
 }
 
-function resetCapture() {
+function resetCaptureUI() {
   showViewfinder();
   root.querySelectorAll('[data-capture-tag].selected').forEach(t => t.classList.remove('selected'));
-  root.querySelector('#ocr-text').value = '불안은 선택이다. 우리가 두려워하는 것들은 대부분 우리 마음이 만들어낸 미래다.';
+  root.querySelector('#ocr-text').value = '';
+  showOcrLoading(false);
 }

@@ -31,6 +31,17 @@ export const config = {
     captureFeedbackMs: 1400,
   },
 
+  ocr: {
+    lang: 'kor+eng',   // 한국어 + 영어 동시 인식
+    // Tesseract.js CDN — 한국어 모델 ~15MB, 첫 로딩 느림
+  },
+
+  camera: {
+    facingMode: 'environment',  // 후면 카메라 우선
+    idealWidth: 1280,
+    idealHeight: 720,
+  },
+
   mockData: {
     dateStr: '5월 4일',
     feedCount: 3,
