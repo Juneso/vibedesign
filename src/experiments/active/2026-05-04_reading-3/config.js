@@ -32,14 +32,21 @@ export const config = {
   },
 
   ocr: {
-    lang: 'kor+eng',   // 한국어 + 영어 동시 인식
-    // Tesseract.js CDN — 한국어 모델 ~15MB, 첫 로딩 느림
+    lang: 'kor+eng',  // 한국어 + 영어 동시 인식
+    psm: '6',         // uniform block of text — 정확도 향상
+    scale: 2,         // 업스케일 배율 (OCR 전 2x 확대)
   },
 
   camera: {
-    facingMode: 'environment',  // 후면 카메라 우선
+    facingMode: 'environment',
     idealWidth: 1280,
     idealHeight: 720,
+  },
+
+  lineDetection: {
+    threshold: 0.92,  // 전체 평균 대비 이 비율 이하 = 텍스트 행
+    minHeight: 8,     // 텍스트 줄로 인정할 최소 높이(px)
+    mergeGap: 6,      // 이 간격 이하의 인접 줄은 병합(px)
   },
 
   mockData: {
