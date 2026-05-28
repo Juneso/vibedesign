@@ -1,8 +1,12 @@
 import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import { resolve, relative, dirname } from 'path'
+import { resolve, relative, dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 import { readdirSync, statSync, existsSync, readFileSync } from 'fs'
+import { tmpdir } from 'os'
+import { aladinPlugin } from './src/shared/plugins/aladinPlugin.js'
+import { openaiPlugin } from './src/shared/plugins/openaiPlugin.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -85,30 +89,27 @@ function editTrailPlugin() {
 
 export default defineConfig({
   plugins: [
+    react(),
     tailwindcss(),
     editTrailPlugin(),
+    aladinPlugin(),
+    openaiPlugin(),
   ],
   assetsInclude: ['**/*.lottie'],
   base: './',
-  resolve: {
-    alias: {
-      'react-native': 'react-native-web',
-      'expo-linear-gradient': resolve(__dirname, 'src/shared/web-shims/linear-gradient.jsx'),
-      'react-native-svg': resolve(__dirname, 'src/shared/web-shims/react-native-svg.jsx'),
-    },
-    extensions: ['.web.js', '.js', '.jsx', '.json'],
-  },
-  esbuild: { jsx: 'automatic', jsxImportSource: 'react' },
+  // .vite 캐시(pre-bundled deps)를 iCloud 밖으로 → 부팅·재로드 속도 큰 폭 개선
+  cacheDir: join(tmpdir(), 'vite-cache-실험실'),
   optimizeDeps: {
-    esbuildOptions: { jsx: 'automatic', jsxImportSource: 'react' },
-    include: ['react', 'react-dom', 'react-dom/client', 'react-native-web'],
+    include: ['react', 'react-dom', 'react-dom/client', 'motion'],
   },
   define: {
-    __DEV__: 'true',
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
   },
   server: {
     port: 5174,
+    watch: {
+      ignored: ['**/*.icloud', '**/.DS_Store', '**/vite.config.js', '**/.env.*'],
+    },
   },
   build: {
     rollupOptions: {
