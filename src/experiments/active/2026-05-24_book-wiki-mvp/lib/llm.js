@@ -341,7 +341,9 @@ JSON만 출력.
 }
 
 // ─── 호출 ────────────────────────────────────────────────────────
-async function callLLM({ system, user, model, temperature }) {
+// 기본 transport: 브라우저 → Vite dev 플러그인 /api/llm.
+// eval/runEval.mjs 같은 Node 환경에서는 setLLMTransport 로 OpenAI 직접 호출 주입.
+let _llmTransport = async ({ system, user, model, temperature }) => {
   const r = await fetch('/api/llm', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -349,8 +351,15 @@ async function callLLM({ system, user, model, temperature }) {
   });
   const data = await r.json();
   if (!r.ok) throw new Error(data?.error || 'llm proxy error');
-  try { return JSON.parse(data.text); }
-  catch { throw new Error('LLM 응답이 JSON이 아님: ' + data.text?.slice(0, 200)); }
+  return data.text;
+};
+
+export function setLLMTransport(fn) { _llmTransport = fn; }
+
+async function callLLM({ system, user, model, temperature }) {
+  const text = await _llmTransport({ system, user, model, temperature });
+  try { return JSON.parse(text); }
+  catch { throw new Error('LLM 응답이 JSON이 아님: ' + String(text).slice(0, 200)); }
 }
 
 // ─── Follow-up: 메모 직후 1~2개 후속 질문 ─────────────────────────
