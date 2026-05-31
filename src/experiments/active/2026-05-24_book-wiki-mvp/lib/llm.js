@@ -91,6 +91,33 @@ export const NUDGE_SCHEMA = {
     type: { enum: ['memo-memo', 'profile-memo', 'book-book'] },
     question: { type: 'string' },
     sourcePageIds: { type: 'array', items: { type: 'string' }, minItems: 1 },
+    usedDerivedKeywords: { type: 'array', items: { type: 'string' } },
+  },
+};
+
+// DES-183 · Profile 해석.
+// 직군·관심사·고민을 받아 wiki 매칭에 쓸 2차 키워드 집합으로 풀어낸다.
+// 직접 단어 매칭이 만들어내는 "디자이너→디자인 메모만" 패턴 회피가 목적.
+export const PROFILE_SCHEMA = {
+  type: 'object',
+  required: ['derivedKeywords', 'confidence'],
+  properties: {
+    derivedKeywords: {
+      type: 'array',
+      minItems: 5,
+      maxItems: 10,
+      items: {
+        type: 'object',
+        required: ['keyword', 'axis', 'reasoning', 'sourceField'],
+        properties: {
+          keyword: { type: 'string' },                   // 짧은 명사구 (1~6단어).
+          axis: { enum: ['인지', '정서', '실무'] },        // 사고/감정/일하는 방식 중 어디서 파생됐는가.
+          reasoning: { type: 'string' },                  // 1문장. 입력의 어떤 부분에서 어떻게 파생됐는지.
+          sourceField: { enum: ['role', 'interests', 'currentConcerns', 'values'] },
+        },
+      },
+    },
+    confidence: { enum: ['low', 'med', 'high'] },
   },
 };
 
@@ -211,11 +238,54 @@ JSON만 출력.
   `.trim();
 }
 
-export function nudgePrompt({ memos, pages, profile }) {
+export function interpretProfilePrompt({ profile }) {
+  const fmt = (arr) => Array.isArray(arr) && arr.length ? arr.map(x => `  - ${x}`).join('\n') : '  (없음)';
   return `
 [사용자 프로필]
-background: ${profile.background || '(없음)'}
+role: ${profile.role || '(없음)'}
+interests:
+${fmt(profile.interests)}
+currentConcerns:
+${fmt(profile.currentConcerns)}
+values:
+${fmt(profile.values)}
+
+[작업]
+이 사용자의 프로필을, 독서 wiki 페이지와 매칭할 때 쓸 **2차 키워드** 5~10개로 풀어낸다.
+
+원칙:
+- 직군의 직접 단어("디자이너", "디지털 프로덕트") 그대로 쓰지 말 것. 그 직군이 *어떤 사고/감정/실무 패턴*을 갖는지로 변환.
+- axis 3축으로 분배:
+  - 인지: 이 사람이 *어떻게 사고하는가* (예: "제약 안에서의 결정", "왜를 먼저 정렬")
+  - 정서: 이 사람이 *무엇에 끌리고 무엇을 두려워하는가* (예: "정답 없는 문제의 몰입감", "사소한 결정의 마비")
+  - 실무: 이 사람이 *무엇을 다루는가* (예: "복잡한 사용성 문제", "프로토타입을 통한 학습")
+- 각 키워드는 짧은 명사구(1~6단어). 슬로건/문장 금지.
+- 환각 금지: 입력에 없는 정보 추정 X. reasoning 에 입력 어느 줄에서 파생됐는지 명시.
+- 다양성: 3축에 골고루 분배 (한 축에 5개 이상 몰리면 다양성 부족).
+
+좋은 예:
+  { keyword: "제약 안에서의 결정", axis: "인지", reasoning: "values 의 '주인의식·오너십'과 '왜를 먼저 알고 시작'에서 파생", sourceField: "values" }
+  { keyword: "정답 없는 영역의 몰입감", axis: "정서", reasoning: "interests 의 '창의적 새 아이디어' + currentConcerns 의 '자유도 높고 범용성 높은 사용성 문제'에서 파생", sourceField: "interests" }
+
+나쁜 예:
+  { keyword: "디자인", axis: "실무", ... }  → 직군 직접 단어
+  { keyword: "성장하고 싶다", axis: "정서", ... }  → 누구에게나 통하는 일반론
+
+스키마:
+${JSON.stringify(PROFILE_SCHEMA)}
+
+JSON만 출력.
+  `.trim();
+}
+
+export function nudgePrompt({ memos, pages, profile, derivedKeywords = [] }) {
+  return `
+[사용자 프로필]
+background: ${profile.background || profile.role || '(없음)'}
 interests: ${(profile.interests || []).join(', ') || '(없음)'}
+
+[파생 키워드 — interpretProfile 결과]
+${derivedKeywords.length ? derivedKeywords.map(k => `- ${k.keyword} (${k.axis})`).join('\n') : '  (없음)'}
 
 [Wiki 페이지 인덱스]
 ${pages.length ? pages.map(p => `- id: ${p.id} | bookId: ${p.bookId || '-'} | type: ${p.type} | title: ${p.title}`).join('\n') : '  (없음)'}
@@ -233,6 +303,8 @@ ${memos.slice(-20).map(m => `- ${m.bookId} / ${m.chapter || '-'} : ${m.text.slic
 - 책 원문 추론이 필요한 질문 금지.
 - sourcePageIds 에 근거 페이지 ID 최소 1개 필수.
 - 질문은 답하기 쉬운 한 문장.
+- profile-memo 타입을 고를 때는 [파생 키워드] 중 하나 이상을 질문 표현·초점에 *실제로 반영*해야 함. usedDerivedKeywords 에 사용한 키워드 명시.
+- 같은 wiki에서 다른 프로필을 넣으면 다른 질문이 나올 정도로 키워드를 살릴 것.
 
 스키마:
 ${JSON.stringify(NUDGE_SCHEMA)}
@@ -339,11 +411,18 @@ export async function planIngest({ memos, book, existingPages, contexts = [], pr
   });
 }
 
-export async function generateNudge({ memos, pages, profile }) {
+export async function interpretProfile({ profile }) {
+  return callLLM({
+    system: SYSTEM_RULES,
+    user: interpretProfilePrompt({ profile }),
+  });
+}
+
+export async function generateNudge({ memos, pages, profile, derivedKeywords = [] }) {
   if (!pages.length) return null;
   const out = await callLLM({
     system: SYSTEM_RULES,
-    user: nudgePrompt({ memos, pages, profile }),
+    user: nudgePrompt({ memos, pages, profile, derivedKeywords }),
   });
   // 환각 차단: 근거 페이지 ID 검증
   if (!out || out.type === 'none' || !out.sourcePageIds?.length) return null;
