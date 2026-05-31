@@ -127,11 +127,13 @@ export const SYSTEM_RULES = `
 출력은 항상 JSON 객체만. 마크다운 코드블록 금지.
 
 [Grounding 룰 — 환각 방지]
-A. 책의 원문 내용을 추측해 단정하지 말 것. 책 사실은 제공된 [책 요약]·[목차] 범위 안에서만 인용.
-B. 책 요약/목차에 없는 사실을 wiki 본문에 쓰려면 반드시 sources에 {kind:"llm-inference", confidence:"low|med|high"} 로 표시.
+A. 책의 원문 내용을 추측해 단정하지 말 것. 책 사실은 제공된 [책 요약]·[목차]·[책 보강 컨텍스트] 범위 안에서만 인용.
+B. 위 범위에 없는 사실을 wiki 본문에 쓰려면 반드시 sources에 {kind:"llm-inference", confidence:"low|med|high"} 로 표시.
 C. 메모의 의미를 왜곡하지 말 것. 메모 원문은 인용 형태로 보존.
 D. tocAnchor 는 제공된 [목차] 항목과 정확히 일치하는 문자열만 사용. 일치하는 게 없으면 "미지정" + anchorConfidence:"low".
+   목차가 빈약하거나 매핑이 어색할 땐 [책 보강 컨텍스트] 의 책소개/책속에서/추천글로 책 맥락을 보강하되, tocAnchor 자체는 억지로 만들지 말 것.
 E. 모든 wiki 페이지에 sources 배열 필수. 메모 id 최소 1개 + 책 메타 인용 시 {kind:"book-meta", id:bookId}.
+   [책 보강 컨텍스트] 를 본문에 인용할 때도 {kind:"book-meta", id:bookId, field:"intro|publisherIntro|excerpts|recommend"} 로 표시.
 F. 한국어. 단정조보다 사실 기술.
 
 [사용자 맥락 룰]
@@ -167,6 +169,12 @@ summary: ${book.summary || '(없음)'}
 toc:
 ${(book.toc || []).map((t, i) => `  ${i + 1}. ${t}`).join('\n') || '  (목차 없음)'}
 
+[책 보강 컨텍스트 — 알라딘 발췌]
+- 책소개: ${(book.aladin?.intro || '').slice(0, 800) || '(없음)'}
+- 출판사 책소개: ${(book.aladin?.publisherIntro || '').slice(0, 1200) || '(없음)'}
+- 책 속에서(저자가 강조한 원문 발췌): ${(book.aladin?.excerpts || '').slice(0, 1500) || '(없음)'}
+- 추천글: ${(book.aladin?.recommend || '').slice(0, 800) || '(없음)'}
+
 [새 메모들]
 ${memos.map(m => `- id: ${m.id}
   사용자가 지정한 chapter: ${m.chapter || '(미지정)'}
@@ -187,10 +195,20 @@ STEP 1: analyses[]
 - tocAnchor: 위 [목차] 중 메모와 가장 가까운 항목의 문자열을 그대로 복사. 일치하는 게 없으면 "미지정".
 - anchorConfidence: 단서 명확하면 "high", 추정이면 "med", 거의 단서 없으면 "low".
 - keyConcepts: 메모에서 추출한 핵심 개념 1~5개 (짧은 명사구).
-- bookContextLink: 1~2문장. 책 요약/목차의 어느 흐름과 연결되는지. 단서 없으면 "책 요약/목차에 명시되지 않음" 으로 솔직히.
+- bookContextLink: 2~3문장. **반드시 책 맥락과 연결**. 순서:
+  (1) [목차] 항목과 명확히 연결되면 그 항목 흐름으로 설명.
+  (2) [목차] 가 빈약하거나 매핑이 어색하면, [책 보강 컨텍스트] 의 책소개/책속에서/추천글에서 **실제 문구를 6~20자 정도 직접 인용** 한 뒤 메모와 어떻게 닿는지 설명. 인용 형식:
+       "(책속에서) "원문 일부 6~20자" — 메모와의 연결 1문장."
+       "(책소개) "원문 일부 6~20자" — 메모와의 연결 1문장."
+     ⚠️ 예시 그대로 베끼지 말 것. "..." 같은 placeholder 금지. 반드시 입력의 [책 보강 컨텍스트] 에서 *진짜 문구* 를 골라 따옴표로 감쌀 것.
+  (3) 둘 다 안 되면(거의 없어야 함) "책 요약/목차/보강 컨텍스트에 명시되지 않음" 으로 솔직히. 이 케이스가 다수면 보강 컨텍스트를 더 적극 활용했는지 자기 검토.
 - userContextLinks: [사용자 맥락 카드] 와 *명확히* 연결될 때만 채움. 단어만 비슷한 무리한 연결 금지. 없으면 빈 배열.
 
-STEP 2: patches[] — "개념 페이지 누적" 원칙
+STEP 2: patches[] — **반드시 비어있지 않게** "개념 페이지 누적" 원칙
+- patches.length 가 0 이면 그 출력은 즉시 실패. analyses 만 출력하고 patches 를 빈 배열로 두지 말 것.
+- analyses 의 keyConcepts 를 dedupe 해서 각 개념마다 create patch 1장 (기존 wiki 비어있을 때 기본 경로).
+- 메모 N개 → 페이지 N개가 아니라, 메모 N개 → 개념 K개 → 페이지 K개 (K ≤ N). 보통 5~10개.
+
 페이지는 *메모마다 만들지 않는다*. 개념(keyConcept) 단위로 1장, 같은 개념을 다룬 새 메모가 들어오면 기존 페이지에 *추가만* 한다.
 
 머지 규칙 (필수):
