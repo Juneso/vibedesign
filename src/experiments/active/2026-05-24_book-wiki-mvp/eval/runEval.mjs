@@ -55,8 +55,27 @@ const rubric = await readFile(resolve(ROOT, 'RUBRIC.md'), 'utf-8');
 async function selfEval(pipeline, input, output) {
   const user = selfEvalPrompt({ pipeline, rubric, input, output });
   const text = await transport({ system: SYSTEM_RULES, user, temperature: 0.1 });
-  try { return JSON.parse(text); }
+  let ev;
+  try { ev = JSON.parse(text); }
   catch { return { axes: [], pass: false, suspect: true, suspectReason: '자기평가 JSON 파싱 실패', _raw: text.slice(0, 300) }; }
+  // A4 자동 보정: 모든 메모의 myThought 가 비어있으면 LLM 판단 무시하고 score=2.
+  if (pipeline === 'A' && Array.isArray(ev.axes)) {
+    const memos = input?.memos || [];
+    const withThought = memos.filter(m => (m.myThought || '').trim()).length;
+    if (withThought === 0) {
+      const a4 = ev.axes.find(a => /A4/.test(a.key));
+      if (a4) {
+        a4.score = 2;
+        a4.reasoning = 'N/A — 모든 메모의 myThought 가 비어있음 (자동 만점)';
+      }
+    }
+  }
+  // pass 는 LLM 판단 신뢰하지 않고 axes 로 재계산: 0점 축이 없으면 pass.
+  if (Array.isArray(ev.axes) && ev.axes.length) {
+    const hasZero = ev.axes.some(a => a.score === 0);
+    ev.pass = !hasZero;
+  }
+  return ev;
 }
 
 // ─── 파이프라인 A · Ingest ──────────────────────────────────────
