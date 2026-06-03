@@ -1,21 +1,38 @@
 import React, { useState } from 'react';
 import { useStore } from '../App.jsx';
-import { update, log, uid } from '../lib/storage.js';
+import { update, log, uid, reset } from '../lib/storage.js';
 import { searchBooks, getBookDetail } from '../lib/aladin.js';
+import { buildSeedState } from '../lib/seedLoader.js';
 
 export default function BookListScreen({ onOpenBook }) {
   const { books } = useStore();
   const list = Object.values(books).sort((a, b) => b.createdAt - a.createdAt);
   const [adding, setAdding] = useState(false);
 
+  const loadSeed = () => {
+    const s = buildSeedState();
+    update(st => {
+      Object.assign(st.books, s.books);
+      Object.assign(st.memos, s.memos);
+      Object.assign(st.profile, s.profile);
+    });
+  };
+
   return (
     <div className="p-4 pb-24">
       <header className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-bold">내 책장</h1>
-        <button
-          onClick={() => setAdding(true)}
-          className="px-3 py-1.5 text-sm bg-black text-white rounded-full"
-        >+ 책 추가</button>
+        <div className="flex gap-2">
+          {import.meta.env.DEV && list.length === 0 && (
+            <button onClick={loadSeed} className="px-3 py-1.5 text-sm bg-zinc-200 text-zinc-700 rounded-full">
+              🌱 시드
+            </button>
+          )}
+          <button
+            onClick={() => setAdding(true)}
+            className="px-3 py-1.5 text-sm bg-black text-white rounded-full"
+          >+ 책 추가</button>
+        </div>
       </header>
 
       {list.length === 0 && (

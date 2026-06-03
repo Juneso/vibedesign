@@ -22,6 +22,7 @@ export function buildSeedState() {
       summary: b.summary,
       toc: b.toc || [],
       genre: b.genre,
+      aladin: b.aladin || null,
       why: '',
       createdAt: now,
     };
