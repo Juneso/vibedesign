@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../App.jsx';
 import { update, log, uid } from '../lib/storage.js';
 import { generateNudge, ingestAnswer } from '../lib/llm.js';
+import { getDerivedKeywords } from '../lib/profileCache.js';
 
 export default function NudgeScreen() {
   const s = useStore();
@@ -10,10 +11,19 @@ export default function NudgeScreen() {
   const open = Object.values(s.nudges).filter(n => !n.answeredAt).sort((a,b) => b.createdAt - a.createdAt);
   const answered = Object.values(s.nudges).filter(n => n.answeredAt).sort((a,b) => b.answeredAt - a.answeredAt);
   const [gen, setGen] = useState(false);
+  const [derivedKeywords, setDerivedKeywords] = useState([]);
+
+  useEffect(() => {
+    if (s.profile?.role || s.profile?.background) {
+      getDerivedKeywords(s.profile).then(r => {
+        setDerivedKeywords(r?.derivedKeywords ?? []);
+      }).catch(() => {});
+    }
+  }, [s.profile]);
 
   const newNudge = async () => {
     setGen(true);
-    const n = await generateNudge({ memos, pages, profile: s.profile });
+    const n = await generateNudge({ memos, pages, profile: s.profile, derivedKeywords });
     setGen(false);
     if (!n) { alert('근거 페이지 부족. wiki를 먼저 채워주세요.'); return; }
     const id = uid('nudge');
@@ -32,7 +42,13 @@ export default function NudgeScreen() {
 
       <section className="mb-6">
         <h2 className="text-xs text-zinc-500 mb-2">오늘 답해보기</h2>
-        {open.length === 0 && <div className="text-xs text-zinc-400 py-6 text-center">대기 중인 질문이 없습니다</div>}
+        {open.length === 0 && (
+          <div className="text-xs text-zinc-400 py-8 text-center leading-relaxed">
+            {pages.length < 2
+              ? '메모가 쌓이면 질문이 생겨요.\n인제스트를 먼저 해보세요.'
+              : '+ 새 질문을 눌러 오늘의 넛지를 받아보세요.'}
+          </div>
+        )}
         <ul className="space-y-2">
           {open.map(n => <NudgeCard key={n.id} nudge={n} pages={pages} />)}
         </ul>
@@ -83,7 +99,9 @@ function NudgeCard({ nudge, pages }) {
     <li className="bg-white p-3 rounded-xl border border-zinc-200">
       <div className="text-[10px] uppercase tracking-wide text-indigo-600 mb-1">{nudge.type}</div>
       <div className="text-sm">{nudge.question}</div>
-      <div className="text-[10px] text-zinc-400 mt-1">근거: {nudge.sourcePageIds.length}개 페이지</div>
+      <div className="text-[10px] text-zinc-400 mt-1">
+        근거: {nudge.sourcePageIds.map(id => pages.find(p => p.id === id)?.title ?? id).join(', ')}
+      </div>
       <textarea
         value={answer} onChange={e => setAnswer(e.target.value)}
         rows={3} placeholder="자유롭게 답하세요"
