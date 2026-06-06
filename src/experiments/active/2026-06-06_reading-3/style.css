@@ -1,4 +1,4 @@
-/* ── 밑줄 앱 — 0504 3 ───────────────────────────── */
+/* ── 밑줄 앱 — 0606 ─────────────────────────────── */
 
 :root {
   --ul-bg:           #f8f6f1;
@@ -706,3 +706,524 @@
 .day-bar.today { opacity: 1; }
 .day-label { font-size: 10px; color: var(--ul-muted); }
 .day-label.today { color: var(--ul-accent); font-weight: 600; }
+
+/* 기록 뱃지 */
+.card-badge.record { color: #3a3530; background: #f0ede8; }
+
+/* 홈 빈 화면 */
+.home-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  gap: 10px;
+}
+.home-empty-icon  { font-size: 40px; margin: 0; }
+.home-empty-title { font-size: 16px; font-weight: 600; color: var(--ul-fg); margin: 0; }
+.home-empty-sub   { font-size: 14px; color: var(--ul-muted); margin: 0; }
+
+/* 서재 빈 화면 */
+.lib-empty {
+  grid-column: 1 / -1;
+  font-size: 14px;
+  color: var(--ul-muted);
+  line-height: 1.7;
+  padding: 40px 0;
+  text-align: center;
+}
+
+/* 프로필 빈 상태 소형 */
+.profile-empty-sm {
+  font-size: 13px;
+  color: var(--ul-muted);
+  padding: 16px;
+  margin: 0;
+}
+
+/* ────────────────────────────────────────────
+   온보딩
+   ──────────────────────────────────────────── */
+.view-onboarding {
+  inset: 0 !important; /* 바텀 nav 영역까지 전체 커버 */
+  background: var(--ul-bg);
+  z-index: 100;
+}
+
+.ob-step {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 앱바 */
+.ob-appbar {
+  padding: 20px 24px 0;
+  flex-shrink: 0;
+}
+.ob-appname {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ul-accent);
+}
+
+/* ── Step 1: 슬라이드 ── */
+.ob-slides-wrap {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+.ob-slides {
+  display: flex;
+  height: 100%;
+  transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ob-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 28px 0;
+  gap: 28px;
+}
+
+/* 일러스트 영역 */
+.ob-illust {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+/* 슬라이드 1 — 캡처 목업 */
+.ob-mock-capture {
+  width: 220px;
+  background: #1a1a1a;
+  border-radius: 14px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+}
+.ob-mock-line {
+  height: 9px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 5px;
+}
+.ob-mock-line.short   { width: 75%; }
+.ob-mock-line.shorter { width: 55%; }
+.ob-hl-stripe {
+  position: absolute;
+  top: 24px; left: 14px; right: 14px;
+  height: 11px;
+  background: rgba(255,80,160,0.35);
+  border-radius: 3px;
+}
+.ob-mock-badge {
+  font-size: 11px;
+  color: var(--ul-muted);
+  margin: 0;
+}
+
+/* 슬라이드 2 — 기록 카드 목업 */
+.ob-mock-card {
+  width: 220px;
+  background: var(--ul-surface);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--ul-border);
+  display: flex;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.ob-mock-quote-bar {
+  width: 3px;
+  border-radius: 2px;
+  background: var(--ul-accent);
+  flex-shrink: 0;
+  align-self: stretch;
+}
+.ob-mock-quote-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+}
+.ob-mock-text-line {
+  height: 8px;
+  background: var(--ul-border);
+  border-radius: 4px;
+}
+.ob-mock-text-line.short   { width: 72%; }
+.ob-mock-text-line.shorter { width: 48%; }
+.ob-mock-memo {
+  width: 220px;
+  background: var(--ul-accent-light);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 슬라이드 3 — 인사이트 목업 */
+.ob-mock-insight-card {
+  width: 220px;
+  background: var(--ul-surface);
+  border-radius: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--ul-border);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.ob-insight-chip {
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.ob-insight-chip.chip-conn { color: #2d5a27; background: #e8f0e7; }
+.ob-insight-chip.chip-ques { color: #5a4a2d; background: #f0ebe7; }
+.ob-insight-preview {
+  font-size: 12px;
+  color: var(--ul-body);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* 카피 */
+.ob-copy { text-align: center; }
+.ob-headline {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--ul-fg);
+  margin: 0 0 10px;
+}
+.ob-body {
+  font-size: 15px;
+  color: var(--ul-muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* 인디케이터 & 버튼 공통 푸터 */
+.ob-footer {
+  padding: 20px 24px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.ob-dots {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.ob-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--ul-border);
+  transition: background 0.2s, width 0.2s;
+}
+.ob-dot.active {
+  background: var(--ul-accent);
+  width: 20px;
+  border-radius: 3px;
+}
+.ob-btn-primary {
+  width: 100%;
+  padding: 16px;
+  background: var(--ul-accent);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ob-btn-primary:active { background: #224420; }
+.ob-btn-ghost {
+  background: none;
+  border: none;
+  color: var(--ul-muted);
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+/* ── Step 2 / 3 공통 ── */
+.ob-step-inner {
+  flex: 1;
+  overflow-y: auto;
+  padding: 36px 24px 0;
+  -webkit-overflow-scrolling: touch;
+}
+.ob-step-inner::-webkit-scrollbar { display: none; }
+.ob-step-num {
+  font-size: 12px;
+  color: var(--ul-muted);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin: 0 0 10px;
+}
+.ob-step-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--ul-fg);
+  line-height: 1.3;
+  margin: 0 0 8px;
+}
+.ob-step-sub {
+  font-size: 14px;
+  color: var(--ul-muted);
+  margin: 0 0 28px;
+}
+
+/* Step 2 — 장르 그리드 */
+.ob-genre-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.ob-genre-btn {
+  padding: 16px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--ul-border);
+  background: var(--ul-surface);
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--ul-fg);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.12s, background 0.12s, color 0.12s;
+}
+.ob-genre-btn.selected {
+  border-color: var(--ul-accent);
+  background: var(--ul-accent-light);
+  color: var(--ul-accent);
+  font-weight: 600;
+}
+
+/* Step 3 — 선택 카드 */
+.ob-choice-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ob-choice-card {
+  background: var(--ul-surface);
+  border: 1.5px solid var(--ul-border);
+  border-radius: 14px;
+  padding: 18px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.ob-choice-card:active {
+  border-color: var(--ul-accent);
+  box-shadow: 0 0 0 3px var(--ul-accent-light);
+}
+.ob-choice-card > div { flex: 1; }
+.ob-choice-emoji { font-size: 30px; flex-shrink: 0; }
+.ob-choice-title { font-size: 16px; font-weight: 700; color: var(--ul-fg); margin: 0 0 3px; }
+.ob-choice-sub   { font-size: 13px; color: var(--ul-muted); margin: 0; }
+.ob-choice-card svg { color: #c8c4bc; flex-shrink: 0; }
+
+/* ────────────────────────────────────────────
+   서재 헤더 + 책 추가 버튼
+   ──────────────────────────────────────────── */
+.lib-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.lib-add-btn {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--ul-accent-light);
+  color: var(--ul-accent);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.lib-add-btn:active { background: #d4e8d2; }
+
+/* 책 커버 이미지 (서재 그리드) */
+.book-cover-img {
+  width: 56px; height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.12);
+}
+
+/* 책 상세 커버 이미지 */
+.detail-cover-img {
+  width: 40px; height: 56px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.12);
+}
+
+/* ────────────────────────────────────────────
+   책 검색 모달 (view-book-search)
+   ──────────────────────────────────────────── */
+.view-book-search {
+  inset: 0 !important;
+  z-index: 60;
+  background: var(--ul-bg);
+}
+
+.bs-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--ul-surface);
+  border-bottom: 1px solid var(--ul-border);
+  flex-shrink: 0;
+}
+.bs-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ul-fg);
+}
+.bs-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.bs-content::-webkit-scrollbar { display: none; }
+
+.bs-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--ul-surface);
+  border-bottom: 1px solid var(--ul-border);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  color: var(--ul-muted);
+}
+.bs-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: none;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--ul-fg);
+}
+.bs-input::placeholder { color: #c8c4bc; }
+
+.bs-empty {
+  padding: 40px 20px;
+  text-align: center;
+}
+.bs-empty p {
+  font-size: 14px;
+  color: var(--ul-muted);
+  margin: 0;
+}
+
+.bs-result-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.bs-result-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--ul-border);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.bs-result-item:active { background: #f5f3ee; }
+.bs-result-item.added { opacity: 0.55; pointer-events: none; }
+
+.bs-result-cover {
+  width: 44px; height: 62px;
+  flex-shrink: 0;
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--ul-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.bs-result-cover img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.bs-result-meta { flex: 1; min-width: 0; }
+.bs-result-title {
+  font-size: 14px; font-weight: 600;
+  color: var(--ul-fg);
+  margin: 0 0 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.bs-result-author {
+  font-size: 12px; color: var(--ul-muted);
+  margin: 0 0 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.bs-result-extra {
+  font-size: 11px; color: #c8c4bc;
+  margin: 0;
+}
+.bs-result-add {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--ul-accent);
+  background: none;
+  color: var(--ul-accent);
+  font-size: 13px; font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.bs-result-item.added .bs-result-add {
+  border-color: var(--ul-border);
+  color: var(--ul-muted);
+}
+.bs-result-add:not([disabled]):active {
+  background: var(--ul-accent);
+  color: #fff;
+}
+
+/* Step 3 — 책 입력 */
+.ob-book-field {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+  font-size: 15px;
+  border-radius: 12px;
+  border: 1.5px solid var(--ul-border);
+  background: var(--ul-surface);
+  outline: none;
+  font-family: inherit;
+  color: var(--ul-fg);
+}
+.ob-book-field:focus { border-color: var(--ul-accent); }

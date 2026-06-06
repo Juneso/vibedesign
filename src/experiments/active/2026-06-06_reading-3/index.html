@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>0606 — 밑줄</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <link rel="stylesheet" href="../../../shared/styles/tokens.css" />
+  <link rel="stylesheet" href="../../../shared/styles/base.css" />
+  <link rel="stylesheet" href="../../../shared/styles/device.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-theme="">
+  <div class="device-frame">
+    <div class="notch"></div>
+
+    <div class="canvas-content" data-inspect="canvas-root">
+
+      <!-- ══════════════════════════════════════
+           온보딩
+           ══════════════════════════════════════ -->
+      <section class="view view-onboarding active" data-view="onboarding">
+
+        <!-- Step 1: 앱 가치 전달 (슬라이드 3장) -->
+        <div class="ob-step" id="ob-step-1">
+          <div class="ob-appbar">
+            <span class="ob-appname">밑줄</span>
+          </div>
+          <div class="ob-slides-wrap">
+            <div class="ob-slides" id="ob-slides">
+
+              <!-- 슬라이드 1: 기록하고 -->
+              <div class="ob-slide">
+                <div class="ob-illust">
+                  <div class="ob-mock-capture">
+                    <div class="ob-mock-line"></div>
+                    <div class="ob-hl-stripe"></div>
+                    <div class="ob-mock-line short"></div>
+                    <div class="ob-mock-line shorter"></div>
+                  </div>
+                  <p class="ob-mock-badge">텍스트 인식 중...</p>
+                </div>
+                <div class="ob-copy">
+                  <h2 class="ob-headline">기록하고</h2>
+                  <p class="ob-body">책 속 문장을 카메라로 찍으면<br>텍스트로 자동 저장됩니다</p>
+                </div>
+              </div>
+
+              <!-- 슬라이드 2: 담아서 남기고 -->
+              <div class="ob-slide">
+                <div class="ob-illust">
+                  <div class="ob-mock-card">
+                    <div class="ob-mock-quote-bar"></div>
+                    <div class="ob-mock-quote-body">
+                      <div class="ob-mock-text-line"></div>
+                      <div class="ob-mock-text-line short"></div>
+                    </div>
+                  </div>
+                  <div class="ob-mock-memo">
+                    <div class="ob-mock-text-line shorter" style="background:var(--ul-accent); opacity:0.2;"></div>
+                    <div class="ob-mock-text-line" style="width:60%; background:var(--ul-accent); opacity:0.15;"></div>
+                  </div>
+                </div>
+                <div class="ob-copy">
+                  <h2 class="ob-headline">담아서 남기고</h2>
+                  <p class="ob-body">기록 위에 내 생각을 더하면<br>나만의 독서 노트가 됩니다</p>
+                </div>
+              </div>
+
+              <!-- 슬라이드 3: 인사이트를 얻어요 -->
+              <div class="ob-slide">
+                <div class="ob-illust">
+                  <div class="ob-mock-insight-card">
+                    <span class="ob-insight-chip chip-conn">연결</span>
+                    <p class="ob-insight-preview">두 기록이 같은 주제를 말하고 있어요</p>
+                  </div>
+                  <div class="ob-mock-insight-card" style="margin-top:8px;">
+                    <span class="ob-insight-chip chip-ques">질문</span>
+                    <p class="ob-insight-preview">오늘 고통받은 순간은 무엇인가요?</p>
+                  </div>
+                </div>
+                <div class="ob-copy">
+                  <h2 class="ob-headline">인사이트를 얻어요</h2>
+                  <p class="ob-body">AI가 기록을 분석해 연결고리와<br>새로운 시각을 제안합니다</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <div class="ob-footer">
+            <div class="ob-dots" id="ob-dots">
+              <div class="ob-dot active"></div>
+              <div class="ob-dot"></div>
+              <div class="ob-dot"></div>
+            </div>
+            <button class="ob-btn-primary" id="ob-slide-next" data-action="ob-slide-next">다음</button>
+            <button class="ob-btn-ghost" data-action="ob-skip-slides">건너뛰기</button>
+          </div>
+        </div>
+
+        <!-- Step 2: 독서 취향 설정 -->
+        <div class="ob-step" id="ob-step-2" style="display:none;">
+          <div class="ob-step-inner">
+            <p class="ob-step-num">2 / 3</p>
+            <h2 class="ob-step-title">어떤 책을<br>즐겨 읽으세요?</h2>
+            <p class="ob-step-sub">관심 장르를 선택해 주세요 · 복수 선택 가능</p>
+            <div class="ob-genre-grid">
+              <button class="ob-genre-btn" data-ob-genre>📖 소설</button>
+              <button class="ob-genre-btn" data-ob-genre>✍️ 에세이</button>
+              <button class="ob-genre-btn" data-ob-genre>🚀 자기계발</button>
+              <button class="ob-genre-btn" data-ob-genre>🏛️ 인문</button>
+              <button class="ob-genre-btn" data-ob-genre>🔬 과학</button>
+              <button class="ob-genre-btn" data-ob-genre>📜 역사</button>
+              <button class="ob-genre-btn" data-ob-genre>💰 경제</button>
+              <button class="ob-genre-btn" data-ob-genre>🎨 예술</button>
+            </div>
+          </div>
+          <div class="ob-footer">
+            <button class="ob-btn-primary" data-action="ob-to-step3">다음</button>
+            <button class="ob-btn-ghost" data-action="ob-to-step3">나중에 설정</button>
+          </div>
+        </div>
+
+        <!-- Step 3: 첫 기록 안내 -->
+        <div class="ob-step" id="ob-step-3" style="display:none;">
+          <div class="ob-step-inner">
+            <p class="ob-step-num">3 / 3</p>
+            <h2 class="ob-step-title">지금 읽고 있는<br>책이 있나요?</h2>
+            <p class="ob-step-sub">바로 첫 기록을 시작할 수 있어요</p>
+
+            <div id="ob-choice-wrap" class="ob-choice-wrap">
+              <button class="ob-choice-card" data-action="ob-has-book">
+                <span class="ob-choice-emoji">📚</span>
+                <div>
+                  <p class="ob-choice-title">있어요</p>
+                  <p class="ob-choice-sub">지금 읽는 책으로 기록 시작</p>
+                </div>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+              <button class="ob-choice-card" data-action="ob-no-book">
+                <span class="ob-choice-emoji">💬</span>
+                <div>
+                  <p class="ob-choice-title">없어요</p>
+                  <p class="ob-choice-sub">샘플 문장으로 먼저 체험해 볼게요</p>
+                </div>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+
+            <div id="ob-book-entry" style="display:none; flex-direction:column; gap:12px; margin-top:24px;">
+              <input class="ob-book-field" id="ob-book-title" placeholder="읽고 있는 책 제목을 입력해 주세요" />
+              <button class="ob-btn-primary" data-action="ob-finish">밑줄 시작하기</button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ══════════════════════════════════════
+           홈 — 인사이트 피드
+           ══════════════════════════════════════ -->
+      <section class="view view-home" data-view="home">
+        <div class="app-header">
+          <div class="app-header-inner">
+            <div>
+              <h1 class="app-title">밑줄</h1>
+              <p class="app-sub">5월 4일 인사이트</p>
+            </div>
+            <div class="avatar">나</div>
+          </div>
+        </div>
+
+        <div class="scroll-area">
+          <p class="feed-meta" id="home-meta">내 기록</p>
+          <div class="feed-list" id="home-feed"></div>
+          <div id="home-empty" class="home-empty">
+            <p class="home-empty-icon">📖</p>
+            <p class="home-empty-title">아직 기록이 없어요</p>
+            <p class="home-empty-sub">캡처 버튼으로 첫 문장을 남겨보세요</p>
+          </div>
+        </div><!-- /scroll-area -->
+
+        <!-- FAB 캡처 버튼 -->
+        <button class="fab" data-action="go-capture" aria-label="캡처">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </button>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           책 검색 모달
+           ══════════════════════════════════════ -->
+      <section class="view view-book-search" data-view="book-search">
+        <header class="bs-topbar">
+          <button class="icon-btn" data-action="close-book-search" aria-label="닫기">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <span class="bs-title">책 추가</span>
+          <span style="width:24px;"></span>
+        </header>
+        <div class="bs-content" id="book-search-root">
+          <!-- openBookSearch()가 채움 -->
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           서재
+           ══════════════════════════════════════ -->
+      <section class="view view-library" data-view="library">
+        <div class="library-header">
+          <div class="lib-header-row">
+            <h1 class="app-title">서재</h1>
+            <button class="icon-btn lib-add-btn" data-action="open-book-search" aria-label="책 추가">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+          <p class="app-sub" id="lib-subtitle">총 0권 · 0개 기록</p>
+        </div>
+
+        <div class="scroll-area">
+          <p class="feed-meta" style="padding-top: 14px;">최근 읽은 책</p>
+          <div class="book-grid" id="book-grid">
+            <p class="lib-empty">등록된 책이 없어요.<br>캡처로 첫 문장을 남겨보세요.</p>
+          </div>
+        </div>
+
+        <!-- 책 상세 오버레이 -->
+        <div class="book-detail" id="book-detail">
+          <div class="detail-topbar">
+            <button class="icon-btn" data-action="close-book">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <span class="detail-book-emoji" id="detail-emoji">📗</span>
+            <div>
+              <p class="detail-book-title" id="detail-title">자유론</p>
+              <p class="detail-book-author" id="detail-author">에픽테토스</p>
+            </div>
+          </div>
+
+          <div class="detail-stats">
+            <div class="stat-cell">
+              <p class="stat-val" id="detail-count">7개</p>
+              <p class="stat-lbl">기록</p>
+            </div>
+            <div class="stat-cell">
+              <p class="stat-val" id="detail-last">3일 전</p>
+              <p class="stat-lbl">마지막 독서</p>
+            </div>
+            <div class="stat-cell">
+              <p class="stat-val">5개</p>
+              <p class="stat-lbl">태그</p>
+            </div>
+          </div>
+
+          <p class="quotes-label" id="detail-quotes-label">밑줄 기록 0개</p>
+          <div class="scroll-area" id="detail-records" style="padding: 0 16px 16px;"></div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           캡처
+           ══════════════════════════════════════ -->
+      <section class="view view-capture capture-view" data-view="capture">
+
+        <!-- 뷰파인더 단계 -->
+        <div id="viewfinder-step" style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
+          <div class="viewfinder"
+               id="viewfinder"
+               data-step="viewfinder">
+            <!-- 실제 카메라 스트림 -->
+            <video id="camera-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+            <!-- 카메라 불가 시 fallback -->
+            <div class="mock-page" id="camera-fallback" style="display:none;">
+              <div class="mock-book-page">
+                <p class="mock-chapter">제4장. 두려움과 선택</p>
+                <p class="mock-body">
+                  불안은 선택이다. 우리가 두려워하는 것들은 대부분
+                  우리 마음이 만들어낸 미래다. 현재에 집중하는 것만이
+                  유일한 해답이다. 지금 이 순간이 전부다.
+                </p>
+              </div>
+              <p class="mock-hint">드래그로 텍스트 영역을 선택하세요</p>
+            </div>
+            <!-- OCR용 숨김 canvas -->
+            <canvas id="capture-canvas" style="display:none;"></canvas>
+
+            <!-- 형광펜 stroke 컨테이너 -->
+            <div id="hl-layer" style="position:absolute;inset:0;pointer-events:none;"></div>
+
+            <!-- OCR 실행 버튼 -->
+            <button class="hl-confirm-btn" id="hl-confirm-btn">텍스트 인식하기</button>
+            <button class="hl-reset-btn" id="hl-reset-btn">다시 그리기</button>
+
+            <div class="vf-topbar">
+              <button class="vf-close" data-action="go-home">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+              <span class="vf-title">텍스트 캡처</span>
+            </div>
+
+            <div class="vf-hint">
+              <p>기록할 줄 위를 좌→우로 밑줄 치세요</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 결과 단계 -->
+        <div id="result-step" style="display:none; flex:1; overflow:hidden; flex-direction:column;">
+          <div class="capture-result">
+            <div class="result-topbar">
+              <button class="icon-btn" data-action="back-to-viewfinder">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+              </button>
+              <span class="result-topbar-title">캡처된 텍스트 확인</span>
+              <button class="save-btn" id="save-btn" data-action="save-capture">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                저장
+              </button>
+            </div>
+
+            <div class="result-body">
+              <!-- OCR 로딩 -->
+              <div class="ocr-loading" id="ocr-loading">
+                <div class="ocr-spinner"></div>
+                <span class="ocr-loading-text">텍스트 인식 중...</span>
+                <span class="ocr-progress" id="ocr-progress"></span>
+              </div>
+              <p class="result-label">인식된 텍스트</p>
+              <textarea class="result-textarea" id="ocr-text" rows="4" placeholder="텍스트 인식 결과가 여기에 표시됩니다"></textarea>
+
+              <p class="result-label mt">책 정보</p>
+              <div class="book-inputs">
+                <input class="book-input" placeholder="책 제목" />
+                <input class="book-input author-input" placeholder="저자" />
+              </div>
+
+              <div class="tag-label-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b8578" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                <p>태그</p>
+              </div>
+              <div class="tag-chips">
+                <button class="capture-tag" data-capture-tag>철학</button>
+                <button class="capture-tag" data-capture-tag>심리학</button>
+                <button class="capture-tag" data-capture-tag>감정</button>
+                <button class="capture-tag" data-capture-tag>자기계발</button>
+                <button class="capture-tag" data-capture-tag>마음챙김</button>
+                <button class="capture-tag" data-capture-tag>관계</button>
+                <button class="capture-tag" data-capture-tag>경제</button>
+                <button class="capture-tag" data-capture-tag>역사</button>
+              </div>
+
+              <p class="result-label mt">한 줄 메모 (선택)</p>
+              <input class="memo-input" placeholder="이 문장을 선택한 이유나 느낌을 적어보세요" />
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ══════════════════════════════════════
+           프로필
+           ══════════════════════════════════════ -->
+      <section class="view view-profile" data-view="profile">
+        <div class="scroll-area">
+          <div class="profile-head">
+            <div class="avatar-lg">나</div>
+            <h1 class="profile-title">독서 기록</h1>
+            <p class="profile-since" id="profile-since">아직 기록이 없어요</p>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2d5a27" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="12" y1="7" x2="12" y2="13"/><line x1="9" y1="10" x2="15" y2="10"/></svg>
+              </div>
+              <div>
+                <p class="stat-num" id="stat-books">0권</p>
+                <p class="stat-name">읽은 책</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2d5a27" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+              </div>
+              <div>
+                <p class="stat-num" id="stat-records">0개</p>
+                <p class="stat-name">밑줄 기록</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2d5a27" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </div>
+              <div>
+                <p class="stat-num" id="stat-days">0일</p>
+                <p class="stat-name">독서 일수</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2d5a27" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+              </div>
+              <div>
+                <p class="stat-num" id="stat-tags">0개</p>
+                <p class="stat-name">사용 태그</p>
+              </div>
+            </div>
+          </div>
+
+          <p class="section-title">자주 기록하는 주제</p>
+          <div class="tags-card" id="profile-tags">
+            <p class="profile-empty-sm">아직 태그가 없어요</p>
+          </div>
+
+          <p class="section-title">이번 주 독서 활동</p>
+          <div class="weekly-card" id="profile-weekly"></div>
+
+          <div style="height:20px;"></div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           바텀 네비게이션
+           ══════════════════════════════════════ -->
+      <nav class="bottom-nav">
+        <button class="nav-tab active" data-nav="home">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          홈
+        </button>
+        <button class="nav-tab" data-nav="library">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          서재
+        </button>
+        <button class="nav-tab" data-nav="capture">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          캡처
+        </button>
+        <button class="nav-tab" data-nav="profile">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          나
+        </button>
+      </nav>
+
+    </div><!-- /canvas-content -->
+  </div><!-- /device-frame -->
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script type="module" src="script.js"></script>
+  <!-- Inspector client (Shift+클릭으로 레이어 검사) -->
+  <script type="module" src="../../../shared/js/animation.js"></script>
+</body>
+</html>

@@ -16,11 +16,11 @@ export const experiments = [
     files: ['index.html', 'style.css', 'config.js', 'script.js', 'meta.json']
   },
   {
-    id: '2026-05-04_reading-3',
-    title: '0504 3',
+    id: '2026-06-06_reading-3',
+    title: '0606 밑줄 (온보딩)',
     status: 'active',
-    path: 'src/experiments/active/2026-05-04_reading-3/index.html',
-    folder: 'src/experiments/active/2026-05-04_reading-3',
+    path: 'src/experiments/active/2026-06-06_reading-3/index.html',
+    folder: 'src/experiments/active/2026-06-06_reading-3',
     files: ['index.html', 'style.css', 'config.js', 'script.js', 'meta.json']
   },
   {
