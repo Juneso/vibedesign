@@ -84,6 +84,15 @@ export const FOLLOWUP_SCHEMA = {
   },
 };
 
+export const NUDGE_VALIDATION_SCHEMA = {
+  type: 'object',
+  required: ['forced', 'reason'],
+  properties: {
+    forced: { type: 'boolean' },   // true = 억지 연결, null 반환
+    reason: { type: 'string' },    // 1문장 판단 근거
+  },
+};
+
 export const NUDGE_SCHEMA = {
   type: 'object',
   required: ['type', 'question', 'sourcePageIds'],
@@ -198,7 +207,8 @@ STEP 1: analyses[]
 - stance: 메모의 사고 단계 — surface | connect | apply | critique (위 가이드 참고).
 - tocAnchor: 위 [목차] 중 메모와 가장 가까운 항목의 문자열을 그대로 복사. 일치하는 게 없으면 "미지정".
 - anchorConfidence: 단서 명확하면 "high", 추정이면 "med", 거의 단서 없으면 "low".
-- keyConcepts: 메모에서 추출한 핵심 개념 1~5개 (짧은 명사구).
+- keyConcepts: 메모 텍스트에 명시되거나 암시된 핵심 개념 1~5개 (짧은 명사구).
+  ⚠️ 책 메타데이터(소개·목차·서평)는 개념 이해 보조용. 메모에 없는 개념을 책 소개에서 끌어와 keyConcepts에 넣지 말 것.
 - bookContextLink: 2~3문장. 책 전체 주제(요약·목차·[책 보강 컨텍스트] 전반)를 *충분히 읽고* 메모가 책의 어느 흐름·관점에 닿는지 설명.
   ⚠️ 인용 마커("(책속에서) ..." 같은 형식) 강제 X. 보강 컨텍스트는 *읽는* 데 쓰는 거지 마커로 박는 게 아님.
   ⚠️ 8개 메모 전부 같은 책 전체 요약 한 줄에 anchor 하지 말 것. 메모마다 책의 *다른 흐름·다른 등장 모티프*와 연결되어야 함. 같은 문구가 반복되면 다양성 부족으로 자기 감점.
@@ -279,6 +289,7 @@ ${fmt(profile.values)}
 
 원칙:
 - 직군의 직접 단어("디자이너", "디지털 프로덕트") 그대로 쓰지 말 것. 그 직군이 *어떤 사고/감정/실무 패턴*을 갖는지로 변환.
+- **프로필 필드 문구 직접 복사 금지**: currentConcerns/interests/values의 문구를 keyword에 그대로 쓰지 말 것. 같은 의미라도 반드시 사고 패턴·정서·실무 방식으로 재표현. 예: "복잡한 사용성 문제" → ❌, "다층적 제약 속 해결책 탐색" → ✅
 - axis 3축으로 분배:
   - 인지: 이 사람이 *어떻게 사고하는가* (예: "제약 안에서의 결정", "왜를 먼저 정렬")
   - 정서: 이 사람이 *무엇에 끌리고 무엇을 두려워하는가* (예: "정답 없는 문제의 몰입감", "사소한 결정의 마비")
@@ -297,6 +308,37 @@ ${fmt(profile.values)}
 
 스키마:
 ${JSON.stringify(PROFILE_SCHEMA)}
+
+JSON만 출력.
+  `.trim();
+}
+
+export function nudgeValidationPrompt({ nudge, pages, derivedKeywords = [] }) {
+  const sourcePages = pages.filter(p => nudge.sourcePageIds?.includes(p.id));
+  return `
+[검수 대상 넛지]
+type: ${nudge.type}
+question: "${nudge.question}"
+
+[근거 페이지]
+${sourcePages.map(p => `- ${p.title}: ${p.body?.slice(0, 200) || ''}`).join('\n') || '(없음)'}
+
+[사용된 파생 키워드]
+${(nudge.usedDerivedKeywords || []).join(', ') || '(없음)'}
+
+[파생 키워드 전체]
+${derivedKeywords.map(k => `- ${k.keyword} (${k.axis})`).join('\n') || '(없음)'}
+
+[판단 기준]
+forced=true 조건 (하나라도 해당하면 forced=true):
+1. 질문이 연결하는 두 개념 사이에 논리적 비약이 있음 — 공유하는 원리·가치관이 없고 단어 조합만 됨
+2. 프로필 직접 용어(직군·업무 도구·서비스명)가 질문에 그대로 노출됨 (예: "사용성", "프로덕트", "디자이너")
+3. "A는 B와 어떻게 다른가" 수준의 대비만 있고 사용자가 탐구할 연결점이 없음
+
+forced=false 조건: 책 개념과 파생 키워드가 같은 패턴·원리·가치관을 공유해 질문이 자연스럽게 연결됨
+
+스키마:
+${JSON.stringify(NUDGE_VALIDATION_SCHEMA)}
 
 JSON만 출력.
   `.trim();
@@ -327,7 +369,9 @@ ${memos.slice(-20).map(m => `- ${m.bookId} / ${m.chapter || '-'} : ${m.text.slic
 - 책 원문 추론이 필요한 질문 금지.
 - sourcePageIds 에 근거 페이지 ID 최소 1개 필수.
 - 질문은 답하기 쉬운 한 문장.
-- profile-memo 타입을 고를 때는 [파생 키워드] 중 하나 이상을 질문 표현·초점에 *실제로 반영*해야 함. usedDerivedKeywords 에 사용한 키워드 명시.
+- profile-memo 타입을 고를 때는 [파생 키워드] 중 하나 이상의 *개념*을 질문 초점에 반영. usedDerivedKeywords 에 사용한 키워드 명시.
+  ⚠️ 파생 키워드 문구를 질문에 그대로 붙여넣지 말 것. 키워드가 나타내는 사고 패턴·정서가 질문의 방향이 되어야 함.
+  ⚠️ 책 개념과 파생 키워드 간에 공유하는 원리·가치관이 있을 때만 연결. "A가 B에 어떤 영향을 미칠까?" 수준의 단순 병치 금지.
 - 같은 wiki에서 다른 프로필을 넣으면 다른 질문이 나올 정도로 키워드를 살릴 것.
 
 스키마:
@@ -449,6 +493,14 @@ export async function interpretProfile({ profile }) {
     system: SYSTEM_RULES,
     user: interpretProfilePrompt({ profile }),
   });
+}
+
+export async function validateNudge({ nudge, pages, derivedKeywords = [] }) {
+  const out = await callLLM({
+    system: SYSTEM_RULES,
+    user: nudgeValidationPrompt({ nudge, pages, derivedKeywords }),
+  });
+  return out;
 }
 
 export async function generateNudge({ memos, pages, profile, derivedKeywords = [] }) {

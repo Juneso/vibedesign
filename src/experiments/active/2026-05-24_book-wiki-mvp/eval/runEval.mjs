@@ -16,6 +16,7 @@ import {
   planIngest,
   interpretProfile,
   generateNudge,
+  validateNudge,
   SYSTEM_RULES,
 } from '../lib/llm.js';
 import { openaiNodeTransport, loadDotEnvLocal } from './lib/transport.mjs';
@@ -132,19 +133,28 @@ async function runNudge({ pages, derivedKeywords, memos }) {
     background: seed.profile.role,
     interests: seed.profile.interests,
   };
-  const out = await generateNudge({
+  const nudge = await generateNudge({
     memos,
     pages,
     profile,
     derivedKeywords: derivedKeywords || [],
   });
+  // C4: 억지 연결 검수 별도 호출 → validation 결과를 output에 포함해 selfEval이 C4 채점 가능하게
+  let validation = null;
+  if (nudge) {
+    try {
+      validation = await validateNudge({ nudge, pages, derivedKeywords: derivedKeywords || [] });
+    } catch (e) {
+      console.warn('  validateNudge 호출 실패:', e.message);
+    }
+  }
   return {
     input: {
       profile,
       derivedKeywords: (derivedKeywords || []).map(k => k.keyword),
       pageCount: pages.length,
     },
-    output: out,
+    output: nudge ? { ...nudge, _validation: validation } : null,
   };
 }
 
