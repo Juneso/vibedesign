@@ -23,7 +23,7 @@ export default function BookListScreen({ onOpenBook }) {
       <header className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-bold">내 책장</h1>
         <div className="flex gap-2">
-          {import.meta.env.DEV && list.length === 0 && (
+          {import.meta.env.DEV && (
             <button onClick={loadSeed} className="px-3 py-1.5 text-sm bg-zinc-200 text-zinc-700 rounded-full">
               🌱 시드
             </button>
