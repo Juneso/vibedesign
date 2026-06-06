@@ -69,10 +69,10 @@ export function selfEvalPrompt({ pipeline, rubric, input, output }) {
         : `→ A4 평가 대상은 위 ${withThought}개의 메모만. 나머지 메모는 N/A 이므로 점수에 영향 X.\n`);
   }
 
-  // C4 채점 기준 주입
+  // C3/C4 채점 기준 주입
   let cNote = '';
   if (pipeline === 'C') {
-    cNote = `\n[C4 연결 자연스러움]\n출력의 _validation 필드(있으면): validateNudge 2차 검수 결과. forced=true면 0점 강하게 고려.\n판단 기준: 넛지 질문이 연결하는 두 개념(책 개념 ↔ 프로필 키워드) 사이에 논리적 비약이 없는가.\n- 2점: 두 개념이 같은 원리·패턴·가치관을 공유해 연결이 자연스러움\n- 1점: 연결은 있으나 다소 억지스럽거나 표층적\n- 0점: "A는 B와 다르다" 수준의 대비만 있거나, 직업 표층어가 질문에 노출된 경우\n예시 0점: "시장의 규범이 복잡한 사용성 문제에 영향을 미칠 수 있을까?" → 사용성(디자이너 직업 표층어) 노출, 논리적 연결 없음\n`;
+    cNote = `\n[C3 derivedKeywords 활용 — 타입별 적용]\nmemo-memo / book-book 타입: usedDerivedKeywords 가 비어있어도 정상. C3 는 N/A → score=2 부여.\nprofile-memo 타입만: derivedKeywords 가 실제로 질문 초점에 반영됐는지 채점 (0~2점).\n\n[C4 연결 자연스러움 — 타입별 기준]\n출력의 _validation 필드(있으면): validateNudge 2차 검수 결과. forced=true면 0점.\n\nmemo-memo/book-book: 두 근거 페이지가 같은 책 맥락에서 자연스럽게 연결되는지만 평가. 프로필 2단계 룰 적용 X.\n- 2점: 두 개념이 같은 책에서 연관된 주제를 다룸 (예: 조르바 욕망↔자유 = 같은 철학적 긴장)\n- 0점: 두 개념이 사실상 무관한 경우만\n\nprofile-memo만: 책 개념 → 파생 키워드 간 인과 체인 2단계 이내\n- 2점: 1-2단계 직접 연결\n- 1점: 3단계 (중간 추론 1개)\n- 0점: 4단계 이상 또는 직업 표층어 노출\n예시 2점(통과): "시장이 도덕 판단 배제 → 사소한 결정의 마비" (2단계)\n예시 0점(차단): "시장 규범 → 창의적 도전" (4단계 이상)\n`;
   }
 
   return `

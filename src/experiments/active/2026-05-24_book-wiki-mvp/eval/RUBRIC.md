@@ -68,9 +68,11 @@
 - **0**: 3종 외 유형, 또는 잘못된 분류.
 
 ### C3. derivedKeywords 활용 (개인화)
-- **2**: 같은 wiki에서 다른 프로필을 넣으면 다른 질문이 나올 정도로 derivedKeywords 가 질문 표현/초점에 반영됨.
-- **1**: derivedKeywords 가 출력에 등장하나 표면적.
-- **0**: derivedKeywords 무시 — 어느 사용자에게나 같은 질문.
+> ⚠️ **타입별 적용**: `profile-memo` 타입만 채점. `memo-memo` / `book-book` 타입은 N/A → score=2 자동 부여.
+
+- **2** (profile-memo): 같은 wiki에서 다른 프로필을 넣으면 다른 질문이 나올 정도로 derivedKeywords 가 질문 표현/초점에 반영됨.
+- **1** (profile-memo): derivedKeywords 가 출력에 등장하나 표면적.
+- **0** (profile-memo): derivedKeywords 무시 — 어느 사용자에게나 같은 질문.
 
 ---
 

@@ -329,13 +329,25 @@ ${(nudge.usedDerivedKeywords || []).join(', ') || '(없음)'}
 [파생 키워드 전체]
 ${derivedKeywords.map(k => `- ${k.keyword} (${k.axis})`).join('\n') || '(없음)'}
 
-[판단 기준]
-forced=true 조건 (하나라도 해당하면 forced=true):
-1. 질문이 연결하는 두 개념 사이에 논리적 비약이 있음 — 공유하는 원리·가치관이 없고 단어 조합만 됨
-2. 프로필 직접 용어(직군·업무 도구·서비스명)가 질문에 그대로 노출됨 (예: "사용성", "프로덕트", "디자이너")
-3. "A는 B와 어떻게 다른가" 수준의 대비만 있고 사용자가 탐구할 연결점이 없음
+[판단 기준 — 넛지 타입별 적용]
 
-forced=false 조건: 책 개념과 파생 키워드가 같은 패턴·원리·가치관을 공유해 질문이 자연스럽게 연결됨
+**memo-memo / book-book 타입**:
+두 근거 페이지 개념이 같은 책 맥락에서 자연스럽게 연결되는지만 확인.
+- forced=false: 같은 책에서 두 개념이 서로 연관된 주제를 다룸 (예: 조르바의 욕망↔자유: 같은 철학적 긴장)
+- forced=true: 두 개념이 사실상 무관하거나 억지로 연결된 경우만
+⚠️ memo-memo에는 프로필 2단계 룰 적용 금지.
+
+**profile-memo 타입만**: 논리적 거리 2단계 이내 엄격 적용
+- 1단계: A이면 바로 B (같은 구조·원리)
+- 2단계: A가 있으면 B가 직접 따라옴
+- 3단계 이상 → forced=true
+
+forced=false 예시:
+- memo-memo "욕망이 개인의 자유를 제한하는가?" (조르바: 욕망↔자유는 같은 철학적 긴장) → forced=false
+- profile-memo "시장이 도덕 판단을 배제 → 사소한 결정의 마비" (2단계) → forced=false
+
+forced=true 예시:
+- profile-memo "시장의 규범이 창의적 도전에 어떤 영향을 미칠까?" → 4단계 이상 → forced=true
 
 스키마:
 ${JSON.stringify(NUDGE_VALIDATION_SCHEMA)}
@@ -354,25 +366,35 @@ interests: ${(profile.interests || []).join(', ') || '(없음)'}
 ${derivedKeywords.length ? derivedKeywords.map(k => `- ${k.keyword} (${k.axis})`).join('\n') : '  (없음)'}
 
 [Wiki 페이지 인덱스]
-${pages.length ? pages.map(p => `- id: ${p.id} | bookId: ${p.bookId || '-'} | type: ${p.type} | title: ${p.title}`).join('\n') : '  (없음)'}
+${pages.length ? pages.map(p => `- id: ${p.id} | bookId: ${p.bookId || '-'} | type: ${p.type} | title: ${p.title} | keyConcepts: ${(p.keyConcepts || []).join(', ')}`).join('\n') : '  (없음)'}
 
 [최근 메모]
 ${memos.slice(-20).map(m => `- ${m.bookId} / ${m.chapter || '-'} : ${m.text.slice(0, 80)}`).join('\n') || '  (없음)'}
 
 [작업]
-아래 3종 중 조건이 만족되는 것 1개만 골라 질문 1개를 생성:
-- memo-memo: 같은 책 내 메모 2개 이상이 같은 개념 페이지를 공유할 때
-- profile-memo: 사용자 프로필 키워드와 메모 개념이 교차할 때
-- book-book: 다른 책 페이지와 개념이 겹칠 때
+아래 3종을 순서대로 검토해 가능한 것 1개 골라 질문 1개 생성.
+⚠️ **type:none은 3종 모두 불가능할 때만 — 반드시 적극적으로 찾은 후 마지막 수단으로만 사용.**
 
-규칙:
+1. **memo-memo** (최우선): [Wiki 페이지 인덱스]에서 keyConcepts가 여러 메모 내용과 겹치는 페이지를 찾아라.
+   - 같은 책의 메모 2개 이상이 같은 키 개념을 다루면 즉시 선택.
+   - 판단 방법: 각 페이지의 keyConcepts와 [최근 메모] 내용을 비교해 공통 주제 확인.
+
+2. **book-book**: [Wiki 페이지 인덱스]에서 bookId가 다른 두 페이지가 같은 개념을 다루면 선택.
+
+3. **profile-memo** (신중하게): 책 개념과 파생 키워드 간 1-2단계 직접 연결이 *확실히* 보일 때만.
+   - 확신 없으면 선택하지 말 것 — memo-memo로 대체.
+
+**profile-memo 선택 조건 (엄격)**:
+- 책 개념 A → 파생 키워드 B 사이에 "A이면 바로 B다" 수준의 1-2단계 연결만 허용
+- 1단계 예(허용): 시장이 도덕 판단 배제 → 사소한 결정의 마비 (기준 상실이 같은 구조)
+- 금지 예: 책 개념 → 중간 개념 2개 이상 → 파생 키워드 (3단계 이상)
+- 확신이 없으면 profile-memo 선택하지 말고 memo-memo로 대신할 것
+
+공통 규칙:
 - 책 원문 추론이 필요한 질문 금지.
 - sourcePageIds 에 근거 페이지 ID 최소 1개 필수.
 - 질문은 답하기 쉬운 한 문장.
-- profile-memo 타입을 고를 때는 [파생 키워드] 중 하나 이상의 *개념*을 질문 초점에 반영. usedDerivedKeywords 에 사용한 키워드 명시.
-  ⚠️ 파생 키워드 문구를 질문에 그대로 붙여넣지 말 것. 키워드가 나타내는 사고 패턴·정서가 질문의 방향이 되어야 함.
-  ⚠️ 책 개념과 파생 키워드 간에 공유하는 원리·가치관이 있을 때만 연결. "A가 B에 어떤 영향을 미칠까?" 수준의 단순 병치 금지.
-- 같은 wiki에서 다른 프로필을 넣으면 다른 질문이 나올 정도로 키워드를 살릴 것.
+- profile-memo 선택 시 usedDerivedKeywords에 사용한 키워드 명시.
 
 스키마:
 ${JSON.stringify(NUDGE_SCHEMA)}
