@@ -1,0 +1,414 @@
+{
+  "round": 1,
+  "model": "gpt-4o-mini",
+  "bookResults": [
+    {
+      "bookTitle": "돈으로 살 수 없는 것들",
+      "pageCount": 4,
+      "variants": {
+        "V1": {
+          "question": "시장 가격이 자발적으로 지불하려는 마음을 반영하는 방식은 무엇인가?",
+          "type": "memo-memo",
+          "sourcePageIds": [
+            "market",
+            "incentives"
+          ],
+          "pass": true,
+          "axes": [
+            {
+              "key": "QA 근거 강제",
+              "score": 2,
+              "reasoning": "질문의 모든 내용이 근거 페이지의 내용과 일치하며, 책 원문 추론이 없다."
+            },
+            {
+              "key": "QB 이해가능성",
+              "score": 1,
+              "reasoning": "질문이 다소 모호하여 추가 설명이 필요할 수 있다."
+            },
+            {
+              "key": "QC 구체성",
+              "score": 1,
+              "reasoning": "질문이 다소 추상적이며, 특정 상황을 상상하기 어려운 부분이 있다."
+            },
+            {
+              "key": "QD 정지력",
+              "score": 1,
+              "reasoning": "흥미로운 질문이지만 예상 가능한 각도에서 접근하고 있어 충격이 약하다."
+            }
+          ],
+          "bestQuestion": "시장 가격이 개인의 선택과 사회적 규범에 미치는 영향을 어떻게 이해할 수 있을까?"
+        },
+        "V2": {
+          "question": "시장이 비시장적 규범을 어떻게 밀어내는지에 대한 구체적인 사례를 생각해본다면, 당신의 일상에서 어떤 상황이 떠오르나요?",
+          "type": "memo-memo",
+          "sourcePageIds": [
+            "corruption",
+            "democracy"
+          ],
+          "pass": true,
+          "axes": [
+            {
+              "key": "QA 근거 강제",
+              "score": 2,
+              "reasoning": "질문의 내용이 부패와 민주주의에 대한 근거 페이지의 내용과 직접적으로 연결되어 있으며, 책 원문 추론이 없다."
+            },
+            {
+              "key": "QB 이해가능성",
+              "score": 1,
+              "reasoning": "질문이 약간 모호할 수 있으며, 맥락 없이 읽으면 추가 설명이 필요할 수 있다."
+            },
+            {
+              "key": "QC 구체성",
+              "score": 2,
+              "reasoning": "일상에서의 구체적인 상황을 떠올릴 수 있도록 요구하는 질문이다."
+            },
+            {
+              "key": "QD 정지력",
+              "score": 1,
+              "reasoning": "흥미롭긴 하나 예상 가능한 질문으로, 충격이 약하다."
+            }
+          ],
+          "bestQuestion": "시장 비시장적 규범의 구체적인 사례를 통해 당신의 일상에서 어떤 상황이 떠오르는지 설명해보세요."
+        },
+        "V3": {
+          "question": "최근 디자인 리뷰에서 팀원 간의 의견 차이를 조율할 때, 당신이 실제로 따른 규범은 뭐였나요?",
+          "type": "profile-memo",
+          "sourcePageIds": [
+            "market",
+            "incentives",
+            "democracy"
+          ],
+          "pass": true,
+          "axes": [
+            {
+              "key": "QA 근거 강제",
+              "score": 2,
+              "reasoning": "질문의 내용은 시장, 인센티브, 민주주의와 관련된 근거 페이지의 내용과 직접적으로 연결된다."
+            },
+            {
+              "key": "QB 이해가능성",
+              "score": 1,
+              "reasoning": "질문은 다소 모호할 수 있으며, 추가 설명이 필요할 수 있다."
+            },
+            {
+              "key": "QC 구체성",
+              "score": 2,
+              "reasoning": "특정 상황인 디자인 리뷰에서의 의견 조율을 언급하여 구체적인 경험을 상상할 수 있다."
+            },
+            {
+              "key": "QD 정지력",
+              "score": 1,
+              "reasoning": "흥미로운 질문이지만, 예상 가능한 각도에서의 질문으로 충격이 약하다."
+            }
+          ],
+          "bestQuestion": "디자인 리뷰에서 팀원 간의 의견 차이를 조율할 때, 어떤 비시장적 규범이 영향을 미쳤나요?"
+        }
+      }
+    },
+    {
+      "bookTitle": "그리스인 조르바",
+      "pageCount": 5,
+      "variants": {
+        "V1": {
+          "question": "어떻게 죽음을 생각하면서 행동하는 것이 우리의 현실 인식에 영향을 미칠 수 있을까?",
+          "type": "memo-memo",
+          "sourcePageIds": [
+            "concept-죽음",
+            "concept-현실"
+          ],
+          "pass": true,
+          "axes": [
+            {
+              "key": "QA 근거 강제",
+              "score": 2,
+              "reasoning": "질문의 모든 내용이 근거 페이지에서 역추적 가능하며, 책 원문 추론이 없다."
+            },
+            {
+              "key": "QB 이해가능성",
+              "score": 1,
+              "reasoning": "질문이 약간 모호하여 추가 설명이 필요할 수 있다."
+            },
+            {
+              "key": "QC 구체성",
+              "score": 1,
+              "reasoning": "질문이 다소 추상적이며, 구체적인 상황을 상상하기 어려운 부분이 있다."
+            },
+            {
+              "key": "QD 정지력",
+              "score": 2,
+              "reasoning": "질문이 예상 밖의 각도로 흥미를 유발할 수 있다."
+            }
+          ],
+          "bestQuestion": "죽음을 생각하는 것이 우리의 행동에 어떤 구체적인 변화를 가져올 수 있을까?"
+        },
+        "V2": {
+          "question": "어떤 상황에서 당신은 자신의 욕망에서 자유로워지기 위해 희생을 감수해야 한다고 느끼나요? 그 과정에서 느끼는 갈등은 무엇인가요?",
+          "type": "memo-memo",
+          "sourcePageIds": [
+            "concept-자유",
+            "concept-죽음"
+          ],
+          "pass": true,
+          "axes": [
+            {
+              "key": "QA 근거 강제",
+              "score": 2,
+              "reasoning": "질문의 모든 내용이 근거 페이지의 내용과 잘 연결되어 있으며, 책 원문 추론이 없다."
+            },
+            {
+              "key": "QB 이해가능성",
+              "score": 1,
+              "reasoning": "질문이 다소 모호할 수 있으며, 추가 설명이 필요할 수 있다."
+            },
+            {
+              "key": "QC 구체성",
+              "score": 1,
+              "reasoning": "질문이 특정 상황을 요구하지만, 다소 추상적인 요소가 포함되어 있다."
+            },
+            {
+              "key": "QD 정지력",
+              "score": 2,
+              "reasoning": "질문이 예상 밖의 각도로 독자의 관심을 끌 수 있는 요소가 있다."
+            }
+          ],
+          "bestQuestion": "자신의 욕망에서 자유로워지기 위해 어떤 희생을 감수해야 한다고 느끼며, 그 과정에서 어떤 갈등을 경험하나요?"
+        },
+        "V3": {
+          "question": "최근 디자인 리뷰에서 팀원 간의 방향성이 맞지 않았을 때, 당신이 실제로 따른 규범은 뭐였나요?",
+          "type": "profile-memo",
+          "sourcePageIds": [
+            "concept-자유",
+            "concept-현실"
+          ],
+          "pass": true,
+          "axes": [
+            {
+              "key": "QA 근거 강제",
+              "score": 2,
+              "reasoning": "질문의 내용이 근거 페이지의 주제와 직접적으로 연결되어 있으며, 책의 내용을 기반으로 하고 있다."
+            },
+            {
+              "key": "QB 이해가능성",
+              "score": 1,
+              "reasoning": "질문이 다소 모호할 수 있으며, 추가적인 설명이 필요할 수 있다."
+            },
+            {
+              "key": "QC 구체성",
+              "score": 2,
+              "reasoning": "특정 상황을 묘사하고 있어, 독자가 머릿속에 그릴 수 있는 구체적인 경험을 제시하고 있다."
+            },
+            {
+              "key": "QD 정지력",
+              "score": 1,
+              "reasoning": "흥미로운 질문이지만, 예상 가능한 방향으로 진행될 수 있어 충격이 약하다."
+            }
+          ],
+          "bestQuestion": "팀원 간의 방향성이 맞지 않았을 때, 당신이 따랐던 규범의 구체적인 사례를 공유해 주세요."
+        }
+      }
+    },
+    {
+      "bookTitle": "디자인의 디자인",
+      "pageCount": 4,
+      "variants": {
+        "V1": {
+          "question": "디자인과 커뮤니케이션 디자인의 관계는 무엇인가?",
+          "type": "memo-memo",
+          "sourcePageIds": [
+            "design",
+            "communication-design"
+          ],
+          "pass": true,
+          "axes": [
+            {
+              "key": "QA 근거 강제 (Grounding)",
+              "score": 2,
+              "reasoning": "질문의 내용이 근거 페이지의 내용과 잘 연결되어 있으며, 책 원문 추론이 없다."
+            },
+            {
+              "key": "QB 이해가능성 (Comprehensibility)",
+              "score": 1,
+              "reasoning": "질문이 다소 모호할 수 있으며, 추가 설명이 필요할 수 있다."
+            },
+            {
+              "key": "QC 구체성 (Concreteness)",
+              "score": 1,
+              "reasoning": "질문이 다소 추상적이며, 구체적인 상황을 상상하기 어려운 부분이 있다."
+            },
+            {
+              "key": "QD 정지력 (Stop-power)",
+              "score": 1,
+              "reasoning": "흥미롭긴 하나 예상 가능한 질문으로, 충격이 약하다."
+            }
+          ],
+          "bestQuestion": "디자인과 커뮤니케이션 디자인이 일상생활에서 어떻게 상호작용하는지 구체적인 사례를 들어 설명해줄 수 있나요?"
+        },
+        "V2": {
+          "question": "디자인에서 '새로운 것'과 '익숙한 것'의 경계를 허물고, 일상 속에서 창조성을 어떻게 재발견할 수 있을까?",
+          "type": "memo-memo",
+          "sourcePageIds": [
+            "design",
+            "creativity"
+          ],
+          "pass": true,
+          "axes": [
+            {
+              "key": "QA 근거 강제 (Grounding)",
+              "score": 2,
+              "reasoning": "질문의 내용이 근거 페이지의 내용과 잘 연결되어 있으며, 책 원문 추론이 없다."
+            },
+            {
+              "key": "QB 이해가능성 (Comprehensibility)",
+              "score": 1,
+              "reasoning": "질문이 다소 모호하게 느껴질 수 있으며, 추가 설명이 필요할 수 있다."
+            },
+            {
+              "key": "QC 구체성 (Concreteness)",
+              "score": 1,
+              "reasoning": "질문이 다소 추상적이며, 특정 상황을 상상하기 어려운 부분이 있다."
+            },
+            {
+              "key": "QD 정지력 (Stop-power)",
+              "score": 2,
+              "reasoning": "질문이 흥미롭고 예상 밖의 각도로 접근하고 있어 주목을 끌 수 있다."
+            }
+          ],
+          "bestQuestion": "디자인에서 익숙한 것의 재발견이 창조성에 미치는 영향은 무엇인가?"
+        },
+        "V3": {
+          "question": "최근 디자인 리뷰에서 '디자인이란 무엇인가'의 비평적 관점이 영향을 미친 적 있나요?",
+          "type": "profile-memo",
+          "sourcePageIds": [
+            "design",
+            "creativity",
+            "communication-design"
+          ],
+          "pass": true,
+          "axes": [
+            {
+              "key": "QA 근거 강제 (Grounding)",
+              "score": 2,
+              "reasoning": "질문의 내용이 근거 페이지의 디자인과 창조성에 대한 설명과 잘 연결되어 있으며, 책 원문 추론이 없다."
+            },
+            {
+              "key": "QB 이해가능성 (Comprehensibility)",
+              "score": 1,
+              "reasoning": "질문이 다소 모호할 수 있으며, 디자인 리뷰와 비평적 관점에 대한 배경 지식이 필요할 수 있다."
+            },
+            {
+              "key": "QC 구체성 (Concreteness)",
+              "score": 1,
+              "reasoning": "질문이 특정 상황을 언급하고 있으나, '디자인이란 무엇인가'라는 개념이 추상적이어서 구체적인 경험을 상상하기 어려울 수 있다."
+            },
+            {
+              "key": "QD 정지력 (Stop-power)",
+              "score": 1,
+              "reasoning": "디자인에 대한 비평적 관점을 제시하고 있으나, 예상 가능한 질문으로 충격이 약하다."
+            }
+          ],
+          "bestQuestion": "디자인 리뷰에서 비평적 관점이 어떤 방식으로 디자인 결정에 영향을 미쳤는지 구체적인 사례를 공유해 주실 수 있나요?"
+        }
+      }
+    },
+    {
+      "bookTitle": "무의미의 축제",
+      "pageCount": 4,
+      "variants": {
+        "V1": {
+          "question": "이 책에서 농담과 유머의 관계에 대해 어떻게 설명하고 있나요?",
+          "type": "memo-memo",
+          "sourcePageIds": [
+            "concept-농담",
+            "concept-유머"
+          ],
+          "pass": true,
+          "axes": [
+            {
+              "key": "QA 근거 강제",
+              "score": 2,
+              "reasoning": "질문의 모든 내용이 근거 페이지의 내용으로 역추적 가능하며, 책 원문 추론이 없다."
+            },
+            {
+              "key": "QB 이해가능성",
+              "score": 2,
+              "reasoning": "책을 읽지 않은 사람도 질문을 한 번에 이해할 수 있으며, 전문 용어가 없다."
+            },
+            {
+              "key": "QC 구체성",
+              "score": 1,
+              "reasoning": "농담과 유머의 관계에 대한 질문은 다소 추상적이며, 구체적인 상황을 상상하기 어려운 부분이 있다."
+            },
+            {
+              "key": "QD 정지력",
+              "score": 1,
+              "reasoning": "흥미로운 질문이지만, 예상 가능한 각도에서 접근하고 있어 충격이 약하다."
+            }
+          ],
+          "bestQuestion": "이 책에서 농담이 인간 존재의 복잡성을 어떻게 드러내는지 설명하고 있나요?"
+        },
+        "V2": {
+          "question": "무의미를 사랑하는 법을 배우는 것이, 당신의 디자인 작업에서 창의적 문제 해결에 어떤 영향을 미칠 수 있을까요?",
+          "type": "memo-memo",
+          "sourcePageIds": [
+            "concept-무의미"
+          ],
+          "pass": true,
+          "axes": [
+            {
+              "key": "QA 근거 강제 (Grounding)",
+              "score": 2,
+              "reasoning": "질문의 내용이 근거 페이지의 '무의미' 개념과 밀접하게 연결되어 있으며, 모든 표현이 페이지에서 유추 가능하다."
+            },
+            {
+              "key": "QB 이해가능성 (Comprehensibility)",
+              "score": 1,
+              "reasoning": "질문이 다소 철학적이며, 무의미의 개념을 이해하지 못한 사람에게는 약간 모호할 수 있다."
+            },
+            {
+              "key": "QC 구체성 (Concreteness)",
+              "score": 1,
+              "reasoning": "질문이 디자인 작업과 관련된 구체적인 상황을 언급하고 있으나, '무의미를 사랑하는 법'이라는 추상적 개념이 포함되어 있어 완전한 구체성은 부족하다."
+            },
+            {
+              "key": "QD 정지력 (Stop-power)",
+              "score": 2,
+              "reasoning": "질문이 예상치 못한 각도에서 창의적 문제 해결을 다루고 있어, 독자의 관심을 끌 수 있는 요소가 있다."
+            }
+          ],
+          "bestQuestion": "무의미를 사랑하는 법이 당신의 디자인 작업에서 창의적 문제 해결에 어떻게 적용될 수 있을까요?"
+        },
+        "V3": {
+          "question": "디자인 리뷰에서 팀원 간의 방향이 맞지 않았던 순간, 당신이 실제로 따랐던 규범은 무엇이었나요?",
+          "type": "profile-memo",
+          "sourcePageIds": [
+            "concept-무의미"
+          ],
+          "pass": true,
+          "axes": [
+            {
+              "key": "QA 근거 강제 (Grounding)",
+              "score": 1,
+              "reasoning": "질문의 내용은 근거 페이지와 일부 연결되지만, 특정 표현이 페이지 밖 지식에 의존할 가능성이 있음."
+            },
+            {
+              "key": "QB 이해가능성 (Comprehensibility)",
+              "score": 1,
+              "reasoning": "질문이 약간 모호하여 추가 설명이 필요할 수 있음."
+            },
+            {
+              "key": "QC 구체성 (Concreteness)",
+              "score": 2,
+              "reasoning": "특정 상황을 상상할 수 있는 질문으로, 구체적인 경험을 요구함."
+            },
+            {
+              "key": "QD 정지력 (Stop-power)",
+              "score": 1,
+              "reasoning": "흥미로운 질문이지만, 예상 가능한 각도에서 다루어져 충격이 약함."
+            }
+          ],
+          "bestQuestion": "디자인 리뷰에서 팀원 간의 의견 차이를 해결하기 위해 어떤 구체적인 행동을 취했나요?"
+        }
+      }
+    }
+  ]
+}

@@ -7,25 +7,33 @@ export function openaiNodeTransport({ apiKey, model } = {}) {
   const key = apiKey || process.env.OPENAI_API_KEY;
   if (!key) throw new Error('OPENAI_API_KEY missing (env or apiKey)');
   return async ({ system, user, model: m, temperature }) => {
-    const r = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${key}`,
-      },
-      body: JSON.stringify({
-        model: m || model || DEFAULT_MODEL,
-        temperature: temperature ?? 0.3,
-        response_format: { type: 'json_object' },
-        messages: [
-          ...(system ? [{ role: 'system', content: system }] : []),
-          { role: 'user', content: user },
-        ],
-      }),
+    const body = JSON.stringify({
+      model: m || model || DEFAULT_MODEL,
+      temperature: temperature ?? 0.3,
+      response_format: { type: 'json_object' },
+      messages: [
+        ...(system ? [{ role: 'system', content: system }] : []),
+        { role: 'user', content: user },
+      ],
     });
-    const data = await r.json();
-    if (!r.ok) throw new Error(data?.error?.message || `openai ${r.status}`);
-    return data.choices?.[0]?.message?.content ?? '';
+    // rate limit 자동 재시도 (최대 3회, 지수 백오프)
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const r = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+        body,
+      });
+      const data = await r.json();
+      if (r.status === 429) {
+        const wait = (attempt + 1) * 15000; // 15s, 30s, 45s
+        console.warn(`  ⚠ rate limit, ${wait/1000}s 대기 후 재시도...`);
+        await new Promise(res => setTimeout(res, wait));
+        continue;
+      }
+      if (!r.ok) throw new Error(data?.error?.message || `openai ${r.status}`);
+      return data.choices?.[0]?.message?.content ?? '';
+    }
+    throw new Error('openai rate limit: 재시도 초과');
   };
 }
 
