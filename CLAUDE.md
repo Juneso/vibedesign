@@ -79,15 +79,23 @@ chore: vite 7 업그레이드
 
 ---
 
-## 역할 분리
+## 역할 분리 (서브에이전트)
 
-작업 지시가 들어오면 아래 두 단계를 분리해서 진행한다.  
-각 역할의 상세 행동 원칙은 별도 파일에 정의되어 있다.
+작업 지시가 들어오면 아래 두 단계를 분리해서 진행한다.
+각 역할은 `.claude/agents/`에 Claude Code 서브에이전트로 정의되어 있으며 Task 도구로 호출 가능하다.
 
 | 단계 | 역할 | 정의 파일 |
 |------|------|----------|
-| 1단계 | 기획자 (Planner) — 계획 수립, Junseo 승인 대기 | [`.agents/planner.md`](.agents/planner.md) |
-| 2단계 | 엔지니어 (Executor) — 승인된 계획 구현 | [`.agents/executor.md`](.agents/executor.md) |
+| 1단계 | 기획자 (Planner) — 계획 수립, Junseo 승인 대기 | [`.claude/agents/planner.md`](.claude/agents/planner.md) |
+| 2단계 | 엔지니어 (Executor) — 승인된 계획 구현 | [`.claude/agents/executor.md`](.claude/agents/executor.md) |
+
+### 트리거 키워드
+
+| 키워드 | 진입 역할 |
+|--------|----------|
+| "기획", "정리해줘", "어떻게 할지", "이슈로 만들어줘", "계획 짜줘" | **Planner** |
+| "구현해줘", "코드 작성", "이대로 진행", 명확한 스펙 + "해줘" | **Executor** |
+| 모호하면 → **Planner** (안전 기본값) |
 
 ---
 
@@ -106,3 +114,14 @@ chore: vite 7 업그레이드
 ## Linear 연동
 
 Linear 이슈 작성 규칙 (제목 원칙, 마일스톤 배정, 어휘 통일, 책임 관리 등) → [`LINEAR.md`](LINEAR.md) 참고.
+
+### 커밋 자동 동기화 (post-commit 훅)
+
+husky `.husky/post-commit` 훅이 매 커밋마다 `scripts/linear-sync.mjs`를 실행한다.
+
+동작:
+1. 커밋 메시지에서 `DES-XXX` 모두 추출
+2. 각 이슈에 대해 — Linear API로 본문의 `## 결과` 섹션에 엔트리 append + 코멘트 추가
+3. 상태 전환은 하지 않음 (Done/In Review는 수동)
+
+필요 env: `.env.local`의 `LINEAR_API_KEY` (이미 설정됨).
