@@ -545,3 +545,261 @@ export async function ingestAnswer({ nudge, answer, pages }) {
     user: answerPrompt({ nudge, answer, pages }),
   });
 }
+
+// ─── 넛지 V7 — 퀄리티 × 다양성 배치 생성 (DES-270 / DES-291) ──────
+// 구조: ① 플랜(앵커×각도 분산, 1콜) → ② history-aware 생성(넛지당 1콜)
+// 다양성 장치 4종 (eval/RUBRIC-NUDGE.md 합격 검증: eval/runs/nudge-v7-7,9):
+//   1. 각도 팔레트 6종 — 배치 내 중복 금지, cluster+profile 필수
+//   2. 도입·초대 스타일을 코드 레벨 로테이션 (styleOffset 으로 배치 간 수렴 차단)
+//   3. 금지어(상투어) 정규식 검출 → 최대 4회 재생성
+//   4. 초대 문구(마지막 문장) 중복 검출 → 최대 2회 재생성
+
+export const NUDGE_PLAN_SCHEMA = {
+  type: 'object',
+  required: ['plans'],
+  properties: {
+    plans: {
+      type: 'array', minItems: 1,
+      items: {
+        type: 'object',
+        required: ['angle', 'anchorMemoIdx', 'anchorQuote', 'gist'],
+        properties: {
+          angle: { enum: ['reframe', 'tension', 'cluster', 'everyday', 'profile', 'counter'] },
+          anchorMemoIdx: { type: 'array', items: { type: 'number' }, minItems: 1, maxItems: 3 }, // 1-based
+          anchorQuote: { type: 'string' },   // 메모 원문에서 10~25자 발췌
+          gist: { type: 'string' },          // AI 생각 스케치 1문장 (구어체)
+        },
+      },
+    },
+  },
+};
+
+export const NUDGE_OPENERS = [
+  { key: 'quote', rule: '메모 원문 인용구로 문장을 바로 시작하라. (예: \'"..."라는 문장, 나는 ~로 읽었어\')' },
+  { key: 'scene', rule: '네(AI)가 떠올린 구체적 장면·상황 묘사로 시작하고, 그 장면에 인용구를 자연스럽게 엮어라.' },
+  { key: 'doubt', rule: '의문 또는 반쯤 동의 못 하는 마음으로 시작하라. (예: "근데 정말 ~일까 싶더라")' },
+  { key: 'react', rule: '유저가 남긴 생각(myThought)이나 하필 그 문장에 밑줄 그은 선택 자체에 대한 반응으로 시작하라. (예: "네가 이 문장을 골랐다는 게 ~")' },
+];
+
+export const NUDGE_INVITES = [
+  { key: 'agree', rule: '내 해석이 맞는지 확인을 구하며 끝내라. (예: "나만 이렇게 읽었나?", "내가 너무 꼬아 읽었으면 말해줘")' },
+  { key: 'counter', rule: '반론을 유도하며 끝내라. (예: "넌 다르게 봤을 것 같기도 해")' },
+  { key: 'experience', rule: '유저 자신의 경험·순간을 가볍게 물으며 끝내라. (예: "너도 이런 적 있어?")' },
+  { key: 'spotlight', rule: '그 메모를 저장한 순간의 마음을 물으며 끝내라. (예: "이거 저장할 때 뭐가 걸렸어?")' },
+];
+
+export const NUDGE_BANNED_WORDS = ['흥미', '인상', '보면 좋겠', '생각해보면', '생각해 보면', '고민해보', '고민해 보', '탐구'];
+export const NUDGE_BANNED_RE = new RegExp(NUDGE_BANNED_WORDS.map(w => w.replace(/ /g, ' ?')).join('|'));
+
+const fmtNudgeMemos = (memos) => memos.map((m, i) =>
+  `[메모-${i + 1}] ${m.chapter || '-'}\n원문: "${m.text}"\n내 생각: ${m.myThought || '(없음)'}`
+).join('\n\n');
+
+const fmtNudgePages = (pages) => pages.map(p =>
+  `- id: ${p.id} | title: ${p.title} | keyConcepts: ${(p.keyConcepts || []).join(', ')}`
+).join('\n');
+
+export function nudgeBatchPlanPrompt({ memos, pages, profile, derivedKeywords = [], n = 4 }) {
+  return `
+당신은 유저와 같은 책을 읽은 독서 친구다. 유저의 메모를 읽고, 시간차를 두고 보낼 넛지 ${n}개를 기획한다.
+넛지 = 친구인 당신이 메모를 읽고 든 자기 생각 1~2문장 + 자연스러운 대화 초대.
+
+[유저 프로필]
+background: ${profile.background || profile.role || '(없음)'}
+interests: ${(profile.interests || []).join(', ') || '(없음)'}
+
+[파생 키워드 — 유저의 사고·정서·실무 패턴]
+${derivedKeywords.map(k => `- ${k.keyword} (${k.axis})`).join('\n') || '(없음)'}
+
+[Wiki 페이지 인덱스]
+${fmtNudgePages(pages)}
+
+[메모 원문 전체]
+${fmtNudgeMemos(memos)}
+
+[기획 규칙 — 모두 필수]
+
+1. **앵커 분산**: ${n}개 플랜의 anchorMemoIdx 는 서로 겹치지 않게. cluster 플랜(2~3개 메모)의 멤버도 다른 플랜의 앵커와 겹치지 않게.
+2. **각도 분산**: 아래 팔레트에서 ${n}개 모두 *다른* 각도를 선택.
+   - reframe: 유저가 포착한 것(myThought)과 살짝 다른 각도의 재해석
+   - tension: 메모 원문과 myThought 사이, 혹은 메모 내부에 숨은 긴장 발견
+   - cluster: 2~3개 메모가 공유하는, 유저가 아직 연결 안 한 보이지 않는 선
+   - everyday: 책 개념이 실제로 작동하는 구체적 일상 장면 발견 (직업 클리셰 금지 — "디자인 리뷰에서" 같은 만능 상황 쓰지 말 것)
+   - profile: 파생 키워드와 1~2단계 직접 연결. **억지면 이 각도를 버리고 다른 각도 선택**
+   - counter: 메모(또는 myThought)의 주장에 대한 부드러운 의심·반례
+3. **연결타입 믹스 (필수)**: 배치에 cluster 플랜 1개 + profile 플랜 1개를 반드시 포함하라.
+   profile 은 파생 키워드 중 가장 자연스러운 1~2단계 연결을 골라라. 도저히 없을 때만 counter 로 대체 (그 경우에도 cluster 는 유지).
+4. **같은 주제의 다른 면**: 메모들이 한 주제를 공유하더라도, 각 플랜의 gist 는 그 주제의 *다른 면*(다른 긴장, 다른 함의, 다른 적용)을 건드려야 한다. ${n}개 gist 를 나란히 읽었을 때 같은 결론이 반복되면 실패.
+5. **자신 있는 것만**: 각 각도에서 가장 강한 후보를 고르되, 연결이 약하면 그 각도를 버리고 다른 각도로 대체. (같은 각도 2회는 마지막 수단. 단 cluster 는 버리지 말 것)
+6. anchorQuote 는 해당 메모 *원문에서 그대로* 10~25자 발췌. 변형 금지.
+7. gist 는 "내(AI)가 이 메모를 읽고 든 생각"의 스케치 1문장. 유저 생각의 단순 요약 금지.
+   친구에게 말하듯 구어체로 ("~인 것 같아"). "~을 고민해볼 수 있어", "~탐구해보면 좋겠어" 같은 강의 톤 금지.
+
+스키마:
+${JSON.stringify(NUDGE_PLAN_SCHEMA)}
+
+JSON만 출력.
+  `.trim();
+}
+
+export function nudgeBatchGenPrompt({ plan, memos, pages, sentNudges, style, feedback }) {
+  const anchorMemos = plan.anchorMemoIdx.map(i => memos[i - 1]).filter(Boolean);
+  const angleGuide = {
+    reframe: '유저의 시각과 살짝 다른 각도로 같은 문구를 다시 읽어라.',
+    tension: '메모 원문과 유저 생각 사이(혹은 메모 내부)의 긴장을 짚어라. 단, 공격이 아니라 발견의 톤. **그 긴장이 실제로 드러나는 구체적 장면·사례를 반드시 하나 들어라** — 추상 명제 두 개를 나열하면 실패.',
+    cluster: '두세 메모를 잇는 보이지 않는 선을 보여줘라. **각 메모에서 짧은 인용·지칭을 하나씩(최소 2개) 포함해 "A랑 B를 같이 보니까" 구조가 겉으로 드러나야 한다.** 인용이 1개뿐이거나 한 메모 해석처럼 읽히면 실패.',
+    everyday: '그 개념이 작동하는 구체적 일상 장면 하나를 그려라. 누구나 겪는 장면이되 뻔하지 않은 것. 직업 클리셰 금지.',
+    profile: '유저의 사고·실무 패턴과 자연스럽게 닿는 지점을 보여줘라. 키워드를 그대로 인용하지 말고 녹여서.',
+    counter: '메모의 주장이 안 통하는 경우를 부드럽게 들어라. "근데 이런 경우엔 어떨까" 톤.',
+  }[plan.angle];
+
+  return `
+당신은 유저와 같은 책을 읽은 독서 친구다. 아래 플랜대로 넛지 1개를 만든다.
+말투는 친구에게 보내는 메시지처럼 구어체("~인 것 같아", "~더라"). 강의·해설 톤("~할 수 있다", "~것이다", "~탐구해보면 좋겠어") 금지.
+
+[플랜]
+각도: ${plan.angle} — ${angleGuide}
+앵커 인용구: "${plan.anchorQuote}"
+내 생각 스케치: ${plan.gist}
+
+[앵커 메모 원문]
+${fmtNudgeMemos(anchorMemos)}
+
+[Wiki 페이지 인덱스 — sourcePageIds 선택용]
+${fmtNudgePages(pages)}
+
+[이미 보낸 넛지들 — 형식이 겹치면 안 됨]
+${sentNudges.length ? sentNudges.map((q, i) => `${i + 1}. ${q}`).join('\n') : '(첫 넛지)'}
+
+[형식 지정 — 반드시 따를 것]
+- 도입 (${style.opener.key}): ${style.opener.rule}
+- 초대 (${style.invite.key}): ${style.invite.rule}
+
+[금지어 — 하나라도 쓰면 실패]
+${NUDGE_BANNED_WORDS.map(w => `"${w}"`).join(', ')} — 이런 상투어 대신 매번 다른, 구체적인 어휘로.
+${feedback ? `\n[재시도 사유]\n${feedback}\n` : ''}
+[작성 규칙]
+
+구조: [지정된 도입] + [내(AI) 생각 — 플랜의 각도로] + [지정된 대화 초대].
+- 인용구만 읽어도 이해되도록, 인용 앞뒤에 짧은 맥락을 한 구절 붙여라. 책 제목·페이지 번호·"메모"라는 단어의 기계적 언급 금지.
+- **책 속 인물·지칭("대장", "그", "선생")은 그대로 쓰지 말고 풀어 써라** — 책을 안 읽은 사람은 누군지 모른다.
+- **내 생각에는 손에 잡히는 일상 장면 하나가 반드시 들어가야 한다.** 책의 비유를 다시 묘사하는 건 장면이 아니다 ("씨앗을 심는 모습" X / "퇴근길에 ~하다가 문득 ~한 순간" O). 추상 철학 문장으로 끝내지 말 것.
+- **장면은 인용구가 *주장하는 바*의 사례여야 한다.** 인용구의 이미지(씨앗, 꽃, 바다 등)를 일상에서 재연하는 건 근거 이탈이다 — 이미지가 아니라 주장을 옮겨라. (인용구가 "대가 없는 성취는 없다"를 비유로 말하면, 장면도 '대가를 치르는 순간'이어야지 '씨앗을 보는 순간'이 아니다.)
+- **추상 개념어("비시장적 규범", "가치 체계" 등)를 쓸 때는 반드시 일상 사물·행동 수준의 사례 하나가 같은 문장 안에 따라붙어야 한다.** 가능하면 개념어 자체를 풀어 써라 ("비시장적 규범" → "돈 없이 굴러가던 약속들").
+- 전체 1~3문장. 장황 금지.
+
+대화 초대 (마지막):
+- 공세적 질문 금지: "왜 그렇게 생각해?", "어떻게 적용할 것인가?" X
+- [이미 보낸 넛지들]과 문구·서술어가 겹치지 않게. 지정된 초대 스타일 안에서 상황에 맞게 새로 만들 것.
+- [이미 보낸 넛지들]에 등장한 장면·예시(예: "친구들과 대화하던 순간")와 같은 장면 재사용 금지. 매번 다른 장면.
+- 권유·강의 톤("~해보면 좋겠어") 금지. 친구의 감상은 단정이나 의심으로 말한다 ("~같아", "~아닐까 싶었어").
+
+[출력 형식 — 중요]
+**question 필드 하나에 [도입 + 내 생각 + 대화 초대] 전체를 1~3문장으로 이어 붙여 넣어라.**
+본문을 content 등 다른 필드에 나눠 담지 말 것. question 만 읽어도 완성된 메시지여야 한다.
+예시 톤: "벌금 대신 요금을 매겼더니 오히려 늦게 데리러 오는 부모가 늘었다는 게, 돈이 죄책감을 면제권으로 바꿔버린 것 같아. 너는 이 메모 저장할 때 뭐가 걸렸어?"
+
+[근거]
+- sourcePageIds: 이 넛지의 근거가 된 wiki 페이지 ID 1개 이상 (cluster 는 2개 이상).
+- type: cluster → "memo-memo", profile → "profile-memo", 그 외 → "memo-memo".
+- 책 원문 추론 금지. 페이지·메모 내용 범위 안에서만.
+
+스키마 (angle 필드 추가):
+${JSON.stringify({ ...NUDGE_SCHEMA, properties: { ...NUDGE_SCHEMA.properties, angle: { type: 'string' } } })}
+
+JSON만 출력.
+  `.trim();
+}
+
+const _nudgeNorm = (s) => (s || '').replace(/[\s"'“”‘’.,!?~—-]/g, '');
+const _nudgeLastSentence = (q) => { const parts = (q || '').split(/(?<=[.?!])\s+/); return _nudgeNorm(parts[parts.length - 1]); };
+
+export function nudgePlanAnchorOverlap(plans) {
+  const sets = plans.map(p => new Set(p.anchorMemoIdx || []));
+  const pairs = [];
+  for (let i = 0; i < sets.length; i++) for (let j = i + 1; j < sets.length; j++)
+    for (const x of sets[i]) if (sets[j].has(x)) { pairs.push(`플랜${i + 1}↔플랜${j + 1} (메모-${x})`); break; }
+  return pairs;
+}
+
+async function callLLMSafe(args) {
+  try { return await callLLM(args); }
+  catch (e) { return { _parseError: String(e.message || e).slice(0, 200) }; }
+}
+
+// 배치 생성 워크플로우. styleOffset 으로 배치 간(책 간) 형식 수렴을 차단한다.
+// 반환: { plans, nudges } — nudges[i] 는 NUDGE_SCHEMA + angle/style 필드.
+export async function generateNudgeBatch({ memos, pages, profile, derivedKeywords = [], n = 4, styleOffset = 0, model } = {}) {
+  if (!pages.length) return { plans: [], nudges: [] };
+
+  let plans = [];
+  {
+    const out = await callLLMSafe({ system: SYSTEM_RULES, user: nudgeBatchPlanPrompt({ memos, pages, profile, derivedKeywords, n }), model, temperature: 0.6 });
+    plans = (out.plans || []).slice(0, n);
+    const overlap = nudgePlanAnchorOverlap(plans);
+    if (overlap.length) {
+      const rePrompt = nudgeBatchPlanPrompt({ memos, pages, profile, derivedKeywords, n })
+        + `\n\n[재시도 사유]\n직전 시도에서 앵커 메모가 겹쳤다: ${overlap.join(', ')}. ${n}개 플랜의 anchorMemoIdx 가 절대 겹치지 않게 다시 기획하라.`;
+      const retryOut = await callLLMSafe({ system: SYSTEM_RULES, user: rePrompt, model, temperature: 0.7 });
+      const retryPlans = (retryOut.plans || []).slice(0, n);
+      if (retryPlans.length === n && !nudgePlanAnchorOverlap(retryPlans).length) plans = retryPlans;
+    }
+  }
+
+  const validIds = new Set(pages.map(p => p.id));
+  const nudges = [];
+  const sent = [];
+
+  const mergeContent = (x) => {
+    if (x && typeof x.content === 'string' && x.content.trim()) {
+      const tail = (x.question || '').trim();
+      x.question = x.content.trim().includes(tail) && tail ? x.content.trim() : [x.content.trim(), tail].filter(Boolean).join(' ');
+      delete x.content;
+    }
+    return x;
+  };
+  const gen = (plan, style, feedback, temperature) =>
+    callLLMSafe({ system: SYSTEM_RULES, user: nudgeBatchGenPrompt({ plan, memos, pages, sentNudges: sent, style, feedback }), model, temperature }).then(mergeContent);
+
+  for (let j = 0; j < plans.length; j++) {
+    const plan = plans[j];
+    const style = { opener: NUDGE_OPENERS[(styleOffset + j) % 4], invite: NUDGE_INVITES[(styleOffset + j * 3) % 4] };
+    let nudge = await gen(plan, style, null, 0.5);
+    // 금지어 검출 시 최대 4회 재생성 — 금지어 없는 결과만 채택
+    for (let attempt = 0; attempt < 4 && nudge.question && NUDGE_BANNED_RE.test(nudge.question); attempt++) {
+      const hit = (nudge.question.match(NUDGE_BANNED_RE) || ['?'])[0];
+      const feedback = `직전 시도가 금지어 "${hit}" 를 포함해 폐기됐다: "${nudge.question.slice(0, 80)}...".
+같은 각도·같은 앵커를 유지하되 다음 단어(및 활용형 전부)를 절대 쓰지 마라: ${NUDGE_BANNED_WORDS.join(', ')}.
+"흥미롭다/인상적이다" 류의 평가 형용사 자체를 버리고, 그 대신 *무엇이* 걸렸는지를 구체적으로 말하라. (예: "~라는 게 마음에 걸렸어", "~가 이상하게 오래 남더라")`;
+      const retry = await gen(plan, style, feedback, 0.5 + attempt * 0.1);
+      if (retry.question && !NUDGE_BANNED_RE.test(retry.question)) { nudge = retry; break; }
+      if (retry.question && attempt < 3) nudge = retry;
+    }
+    // 초대 문구(마지막 문장)가 이미 보낸 넛지와 동일하면 최대 2회 재생성
+    for (let attempt = 0; attempt < 2 && nudge.question && sent.some(q => _nudgeLastSentence(q) === _nudgeLastSentence(nudge.question)); attempt++) {
+      const feedback = `직전 시도의 마지막 문장(대화 초대)이 이미 보낸 넛지와 똑같아서 폐기됐다: "${nudge.question.slice(-40)}". 같은 내용을 유지하되 마지막 문장을 완전히 다른 표현으로 바꿔라.`;
+      const retry = await gen(plan, style, feedback, 0.6 + attempt * 0.15);
+      if (retry.question && !NUDGE_BANNED_RE.test(retry.question)) nudge = retry;
+    }
+    // 자가 검수 (DES-258 검수 에이전트 패턴): 이해가능성·구체성 미달 시 1회 재생성
+    if (nudge.question) {
+      const check = await callLLMSafe({
+        system: SYSTEM_RULES, model, temperature: 0,
+        user: `바쁜 사람이 알림으로 이 메시지를 받았다. 책은 안 읽었다.\n\n"${nudge.question}"\n\n두 가지만 냉정하게 판단하라:\n- understandable: 한 번에 이해되는가? (책 속 인물·맥락 지식 없이)\n- concrete: 구체적 일상 장면·순간이 머릿속에 그려지는가? (추상 개념·비유 말고 실제 생활 장면)\n\n스키마: {"understandable": true|false, "concrete": true|false, "fix": "미달 시 어떻게 고칠지 1문장"}\nJSON만 출력.`,
+      });
+      if (check && (check.understandable === false || check.concrete === false)) {
+        const feedback = `직전 시도가 자가 검수에서 미달했다 (이해가능: ${check.understandable}, 구체성: ${check.concrete}). 보완 방향: ${check.fix || '구체적 일상 장면을 한 문장 안에 넣어라'}. 같은 각도·앵커를 유지하며 다시 써라.
+단, 두 가지 절대 조건: ① 앵커 인용구·메모 내용 밖의 새 주장을 만들지 말 것 (장면은 어디까지나 인용구의 *예시*여야 한다). ② 일상 장면은 [이미 보낸 넛지들]에 등장하지 않은 새로운 장면이어야 한다.`;
+        const retry = await gen(plan, style, feedback, 0.6);
+        if (retry.question && !NUDGE_BANNED_RE.test(retry.question) && !sent.some(q => _nudgeLastSentence(q) === _nudgeLastSentence(retry.question))) nudge = retry;
+      }
+    }
+    if (nudge._parseError || !nudge.question) { nudges.push({ type: 'none', question: '', sourcePageIds: [], angle: plan.angle, _error: nudge._parseError }); continue; }
+    nudge.sourcePageIds = (nudge.sourcePageIds || []).filter(id => validIds.has(id));
+    nudge.angle = nudge.angle || plan.angle;
+    nudge.style = `${style.opener.key}/${style.invite.key}`;
+    nudges.push(nudge);
+    sent.push(nudge.question);
+  }
+  return { plans, nudges };
+}
