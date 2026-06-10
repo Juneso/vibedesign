@@ -1,0 +1,72 @@
+<svg viewBox="0 0 700 640" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'Apple SD Gothic Neo', sans-serif">
+<defs>
+<marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#888780"/></marker>
+</defs>
+<rect x="0" y="0" width="700" height="640" fill="#FFFFFF"/>
+
+<rect x="70" y="28" width="250" height="54" rx="4" fill="#F1EFE8" stroke="#5F5E5A"/>
+<text x="195" y="50" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">golden/seed-v1.json</text>
+<text x="195" y="70" text-anchor="middle" font-size="12" fill="#5F5E5A">박제 입력 — 4책 × 30메모</text>
+<rect x="380" y="28" width="250" height="54" rx="4" fill="#F1EFE8" stroke="#5F5E5A"/>
+<text x="505" y="50" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">golden/ingest-cache.json</text>
+<text x="505" y="70" text-anchor="middle" font-size="12" fill="#5F5E5A">위키 페이지 캐시 (1회 생성)</text>
+
+<line x1="195" y1="82" x2="195" y2="122" stroke="#888780" stroke-width="1.5" marker-end="url(#ar)"/>
+<line x1="505" y1="82" x2="505" y2="122" stroke="#888780" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<rect x="40" y="124" width="620" height="164" rx="4" fill="#EEEDFE" stroke="#534AB7"/>
+<text x="350" y="148" text-anchor="middle" font-size="14" font-weight="500" fill="#3C3489">생성 — lib/llm.js generateNudgeBatch (앱과 동일 코드)</text>
+<rect x="70" y="162" width="180" height="66" rx="4" fill="#FFFFFF" stroke="#534AB7"/>
+<text x="160" y="188" text-anchor="middle" font-size="14" font-weight="500" fill="#3C3489">① 플랜 (1콜)</text>
+<text x="160" y="208" text-anchor="middle" font-size="12" fill="#534AB7">앵커 × 각도 6종 분산</text>
+<rect x="290" y="162" width="180" height="66" rx="4" fill="#FFFFFF" stroke="#534AB7"/>
+<text x="380" y="188" text-anchor="middle" font-size="14" font-weight="500" fill="#3C3489">② 생성 (넛지당 1콜)</text>
+<text x="380" y="208" text-anchor="middle" font-size="12" fill="#534AB7">도입·초대 스타일 로테이션</text>
+<rect x="510" y="162" width="120" height="66" rx="4" fill="#FAECE7" stroke="#993C1D"/>
+<text x="570" y="188" text-anchor="middle" font-size="14" font-weight="500" fill="#712B13">가드</text>
+<text x="570" y="208" text-anchor="middle" font-size="12" fill="#993C1D">금지어·중복·자가검수</text>
+<line x1="250" y1="195" x2="288" y2="195" stroke="#888780" stroke-width="1.5" marker-end="url(#ar)"/>
+<line x1="470" y1="195" x2="508" y2="195" stroke="#888780" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M 570 228 L 570 252 L 380 252 L 380 232" fill="none" stroke="#D85A30" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+<text x="475" y="268" text-anchor="middle" font-size="12" fill="#993C1D">미달 시 재생성 (금지어 4회 · 초대 2회 · 검수 1회)</text>
+
+<line x1="160" y1="288" x2="160" y2="328" stroke="#888780" stroke-width="1.5" marker-end="url(#ar)"/>
+<line x1="350" y1="288" x2="350" y2="328" stroke="#888780" stroke-width="1.5" marker-end="url(#ar)"/>
+<line x1="540" y1="288" x2="540" y2="328" stroke="#888780" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<text x="272" y="320" text-anchor="middle" font-size="12" fill="#5F5E5A">채점 — judge 모델 gpt-4o (생성 모델과 분리)</text>
+<rect x="35" y="330" width="145" height="78" rx="4" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="107" y="356" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">퀄리티 QA~QD</text>
+<text x="107" y="376" text-anchor="middle" font-size="12" fill="#0F6E56">넛지 1개 단위</text>
+<text x="107" y="394" text-anchor="middle" font-size="12" fill="#0F6E56">근거·이해·구체·정지력</text>
+<rect x="200" y="330" width="145" height="78" rx="4" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="272" y="356" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">다양성 D1~D4</text>
+<text x="272" y="376" text-anchor="middle" font-size="12" fill="#0F6E56">책 배치(4개) 단위</text>
+<text x="272" y="394" text-anchor="middle" font-size="12" fill="#0F6E56">앵커·각도·문형·연결</text>
+<rect x="365" y="330" width="145" height="78" rx="4" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="437" y="356" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">D5 비수렴</text>
+<text x="437" y="376" text-anchor="middle" font-size="12" fill="#0F6E56">4책 전체 단위</text>
+<text x="437" y="394" text-anchor="middle" font-size="12" fill="#0F6E56">책 간 템플릿 반복 검출</text>
+<rect x="530" y="330" width="140" height="78" rx="4" fill="#F1EFE8" stroke="#5F5E5A"/>
+<text x="600" y="356" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">프로그램 체크</text>
+<text x="600" y="376" text-anchor="middle" font-size="12" fill="#5F5E5A">정규식 · 결정적</text>
+<text x="600" y="394" text-anchor="middle" font-size="12" fill="#5F5E5A">judge와 충돌 시 강등</text>
+
+<line x1="107" y1="408" x2="107" y2="430" stroke="#888780" stroke-width="1.5"/>
+<line x1="272" y1="408" x2="272" y2="430" stroke="#888780" stroke-width="1.5"/>
+<line x1="437" y1="408" x2="437" y2="430" stroke="#888780" stroke-width="1.5"/>
+<line x1="600" y1="408" x2="600" y2="430" stroke="#888780" stroke-width="1.5"/>
+<line x1="107" y1="430" x2="600" y2="430" stroke="#888780" stroke-width="1.5"/>
+<line x1="350" y1="430" x2="350" y2="452" stroke="#888780" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<rect x="175" y="454" width="350" height="56" rx="4" fill="#F1EFE8" stroke="#5F5E5A"/>
+<text x="350" y="478" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">합격 판정 (verdict)</text>
+<text x="350" y="498" text-anchor="middle" font-size="12" fill="#5F5E5A">모든 축 ≥1 · Q평균 ≥1.5 · D합 ≥6/8 · D5 ≥1</text>
+<line x1="350" y1="510" x2="350" y2="548" stroke="#888780" stroke-width="1.5" marker-end="url(#ar)"/>
+<rect x="175" y="550" width="350" height="54" rx="4" fill="#F1EFE8" stroke="#5F5E5A"/>
+<text x="350" y="572" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">runs/nudge-v7-N.md + .json</text>
+<text x="350" y="592" text-anchor="middle" font-size="12" fill="#5F5E5A">라운드 자동 번호 — 변경 이력이 곧 실험 기록</text>
+
+<path d="M 175 482 L 22 482 L 22 206 L 38 206" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+<text transform="rotate(-90 14 470)" x="14" y="470" text-anchor="start" font-size="12" fill="#534AB7">불합격 → 프롬프트 수정 → 재실행 (17라운드)</text>
+</svg>
