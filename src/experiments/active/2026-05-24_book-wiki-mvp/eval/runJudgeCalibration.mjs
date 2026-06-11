@@ -25,13 +25,13 @@ const transport = openaiNodeTransport({});
 const judge = (user) => transport({ user, temperature: 0, model: EVAL_MODEL });
 
 const seed = JSON.parse(await readFile(resolve(__dirname, 'golden/seed-v1.json'), 'utf-8'));
-const calib = JSON.parse(await readFile(resolve(__dirname, 'golden/calib-set-v1.json'), 'utf-8'));
+const calib = JSON.parse(await readFile(resolve(__dirname, 'golden/calib-set-v2.json'), 'utf-8'));
 
 // ─── 1. 라벨 파싱 ────────────────────────────────────────────────
 const sheetRaw = await readFile(resolve(__dirname, 'runs/calib-labeling-sheet.md'), 'utf-8');
 const labels = new Map();
 for (const sec of sheetRaw.split(/^## /m).slice(1)) {
-  const id = sec.match(/^(C-\d+[a-z])/)?.[1];
+  const id = sec.match(/^([CD]-\d+[a-z])/)?.[1];
   if (!id) continue;
   const verdictRaw = sec.match(/^- 판정:\s*(.*)$/m)?.[1]?.trim() || '';
   const levelRaw = sec.match(/^- 레벨:\s*(.*)$/m)?.[1]?.trim() || '';
@@ -125,8 +125,8 @@ ${disagreements.map(r => `### ${r.id} — ${r.book.title} p.${r.memo.page} (변�
 
 > "${r.memo.quote.slice(0, 100)}…"
 
-- 알림: ${r.out.interpretation}
-- 질문: ${r.out.question}
+- 메시지: ${r.out.message}
+- 선지: ${r.out.choices.join(' / ')}
 - **나**: ${r.my.verdict ? '합' : '불'}${r.my.level ? ` (${r.my.level})` : ''} — ${r.my.reason || '(이유 없음)'}
 - **judge**: ${r.scored.pass ? '합' : '불'} (J1=${r.scored.j1.score} J2=${r.scored.j2.score} J3=${r.scored.j3.score} ${r.scored.j3.level}${r.scored.det.allPass ? '' : ' / F체커 실패'})
   - J1: ${r.scored.j1.reasoning}
