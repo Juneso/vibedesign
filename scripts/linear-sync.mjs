@@ -46,7 +46,7 @@ const files = execSync('git show --stat --name-only --format= HEAD')
   .filter(Boolean)
 
 // 커밋 메시지에서 DES-XXX 모두 추출
-const ids = [...new Set([...message.matchAll(/\bDES-\d+\b/g)].map((m) => m[0]))]
+const ids = [...new Set([...message.matchAll(/\b[A-Z]+-\d+\b/g)].map((m) => m[0]))]
 if (ids.length === 0) {
   console.log('[linear-sync] DES-XXX 없음 — 스킵')
   process.exit(0)
