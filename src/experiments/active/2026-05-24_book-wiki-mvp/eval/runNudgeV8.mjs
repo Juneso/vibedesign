@@ -94,10 +94,10 @@ const md = `# Nudge V8 Round ${ROUND} — 차원 분리 채점 (자극성 폐기
 - 레벨 분포: ${distPass ? '✅' : '❌'} — L7=${l7}(허용0) / L6=${l6}(≤${Math.floor(n * 0.2)}) / L2~L4=${l24}/${n}(≥${Math.ceil(n * 0.7)})
 - 분포 상세: ${Object.entries(lvlCount).sort().map(([k, v]) => `${k}:${v}`).join(' ') || '(없음)'}
 
-| 책 p.# | F1 | F2 | F3 | F4 | F5 | J1 풀이 | J2 공감 | J3 거리 | lvl | 평균 | 판정 |
+| 책 p.# | F1 | F2 | F3 | F4 | F5 | J1 풀이 | J2 공감 | J3 선지 | lvl | — | 판정 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 ${results.map(r => r.out
-  ? `| ${r.book.title.slice(0, 8)} p.${r.memo.page} | ${yn(r.det.F1)} | ${yn(r.det.F2)} | ${yn(r.det.F3)} | ${yn(r.det.F4)} | ${yn(r.det.F5)} | ${r.j1.score} | ${r.j2.score} | ${r.j3.score} | ${r.j3.level} | ${r.judgeAvg.toFixed(2)} | ${yn(r.pass)} |`
+  ? `| ${r.book.title.slice(0, 8)} p.${r.memo.page} | ${yn(r.det.F1)} | ${yn(r.det.F2)} | ${yn(r.det.F3)} | ${yn(r.det.F4)} | ${yn(r.det.F5)} | ${r.j1.score} | ${r.j2.score} | ${yn(!r.j3HasDefect)} | ${r.j3.level} | — | ${yn(r.pass)} |`
   : `| ${r.book.title.slice(0, 8)} p.${r.memo.page} | — | — | — | — | — | — | — | — | — | — | ❌생성실패 |`
 ).join('\n')}
 
@@ -118,7 +118,7 @@ ${r.out.choices.map(c => `- [ ${c} ]`).join('\n')}
 **채점**
 - J1 풀이정확도 ${r.j1.score}/2 — ${r.j1.reasoning}
 - J2 공감 ${r.j2.score}/2 — ${r.j2.reasoning}
-- J3 응용거리 ${r.j3.score}/2 (${r.j3.level}) — ${r.j3.reasoning}
+- J3 선지품질 ${r.j3HasDefect ? '❌결격' : '✅통과'} (${r.j3.level}) — ${[r.j3.quiz&&'quiz',r.j3.coreMiss&&'coreMiss',r.j3.disconnect&&'disconnect',r.j3.samefork&&'samefork',r.j3.forced&&'forced',r.j3.burden&&'burden'].filter(Boolean).join(',')||'없음'} — ${r.j3.reasoning}
 - 결정적: ${Object.entries(r.det).filter(([k]) => k !== 'allPass').map(([k, v]) => `${k}${v ? '✓' : '✗'}`).join(' ')}
 `}`).join('\n---\n')}
 `;

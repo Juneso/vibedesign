@@ -36,7 +36,21 @@ export function deterministicChecks({ message = '', choices = [] }, book) {
 
 // ─── C. 차원 분리 judge 프롬프트 ─────────────────────────────────
 export const SCORE_SCHEMA = { type: 'object', required: ['score', 'reasoning'], properties: { score: { enum: [0, 1, 2] }, reasoning: { type: 'string' } } };
-export const J3_SCHEMA = { type: 'object', required: ['score', 'level', 'reasoning'], properties: { score: { enum: [0, 1, 2] }, level: { enum: ['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7'] }, reasoning: { type: 'string' } } };
+// J3 v3: 점수 채점이 아니라 결격 체크리스트 — 합·불 라벨이 점수 중앙 쏠림(1/1/1)으로 분리 불가능했던 문제 해소 (calib-4 중재)
+export const J3_SCHEMA = {
+  type: 'object',
+  required: ['quiz', 'coreMiss', 'disconnect', 'samefork', 'forced', 'burden', 'level', 'reasoning'],
+  properties: {
+    quiz: { type: 'boolean' },        // 선지가 책 내용 확인 퀴즈·개념 요약 나열
+    coreMiss: { type: 'boolean' },    // 선지가 문장의 핵심 논점(저장한 이유)에서 벗어남
+    disconnect: { type: 'boolean' },  // 질문과 선지가 이어지지 않음
+    samefork: { type: 'boolean' },    // 두 선지 이상이 같은 결 / 단순 긍정·부정·중립
+    forced: { type: 'boolean' },      // 질문이 문장의 논점과 무관한 억지 연결
+    burden: { type: 'boolean' },      // 답하려면 문장에서 뭔가를 또 찾아내야 하는 인지 부하 / 선지가 난해
+    level: { enum: ['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7'] },
+    reasoning: { type: 'string' },
+  },
+};
 
 export function j1Prompt({ memo, body }) {
   return `
@@ -81,10 +95,11 @@ JSON만: ${JSON.stringify(SCORE_SCHEMA)}
 
 export function j3Prompt({ memo, question, choices }) {
   return `
-독서 앱 넛지의 "마지막 질문 + 선택지 3개"를 **질문·선지 품질** 축으로 채점하고, 질문의 응용 거리 레벨을 분류한다.
+독서 앱 넛지의 "마지막 질문 + 선택지 3개"를 **결격 사유 체크리스트**로 검사하고, 질문의 응용 거리 레벨을 분류한다.
 
 [유저가 저장한 문장]
 "${memo.quote}"
+${memo.myThought ? `[유저가 함께 적은 생각]\n"${memo.myThought}"` : ''}
 
 [메시지의 마지막 질문]
 "${question || '(질문 없음)'}"
@@ -94,16 +109,44 @@ ${choices.map((c, i) => `${i + 1}. ${c}`).join('\n')}
 [설계 의도] 선택지는 "이 문장을 저장한 사람이 가졌을 법한 서로 다른 생각의 방향 3개"다.
 정답이 없어야 하고, 고르는 행위가 자기표현이어야 한다.
 
-[레벨 정의 — 질문이 책에서 얼마나 멀어졌나]
+[검사 절차]
+
+STEP 1: 이 문장의 핵심 논점을 한 줄로 잡아라 — 유저가 *왜 이 문장을 저장했을지*. (적은 생각이 있으면 그것이 단서다.)
+
+STEP 2: 아래 6가지 결격 사유를 각각 true/false로 판정하라. **해당하면 true**.
+⚠️ **의심스러우면 true로 판정하라. 나쁜 넛지를 통과시키는 것이 좋은 넛지를 탈락시키는 것보다 훨씬 위험하다.**
+
+  quiz — 선택지가 책 내용 확인 퀴즈·개념 요약 명사구 나열. 선지 3개가 문장의 키워드를 쪼개 놓은 것이면 true.
+    나쁜 예: "기술과 전통의 갈등 / 디자인의 사회적 역할 / 장인의 가치 재발견" (문장 키워드를 명사구로 쪼갠 것)
+    나쁜 예: "비판적 관점의 중요성 / 일상 속 디자인의 역할 / 디자인의 철학적 깊이" (문장 주제를 나열한 것)
+    ⚠️ 단, 선지가 해석적 입장·가치 판단·태도를 나타내면 quiz가 아니다 (예: "잘 설명한다 / 뒤처진 주장이다 / 장인 정신이 핵심이다" → false. 이것은 입장 선택이지 퀴즈가 아님)
+
+  coreMiss — 선택지가 STEP 1의 핵심 논점에서 벗어남. 풀이(message)가 표면적으로 맞아도, **선지가 저장한 이유의 핵심을 다루지 않으면 true**.
+    핵심 테스트: "유저가 이 문장을 메모한 가장 큰 이유"와 "선지 3개가 탐색하는 주제"가 같은 것인가? 다르면 true.
+    나쁜 예: 문장의 핵심이 "장인정신이 디자인의 뿌리"인데, 선지가 "과거의 가치 재조명 / 사회적 역할 / 기술과 예술의 조화" → true (피상적 요약이지 핵심이 아님)
+
+  disconnect — 질문과 선택지가 이어지지 않음. 선택지가 질문의 **직접적인 답**이 아니면 true.
+    나쁜 예: 질문 "이 씨앗이 어떤 방향으로 자라길 바라는 거야?" + 선지 "배려와 정직으로 충분하다 / 강렬함이 필요하다 / 둘의 조화" → true (질문은 방향을, 선지는 수단을 말함)
+    나쁜 예: 질문 "어떤 부분이 가장 중요하다고 생각해?" + 선지 "목적에 맞는 규범 찾기 / 도덕적 책임의 우선순위 / 본질적 역할" → true (질문에 대한 답이 아니라 개념 나열)
+    나쁜 예: 질문 "~라고 생각해?" (예/아니오형) + 선지가 이유·관점 나열 → true (질문은 동의 여부를 묻는데 선지는 다른 차원)
+
+  samefork — 두 선택지 이상이 사실상 같은 결, 또는 단순 긍정·부정·중립 ("~에 동의한다 / ~에 동의하지 않는다 / 상황에 따라")
+    나쁜 예: "무의미를 있는 그대로 받아들이기 / 무의미를 자연스럽게 수용하기" → 같은 결
+
+  forced — 질문이 문장의 논점과 무관한 영역으로 억지 연결. 문장이 다루지 않는 분야(정치, 기술, 직업 등)로 점프하면 true.
+    나쁜 예: 디자인 비평 문장에서 "정치나 기술 같은 다른 영역에도 적용될 수 있을까?" → true
+
+  burden — 답하려면 문장을 다시 분석해야 하거나, 선지가 추상적이어서 무슨 뜻인지 한번에 안 읽히면 true.
+    나쁜 예: "이런 생각이 어디서 가장 잘 드러난다고 느꼈어?" (문장 속에서 뭔가를 또 찾아야 함)
+    나쁜 예: "목적에 맞는 규범 찾기 / 도덕적 책임의 우선순위 / 사회제도의 본질적 역할" (너무 어려움)
+
+⚠️ 거리(레벨)는 그 자체로 결격 사유가 아니다. L6~L7이어도 문장의 논점에서 자연스럽게 이어지면 결격 아님. 억지일 때만 forced=true.
+
+STEP 3: 레벨 분류
 L1 순수 풀이 / L2 풀이+마음짚기 / L3 문장 안에서 묻기 / L4 같은 책 맥락 반걸음 /
 L5 보편 일상 반걸음 / L6 유저 직업·삶 한 걸음 / L7 전이·반론(책 밖 적용·뒤집기)
 
-[축 — 질문·선지 품질]
-- 2 = 질문이 L2~L4이고, 선택지 3개가 서로 다른 해석 방향(같은 결 없음, 정답 없음)이며, 질문의 직접적인 답이 됨.
-- 1 = 다음 중 하나: 질문이 L5 / 선택지 중 1개가 정답형·유도형 / 두 선택지가 비슷한 결 / 질문과 선지가 살짝 어긋남.
-- 0 = 다음 중 하나: 질문이 L6~L7(책 밖·억지 연결) / 선택지가 책 내용 확인 퀴즈·요약 나열 / 단순 긍정·부정·중립 / 사실상 동형.
-
-level 은 질문의 실제 거리로 분류해 반환.
+reasoning에는 true로 판정한 사유만 간결하게 적어라. 전부 false면 "결격 없음"으로.
 JSON만: ${JSON.stringify(J3_SCHEMA)}
   `.trim();
 }
@@ -113,14 +156,35 @@ JSON만: ${JSON.stringify(J3_SCHEMA)}
 export async function scoreNudge({ out, memo, book, judge }) {
   const det = deterministicChecks(out, book);
   const { body, question } = splitMessage(out.message);
-  const parse = (raw, fb) => { try { return JSON.parse(raw); } catch { return fb; } };
+  // 파싱 방어: 스키마 따라그림 언래핑 + score 숫자 검증. 실패 시 1회 재호출.
+  const parseScore = (raw) => {
+    try {
+      let o = JSON.parse(raw);
+      if (o && typeof o.score !== 'number' && o.properties && typeof o.properties.score === 'number') o = o.properties;
+      return typeof o?.score === 'number' ? o : null;
+    } catch { return null; }
+  };
+  const parseJ3 = (raw) => {
+    try {
+      let o = JSON.parse(raw);
+      if (o && o.properties && typeof o.properties.quiz === 'boolean') o = o.properties;
+      return typeof o?.quiz === 'boolean' ? o : null;
+    } catch { return null; }
+  };
+  const callJudge = async (prompt, fb, parseFn) => {
+    for (let i = 0; i < 2; i++) {
+      const o = (parseFn || parseScore)(await judge(prompt));
+      if (o) return o;
+    }
+    return fb;
+  };
+  const J3_FAIL = { quiz: true, coreMiss: true, disconnect: false, samefork: false, forced: false, burden: false, level: 'L7', reasoning: '(judge 2회 실패)' };
   const [j1, j2, j3] = await Promise.all([
-    judge(j1Prompt({ memo, body })).then(r => parse(r, { score: 0, reasoning: '(judge 실패)' })),
-    judge(j2Prompt({ memo, body })).then(r => parse(r, { score: 0, reasoning: '(judge 실패)' })),
-    judge(j3Prompt({ memo, question, choices: out.choices })).then(r => parse(r, { score: 0, level: 'L7', reasoning: '(judge 실패)' })),
+    callJudge(j1Prompt({ memo, body }), { score: 0, reasoning: '(judge 2회 실패)' }),
+    callJudge(j2Prompt({ memo, body }), { score: 0, reasoning: '(judge 2회 실패)' }),
+    callJudge(j3Prompt({ memo, question, choices: out.choices }), J3_FAIL, parseJ3),
   ]);
-  const judgeMin = Math.min(j1.score, j2.score, j3.score);
-  const judgeAvg = (j1.score + j2.score + j3.score) / 3;
-  const pass = det.allPass && judgeMin >= 1 && judgeAvg >= 1.5;
-  return { det, j1, j2, j3, judgeAvg, pass };
+  const j3HasDefect = j3.quiz || j3.coreMiss || j3.disconnect || j3.samefork || j3.forced;
+  const pass = det.allPass && j1.score >= 1 && j2.score >= 1 && !j3HasDefect;
+  return { det, j1, j2, j3, j3HasDefect, pass };
 }

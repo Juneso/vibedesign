@@ -7,9 +7,12 @@ export function openaiNodeTransport({ apiKey, model } = {}) {
   const key = apiKey || process.env.OPENAI_API_KEY;
   if (!key) throw new Error('OPENAI_API_KEY missing (env or apiKey)');
   return async ({ system, user, model: m, temperature }) => {
+    const useModel = m || model || DEFAULT_MODEL;
+    // gpt-5 계열·o-시리즈(reasoning)는 temperature 기본값(1)만 지원 — 파라미터 생략
+    const noTemp = /^(gpt-5|o\d)/.test(useModel);
     const body = JSON.stringify({
-      model: m || model || DEFAULT_MODEL,
-      temperature: temperature ?? 0.3,
+      model: useModel,
+      ...(noTemp ? {} : { temperature: temperature ?? 0.3 }),
       response_format: { type: 'json_object' },
       messages: [
         ...(system ? [{ role: 'system', content: system }] : []),

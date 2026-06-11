@@ -111,9 +111,9 @@ ${Object.entries(byVariant).map(([v, s]) => `- ${v}: ${pct(s.agree, s.n)} (${s.a
 
 ## 전체 표
 
-| id | 변형 | 나 | judge | J1 | J2 | J3 | lvl(judge/나) | 일치 |
+| id | 변형 | 나 | judge | J1 | J2 | J3결격 | lvl(judge/나) | 일치 |
 |---|---|---|---|---|---|---|---|---|
-${rows.map(r => `| ${r.id} | ${r.variant} | ${r.my.verdict ? '합' : '불'} | ${r.scored.pass ? '합' : '불'} | ${r.scored.j1.score} | ${r.scored.j2.score} | ${r.scored.j3.score} | ${r.scored.j3.level}/${r.my.level || '-'} | ${r.agree ? '✓' : '✗'} |`).join('\n')}
+${rows.map(r => { const defects = [r.scored.j3.quiz&&'quiz',r.scored.j3.coreMiss&&'core',r.scored.j3.disconnect&&'disc',r.scored.j3.samefork&&'same',r.scored.j3.forced&&'forced',r.scored.j3.burden&&'burden'].filter(Boolean).join(',')||'—'; return `| ${r.id} | ${r.variant} | ${r.my.verdict ? '합' : '불'} | ${r.scored.pass ? '합' : '불'} | ${r.scored.j1.score} | ${r.scored.j2.score} | ${defects} | ${r.scored.j3.level}/${r.my.level || '-'} | ${r.agree ? '✓' : '✗'} |`; }).join('\n')}
 
 ---
 
@@ -128,7 +128,7 @@ ${disagreements.map(r => `### ${r.id} — ${r.book.title} p.${r.memo.page} (변�
 - 메시지: ${r.out.message}
 - 선지: ${r.out.choices.join(' / ')}
 - **나**: ${r.my.verdict ? '합' : '불'}${r.my.level ? ` (${r.my.level})` : ''} — ${r.my.reason || '(이유 없음)'}
-- **judge**: ${r.scored.pass ? '합' : '불'} (J1=${r.scored.j1.score} J2=${r.scored.j2.score} J3=${r.scored.j3.score} ${r.scored.j3.level}${r.scored.det.allPass ? '' : ' / F체커 실패'})
+- **judge**: ${r.scored.pass ? '합' : '불'} (J1=${r.scored.j1.score} J2=${r.scored.j2.score} J3=${[r.scored.j3.quiz&&'quiz',r.scored.j3.coreMiss&&'coreMiss',r.scored.j3.disconnect&&'disconnect',r.scored.j3.samefork&&'samefork',r.scored.j3.forced&&'forced',r.scored.j3.burden&&'burden'].filter(Boolean).join(',')||'결격없음'} ${r.scored.j3.level}${r.scored.det.allPass ? '' : ' / F체커 실패'})
   - J1: ${r.scored.j1.reasoning}
   - J2: ${r.scored.j2.reasoning}
   - J3: ${r.scored.j3.reasoning}
