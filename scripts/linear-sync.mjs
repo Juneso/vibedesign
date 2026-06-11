@@ -95,11 +95,11 @@ const ISSUE_UPDATE_MUTATION = `
 // 커밋 1줄 요약(헤더) 추출
 const header = message.split('\n')[0]
 
-// ## 결과 섹션 엔트리 (LINEAR.md 컨벤션 — 완료 시 채우는 섹션)
+// ## 결과 섹션 엔트리 (LINEAR.md 포맷 강제 — 상세는 콜랩스 안에만, 최상위 불렛 오염 금지)
 function buildResultEntry() {
-  const fileLines = files.slice(0, 20).map((f) => `  - \`${f}\``).join('\n')
-  const moreNote = files.length > 20 ? `\n  - ... 외 ${files.length - 20}개 파일` : ''
-  return `- **\`${shortSha}\`** ${header}\n${fileLines}${moreNote}`
+  const fileLines = files.slice(0, 20).map((f) => `- \`${f}\``).join('\n')
+  const moreNote = files.length > 20 ? `\n- ... 외 ${files.length - 20}개 파일` : ''
+  return `+++ 커밋 \`${shortSha}\` — ${header}\n${fileLines}${moreNote}\n+++`
 }
 
 // 기존 description에 ## 결과 섹션 갱신
