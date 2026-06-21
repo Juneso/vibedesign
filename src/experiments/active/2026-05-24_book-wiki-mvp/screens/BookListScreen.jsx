@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useStore } from '../App.jsx';
 import { update, log, uid, reset } from '../lib/storage.js';
 import { searchBooks, getBookDetail } from '../lib/aladin.js';
-import { buildSeedState } from '../lib/seedLoader.js';
+import { buildSeedState, buildSeedWikiPages } from '../lib/seedLoader.js';
 
 export default function BookListScreen({ onOpenBook }) {
   const { books } = useStore();
@@ -11,10 +11,17 @@ export default function BookListScreen({ onOpenBook }) {
 
   const loadSeed = () => {
     const s = buildSeedState();
+    const wikiPages = buildSeedWikiPages();
+    reset(); // 기존 상태 초기화 후 캐논 시드 적재 (중복 방지)
     update(st => {
       Object.assign(st.books, s.books);
       Object.assign(st.memos, s.memos);
       Object.assign(st.profile, s.profile);
+      // 최종 ingest 산출물(4권) 위키 반영
+      Object.assign(st.wikiPages, wikiPages);
+      // 박제된 위키가 있으므로 시드 메모는 ingest 완료 처리
+      const now = Date.now();
+      Object.values(st.memos).forEach(m => { if (m.ingestedAt == null) m.ingestedAt = now; });
     });
   };
 
