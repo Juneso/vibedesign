@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+/* 디바이스 프레임 내부에서 Tailwind 기본 reset이 충돌하지 않도록 최소 보정 */
+#app-root {
+  font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
+  background: #f7f7f8;
+  color: #111;
+}
+#app-root * { box-sizing: border-box; }
+#app-root button { font-family: inherit; }
