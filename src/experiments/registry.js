@@ -32,4 +32,13 @@ export const experiments = [
     folder: 'src/experiments/active/2026-05-24_book-wiki-mvp',
     files: ['index.html', 'main.jsx', 'App.jsx', 'style.css', 'meta.json', 'PLAN.md', 'lib/storage.js', 'lib/aladin.js', 'lib/llm.js', 'screens/BookListScreen.jsx', 'screens/BookDetailScreen.jsx', 'screens/NudgeScreen.jsx', 'screens/WikiScreen.jsx']
   },
+  {
+    id: '2026-06-21_book-wiki-mvp',
+    title: '0621 Book Wiki — 마인드맵',
+    chip: '마인드맵',
+    status: 'active',
+    path: 'src/experiments/active/2026-06-21_book-wiki-mvp/index.html',
+    folder: 'src/experiments/active/2026-06-21_book-wiki-mvp',
+    files: ['index.html', 'main.jsx', 'App.jsx', 'style.css', 'meta.json', 'screens/MindMapScreen.jsx', 'lib/mindmaps.json']
+  },
 ];
