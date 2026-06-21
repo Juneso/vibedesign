@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useStore } from '../App.jsx';
 import { update } from '../lib/storage.js';
-import { buildSeedState, buildSeedWikiPages } from '../lib/seedLoader.js';
+import { buildSeedState, buildSeedWikiPages, buildDesignBooksData, buildSuperConceptPages } from '../lib/seedLoader.js';
 
 const SOURCE_COLORS = {
   memo: 'bg-amber-100 text-amber-800',
@@ -13,6 +13,7 @@ const SOURCE_COLORS = {
 
 // 그래프 노드 색상 (페이지 type별)
 const TYPE_COLORS = {
+  super:      '#ec4899', // pink — 상위 개념(여러 개념을 묶는 허브)
   concept:    '#6366f1', // indigo
   entity:     '#0ea5e9', // sky
   reflection: '#f59e0b', // amber
@@ -36,12 +37,14 @@ export default function WikiScreen() {
     if (Object.keys(s.wikiPages).length > 0) return;
     const seedState = buildSeedState();
     const wikiPages = buildSeedWikiPages();
+    const design = buildDesignBooksData(); // 옵시디언 디자인 책 4권 (기존에 추가)
+    const superPages = buildSuperConceptPages(); // 상위 개념 노드 (책 가로지르는 연결)
     const now = Date.now();
     update(st => {
-      Object.assign(st.books, seedState.books);
+      Object.assign(st.books, seedState.books, design.books);
       Object.assign(st.memos, seedState.memos);
       Object.assign(st.profile, seedState.profile);
-      Object.assign(st.wikiPages, wikiPages);
+      Object.assign(st.wikiPages, wikiPages, design.wikiPages, superPages);
       Object.values(st.memos).forEach(m => { if (m.ingestedAt == null) m.ingestedAt = now; });
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -197,10 +200,34 @@ function buildEdges(pages) {
   return [...edges.values()];
 }
 
+// 엣지 키 → [0,1) 결정적 해시 (같은 엣지는 항상 같은 곡률 → 흔들리지 않음)
+function hashUnit(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return ((h >>> 0) % 100000) / 100000;
+}
+
+// 한 방향으로 흐르는 가지 곡선: 휘는 방향은 일관(시계 반대), 정도·제어점 위치만 해시로 다양화.
+// 항상 같은 회전쪽으로 굽어 "함께 흐르는" 느낌. 부모(낮은 차수)→자식 방향 무관하게 일관된 결.
+function curvePath(a, b, key) {
+  const dx = b.x - a.x, dy = b.y - a.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const h2 = hashUnit(key + '~'), h3 = hashUnit('#' + key);
+  const bend = Math.min(36, (0.10 + 0.18 * h2) * len); // 휘는 정도만 다양화
+  const t = 0.42 + 0.20 * h3;                           // 제어점을 끝점 쪽으로 살짝 (가지 끝이 휘는 결)
+  const bx = a.x + dx * t, by = a.y + dy * t;
+  // 수직 오프셋을 항상 같은 부호로 → 모든 가지가 한 방향으로 흐름
+  const cx = bx - (dy / len) * bend;
+  const cy = by + (dx / len) * bend;
+  return `M ${a.x} ${a.y} Q ${cx.toFixed(2)} ${cy.toFixed(2)} ${b.x} ${b.y}`;
+}
+
 function GraphView({ pages, books, onOpen }) {
   const svgRef = useRef(null);
   const nodesRef = useRef([]);
   const dragRef = useRef(null); // {id, moved}
+  const panRef = useRef(null);  // {sx, sy, otx, oty}
+  const viewRef = useRef({ tx: 0, ty: 0, k: 1 }); // 화면 변환(이동/줌)
   const [, force] = useState(0);
   const rerender = () => force(n => n + 1);
 
@@ -220,7 +247,7 @@ function GraphView({ pages, books, onOpen }) {
         x: cx + Math.cos(a) * R + (i % 3 - 1) * 6,
         y: cy + Math.sin(a) * R + (i % 2 ? 6 : -6),
         vx: 0, vy: 0,
-        r: 7 + Math.min(8, (deg[p.id] ?? 0) * 1.6),
+        r: (p.type === 'super' ? 3.5 : 2) + Math.min(3, (deg[p.id] ?? 0) * 0.55),
       };
     });
     rerender();
@@ -283,36 +310,70 @@ function GraphView({ pages, books, onOpen }) {
     return () => cancelAnimationFrame(raf);
   }, [sig]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // 화면(viewBox) 좌표
   const toSvg = (evt) => {
     const svg = svgRef.current;
     const pt = svg.createSVGPoint();
     pt.x = evt.clientX; pt.y = evt.clientY;
-    const p = pt.matrixTransform(svg.getScreenCTM().inverse());
-    return p;
+    return pt.matrixTransform(svg.getScreenCTM().inverse());
+  };
+  // 그래프(노드) 좌표 = 화면좌표에서 이동/줌 역변환
+  const toGraph = (evt) => {
+    const p = toSvg(evt);
+    const v = viewRef.current;
+    return { x: (p.x - v.tx) / v.k, y: (p.y - v.ty) / v.k };
   };
 
+  // 노드 위 포인터다운 = 노드 드래그
   const onPointerDown = (id) => (e) => {
     e.preventDefault();
     e.stopPropagation();
+    const g = toGraph(e);
+    dragRef.current = { id, moved: false, startX: g.x, startY: g.y };
+    try { svgRef.current?.setPointerCapture?.(e.pointerId); } catch {}
+  };
+  // 빈 배경 포인터다운 = 화면 이동(팬)
+  const onBgPointerDown = (e) => {
     const p = toSvg(e);
-    dragRef.current = { id, moved: false, startX: p.x, startY: p.y };
-    // 캡처는 SVG에 — 손가락이 노드를 벗어나도 드래그 유지, move/up 이벤트 누락 방지
+    const v = viewRef.current;
+    panRef.current = { sx: p.x, sy: p.y, otx: v.tx, oty: v.ty };
     try { svgRef.current?.setPointerCapture?.(e.pointerId); } catch {}
   };
   const onPointerMove = (e) => {
+    if (panRef.current) {
+      const p = toSvg(e);
+      const v = viewRef.current;
+      v.tx = panRef.current.otx + (p.x - panRef.current.sx);
+      v.ty = panRef.current.oty + (p.y - panRef.current.sy);
+      return;
+    }
     const drag = dragRef.current;
     if (!drag) return;
-    const p = toSvg(e);
-    if (Math.hypot(p.x - drag.startX, p.y - drag.startY) > 4) drag.moved = true;
+    const g = toGraph(e);
+    if (Math.hypot(g.x - drag.startX, g.y - drag.startY) > 4) drag.moved = true;
     const n = nodesRef.current.find(n => n.id === drag.id);
-    if (n) { n.x = p.x; n.y = p.y; n.vx = 0; n.vy = 0; }
+    if (n) { n.x = g.x; n.y = g.y; n.vx = 0; n.vy = 0; }
     // 위치 반영은 상시 도는 시뮬레이션 루프가 처리 → 별도 rerender 불필요
   };
   const onPointerUp = (e) => {
     const drag = dragRef.current;
+    const wasPan = panRef.current;
     dragRef.current = null;
+    panRef.current = null;
     try { svgRef.current?.releasePointerCapture?.(e.pointerId); } catch {}
-    if (drag && !drag.moved) onOpen(drag.id); // 움직임 없는 탭 = 열기
+    if (!wasPan && drag && !drag.moved) onOpen(drag.id); // 움직임 없는 탭 = 열기
+  };
+  // 스크롤 = 커서 기준 확대/축소
+  const onWheel = (e) => {
+    e.preventDefault();
+    const p = toSvg(e);
+    const v = viewRef.current;
+    const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+    const nk = Math.max(0.4, Math.min(6, v.k * factor));
+    // 커서 아래 그래프 점이 고정되도록 tx/ty 보정
+    v.tx = p.x - ((p.x - v.tx) / v.k) * nk;
+    v.ty = p.y - ((p.y - v.ty) / v.k) * nk;
+    v.k = nk;
   };
 
   if (pages.length === 0) {
@@ -326,6 +387,7 @@ function GraphView({ pages, books, onOpen }) {
   const nodes = nodesRef.current;
   const byId = {};
   nodes.forEach(n => { byId[n.id] = n; });
+  const v = viewRef.current;
 
   return (
     <div className="flex-1 min-h-0 relative">
@@ -333,20 +395,25 @@ function GraphView({ pages, books, onOpen }) {
         ref={svgRef}
         viewBox={`0 0 ${VB_W} ${VB_H}`}
         className="w-full h-full touch-none select-none"
+        onPointerDown={onBgPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerLeave={onPointerUp}
+        onWheel={onWheel}
       >
+       <g transform={`translate(${v.tx.toFixed(2)},${v.ty.toFixed(2)}) scale(${v.k.toFixed(3)})`}>
         {edges.map((e, i) => {
           const a = byId[e.source], b = byId[e.target];
           if (!a || !b) return null;
           const concept = e.reasons.has('concept');
           return (
-            <line
+            <path
               key={i}
-              x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-              stroke={concept ? '#c7d2fe' : '#e4e4e7'}
-              strokeWidth={concept ? 1.4 : 0.8}
+              d={curvePath(a, b, `${e.source}|${e.target}`)}
+              fill="none"
+              stroke={concept ? '#c7d2fe' : '#d4d4d8'}
+              strokeWidth={concept ? 1.2 : 0.7}
+              strokeLinecap="round"
             />
           );
         })}
@@ -362,15 +429,16 @@ function GraphView({ pages, books, onOpen }) {
             >
               <circle r={n.r} fill={color} fillOpacity={0.9} stroke="#fff" strokeWidth={1.5} />
               <text
-                y={n.r + 9}
+                y={n.r + 10}
                 textAnchor="middle"
-                fontSize={8}
+                fontSize={9}
                 fill="#52525b"
                 style={{ pointerEvents: 'none' }}
               >{label}</text>
             </g>
           );
         })}
+       </g>
       </svg>
 
       {/* 범례 */}
@@ -382,7 +450,7 @@ function GraphView({ pages, books, onOpen }) {
           </span>
         ))}
       </div>
-      <div className="absolute top-1 right-3 text-[9px] text-zinc-400">탭=열기 · 드래그=이동</div>
+      <div className="absolute top-1 right-3 text-[9px] text-zinc-400">탭=열기 · 노드드래그=이동 · 배경드래그=화면이동 · 스크롤=확대</div>
     </div>
   );
 }
