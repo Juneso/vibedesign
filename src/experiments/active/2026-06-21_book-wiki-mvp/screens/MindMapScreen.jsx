@@ -9,18 +9,73 @@ import data from '../lib/mindmaps.json';
 const W = 1500, H = 1050;
 const MIN_TEXT_PX = 16; // 이 픽셀보다 작아지는 라벨은 숨김
 
+// 책마다 H(색상)만 다르게 — 깊이(책/테마/키워드)는 같은 hue 안에서 S/L·opacity로 구분.
+const BASE_HUE = 25;          // 시작 색상(기존 주황 계열)
+const HUE_STEP = 45;          // 책당 H 간격 (8권 → 360 한 바퀴)
+const bookHue = (i) => Math.round((BASE_HUE + i * HUE_STEP) % 360);
+const hsl = (h, s, l) => `hsl(${h} ${s}% ${l}%)`;
+function hslToHex(h, s, l) {
+  s /= 100; l /= 100;
+  const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2;
+  let r = 0, g = 0, b = 0;
+  if (h < 60) [r, g, b] = [c, x, 0]; else if (h < 120) [r, g, b] = [x, c, 0]; else if (h < 180) [r, g, b] = [0, c, x];
+  else if (h < 240) [r, g, b] = [0, x, c]; else if (h < 300) [r, g, b] = [x, 0, c]; else [r, g, b] = [c, 0, x];
+  const hx = v => Math.round((v + m) * 255).toString(16).padStart(2, '0');
+  return '#' + hx(r) + hx(g) + hx(b);
+}
+
+const NODE_COLOR = '#A5AFA9';   // 개념(테마/키워드) 통일 색
+const BOOK_COLOR = '#FF6600';   // 책 제목 노드 색
+const EDGE_COLOR = '#000000';   // 라인 색
+const EDGE_OPACITY = 0.1;       // 라인 불투명도
+const NODE_R = 6;               // 모든 노드 크기 통일
 const KIND = {
-  book:   { color: '#f97316', r: 9,   fs: 17, op: 1.0,  textOp: 1.0,  fw: 700 },  // 책 — 최상위 주황
-  branch: { color: '#16a34a', r: 5.5, fs: 14, op: 0.7,  textOp: 1.0,  fw: 600 },  // 테마 — 1뎁스 녹색, 웨이트 한 단계 낮춤
-  leaf:   { color: '#22c55e', r: 3.5, fs: 9,  op: 0.45, textOp: 0.6,  fw: 400 },  // 키워드 — 말단 연녹색
+  book:   { color: BOOK_COLOR, r: NODE_R, op: 1,   fs: 21, fw: 700 }, // 책 제목 노드
+  branch: { color: NODE_COLOR, r: NODE_R, op: 1,   fs: 11, fw: 500 }, // 테마(1뎁스)
+  leaf:   { color: NODE_COLOR, r: NODE_R, op: 0.5, fs: 9,  fw: 400 }, // 키워드(2뎁스) — 오퍼시티 절반
 };
 
-// 3종 라인 디자인
-const LINE = {
-  main:  { stroke: '#475569', width: 1.6, opacity: 0.8,  dash: null },     // ① 책↔1뎁스: 진한 실선 굵게
-  sub:   { stroke: '#cbd5e1', width: 0.8, opacity: 0.75, dash: null },     // ② 상위↔하위: 옅은 실선 가늘게
-  cross: { stroke: '#16a34a', width: 1.1, opacity: 0.6,  dash: '5 4' },    // ③ 책 간 유사개념: 녹색 점선
+function hexToHsl(hex) {
+  let r = 0, g = 0, b = 0; const m = hex.replace('#', '');
+  r = parseInt(m.slice(0, 2), 16) / 255; g = parseInt(m.slice(2, 4), 16) / 255; b = parseInt(m.slice(4, 6), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b); let h = 0, s = 0, l = (max + min) / 2;
+  if (max !== min) { const d = max - min; s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === r) h = (g - b) / d + (g < b ? 6 : 0); else if (max === g) h = (b - r) / d + 2; else h = (r - g) / d + 4; h *= 60; }
+  return { h: Math.round(h), s: Math.round(s * 100), l: Math.round(l * 100) };
+}
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+// 노드별 결정적 난수 [0,1) — 불규칙성 부여(매번 같은 값)
+const rand = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0) % 100000) / 100000; };
+// 베이스 색(책 원색) → 종류별 색 파생: 책=원색 / 테마=어둡게 / 키워드=밝게
+function nodeColor(baseHex, kind) {
+  const c = hexToHsl(baseHex);
+  if (kind === 'branch') return hsl(c.h, c.s, clamp(c.l - 12, 18, 88));
+  if (kind === 'leaf') return hsl(c.h, clamp(c.s - 8, 0, 100), clamp(c.l + 14, 0, 90));
+  return hsl(c.h, c.s, c.l); // book
+}
+// 책 간 유사선만 중립색
+const CROSS_LINE = { stroke: '#94a3b8', width: 1.1, opacity: 0.55, dash: '5 4' };
+function edgeStyle(e, byId, colors) {
+  if (e.kind === 'cross') return CROSS_LINE;
+  const bi = byId[e.a]?.book ?? 0;
+  const c = hexToHsl(colors[bi] || '#888888');
+  return e.kind === 'main'
+    ? { stroke: hsl(c.h, c.s, clamp(c.l - 14, 16, 80)), width: 1.6, opacity: 0.85, dash: null }  // 책↔테마: 어두운 굵은선
+    : { stroke: hsl(c.h, clamp(c.s - 10, 0, 100), clamp(c.l + 10, 0, 85)), width: 0.9, opacity: 0.7, dash: null }; // 테마↔키워드
+}
+// 사용자가 고른 책별 색 (기본값)
+const BOOK_COLORS = {
+  '돈으로 살 수 없는 것들': '#f9bf95',
+  '그리스인 조르바': '#99b607',
+  '디자인의 디자인': '#a0c99c',
+  '무의미의 축제': '#9fd6c3',
+  '디자인과 인간 심리': '#5299cb',
+  '디자인 미학': '#aea4e5',
+  '욕망의 사물, 디자인의 사회사': '#d59090',
+  '미래세상의 디자인': '#cf819b',
 };
+const defaultColor = (i, title) => BOOK_COLORS[title] || hslToHex(bookHue(i), KIND.book.s, KIND.book.l);
+const LS_KEY = 'bookwiki-0621-colorsV2';
 
 const STOP = new Set(['디자인','디자이너','미래','세상','관계','문제','중심','방법','개념','사물','사회','역할','의미','이론','특징','대한','위한','통한']);
 function tokens(s) {
@@ -85,62 +140,138 @@ export default function MindMapScreen() {
   const dragRef = useRef(null);
   const panRef = useRef(null);
   const viewRef = useRef({ tx: 0, ty: 0, k: 1 });
+  const interactRef = useRef(0); // 이 시각 전까지는 상호작용 중 → 텍스트 숨김
+  const bump = () => { interactRef.current = performance.now() + 350; };
   const [, force] = useState(0);
   const rr = () => force(n => n + 1);
 
-  const deg = useMemo(() => { const d = {}; simEdges.forEach(e => { d[e.a] = (d[e.a] || 0) + 1; d[e.b] = (d[e.b] || 0) + 1; }); return d; }, [simEdges]);
+  const books = data.books || [];
+  // 책별 베이스 색 (컬러 피커로 조정, localStorage 저장)
+  const [colors, setColors] = useState(() => {
+    try { const s = JSON.parse(localStorage.getItem(LS_KEY)); if (Array.isArray(s) && s.length === books.length) return s; } catch {}
+    return books.map((b, i) => defaultColor(i, b.title));
+  });
+  useEffect(() => { try { localStorage.setItem(LS_KEY, JSON.stringify(colors)); } catch {} }, [colors]);
+  const setColor = (i, hex) => setColors(prev => prev.map((v, j) => j === i ? hex : v));
+  const resetColors = () => setColors(books.map((b, i) => defaultColor(i, b.title)));
+  const [panel, setPanel] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const copyColors = async () => {
+    const map = {};
+    books.forEach((b, i) => { map[b.title] = colors[i]; });
+    const text = JSON.stringify(map, null, 2);
+    try { await navigator.clipboard.writeText(text); } catch { window.prompt('복사', text); }
+    setCopied(true); setTimeout(() => setCopied(false), 1500);
+  };
 
+  // Tidy 방사형 트리: 책마다 부채꼴을 갖고, 그 안을 가지별 잎 수에 비례해 겹치지 않는 구획으로 분할.
+  // 가지·잎을 책 중심에서 같은 방향으로 뻗어 → 다른 부모의 자식끼리 영역 분리, 라인 교차 없음.
   useEffect(() => {
-    const cx = W / 2, cy = H / 2, R = Math.min(W, H) * 0.42, N = rawNodes.length;
-    nodesRef.current = rawNodes.map((n, i) => {
-      const a = (i / N) * Math.PI * 2, k = KIND[n.kind];
-      return { ...n, x: cx + Math.cos(a) * R + (i % 5 - 2) * 8, y: cy + Math.sin(a) * R + (i % 3 - 1) * 8, vx: 0, vy: 0, r: k.r + Math.min(8, (deg[n.id] || 0) * 0.7) };
+    const cx = W / 2, cy = H / 2;
+    const Rb = 200, Rbr = 145, Rleaf = 285; // 중심→책, 책→테마, 책→키워드 반지름
+    const NB = books.length || 1;
+    const wedge = (2 * Math.PI / NB) * 0.92;  // 책 1권 부채꼴 (이웃과 간격)
+    const cap = Math.min(wedge, Math.PI / 2); // ≤90° 제한
+    const pos = {};
+    books.forEach((b, bi) => {
+      const bid = `bk${bi}`;
+      const bookAngle = (bi / NB) * 2 * Math.PI - Math.PI / 2 + (rand(bid + 'a') - 0.5) * 0.12;
+      const rb = Rb * (0.9 + 0.2 * rand(bid + 'r'));
+      const bp = { x: cx + Math.cos(bookAngle) * rb, y: cy + Math.sin(bookAngle) * rb };
+      pos[bid] = bp;
+      const branches = b.branches || [];
+      const weights = branches.map(br => Math.max(1, (br.leaves || []).length));
+      const total = weights.reduce((s, w) => s + w, 0) || 1;
+      let a = bookAngle - cap / 2; // 부채꼴 시작각
+      branches.forEach((br, ri) => {
+        const rid = `${bid}-r${ri}`;
+        const arc = cap * (weights[ri] / total);   // 이 가지의 각도 구획
+        const brAngle = a + arc / 2 + (rand(rid + 'a') - 0.5) * arc * 0.22;     // 구획 내 소폭 흔들기
+        const rbr = Rbr * (0.82 + 0.34 * rand(rid + 'r'));
+        pos[rid] = { x: bp.x + Math.cos(brAngle) * rbr, y: bp.y + Math.sin(brAngle) * rbr };
+        const leaves = br.leaves || [];
+        const L = leaves.length;
+        const pad = arc * 0.12; // 구획 양끝 여백
+        const cell = (arc - 2 * pad) / Math.max(1, L);
+        leaves.forEach((lf, li) => {
+          const lid = `${rid}-l${li}`;
+          const baseA = L === 1 ? brAngle : (a + pad) + cell * (li + 0.5);
+          const la = baseA + (rand(lid + 'a') - 0.5) * cell * 0.5; // 자기 셀 안에서만 → 교차 없음
+          const rl = Rleaf * (0.84 + 0.32 * rand(lid + 'r'));
+          pos[lid] = { x: bp.x + Math.cos(la) * rl, y: bp.y + Math.sin(la) * rl };
+        });
+        a += arc; // 다음 가지 구획으로
+      });
+    });
+    nodesRef.current = rawNodes.map(n => {
+      const p = pos[n.id] || { x: cx, y: cy };
+      return { ...n, x: p.x, y: p.y, hx: p.x, hy: p.y, vx: 0, vy: 0, r: KIND[n.kind].r,
+        sf: 0.7 + 0.6 * rand(n.id + 's'), df: 1 + (rand(n.id + 'd') - 0.5) * 0.06 };
     });
     rr();
-  }, [rawNodes, deg]);
+  }, [rawNodes]);
 
-  useEffect(() => {
-    if (!rawNodes.length) return;
-    let alpha = 1, raf; const byId = {};
-    const tick = () => {
-      const ns = nodesRef.current; ns.forEach(n => byId[n.id] = n);
-      const cx = W / 2, cy = H / 2;
-      for (let i = 0; i < ns.length; i++) for (let j = i + 1; j < ns.length; j++) {
-        const a = ns[i], b = ns[j]; let dx = a.x - b.x, dy = a.y - b.y, d2 = dx * dx + dy * dy || 0.01;
-        const f = 3200 / d2 * alpha, d = Math.sqrt(d2), fx = dx / d * f, fy = dy / d * f;
-        a.vx += fx; a.vy += fy; b.vx -= fx; b.vy -= fy;
-      }
-      for (const e of simEdges) {
-        const a = byId[e.a], b = byId[e.b]; if (!a || !b) continue;
-        const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 0.01;
-        const target = e.kind === 'main' ? 130 : 64;
-        const f = (d - target) * 0.03 * alpha, fx = dx / d * f, fy = dy / d * f;
-        a.vx += fx; a.vy += fy; b.vx -= fx; b.vy -= fy;
-      }
+  // 스프링 애니메이션: home(hx,hy)으로 돌아오며 흔들림
+  const rafRef = useRef(0), runningRef = useRef(false);
+  const startAnim = () => {
+    if (runningRef.current) return; runningRef.current = true;
+    const STIFF = 0.018, DAMP = 0.94; // 살랑살랑: 느린 복귀 + 오래 흔들림
+    const step = () => {
+      const ns = nodesRef.current; let energy = 0;
       for (const n of ns) {
-        n.vx += (cx - n.x) * 0.003 * alpha; n.vy += (cy - n.y) * 0.003 * alpha;
-        if (dragRef.current && dragRef.current.id === n.id) { n.vx = 0; n.vy = 0; continue; }
-        n.vx *= 0.85; n.vy *= 0.85; n.x += n.vx; n.y += n.vy;
-        n.x = Math.max(n.r + 4, Math.min(W - n.r - 4, n.x)); n.y = Math.max(n.r + 4, Math.min(H - n.r - 4, n.y));
+        if (dragRef.current && dragRef.current.id === n.id) continue;
+        const st = STIFF * (n.sf || 1), dp = DAMP * (n.df || 1);
+        const ax = (n.hx - n.x) * st, ay = (n.hy - n.y) * st;
+        n.vx = (n.vx + ax) * dp; n.vy = (n.vy + ay) * dp;
+        n.x += n.vx; n.y += n.vy;
+        energy += n.vx * n.vx + n.vy * n.vy + (n.hx - n.x) ** 2 + (n.hy - n.y) ** 2;
       }
-      if (dragRef.current) alpha = Math.max(alpha, 0.3);
-      alpha *= 0.99; if (alpha < 0.05) alpha = 0.05;
-      rr(); raf = requestAnimationFrame(tick);
+      rr();
+      if (energy > 0.12 || dragRef.current) rafRef.current = requestAnimationFrame(step);
+      else runningRef.current = false;
     };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [rawNodes, simEdges]);
+    rafRef.current = requestAnimationFrame(step);
+  };
+  useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
+  // 스와이프 충격: 깊이가 깊을수록 더 크게 흔듦(잎>테마>책), 노드별 미세 편차
+  const shake = (gvx, gvy) => {
+    const F = 10, MAX = 50;
+    for (const n of nodesRef.current) {
+      const kf = n.kind === 'book' ? 0.6 : n.kind === 'branch' ? 0.85 : 1.15;
+      const jitter = 0.75 + 0.5 * (((n.id.length * 37 + n.id.charCodeAt(0)) % 100) / 100);
+      let ix = gvx * F * kf * jitter, iy = gvy * F * kf * jitter;
+      const m = Math.hypot(ix, iy); if (m > MAX) { ix *= MAX / m; iy *= MAX / m; }
+      n.vx += ix; n.vy += iy;
+    }
+    startAnim();
+  };
 
   const toSvg = (e) => { const p = svgRef.current.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; return p.matrixTransform(svgRef.current.getScreenCTM().inverse()); };
   const toGraph = (e) => { const p = toSvg(e), v = viewRef.current; return { x: (p.x - v.tx) / v.k, y: (p.y - v.ty) / v.k }; };
+  const velRef = useRef({ x: 0, y: 0, t: 0, vx: 0, vy: 0 });
   const onNodeDown = (id) => (e) => { e.preventDefault(); e.stopPropagation(); dragRef.current = { id }; try { svgRef.current.setPointerCapture(e.pointerId); } catch {} };
-  const onBgDown = (e) => { const p = toSvg(e), v = viewRef.current; panRef.current = { sx: p.x, sy: p.y, otx: v.tx, oty: v.ty }; try { svgRef.current.setPointerCapture(e.pointerId); } catch {} };
+  const onBgDown = (e) => { const p = toSvg(e), v = viewRef.current; panRef.current = { sx: p.x, sy: p.y, otx: v.tx, oty: v.ty }; velRef.current = { x: p.x, y: p.y, t: performance.now(), vx: 0, vy: 0 }; try { svgRef.current.setPointerCapture(e.pointerId); } catch {} };
   const onMove = (e) => {
-    if (panRef.current) { const p = toSvg(e), v = viewRef.current; v.tx = panRef.current.otx + (p.x - panRef.current.sx); v.ty = panRef.current.oty + (p.y - panRef.current.sy); return; }
-    if (!dragRef.current) return; const g = toGraph(e); const n = nodesRef.current.find(n => n.id === dragRef.current.id); if (n) { n.x = g.x; n.y = g.y; n.vx = 0; n.vy = 0; }
+    if (panRef.current) {
+      const p = toSvg(e), v = viewRef.current;
+      v.tx = panRef.current.otx + (p.x - panRef.current.sx); v.ty = panRef.current.oty + (p.y - panRef.current.sy);
+      const vr = velRef.current, now = performance.now(), dt = Math.max(8, now - vr.t);
+      vr.vx = (p.x - vr.x) / dt; vr.vy = (p.y - vr.y) / dt; vr.x = p.x; vr.y = p.y; vr.t = now;
+      rr(); return;
+    }
+    if (!dragRef.current) return; const g = toGraph(e); const n = nodesRef.current.find(n => n.id === dragRef.current.id); if (n) { n.x = g.x; n.y = g.y; } rr();
   };
-  const onUp = (e) => { dragRef.current = null; panRef.current = null; try { svgRef.current.releasePointerCapture(e.pointerId); } catch {} };
-  const onWheel = (e) => { e.preventDefault(); const p = toSvg(e), v = viewRef.current; const f = e.deltaY < 0 ? 1.12 : 1 / 1.12; const nk = Math.max(0.3, Math.min(6, v.k * f)); v.tx = p.x - (p.x - v.tx) / v.k * nk; v.ty = p.y - (p.y - v.ty) / v.k * nk; v.k = nk; rr(); };
+  const onUp = (e) => {
+    const wasDrag = dragRef.current;
+    if (panRef.current) {  // 스와이프 플릭 → 흔들기 (속도 → 그래프 좌표 충격)
+      const vr = velRef.current, v = viewRef.current;
+      if (performance.now() - vr.t < 90 && Math.hypot(vr.vx, vr.vy) > 0.15) shake(vr.vx / v.k, vr.vy / v.k);
+    }
+    dragRef.current = null; panRef.current = null;
+    if (wasDrag) startAnim(); // 노드 드래그 후 제자리로 스프링
+    try { svgRef.current.releasePointerCapture(e.pointerId); } catch {}
+  };
+  const onWheel = (e) => { e.preventDefault(); const p = toSvg(e), v = viewRef.current; const f = e.deltaY < 0 ? 1.12 : 1 / 1.12; const nk = Math.max(0.3, Math.min(6, v.k * f)); v.tx = p.x - (p.x - v.tx) / v.k * nk; v.ty = p.y - (p.y - v.ty) / v.k * nk; v.k = nk; bump(); rr(); };
   const fit = () => { viewRef.current = { tx: 0, ty: 0, k: 1 }; rr(); };
 
   const nodes = nodesRef.current, byId = {}; nodes.forEach(n => byId[n.id] = n);
@@ -169,39 +300,25 @@ export default function MindMapScreen() {
             </filter>
           </defs>
           <g transform={`translate(${v.tx.toFixed(2)},${v.ty.toFixed(2)}) scale(${v.k.toFixed(3)})`}>
-            {/* cross 라인 먼저(맨 뒤) → main/sub 순으로 위에 */}
-            {['cross', 'sub', 'main'].map(kind => edges.filter(e => e.kind === kind).map((e, i) => {
-              const a = byId[e.a], b = byId[e.b]; if (!a || !b) return null; const s = LINE[kind];
-              return <line key={kind + i} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={s.stroke} strokeWidth={s.width} strokeOpacity={s.opacity} strokeLinecap="round" strokeDasharray={s.dash || undefined} />;
-            }))}
+            {/* 라인: 전부 검정 10% 통일 */}
+            {edges.map((e, i) => {
+              const a = byId[e.a], b = byId[e.b]; if (!a || !b) return null;
+              return <line key={i} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={EDGE_COLOR} strokeOpacity={EDGE_OPACITY} strokeWidth={1} strokeLinecap="round" />;
+            })}
             {nodes.map(n => {
               const k = KIND[n.kind];
-              const label = n.label?.length > 12 ? n.label.slice(0, 11) + '…' : (n.label || '');
-              const showText = k.fs * v.k >= MIN_TEXT_PX; // 화면상 6px 미만이면 텍스트 숨김(노드 유지)
               return (
                 <g key={n.id} transform={`translate(${n.x},${n.y})`} onPointerDown={onNodeDown(n.id)} style={{ cursor: 'pointer' }}>
                   <circle r={n.r} fill={k.color} fillOpacity={k.op} stroke="#fff" strokeWidth={1.2} />
-                  {showText && (
-                    <text y={n.r + k.fs} textAnchor="middle" fontSize={k.fs} fontWeight={k.fw}
-                      fill="#27272a" fillOpacity={k.textOp} filter="url(#txtHalo)" style={{ pointerEvents: 'none' }}>{label}</text>
+                  {n.kind === 'book' && (
+                    <text y={n.r + k.fs + 2} textAnchor="middle" fontSize={k.fs} fontWeight={k.fw}
+                      fill="#27272a" filter="url(#txtHalo)" style={{ pointerEvents: 'none' }}>{n.label}</text>
                   )}
                 </g>
               );
             })}
           </g>
         </svg>
-        <div className="absolute bottom-2 left-2 flex flex-col gap-0.5 bg-white/85 backdrop-blur rounded-lg px-2 py-1.5 text-[9px]">
-          <div className="flex gap-x-2">
-            <span className="flex items-center gap-1"><span className="inline-block w-2 h-2 rounded-full" style={{ background: KIND.book.color }} />책</span>
-            <span className="flex items-center gap-1"><span className="inline-block w-2 h-2 rounded-full" style={{ background: KIND.branch.color }} />테마</span>
-            <span className="flex items-center gap-1"><span className="inline-block w-2 h-2 rounded-full" style={{ background: KIND.leaf.color }} />키워드</span>
-          </div>
-          <div className="flex gap-x-2 text-zinc-500">
-            <span className="flex items-center gap-1"><span className="inline-block w-3" style={{ borderTop: '2px solid #475569' }} />책-테마</span>
-            <span className="flex items-center gap-1"><span className="inline-block w-3" style={{ borderTop: '1px solid #cbd5e1' }} />테마-키워드</span>
-            <span className="flex items-center gap-1"><span className="inline-block w-3" style={{ borderTop: '1px dashed #16a34a' }} />책 간 유사</span>
-          </div>
-        </div>
         <button onClick={fit} className="absolute bottom-2 right-3 text-[10px] px-2 py-1 rounded bg-white/80 border border-zinc-200">맞춤</button>
         <div className="absolute top-1 right-3 text-[9px] text-zinc-400">스크롤=확대 · 드래그=이동</div>
       </div>
