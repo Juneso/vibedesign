@@ -46,6 +46,16 @@ function hexToHsl(hex) {
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 // 노드별 결정적 난수 [0,1) — 불규칙성 부여(매번 같은 값)
 const rand = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0) % 100000) / 100000; };
+// 꽃 개화 곡선(번들→벌어짐): 줄기를 밑동에서 "부모 성장방향(g→p)"으로 묶어 출발시킨 뒤 자식으로 벌린다.
+// 제어점을 부모 접선 위에만 두면 → 출발은 수직 번들, 끝(tip)은 바깥을 향해 벌어져 분수/꽃 형태가 된다.
+// (측면 밀기를 빼서 끝이 안쪽으로 말리지 않게 함.)
+function petalCtrl(px, py, bx, by, gx, gy, key) {
+  let ux = px - gx, uy = py - gy; const ul = Math.hypot(ux, uy) || 1; ux /= ul; uy /= ul; // 부모 성장방향(접선)
+  const len = Math.hypot(bx - px, by - py) || 1;
+  const d = len * (0.38 + 0.12 * rand(key)); // 접선 진행 길이 = 번들 정도(노드마다 미세 차이). 과하면 tip이 말려서 0.5 미만 유지.
+  return { cx: px + ux * d, cy: py + uy * d };
+}
+const quad = (ax, ay, cx, cy, bx, by) => `M ${ax} ${ay} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${bx} ${by}`;
 // 베이스 색(책 원색) → 종류별 색 파생: 책=원색 / 테마=어둡게 / 키워드=밝게
 function nodeColor(baseHex, kind) {
   const c = hexToHsl(baseHex);
@@ -172,7 +182,7 @@ export default function MindMapScreen() {
     const NB = books.length || 1;
     const wedge = (2 * Math.PI / NB) * 0.92;  // 책 1권 부채꼴 (이웃과 간격)
     const cap = Math.min(wedge, Math.PI / 2); // ≤90° 제한
-    const pos = {};
+    const pos = {}, cf = {}; // cf: 노드별 누적 곡률
     books.forEach((b, bi) => {
       const bid = `bk${bi}`;
       const bookAngle = (bi / NB) * 2 * Math.PI - Math.PI / 2 + (rand(bid + 'a') - 0.5) * 0.12;
@@ -189,6 +199,8 @@ export default function MindMapScreen() {
         const brAngle = a + arc / 2 + (rand(rid + 'a') - 0.5) * arc * 0.22;     // 구획 내 소폭 흔들기
         const rbr = Rbr * (0.82 + 0.34 * rand(rid + 'r'));
         pos[rid] = { x: bp.x + Math.cos(brAngle) * rbr, y: bp.y + Math.sin(brAngle) * rbr };
+        const brCurve = 0.03 + 0.05 * rand(rid + 'c');  // 가지(부모) 곡률
+        cf[rid] = brCurve;
         const leaves = br.leaves || [];
         const L = leaves.length;
         const pad = arc * 0.12; // 구획 양끝 여백
@@ -199,6 +211,7 @@ export default function MindMapScreen() {
           const la = baseA + (rand(lid + 'a') - 0.5) * cell * 0.5; // 자기 셀 안에서만 → 교차 없음
           const rl = Rleaf * (0.84 + 0.32 * rand(lid + 'r'));
           pos[lid] = { x: bp.x + Math.cos(la) * rl, y: bp.y + Math.sin(la) * rl };
+          cf[lid] = brCurve + 0.04 + 0.05 * rand(lid + 'c'); // 자식 곡률 = 부모 + 추가
         });
         a += arc; // 다음 가지 구획으로
       });
@@ -206,6 +219,7 @@ export default function MindMapScreen() {
     nodesRef.current = rawNodes.map(n => {
       const p = pos[n.id] || { x: cx, y: cy };
       return { ...n, x: p.x, y: p.y, hx: p.x, hy: p.y, vx: 0, vy: 0, r: KIND[n.kind].r,
+        cf: cf[n.id] || 0,
         sf: 0.7 + 0.6 * rand(n.id + 's'), df: 1 + (rand(n.id + 'd') - 0.5) * 0.06 };
     });
     rr();
@@ -303,7 +317,13 @@ export default function MindMapScreen() {
             {/* 라인: 전부 검정 10% 통일 */}
             {edges.map((e, i) => {
               const a = byId[e.a], b = byId[e.b]; if (!a || !b) return null;
-              return <line key={i} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={EDGE_COLOR} strokeOpacity={EDGE_OPACITY} strokeWidth={1} strokeLinecap="round" />;
+              if (e.kind === 'cross') // 책 간 유사선: 배경처럼 흐리게(거의 안 보이게)
+                return <line key={i} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={EDGE_COLOR} strokeOpacity={0.03} strokeWidth={1} strokeLinecap="round" />;
+              // 책→가지·가지→잎: 부모가 자라온 방향을 이어 바깥으로 피는 곡선
+              // 조부모 = main(책→가지)이면 중심, sub(가지→잎)이면 책
+              const g = e.kind === 'main' ? { x: W / 2, y: H / 2 } : (byId[`bk${a.book}`] || { x: W / 2, y: H / 2 });
+              const c = petalCtrl(a.x, a.y, b.x, b.y, g.x, g.y, e.a + '|' + e.b);
+              return <path key={i} d={quad(a.x, a.y, c.cx, c.cy, b.x, b.y)} fill="none" stroke={EDGE_COLOR} strokeOpacity={EDGE_OPACITY} strokeWidth={1} strokeLinecap="round" />;
             })}
             {nodes.map(n => {
               const k = KIND[n.kind];
