@@ -25,14 +25,14 @@ function hslToHex(h, s, l) {
 }
 
 const NODE_COLOR = '#A5AFA9';   // 개념(테마/키워드) 통일 색
-const BOOK_COLOR = '#FF6600';   // 책 제목 노드 색
+const BOOK_COLOR = '#F37B0B';   // 책 제목 노드 색
 const EDGE_COLOR = '#000000';   // 라인 색
 const EDGE_OPACITY = 0.1;       // 라인 불투명도
 const NODE_R = 6;               // 모든 노드 크기 통일
 const KIND = {
-  book:   { color: BOOK_COLOR, r: NODE_R, op: 1,   fs: 21, fw: 700 }, // 책 제목 노드
-  branch: { color: NODE_COLOR, r: NODE_R, op: 1,   fs: 11, fw: 500 }, // 테마(1뎁스)
-  leaf:   { color: NODE_COLOR, r: NODE_R, op: 0.5, fs: 9,  fw: 400 }, // 키워드(2뎁스) — 오퍼시티 절반
+  book:   { color: BOOK_COLOR, r: NODE_R + 4, op: 1, fs: 21, fw: 700 }, // 책 제목 노드(크게)
+  branch: { color: '#F9AD7B', r: NODE_R, op: 1,   fs: 11, fw: 500 }, // 테마(1뎁스)
+  leaf:   { color: '#5F906B', r: NODE_R, op: 0.5, fs: 9,  fw: 400 }, // 키워드(2뎁스) — 오퍼시티 절반
 };
 
 function hexToHsl(hex) {
@@ -178,15 +178,16 @@ export default function MindMapScreen() {
   // 가지·잎을 책 중심에서 같은 방향으로 뻗어 → 다른 부모의 자식끼리 영역 분리, 라인 교차 없음.
   useEffect(() => {
     const cx = W / 2, cy = H / 2;
-    const Rb = 200, Rbr = 145, Rleaf = 285; // 중심→책, 책→테마, 책→키워드 반지름
+    const Rb = 200, Rbr = 78, Rleaf = 162; // 중심→책 / 책→테마 / 책→키워드 (짧은 라인 유지)
     const NB = books.length || 1;
     const wedge = (2 * Math.PI / NB) * 0.92;  // 책 1권 부채꼴 (이웃과 간격)
-    const cap = Math.min(wedge, Math.PI / 2); // ≤90° 제한
+    const cap = Math.min(wedge * 2.3, Math.PI * 0.58); // 말단 노드가 더 벌어지게 부채각 확대(≈90°)
     const pos = {}, cf = {}; // cf: 노드별 누적 곡률
     books.forEach((b, bi) => {
       const bid = `bk${bi}`;
-      const bookAngle = (bi / NB) * 2 * Math.PI - Math.PI / 2 + (rand(bid + 'a') - 0.5) * 0.12;
-      const rb = Rb * (0.9 + 0.2 * rand(bid + 'r'));
+      const slot = (2 * Math.PI / NB);
+      const bookAngle = (bi / NB) * 2 * Math.PI - Math.PI / 2 + (rand(bid + 'a') - 0.5) * slot * 0.55; // 슬롯의 ±27%까지 각도 흔들림
+      const rb = Rb * (0.78 + 0.42 * rand(bid + 'r')); // 반지름도 더 들쭉날쭉
       const bp = { x: cx + Math.cos(bookAngle) * rb, y: cy + Math.sin(bookAngle) * rb };
       pos[bid] = bp;
       const branches = b.branches || [];
@@ -203,12 +204,12 @@ export default function MindMapScreen() {
         cf[rid] = brCurve;
         const leaves = br.leaves || [];
         const L = leaves.length;
-        const pad = arc * 0.12; // 구획 양끝 여백
+        const pad = arc * 0.04; // 구획 양끝 여백(줄여서 잎이 더 넓게 퍼짐)
         const cell = (arc - 2 * pad) / Math.max(1, L);
         leaves.forEach((lf, li) => {
           const lid = `${rid}-l${li}`;
           const baseA = L === 1 ? brAngle : (a + pad) + cell * (li + 0.5);
-          const la = baseA + (rand(lid + 'a') - 0.5) * cell * 0.5; // 자기 셀 안에서만 → 교차 없음
+          const la = baseA + (rand(lid + 'a') - 0.5) * cell * 0.7; // 자기 셀 안에서만 → 교차 없음
           const rl = Rleaf * (0.84 + 0.32 * rand(lid + 'r'));
           pos[lid] = { x: bp.x + Math.cos(la) * rl, y: bp.y + Math.sin(la) * rl };
           cf[lid] = brCurve + 0.04 + 0.05 * rand(lid + 'c'); // 자식 곡률 = 부모 + 추가
