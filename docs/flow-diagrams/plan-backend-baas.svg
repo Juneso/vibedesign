@@ -1,0 +1,49 @@
+<svg width="680" height="362" viewBox="0 0 680 362" xmlns="http://www.w3.org/2000/svg" font-family="Apple SD Gothic Neo, AppleSDGothicNeo, sans-serif">
+<rect x="0" y="0" width="680" height="362" fill="#ffffff"/>
+<defs>
+<marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#5F5E5A"/></marker>
+</defs>
+
+<text x="40" y="22" font-size="15" font-weight="500" fill="#2C2C2A">백엔드 구조 — Firebase BaaS (BKT-273)</text>
+<text x="640" y="22" font-size="12" fill="#5F5E5A" text-anchor="end">별도 서버 없이 Firebase로 백엔드 전체</text>
+<line x1="40" y1="30" x2="640" y2="30" stroke="#B4B2A9"/>
+
+<rect x="250" y="42" width="180" height="40" rx="6" fill="#F1EFE8" stroke="#5F5E5A"/>
+<text x="340" y="66" font-size="14" font-weight="500" fill="#2C2C2A" text-anchor="middle">iOS 앱 (SwiftUI)</text>
+<path d="M340 82 L340 96" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<rect x="206" y="98" width="268" height="48" rx="6" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="340" y="118" font-size="14" font-weight="500" fill="#085041" text-anchor="middle">SwiftData — 로컬 캐시</text>
+<text x="340" y="136" font-size="12" fill="#0F6E56" text-anchor="middle">오프라인 읽기 · UI 바인딩 · BKT-272</text>
+
+<path d="M340 146 L340 172" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M352 172 L352 146" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="372" y="163" font-size="12" fill="#5F5E5A">Firebase SDK · 양방향 동기화</text>
+
+<rect x="40" y="176" width="600" height="124" rx="10" fill="#EEEDFE" stroke="#534AB7"/>
+<text x="56" y="196" font-size="13" font-weight="500" fill="#3C3489">Firebase BaaS — 클라우드 백엔드</text>
+<text x="624" y="196" font-size="12" fill="#534AB7" text-anchor="end">BKT-273</text>
+
+<rect x="52" y="206" width="132" height="80" rx="6" fill="#ffffff" stroke="#7F77DD"/>
+<text x="118" y="230" font-size="13" font-weight="500" fill="#3C3489" text-anchor="middle">Auth (신원)</text>
+<text x="118" y="250" font-size="12" fill="#534AB7" text-anchor="middle">익명 UID + SIWA</text>
+<text x="118" y="270" font-size="12" fill="#7F77DD" text-anchor="middle">BKT-312</text>
+
+<rect x="196" y="206" width="132" height="80" rx="6" fill="#ffffff" stroke="#7F77DD"/>
+<text x="262" y="230" font-size="13" font-weight="500" fill="#3C3489" text-anchor="middle">Firestore (데이터)</text>
+<text x="262" y="250" font-size="12" fill="#534AB7" text-anchor="middle">원본 · 실시간 동기화</text>
+<text x="262" y="270" font-size="12" fill="#7F77DD" text-anchor="middle">BKT-313 · 275</text>
+
+<rect x="340" y="206" width="132" height="80" rx="6" fill="#ffffff" stroke="#B4B2A9"/>
+<text x="406" y="230" font-size="13" font-weight="500" fill="#444441" text-anchor="middle">Cloud Messaging</text>
+<text x="406" y="250" font-size="12" fill="#5F5E5A" text-anchor="middle">푸시 알림</text>
+<text x="406" y="270" font-size="12" fill="#888780" text-anchor="middle">추후</text>
+
+<rect x="484" y="206" width="132" height="80" rx="6" fill="#ffffff" stroke="#B4B2A9"/>
+<text x="550" y="230" font-size="13" font-weight="500" fill="#444441" text-anchor="middle">Functions</text>
+<text x="550" y="250" font-size="12" fill="#5F5E5A" text-anchor="middle">LLM 프록시</text>
+<text x="550" y="270" font-size="12" fill="#888780" text-anchor="middle">추후 · BKT-274</text>
+
+<rect x="40" y="310" width="600" height="38" rx="6" fill="#F1EFE8" stroke="#5F5E5A"/>
+<text x="340" y="334" font-size="13" font-weight="500" fill="#444441" text-anchor="middle">Firebase 프로젝트 셋업 &amp; iOS SDK 통합 — BKT-311 (토대)</text>
+</svg>

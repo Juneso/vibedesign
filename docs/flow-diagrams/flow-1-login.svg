@@ -1,0 +1,99 @@
+<svg width="680" height="432" viewBox="0 0 680 432" xmlns="http://www.w3.org/2000/svg" font-family="Apple SD Gothic Neo, AppleSDGothicNeo, sans-serif">
+<rect x="0" y="0" width="680" height="432" fill="#ffffff"/>
+<text x="40" y="22" font-size="15" font-weight="500" fill="#2C2C2A">① 로그인하면 뒷단에서</text>
+
+<g>
+<rect x="40" y="34" width="176" height="50" rx="6" fill="#EEEDFE" stroke="#534AB7"/>
+<text x="128" y="56" font-size="14" font-weight="500" fill="#3C3489" text-anchor="middle">앱 첫 실행</text>
+<text x="128" y="74" font-size="12" fill="#534AB7" text-anchor="middle">로그인 화면 없음</text>
+</g>
+<g>
+<rect x="238" y="34" width="176" height="50" rx="6" fill="#EEEDFE" stroke="#534AB7"/>
+<text x="326" y="56" font-size="14" font-weight="500" fill="#3C3489" text-anchor="middle">Anonymous Auth</text>
+<text x="326" y="74" font-size="12" fill="#534AB7" text-anchor="middle">익명 UID 자동 발급</text>
+</g>
+<g>
+<rect x="436" y="34" width="176" height="50" rx="6" fill="#EEEDFE" stroke="#534AB7"/>
+<text x="524" y="56" font-size="14" font-weight="500" fill="#3C3489" text-anchor="middle">데이터 경로 확보</text>
+<text x="524" y="74" font-size="12" fill="#534AB7" text-anchor="middle">users/{uid}</text>
+</g>
+<path d="M216 59 L235 59" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ah)"/>
+<path d="M414 59 L433 59" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ah)"/>
+<path d="M524 84 L524 95" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ah)"/>
+
+<g>
+<rect x="436" y="100" width="176" height="50" rx="6" fill="#EEEDFE" stroke="#534AB7"/>
+<text x="524" y="122" font-size="14" font-weight="500" fill="#3C3489" text-anchor="middle">Apple로 계속하기</text>
+<text x="524" y="140" font-size="12" fill="#534AB7" text-anchor="middle">SIWA credential 획득</text>
+</g>
+<g>
+<rect x="238" y="100" width="176" height="50" rx="6" fill="#EEEDFE" stroke="#534AB7"/>
+<text x="326" y="122" font-size="14" font-weight="500" fill="#3C3489" text-anchor="middle">link(credential)</text>
+<text x="326" y="140" font-size="12" fill="#534AB7" text-anchor="middle">UID 유지한 채 승격</text>
+</g>
+<g>
+<rect x="40" y="100" width="176" height="50" rx="6" fill="#EEEDFE" stroke="#534AB7"/>
+<text x="128" y="122" font-size="14" font-weight="500" fill="#3C3489" text-anchor="middle">기기 간 동기화</text>
+<text x="128" y="140" font-size="12" fill="#534AB7" text-anchor="middle">같은 Apple ID = 같은 UID</text>
+</g>
+<path d="M436 125 L417 125" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ah)"/>
+<path d="M238 125 L219 125" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ah)"/>
+
+<text x="40" y="172" font-size="12" fill="#5F5E5A">핵심: 로그인은 새 계정 생성이 아니라 익명 UID를 애플 계정에 "연결" → 기존 데이터 그대로 유지</text>
+<line x1="40" y1="184" x2="640" y2="184" stroke="#B4B2A9" stroke-width="1"/>
+
+<text x="40" y="208" font-size="15" font-weight="500" fill="#2C2C2A">② 새 노트를 저장하면</text>
+
+<g>
+<rect x="40" y="220" width="176" height="50" rx="6" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="128" y="242" font-size="14" font-weight="500" fill="#085041" text-anchor="middle">메모 입력 · 저장</text>
+<text x="128" y="260" font-size="12" fill="#0F6E56" text-anchor="middle">사용자 액션</text>
+</g>
+<g>
+<rect x="238" y="220" width="176" height="50" rx="6" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="326" y="242" font-size="14" font-weight="500" fill="#085041" text-anchor="middle">SwiftData 로컬 저장</text>
+<text x="326" y="260" font-size="12" fill="#0F6E56" text-anchor="middle">즉시 · 오프라인 OK</text>
+</g>
+<g>
+<rect x="436" y="220" width="176" height="50" rx="6" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="524" y="242" font-size="14" font-weight="500" fill="#085041" text-anchor="middle">Firestore 동기화</text>
+<text x="524" y="260" font-size="12" fill="#0F6E56" text-anchor="middle">users/{uid}/memos</text>
+</g>
+<path d="M216 245 L235 245" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ah)"/>
+<path d="M414 245 L433 245" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ah)"/>
+<path d="M524 270 L524 281" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ah)"/>
+
+<g>
+<rect x="436" y="286" width="176" height="50" rx="6" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="524" y="308" font-size="14" font-weight="500" fill="#085041" text-anchor="middle">보안 규칙 검증</text>
+<text x="524" y="326" font-size="12" fill="#0F6E56" text-anchor="middle">uid == userId</text>
+</g>
+<g>
+<rect x="238" y="286" width="176" height="50" rx="6" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="326" y="308" font-size="14" font-weight="500" fill="#085041" text-anchor="middle">타 기기 전파</text>
+<text x="326" y="326" font-size="12" fill="#0F6E56" text-anchor="middle">연결 상태일 때만</text>
+</g>
+<path d="M436 311 L417 311" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ah)"/>
+
+<text x="40" y="358" font-size="12" fill="#5F5E5A">저장소</text>
+<g>
+<rect x="40" y="366" width="145" height="34" rx="6" fill="#F1EFE8" stroke="#5F5E5A"/>
+<text x="112" y="387" font-size="13" font-weight="500" fill="#444441" text-anchor="middle">SwiftData · 로컬</text>
+</g>
+<g>
+<rect x="194" y="366" width="145" height="34" rx="6" fill="#F1EFE8" stroke="#5F5E5A"/>
+<text x="266" y="387" font-size="13" font-weight="500" fill="#444441" text-anchor="middle">Firestore · 클라우드</text>
+</g>
+<g>
+<rect x="348" y="366" width="145" height="34" rx="6" fill="#F1EFE8" stroke="#5F5E5A"/>
+<text x="420" y="387" font-size="13" font-weight="500" fill="#444441" text-anchor="middle">Firebase Auth · 신원</text>
+</g>
+<g>
+<rect x="502" y="366" width="138" height="34" rx="6" fill="#F1EFE8" stroke="#5F5E5A"/>
+<text x="571" y="387" font-size="13" font-weight="500" fill="#444441" text-anchor="middle">Apple · SIWA</text>
+</g>
+
+<defs>
+<marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#5F5E5A"/></marker>
+</defs>
+</svg>
