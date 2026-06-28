@@ -31,10 +31,12 @@ yarn-error.log*
 .env.*
 !.env.example
 
-# Claude 작업 폴더 (agents는 팀 공유)
+# Claude 작업 폴더 (agents·skills는 팀 공유)
 .claude/*
 !.claude/agents/
 !.claude/agents/**
+!.claude/skills/
+!.claude/skills/**
 
 # OMC (oh-my-claudecode) session state
 .omc/
