@@ -1,0 +1,66 @@
+<svg width="680" height="362" viewBox="0 0 680 362" xmlns="http://www.w3.org/2000/svg" font-family="Apple SD Gothic Neo, AppleSDGothicNeo, sans-serif">
+<rect x="0" y="0" width="680" height="362" fill="#ffffff"/>
+<defs>
+<marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#5F5E5A"/></marker>
+<marker id="arp" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#7F77DD"/></marker>
+</defs>
+
+<text x="40" y="22" font-size="15" font-weight="500" fill="#2C2C2A">책 상세·발췌 구조 — 행동 → 데이터 → 저장·연관 (BKT-283)</text>
+<line x1="40" y1="30" x2="640" y2="30" stroke="#B4B2A9"/>
+
+<text x="111" y="62" font-size="12" font-weight="500" fill="#0F6E56" text-anchor="middle">유저 행동</text>
+<text x="320" y="62" font-size="12" font-weight="500" fill="#854F0B" text-anchor="middle">수집 데이터</text>
+<text x="547" y="62" font-size="12" font-weight="500" fill="#534AB7" text-anchor="middle">저장 &amp; 연관</text>
+
+<g><rect x="36" y="72" width="150" height="54" rx="6" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="111" y="95" font-size="13" font-weight="500" fill="#085041" text-anchor="middle">발췌 추가</text>
+<text x="111" y="113" font-size="12" fill="#0F6E56" text-anchor="middle">타이핑 · OCR</text></g>
+<g><rect x="202" y="72" width="236" height="54" rx="6" fill="#FAEEDA" stroke="#BA7517"/>
+<text x="320" y="92" font-size="13" font-weight="500" fill="#854F0B" text-anchor="middle">Highlight (발췌, 필수)</text>
+<text x="320" y="108" font-size="11" fill="#854F0B" text-anchor="middle">책 속 문장 · 챕터 · source(typing/ocr)</text>
+<text x="320" y="122" font-size="11" fill="#BA7517" text-anchor="middle">OCR = VisionKit 자동 인식</text></g>
+<g><rect x="454" y="72" width="186" height="54" rx="6" fill="#EEEDFE" stroke="#534AB7"/>
+<text x="547" y="95" font-size="12" font-weight="500" fill="#3C3489" text-anchor="middle">highlights/{id}</text>
+<text x="547" y="113" font-size="11" fill="#534AB7" text-anchor="middle">└ bookId → Book</text></g>
+<path d="M186 99 L200 99" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M438 99 L452 99" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<g><rect x="36" y="138" width="150" height="50" rx="6" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="111" y="159" font-size="13" font-weight="500" fill="#085041" text-anchor="middle">생각 달기</text>
+<text x="111" y="176" font-size="12" fill="#0F6E56" text-anchor="middle">(선택, 0~N)</text></g>
+<g><rect x="202" y="138" width="236" height="50" rx="6" fill="#FAEEDA" stroke="#BA7517"/>
+<text x="320" y="159" font-size="13" font-weight="500" fill="#854F0B" text-anchor="middle">Thought (내 생각)</text>
+<text x="320" y="176" font-size="11" fill="#854F0B" text-anchor="middle">content · highlightId</text></g>
+<g><rect x="454" y="138" width="186" height="50" rx="6" fill="#EEEDFE" stroke="#534AB7"/>
+<text x="547" y="159" font-size="11" font-weight="500" fill="#3C3489" text-anchor="middle">…/{id}/thoughts/{id}</text>
+<text x="547" y="176" font-size="11" fill="#534AB7" text-anchor="middle">└ highlightId</text></g>
+<path d="M186 163 L200 163" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M438 163 L452 163" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M464 126 L464 137" stroke="#7F77DD" stroke-width="1.5" marker-end="url(#arp)"/>
+<text x="470" y="135" font-size="10" fill="#534AB7">1:N</text>
+
+<g><rect x="36" y="200" width="150" height="50" rx="6" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="111" y="221" font-size="13" font-weight="500" fill="#085041" text-anchor="middle">정리하기</text>
+<text x="111" y="238" font-size="12" fill="#0F6E56" text-anchor="middle">→ 인제스트</text></g>
+<g><rect x="202" y="200" width="236" height="50" rx="6" fill="#FAEEDA" stroke="#BA7517"/>
+<text x="320" y="221" font-size="13" font-weight="500" fill="#854F0B" text-anchor="middle">위키 노드 (4_)</text>
+<text x="320" y="238" font-size="11" fill="#854F0B" text-anchor="middle">발췌+생각 → 개념 · backlink</text></g>
+<g><rect x="454" y="200" width="186" height="50" rx="6" fill="#EEEDFE" stroke="#534AB7"/>
+<text x="547" y="221" font-size="13" font-weight="500" fill="#3C3489" text-anchor="middle">wiki/{nodeId}</text>
+<text x="547" y="238" font-size="11" fill="#534AB7" text-anchor="middle">발췌 출처 연결</text></g>
+<path d="M186 225 L200 225" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M438 225 L452 225" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M464 188 L464 199" stroke="#7F77DD" stroke-width="1.5" marker-end="url(#arp)"/>
+<text x="470" y="197" font-size="10" fill="#534AB7">ingest</text>
+
+<g><rect x="36" y="262" width="150" height="44" rx="6" fill="#F1EFE8" stroke="#5F5E5A"/>
+<text x="111" y="289" font-size="13" font-weight="500" fill="#444441" text-anchor="middle">발췌/책 삭제</text></g>
+<g><rect x="202" y="262" width="236" height="44" rx="6" fill="#F1EFE8" stroke="#5F5E5A"/>
+<text x="320" y="289" font-size="13" font-weight="500" fill="#444441" text-anchor="middle">캐스케이드 (확인 모달)</text></g>
+<g><rect x="454" y="262" width="186" height="44" rx="6" fill="#F1EFE8" stroke="#5F5E5A"/>
+<text x="547" y="289" font-size="12" font-weight="500" fill="#444441" text-anchor="middle">highlight+thought 제거</text></g>
+<path d="M186 284 L200 284" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M438 284 L452 284" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<text x="40" y="332" font-size="11" fill="#5F5E5A">저장: 로컬 SwiftData ↔ 클라우드 Firestore — users/{uid}/{books, highlights/{id}/thoughts, wiki}. bookId·highlightId로 연결.</text>
+</svg>

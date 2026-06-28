@@ -163,6 +163,16 @@
 ✅ "회고가 끝나면 위키에 자동 반영되도록"
 ```
 
+## 플로우 구조 (Release 프로젝트)
+
+Release 프로젝트는 이슈를 **3계층 트리**로 관리한다. 상세 SSOT: [`docs/flow-structure.md`](docs/flow-structure.md).
+
+- `N | 플로우명` (최상위 플로우) → `N-M | 핵심 기획`(`기획` 라벨) → 구현 서브이슈(`UX`/`인프라` 라벨)
+- **결정(기획)이 위, 구현(UX·인프라)이 아래.**
+- **최상위 플로우(`N | …`) 본문엔 항상 `## 구조 (한눈에)` 구조도가 있어야 하고, 기획이 바뀌면 갱신한다.**
+  - 갱신: `node scripts/flow-diagram.mjs <flowIssue> docs/flow-diagrams/<flow>.svg` (SVG→PNG→업로드→이미지 교체, 멱등)
+  - 보장: 스킬 `.claude/skills/flow-diagram` + 훅 `.claude/settings.json`(PostToolUse `save_issue` → 갱신 리마인더)
+
 ## 프로젝트 / 팀 배정
 | 성격 | 팀 | 프로젝트 |
 |------|-----|---------|
