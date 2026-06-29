@@ -3,6 +3,7 @@ export const meta = {
   description: '리니어 프로젝트의 마일스톤→핵심이슈→서브→리프 트리를 계층적 서브에이전트로 정독해 모순·정렬 이탈을 탐지하고, 사소한 것은 자동 수정(검증 후), 나머지는 전용 리포트 이슈에 정리해 Junseo를 @태그한다.',
   phases: [
     { title: 'Scan', detail: '프로젝트 이슈 트리 구축' },
+    { title: 'Prior', detail: '직전 리포트 + 사용자 코멘트 읽어 중복 방지' },
     { title: 'Analyze', detail: '핵심이슈마다 1 에이전트 — 모순 탐지' },
     { title: 'Verify', detail: '자동수정 후보를 독립 회의론자가 검증' },
     { title: 'Apply', detail: '검증 통과한 사소한 수정만 리니어에 반영' },
@@ -217,6 +218,56 @@ log(
     `마일스톤 ${tree.milestones.length}개. 분석 시작(Analyze=Sonnet).`,
 )
 
+// Phase 0.5 — Prior: 직전 리포트 + 사용자 코멘트를 읽어 "이미 처리된 것" 추출 → 중복 발행 방지
+phase('Prior')
+const PRIOR_SCHEMA = {
+  type: 'object',
+  additionalProperties: true,
+  properties: {
+    reportExists: { type: 'boolean' },
+    reportIssueId: { type: 'string' },
+    userDecisions: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: true,
+        properties: {
+          topic: { type: 'string' },
+          decision: { type: 'string', description: 'Junseo가 코멘트로 내린 결정·지시' },
+          relatedIssues: { type: 'array', items: { type: 'string' } },
+        },
+        required: ['topic', 'decision'],
+      },
+    },
+    suppress: { type: 'array', items: { type: 'string' }, description: '다시 새 모순으로 올리면 안 되는 주제/이슈ID/항목 키' },
+    stillOpen: { type: 'array', items: { type: 'string' }, description: '직전 리포트가 제기했으나 Junseo가 아직 답 안 한 항목' },
+    notes: { type: 'string' },
+  },
+  required: ['reportExists'],
+}
+const prior = (await agent(
+  `너는 직전 정렬 리포트와 거기 달린 Junseo 코멘트를 읽어, 다음 리포트가 "이미 처리·결정된 것을 중복 발행"하지 않도록 맥락을 추출하는 에이전트다. ${READ_TOOLS}\n\n` +
+    `대상: "${REPORT_PARENT}" 하위의 리포트 이슈 (title="${REPORT_TITLE}").\n\n` +
+    `할 일:\n` +
+    `1) list_issues(parentId="${REPORT_PARENT}") 로 자식들 중 title="${REPORT_TITLE}" 이슈를 찾는다. 없으면 reportExists=false 로 반환(첫 실행 — 억제할 것 없음).\n` +
+    `2) 있으면 get_issue 로 본문(직전 대시보드)을, list_comments(issueId=...) 로 모든 코멘트를 읽는다.\n` +
+    `3) ★중요★ 봇 코멘트와 Junseo 코멘트는 둘 다 같은 계정(오준서)으로 달린다. 작성자로 구분하지 말고 마커로 구분하라:\n` +
+    `   - 봇/시스템 코멘트 = "@${MENTION}" 로 시작하거나, "🤖 정렬봇" 포함하거나, "This comment thread is synced" 같은 GitHub 동기화 알림.\n` +
+    `   - 그 외 모든 코멘트 = Junseo 본인의 피드백·결정·지시.\n` +
+    `4) Junseo 코멘트에서 추출:\n` +
+    `   - userDecisions: 그가 내린 결정·지시 (어떤 모순/액션플랜에 "이렇게 가자/이건 의도된 거다/이미 처리함"이라 한 것).\n` +
+    `   - suppress: 그가 이미 결정했거나 "의도된 것/무시"라 했거나 직접 처리한 항목 — 다음 리포트에서 새 모순으로 다시 올리면 안 되는 주제·이슈ID·항목 키 목록.\n` +
+    `   - stillOpen: 직전 리포트가 제기했지만 Junseo가 아직 답하지 않은 항목(계속 추적).\n` +
+    `5) Junseo 코멘트가 전혀 없으면 userDecisions=[], suppress=[], stillOpen=직전 미해결 항목 전부.\n` +
+    `구조화 출력만 반환.`,
+  { label: 'prior-report', phase: 'Prior', schema: PRIOR_SCHEMA, model: 'sonnet' },
+)) || { reportExists: false, userDecisions: [], suppress: [], stillOpen: [] }
+const priorBrief = prior.reportExists
+  ? `직전 리포트 존재. Junseo가 이미 결정/처리해 ★다시 새 모순으로 올리면 안 되는★ 항목(suppress): ${JSON.stringify(prior.suppress || [])}. ` +
+    `Junseo의 결정(userDecisions): ${JSON.stringify(prior.userDecisions || [])}.`
+  : '직전 리포트 없음(첫 실행). 억제할 항목 없음.'
+log(prior.reportExists ? `직전 리포트 반영 — 억제 ${(prior.suppress || []).length}건 · 결정 ${(prior.userDecisions || []).length}건 · 미해결 ${(prior.stillOpen || []).length}건.` : '직전 리포트 없음(첫 실행).')
+
 // Phase 1 — Analyze: 활성 핵심이슈마다 1 에이전트 (Sonnet — 1차 탐지, 비용 지배 구간)
 phase('Analyze')
 const coreFindings = (
@@ -235,6 +286,9 @@ const coreFindings = (
           `4) autoFixable 은 오직 ssotClear=true 이고 수정이 "사소"할 때만 true: 오타/용어 불일치/명백한 중복/이미 합의된 stale 본문 한 줄 갱신 같은 비파괴적 변경. ` +
           `기획 방향 자체가 바뀌는 판단, 우선순위 변경, 이슈 삭제/대규모 본문 재작성은 절대 autoFixable=false (Junseo 판단 필요).\n` +
           `5) autoFixable=true 인 건 fixOps 에 정확한 변경 지시를 적는다. 이 단계에서는 절대 리니어에 쓰지 마라(읽기만).\n` +
+          `6) ★직전 리포트 반영★ — ${priorBrief}\n` +
+          `   suppress 목록·userDecisions 에 해당하는 모순은 이미 Junseo가 결정·처리한 것이니 contradictions 에 다시 넣지 마라(중복 발행 금지). ` +
+          `단, 그 결정이 본문에 아직 반영 안 돼 "본문 vs 결정"이 여전히 어긋나면, 그건 stale 모순으로 잡되 latestSSOT 에 "Junseo가 코멘트로 이미 결정함"을 명시하라.\n` +
           `모순이 없으면 contradictions=[] 로 정직하게 반환. 추측 금지, 근거(evidence)에 실제로 읽은 위치를 적어라.`,
         { label: `analyze:${ci.id}`, phase: 'Analyze', schema: FINDINGS_SCHEMA, model: 'sonnet' },
       ),
@@ -318,7 +372,8 @@ const milestoneSummaries = (
           SSOT_RULE +
           `\n\n마일스톤: "${mName}"\n마일스톤 목표(설명): ${JSON.stringify(mDesc)}\n\n` +
           `하위 핵심이슈 분석 결과(JSON):\n${JSON.stringify(findings, null, 2)}\n\n` +
-          `이번 실행에서 이미 자동 반영된 사소 수정: ${JSON.stringify(appliedHere.map((a) => a.what))}\n\n` +
+          `이번 실행에서 이미 자동 반영된 사소 수정: ${JSON.stringify(appliedHere.map((a) => a.what))}\n` +
+          `★직전 리포트 반영★ — ${priorBrief}\n   suppress·userDecisions 에 해당하는 것은 다시 새로 제기하지 말고, 필요하면 "Junseo 결정대로 진행 중"으로만 처리하라.\n\n` +
           `할 일:\n` +
           `1) 핵심이슈들의 결과를 종합해 (a) 마일스톤 목표와의 정렬, (b) 이슈끼리(형제) 충돌하는 결정 = crossIssueContradictions, (c) Junseo 판단이 필요한 상위 미해결 항목 topUnresolved 를 도출.\n` +
           `2) 개별 핵심이슈 안에서 이미 잡힌 모순은 중복 나열하지 말고, "마일스톤 수준에서만 보이는" 교차 모순·정렬 문제에 집중.\n` +
@@ -347,6 +402,12 @@ const overview = {
     .filter((c) => c.severity === 'high' && !confirmed.includes(c))
     .map((c) => ({ id: c.id, title: c.title, kind: c.kind, milestone: c._milestone, locations: c.locations, proposed: c.proposedResolution })),
   milestoneSummaries,
+  priorContext: {
+    reportExists: prior.reportExists,
+    userDecisions: prior.userDecisions || [],
+    suppress: prior.suppress || [],
+    stillOpen: prior.stillOpen || [],
+  },
 }
 
 const finalReport = await agent(
@@ -354,11 +415,15 @@ const finalReport = await agent(
     `프로젝트: "${PROJECT_NAME}" (ID ${PROJECT_ID}), 팀: "${TEAM_NAME}".\n` +
     `종합 데이터(JSON):\n${JSON.stringify(overview, null, 2)}\n\n` +
     `할 일:\n` +
+    `★직전 리포트 반영★ — priorContext.userDecisions 는 Junseo가 지난 리포트 코멘트로 이미 내린 결정이다. ` +
+    `그 결정들은 "다시 풀어야 할 모순"으로 올리지 말고, 아래 "변동" 섹션에서 *닫힌 것*으로 처리하라. ` +
+    `priorContext.suppress 항목도 재발행 금지. priorContext.stillOpen 은 계속 추적.\n` +
     `1) 다음을 담은 "정렬 리포트" 본문(마크다운)을 작성하라 — 이건 매 실행 갱신되는 살아있는 대시보드(SSOT)다:\n` +
     `   ## 한눈에 — 이번 점검 요약(핵심이슈 N · 모순 N · 자동정정 N)\n` +
-    `   ## 지금 꼭 풀어야 할 모순 — 심각도 high 우선, [이슈ID] 링크와 함께, 각 항목에 "왜 충돌인지 / 권장 결정"\n` +
+    `   ## 변동 — 지난 리포트 대비 (priorContext 기반): **새로 발견** / **Junseo가 결정·처리해 닫힘**(userDecisions 반영) / **여전히 열림**(stillOpen). 첫 실행이면 "첫 점검"이라 적기.\n` +
+    `   ## 지금 꼭 풀어야 할 모순 — 심각도 high 우선, [이슈ID] 링크와 함께, 각 항목에 "왜 충돌인지 / 권장 결정". ★이미 Junseo가 결정한 항목은 여기 넣지 말 것★\n` +
     `   ## 병목 & 우선순위 — 진행을 막는 것, 먼저 결정할 것 순서\n` +
-    `   ## 액션 플랜 — Junseo가 고를 수 있는 구체적 선택지 2~4개\n` +
+    `   ## 액션 플랜 — Junseo가 고를 수 있는 구체적 선택지 2~4개 (아직 결정 안 한 것만)\n` +
     `   ## 자동 정정됨 — 이번에 봇이 스스로 고친 사소한 항목 목록\n` +
     `   포맷 규칙: 섹션당 불렛 간결하게. 비개발자가 읽어도 무엇을 결정해야 하는지 분명하게.\n` +
     (DRY_RUN
@@ -369,7 +434,9 @@ const finalReport = await agent(
         `   - 없으면 save_issue(title="${REPORT_TITLE}", team="${REPORT_TEAM}", project="${REPORT_PROJECT}", milestone="${REPORT_MILESTONE}", parentId="${REPORT_PARENT}", assignee="${MENTION}", description=리포트 본문) 로 생성.\n` +
         `   주의: 이 리포트는 "${PROJECT_NAME}" 프로젝트를 점검한 결과지만, 이슈 자체는 "${REPORT_PROJECT}" 프로젝트의 ${REPORT_PARENT} 하위에 둔다(둘 다 ${REPORT_TEAM} 팀이라 부모-자식 가능).\n` +
         `3) 그 리포트 이슈에 save_comment(issueId=<리포트이슈>, body=...) 로 이번 실행 요약 댓글을 남기되 반드시 @${MENTION} 멘션으로 시작하라(로그는 댓글로 쌓인다). 예: "@${MENTION} 이번 정렬 점검 결과입니다 — 결정 필요 N건, 자동정정 N건. 본문 리포트 확인 부탁."\n` +
-        `   댓글엔 "지금 당장 네 결정이 필요한 것" top 3를 불렛으로.\n`) +
+        `   ★중복 핑 방지★ — 댓글의 "지금 결정 필요" 목록에는 priorContext.userDecisions/suppress 에 이미 있는(=Junseo가 지난번 답한) 항목을 다시 넣지 마라. **새로 생겼거나 아직 답 안 한 항목만** 핑하라.\n` +
+        `   이번에 새로 결정 필요한 게 없으면(전부 지난번에 답함) 핑을 과하게 하지 말고 "새로 결정할 것 없음 — 지난 결정 반영해 본문 갱신함"이라고만 간단히 남겨라.\n` +
+        `   댓글엔 "지금 당장 네 결정이 필요한 것(새 항목)" top 3를 불렛으로.\n`) +
     `구조화 출력으로 reportIssueId, reportIssueUrl, commentPosted, note, reportBody 를 반환하라.`,
   {
     label: 'overseer',
