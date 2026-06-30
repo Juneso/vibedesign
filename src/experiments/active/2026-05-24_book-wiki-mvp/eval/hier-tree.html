@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>디자인의 디자인 — 개념 위계 (실데이터 인제스트)</title>
+<style>
+  :root { --bg:#1b1c22; --panel:#23242c; --line:#3a3b45; --leaf:#2c2e38; --leaf-b:#4a4c5a;
+          --theme:#2a3a34; --theme-b:#3f9e5f; --root:#3a2f4a; --root-b:#9b7fd6;
+          --txt:#e7e7ee; --dim:#9fa0ad; --accent:#6fd99a; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--txt);
+    font-family:"Apple SD Gothic Neo","AppleSDGothicNeo","Pretendard",-apple-system,sans-serif; }
+  #wrap { display:flex; height:100vh; }
+  #stage { flex:1; overflow:auto; position:relative; }
+  header { position:absolute; top:0; left:0; right:0; padding:16px 22px; z-index:5;
+    background:linear-gradient(180deg,rgba(27,28,34,.96),rgba(27,28,34,0)); pointer-events:none; }
+  header h1 { font-size:16px; margin:0; font-weight:600; }
+  header p { margin:4px 0 0; font-size:12px; color:var(--dim); }
+  svg { display:block; }
+  .link { fill:none; stroke:var(--line); stroke-width:1.5; }
+  .node { cursor:pointer; }
+  .node rect { rx:9; transition:filter .15s, stroke .15s; }
+  .node.leaf rect { fill:var(--leaf); stroke:var(--leaf-b); }
+  .node.theme rect { fill:var(--theme); stroke:var(--theme-b); }
+  .node.root rect { fill:var(--root); stroke:var(--root-b); }
+  .node text { fill:var(--txt); font-size:13px; dominant-baseline:middle; }
+  .node .cnt { fill:var(--dim); font-size:11px; }
+  .node:hover rect { filter:brightness(1.25); }
+  .node.sel rect { stroke:var(--accent); stroke-width:2.5; filter:brightness(1.2); }
+  #panel { width:0; transition:width .22s ease; background:var(--panel); overflow:hidden;
+    border-left:1px solid var(--line); display:flex; flex-direction:column; position:relative; }
+  #panel.open { width:440px; }
+  #panel .ph { padding:18px 20px 12px; border-bottom:1px solid var(--line); }
+  #panel .ph .kind { font-size:11px; color:var(--accent); letter-spacing:.5px; }
+  #panel .ph h2 { margin:6px 0 0; font-size:18px; }
+  #panel .ph .meta { margin-top:6px; font-size:12px; color:var(--dim); }
+  #panel .body { padding:8px 20px 28px; overflow:auto; }
+  .quote { background:var(--leaf); border:1px solid var(--line); border-radius:10px; padding:13px 15px; margin:12px 0; }
+  .quote .pg { font-size:11px; color:var(--accent); margin-bottom:7px; }
+  .quote .pg .ch { color:var(--dim); margin-left:6px; }
+  .quote .tx { font-size:13.5px; line-height:1.65; }
+  .quote .my { margin-top:9px; padding-top:9px; border-top:1px dashed var(--line); font-size:12.5px; color:#cdb9e6; }
+  .quote .my::before { content:"💭 "; }
+  .summary { background:#26302b; border:1px solid var(--theme-b); border-radius:10px; padding:13px 15px; margin:12px 0 4px; font-size:14px; line-height:1.6; color:#d9f3e3; }
+  .summary::before { content:"📝 한 문장 정리"; display:block; font-size:11px; color:var(--accent); margin-bottom:6px; letter-spacing:.3px; }
+  .srclabel { font-size:11px; color:var(--dim); margin:16px 0 -4px; letter-spacing:.3px; }
+  .empty { color:var(--dim); font-size:13px; padding:18px 0; }
+  #panel .close { position:absolute; top:14px; right:16px; cursor:pointer; color:var(--dim); font-size:20px; line-height:1; background:none; border:none; }
+  .hint { position:absolute; bottom:16px; left:22px; font-size:12px; color:var(--dim); }
+  .err { padding:40px; color:#e88; font-size:14px; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="stage">
+    <header>
+      <h1 id="h-title">개념 위계</h1>
+      <p id="h-sub">노드를 누르면 실제 수집한 발췌가 보여요</p>
+    </header>
+    <svg id="svg"></svg>
+    <div class="hint">초록=상위 테마 · 회색=개념 · 보라=책</div>
+  </div>
+  <aside id="panel">
+    <div class="ph">
+      <button class="close" onclick="closePanel()">×</button>
+      <div class="kind" id="p-kind"></div>
+      <h2 id="p-title"></h2>
+      <div class="meta" id="p-meta"></div>
+    </div>
+    <div class="body" id="p-body"></div>
+  </aside>
+</div>
+
+<script id="data">
+// 자동 생성 (node eval/protoRealMeta.mjs) — 기존 planIngest(메타) + 위계
+window.DATA = {
+ "book": {
+  "title": "디자인의 디자인",
+  "author": "하라 켄야"
+ },
+ "memos": {
+  "32": {
+   "t": "러스킨의 저작과 강연 그리고 모리스의 미술공예운동은 기계 생산의 폐해를 냉엄하게 비판하고 장인의 기술을 옹호하여 부흥시키자는 반근대적인 경향이 뚜렷한 주장이었기 때문에 결과적으로는 시류에 반영되지 못하고 사회의 변혁을 제지할 힘을 얻지 못했다. 그러나 그 바탕에 있는 생각, 무엇인가를 만드는 것과 생활의 관계 속에 즐거움을 만들어내는 원천이 존재한다는 감성과 발상은 디자인이라는 사상의 기원이 되어 그 후 디자인 운동가들의 지지를 얻었고 곧 사회에 커다란 영향을 주게 된다.",
+   "m": "",
+   "chapter": ""
+  },
+  "33": {
+   "t": "자본주의 질서와 그것을 뒷받침하는 기술적 진보, 추종하는 사람들과 디자인 현재의 디자인은 테크놀로지가 가져다주는 '신기한과일'을 사회에 프레젠테이션하는 역할을 맡아 여기에 왜곡을 가하고 있다. '오늘의 것을 내일이면 오래된 것으로 만든다.'라는 것에 온 힘을 쏟아 식탁위에 '기묘한 과일'을 내놓는 서비스에 익숙해진 디자인은 새로운 테크놀로지를 추종하고 그 경향은 점점 더 심해질 것이다.",
+   "m": "",
+   "chapter": ""
+  },
+  "35": {
+   "t": "한편 과학기술의 발달이 가져온 새로운 상황뿐 아니라 익숙한 일상생활에도 무수한 디자인의 가능성이 잠들어 있다는 것을, 요즘의 디자이너들이 알아채기 시작했다. 기묘한 것을 만들어내는 것만이 창조성이 아니다. 익숙한 것을 미지의 것으로 재발견할 수 있는 감성 또한 똑같은 창조성이다. 형태나 소재의 참신함으로 놀라움을 선사하는 것이 아니라, 생활의 틈새로부터 평범하면서도 은근히 사람을 놀라게 하는 발상을 끊임없이 끄집어내는 독창성이야말로 디자인이다.",
+   "m": "",
+   "chapter": "모더니즘과 그 미래"
+  },
+  "36": {
+   "t": "새로운 테크놀로지가 이제까지의 것들을 대신하는 것이 아니라 '옛것'이 '새것'을 받아들이고 그 결과로 선택의 폭이 늘어난다. 여기에 필요한 것은 '새것'에만 매달리지 않고 손에 넣은 선택의 폭을 냉정하게 분석하는 태도이다. 말하자면 미디어가 늘어나 서로 복합되어 커뮤니케이션 채널이 다원화되었을 뿐이다. 커뮤니케이션 디자인이란 이들 미디어를 합리적으로 정리하는 감성이다. 과거의 미디어에서 키운 감각이 새로운 미디어가 발생했다고 해서 소용없어지는 것은 아니기 때문이다. 하나의 미디어에서 육성된 커뮤니케이션 감각은 다른 미디어를 통해 유용하게 살아난다.  기존 미디어나 새 미디어 가운데 어느 한쪽으로 치우치는 것이 아니라 그것들을 횡단하여 모두 시야에 넣고 종횡으로 사용하는 기능이 디자인인 것이다, 디자인은 미디어에 종속되는 것이 아니라 오히려 미디어의 본질을 탐색해나가는 작용을 한다. 미디어가 복잡히여 착각하기 쉬운 상황일수록 디자인의 진가가 드러난다.",
+   "m": "",
+   "chapter": ""
+  },
+  "38": {
+   "t": "디자인은 오히려 눈과 귀를 활짝 열고 생활 속에서 새로운 의문을 발견해나가는 것이다. 사람이 살아 있어야 환경이다. 그것을 냉정하게 관찰하는 시선 저편에 테크놀로지의 미래나 디자인의 미래가 있다. 그것들이 서서히 교차하는 부근에서 모더니즘의 미래를 내다볼 수 있을 것이다.",
+   "m": "",
+   "chapter": ""
+  },
+  "48": {
+   "t": "디자인은 생활이라는 관점에 기초한 문명 비평이기도 하다. 이것은 어제오늘 시작된 일이 아니다. 디자인이라는 사고방식과 디자인을 느끼는 방식은 그 발생을 거슬러 올라가 보면 비평적인 것이다. 화장지를 감는 둥근 종이 심과 사각형 종이 심, 그 차이 속에서 디자인이 가진 비평성의 리얼리티를 느끼기를 기대한다.",
+   "m": "",
+   "chapter": ""
+  },
+  "70": {
+   "t": "21세기는 듣지도 보지도 못한 것들이 만들어지고 무엇이든 끊임없이 혁신되어 나갈 것으로 생각하고 있었지만 그런 발상은 오히려 20세기에 남겨 두고 오는 편이 좋다. 새로운 시대는 우리가 이미 알고 있는 일상이 끊임없이 미지화되어 새롭게 등장하는 시대다.",
+   "m": "",
+   "chapter": ""
+  },
+  "82": {
+   "t": "물론 이 프로그램 자체가 정보의 건축이라는 뜻은 아니다. 그것은 이 프로그램이라는 일련의 정보를 접한 사람들의 머릿속에 구축되어 가는 것이다.",
+   "m": "",
+   "chapter": ""
+  },
+  "109": {
+   "t": "그러나 정보가 대량으로 저장되거나 고속으로 이동되어야만 하는 것은 아니다. 정보와 개인의 관계를 냉정하게 통찰한다면 정보를 얼마나 음미할 수 있느냐 하는 요인이 더욱 중요해진다.",
+   "m": "",
+   "chapter": ""
+  },
+  "114": {
+   "t": "때문에 종이 미디어를 사용하는 경우에는 무의식이 아니라 확실한 의지를 가지고 그것과 마주하려고 한다. 디지털 미디어가 등장한 덕분에 종이는 이제야 겨우 본래의 매력적인 소재로서의 역할을 마음껏 할 수 있게 되었다.",
+   "m": "",
+   "chapter": ""
+  },
+  "139": {
+   "t": "한 사람 한 사람의 행위는 어차피 그 정도이지만 그런 작은 일들을 축적하면서도 찾고 있던 장소에 도착하려면, 그곳까지 자신을 안내할 유도 장치를 자기 의식 속에 설치해두어야 한다.",
+   "m": "",
+   "chapter": ""
+  },
+  "148": {
+   "t": "일본의 자동차가 일본인의 눈에 얌전하게 보이는 것은 자동차에 개한 일본인의 욕망을 정밀하게 스캔하고 그것에 완벽하게 순종하는 형태로 만들었기 때문이다. 따라서 좋은 의미에서건 나쁜 의미에서건 일본의 자동차는 일본인의 자동차에 대한 욕망의 수준 그 자체이다.",
+   "m": "",
+   "chapter": ""
+  },
+  "216": {
+   "t": "그러나 이와 같은 좌절을 거쳐 새롭게 깨달은 것이 있다. 만약 어떤 어려운 상황을 맞이한다고 해도 나는 디자이너로서 자신의 명확한 의도와 의지로 그 계획에 관여하고 싶다는 것이다. 나는 '핵 반대'라든디 '전쟁 반대' 등과 같이 어떤 것을 반대하는 메시지를 만드는 데는 흥미가 없다. 디자인은 어떤 것을 계획해나가는 상황에서 기능하기 때문이다.",
+   "m": "",
+   "chapter": ""
+  },
+  "219": {
+   "t": "디자이너는 본래 커뮤니케이션의 문제를 다양한 미디어를 통한 디자인으로 치료하는 의사와 같다. 따라서 머리가 아프다고 두통약을 원하는 환자에게 간단히 그것을 손에 쥐어 주어서는 안 된다. 진찰을 해보면 그곳에 중대한 병이 숨어 있을지 모른다. 어쩌면 수술이 필요할지도 모른다. 그것을 발견하여 최선의 해결책을 제시하는 것이 디자이너의 역할이다. '두통약'을 파는 일에 정신이 없는 디자이너는 값싼 두통약이 등장하면 당황하고 허둥거리게 되고 만다.",
+   "m": "",
+   "chapter": ""
+  },
+  "220": {
+   "t": "마셜 매클루언의 말 그대로 미디어는 분명 메시지이며 새로운 미디어에는 새로운 커뮤니케이션 감각과 지식이 깃들어 있을 것이다. 그러나 미디어 그 자체에 창조성의 근고를 맡기려는 것은 사물의 본질을 무시하는 발상이다",
+   "m": "",
+   "chapter": ""
+  },
+  "234": {
+   "t": "따라서 새로운 테크놀로지와 관련해서 넓게 이 분야를 다루고자 한다면, 그것은 컴퓨터를 표현 도구로 정의하는 좁은 의미의 비주얼 디자인을 뜻하는 것이 아니라 컴퓨터나 정보 테크놀로지를 통해 확대되는 시각성을 통하여 인간이 그 신체성과 감각을 어디까지 확장시킬 수 있는지 관점을 다루는 단계에 있다고 생각한다.",
+   "m": "",
+   "chapter": "비주얼커뮤니케이션 디자인"
+  },
+  "236": {
+   "t": "쉽게 어떤 것을 버리고 다른 것으로 갈아타는 행위는 경솔하다. 테크놀로지의 변화에 떠라서 그래픽 디자이너의 활동 영역이나 내용이 바뀐다면, 그 활동을 통해서 '그래픽 디자인'의 의미를 쇄신해나가는 것이 오히려 바람직하다. 즉 자신들의 활동을 통해서 그래픽 디자인을 새롭게 태어나게 하면 된다.",
+   "m": "",
+   "chapter": ""
+  }
+ },
+ "tree": {
+  "title": "디자인의 디자인",
+  "kind": "root",
+  "summary": "",
+  "pages": [],
+  "children": [
+   {
+    "title": "디자인의 철학",
+    "kind": "theme",
+    "summary": "",
+    "pages": [],
+    "children": [
+     {
+      "title": "러스킨과 모리스의 디자인 사상",
+      "kind": "leaf",
+      "summary": "러스킨과 모리스는 반근대적 경향을 가진 디자인 사상가로, 기계 생산의 폐해를 비판하고 장인의 기술을 옹호하였다. 이들의 주장은 사회 변혁에 실패했지만, 디자인 사상의 기원이 되어 후대에 영향을 미쳤다. 이 책은 익숙한 일상을 낯설게 되돌아보는 RE-DESIGN의 관점에서 디자인의 가능성을 탐색하며, 러스킨과 모리스의 사상을 연결한다.",
+      "pages": [
+       32
+      ],
+      "children": []
+     },
+     {
+      "title": "디자인의 문명 비평",
+      "kind": "leaf",
+      "summary": "디자인의 문명 비평은 생활을 기반으로 한 디자인의 비평적 성격을 강조한다. 이 책은 디자인을 생활이라는 관점에 기초한 문명 비평으로 보고, 디자인의 비평적 성격을 강조한다. 이는 일상적인 사물 속에서도 디자인의 비평성을 발견할 수 있게 한다.",
+      "pages": [
+       48
+      ],
+      "children": []
+     },
+     {
+      "title": "모더니즘과 디자인의 미래",
+      "kind": "leaf",
+      "summary": "모더니즘과 디자인의 미래는 생활 속에서 새로운 의문을 발견하며, 테크놀로지와 디자인의 교차점에서 그 방향을 탐구하는 것이다. 이 책은 디자인을 생활에 기초한 문명 비평으로 보며, 새로운 의문을 발견하는 것이 디자인의 역할임을 강조한다. 이는 디자인이 단순한 스타일링이 아닌 사고방식으로 이해되도록 한다.",
+      "pages": [
+       38
+      ],
+      "children": []
+     }
+    ]
+   },
+   {
+    "title": "디자인과 테크놀로지",
+    "kind": "theme",
+    "summary": "",
+    "pages": [],
+    "children": [
+     {
+      "title": "테크놀로지와 디자인의 왜곡",
+      "kind": "leaf",
+      "summary": "현대 디자인은 테크놀로지가 제공하는 '신기한 과일'에 집착하며, 빠르게 변화하는 사회에서 왜곡된 역할을 하고 있다. 이 책은 현대 디자인이 새로운 것만을 추구하는 경향을 비판하며, 익숙한 일상의 미지화를 통해 디자인의 본질을 탐구한다. 이러한 관점에서 테크놀로지와 디자인의 관계를 비판적으로 고찰한다.",
+      "pages": [
+       33
+      ],
+      "children": []
+     },
+     {
+      "title": "비주얼 디자인과 정보 테크놀로지",
+      "kind": "leaf",
+      "summary": "비주얼 디자인은 컴퓨터나 정보 테크놀로지를 통해 시각성을 확장시키는 관점을 다루어야 한다. 이 책은 비주얼커뮤니케이션 디자인을 통해 인간의 신체성과 감각을 확장시키는 관점을 탐구한다. 이는 디자인이 단순한 스타일링이 아닌 사고방식으로 이해되도록 한다.",
+      "pages": [
+       234
+      ],
+      "children": []
+     },
+     {
+      "title": "그래픽 디자인의 쇄신",
+      "kind": "leaf",
+      "summary": "그래픽 디자인은 테크놀로지의 변화에 따라 그 활동 영역이 바뀌더라도, 그 활동을 통해 그래픽 디자인의 의미를 쇄신해야 한다. 이 책은 디자인이 미디어에 종속되지 않고 본질을 탐색하는 횡단적 커뮤니케이션으로서의 역할을 강조한다. 이는 디자이너가 변화에 대응하며 디자인의 본질을 유지하는 데 중점을 둔다.",
+      "pages": [
+       236
+      ],
+      "children": []
+     }
+    ]
+   },
+   {
+    "title": "정보와 커뮤니케이션",
+    "kind": "theme",
+    "summary": "",
+    "pages": [],
+    "children": [
+     {
+      "title": "커뮤니케이션 디자인과 미디어",
+      "kind": "leaf",
+      "summary": "커뮤니케이션 디자인은 다양한 미디어를 종횡으로 사용하여 합리적으로 정리하는 감성을 의미한다. 이 책은 디자인이 미디어에 종속되지 않고 본질을 탐색하는 횡단적 커뮤니케이션으로서의 역할을 강조한다. 이는 미디어의 복잡성 속에서 디자인의 진가를 드러내는 중요한 요소로 작용한다.",
+      "pages": [
+       36
+      ],
+      "children": []
+     },
+     {
+      "title": "정보의 건축",
+      "kind": "leaf",
+      "summary": "정보의 건축은 정보를 접한 사람들의 머릿속에 구축되는 구조를 의미한다. 이 책은 정보를 받는 사람의 머릿속에 구축되는 '정보의 건축'을 다루며, 정보와 개인의 관계를 통찰하여 정보를 얼마나 음미할 수 있는지가 중요하다고 강조한다. 이는 정보의 대량 저장과 고속 이동보다 개인의 이해와 수용이 중요함을 시사한다.",
+      "pages": [
+       82,
+       109
+      ],
+      "children": []
+     },
+     {
+      "title": "디자이너의 역할과 문제 해결",
+      "kind": "leaf",
+      "summary": "디자이너는 커뮤니케이션 문제를 다양한 미디어를 통해 해결하는 의사와 같다. 이 책은 디자이너를 커뮤니케이션 문제를 해결하는 의사에 비유하며, 디자인의 본질적 역할을 강조한다. 이는 단순히 표면적인 해결책을 제공하는 것이 아니라, 근본적인 문제를 파악하고 최선의 해결책을 제시하는 데 중점을 둔다.",
+      "pages": [
+       219
+      ],
+      "children": []
+     }
+    ]
+   },
+   {
+    "title": "창조성과 미지화",
+    "kind": "theme",
+    "summary": "",
+    "pages": [],
+    "children": [
+     {
+      "title": "미지화와 창조성",
+      "kind": "leaf",
+      "summary": "미지화는 익숙한 것을 미지의 것으로 재발견하는 창조성을 의미한다. 이 책은 형태나 소재의 참신함보다 생활의 틈새에서 놀라움을 끌어내는 독창성을 디자인의 본질로 본다. 이는 디자인의 가능성을 확장시키며, 일상 속에서 새로운 창조성을 발견하는 데 중점을 둔다.",
+      "pages": [
+       35
+      ],
+      "children": []
+     },
+     {
+      "title": "미지화",
+      "kind": "leaf",
+      "summary": "21세기는 이미 알고 있는 일상이 끊임없이 미지화되어 새롭게 등장하는 시대이다. 책은 익숙한 일상을 낯설게 되돌아보는 RE-DESIGN의 관점에서 디자인의 가능성을 탐색한다.",
+      "pages": [
+       70
+      ],
+      "children": []
+     },
+     {
+      "title": "미디어와 창조성의 본질",
+      "kind": "leaf",
+      "summary": "미디어 그 자체에 창조성의 근거를 두는 것은 사물의 본질을 무시하는 발상이다. 이 책은 미디어에 종속되지 않고 본질을 탐색하는 디자인의 역할을 강조한다. 이는 미디어의 다양성과 그 활용 가능성을 확장시키며, 창조성의 본질을 탐구하는 데 중점을 둔다.",
+      "pages": [
+       220
+      ],
+      "children": []
+     }
+    ]
+   },
+   {
+    "title": "디자인의 역할",
+    "kind": "theme",
+    "summary": "",
+    "pages": [],
+    "children": [
+     {
+      "title": "디자이너의 의도와 계획",
+      "kind": "leaf",
+      "summary": "디자이너는 명확한 의도와 의지로 계획에 관여해야 하며, 반대 메시지를 만드는 데 흥미가 없다. 이 책은 디자이너의 역할을 강조하며, 디자인은 계획을 통해 기능해야 한다고 주장한다. 이는 디자이너가 단순히 반대 메시지를 전달하는 것이 아니라, 창의적이고 의도적인 계획을 통해 문제를 해결하는 데 중점을 둔다.",
+      "pages": [
+       216
+      ],
+      "children": []
+     },
+     {
+      "title": "유도 장치",
+      "kind": "leaf",
+      "summary": "작은 일들을 축적하면서도 자신을 안내할 유도 장치를 자기 의식 속에 설치해야 한다. 책 요약/목차/보강 컨텍스트에 명시되지 않음",
+      "pages": [
+       139
+      ],
+      "children": []
+     },
+     {
+      "title": "일본 자동차",
+      "kind": "leaf",
+      "summary": "일본의 자동차는 일본인의 욕망을 정밀하게 반영하여 그 자체로 욕망의 수준을 나타낸다. 책은 일본의 디자인을 다루며, 일본인의 욕망을 정밀하게 반영한 디자인의 특성을 설명한다.",
+      "pages": [
+       148
+      ],
+      "children": []
+     }
+    ]
+   },
+   {
+    "title": "종이와 디지털 미디어의 역할",
+    "kind": "leaf",
+    "summary": "디지털 미디어의 등장은 종이의 본래 매력적인 소재로서의 역할을 부각시켰다. 이 책은 디자인이 미디어에 종속되지 않고 본질을 탐색하는 횡단적 커뮤니케이션으로서의 역할을 강조하며, 종이와 디지털 미디어의 상호 보완적 관계를 탐구한다. 이는 미디어의 다양성과 그 활용 가능성을 확장시킨다.",
+    "pages": [
+     114
+    ],
+    "children": []
+   }
+  ]
+ }
+};
+</script>
+<script>
+if (!window.DATA) {
+  document.getElementById('stage').innerHTML = '<div class="err">hier-data.js 가 없습니다. 먼저 <code>node eval/protoReal.mjs</code> 를 실행하세요.</div>';
+} else { (function(){
+  const MEMOS = window.DATA.memos, TREE = window.DATA.tree;
+  document.getElementById('h-title').textContent = `${window.DATA.book.title} — 개념 위계`;
+
+  // ─── 레이아웃 (tidy tree) ──────────────────────────────────
+  const COLX=[70,300,580], ROWH=44, NODE_H=30, TOP=92;
+  let leafY=0;
+  function measure(n, depth){
+    n.depth=depth; n.kind=n.kind||'leaf';
+    if(n.children&&n.children.length){ n.children.forEach(c=>measure(c,depth+1)); n.y=(n.children[0].y+n.children[n.children.length-1].y)/2; }
+    else { n.y=TOP+leafY*ROWH; leafY++; }
+    n.x=COLX[Math.min(depth,2)];
+    n.allPages = n.children&&n.children.length ? [...new Set(n.children.flatMap(c=>c.allPages))] : [...new Set(n.pages||[])];
+    return n;
+  }
+  measure(TREE,0);
+  const allNodes=[]; (function walk(n){allNodes.push(n);(n.children||[]).forEach(walk);})(TREE);
+  const W=COLX[2]+280, H=TOP+leafY*ROWH+24;
+  document.getElementById('h-sub').textContent = `${window.DATA.book.author||''} · 발췌 ${new Set(allNodes.flatMap(n=>n.allPages)).size}개 → 개념 ${allNodes.filter(n=>n.kind==='leaf').length} / 테마 ${allNodes.filter(n=>n.kind==='theme').length} · 노드를 누르면 실제 발췌가 보여요`;
+
+  const NS='http://www.w3.org/2000/svg';
+  const svg=document.getElementById('svg');
+  svg.setAttribute('width',W); svg.setAttribute('height',H); svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const el=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;};
+  const nodeW=n=> 24 + [...n.title].length*13.5 + (n.allPages.length?34:0);
+  allNodes.forEach(n=>(n.children||[]).forEach(c=>{
+    const x1=n.x+nodeW(n), y1=n.y, x2=c.x, y2=c.y, mx=(x1+x2)/2;
+    svg.appendChild(el('path',{class:'link',d:`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`}));
+  }));
+  allNodes.forEach(n=>{
+    const w=nodeW(n), g=el('g',{class:`node ${n.kind}`,transform:`translate(${n.x},${n.y-NODE_H/2})`});
+    g.appendChild(el('rect',{width:w,height:NODE_H,x:0,y:0}));
+    const tx=el('text',{x:14,y:NODE_H/2}); tx.textContent=n.title; g.appendChild(tx);
+    if(n.allPages.length){ const c=el('text',{class:'cnt',x:w-24,y:NODE_H/2}); c.textContent='📄'+n.allPages.length; g.appendChild(c); }
+    g.addEventListener('click',()=>select(n,g)); n._g=g; svg.appendChild(g);
+  });
+
+  let selG=null;
+  function countLeaves(n){ return n.children&&n.children.length?n.children.reduce((s,c)=>s+countLeaves(c),0):1; }
+  window.closePanel=function(){ document.getElementById('panel').classList.remove('open'); if(selG){selG.classList.remove('sel');selG=null;} };
+  const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  function select(n,g){
+    if(selG)selG.classList.remove('sel'); g.classList.add('sel'); selG=g;
+    document.getElementById('p-kind').textContent = n.kind==='root'?'책':n.kind==='theme'?'상위 테마':'개념';
+    document.getElementById('p-title').textContent=n.title;
+    const pages=[...new Set(n.allPages)].sort((a,b)=>a-b);
+    document.getElementById('p-meta').textContent=(n.kind!=='leaf'?`하위 ${countLeaves(n)}개 개념 · `:'')+`발췌 ${pages.length}개`;
+    const body=document.getElementById('p-body'); body.innerHTML='';
+    if(n.summary){ const s=document.createElement('div'); s.className='summary'; s.textContent=n.summary; body.appendChild(s); }
+    if(pages.length){ const lb=document.createElement('div'); lb.className='srclabel'; lb.textContent='수집한 발췌'; body.appendChild(lb); }
+    if(!pages.length && !n.summary){ body.innerHTML='<div class="empty">직접 수집된 발췌가 없는 노드예요.</div>'; }
+    else pages.forEach(p=>{
+      const m=MEMOS[p]; if(!m)return;
+      const q=document.createElement('div'); q.className='quote';
+      q.innerHTML=`<div class="pg">p.${p}${m.chapter?`<span class="ch">${esc(m.chapter)}</span>`:''}</div><div class="tx">${esc(m.t)}</div>`+(m.m?`<div class="my">${esc(m.m)}</div>`:'');
+      body.appendChild(q);
+    });
+    document.getElementById('panel').classList.add('open');
+  }
+})(); }
+</script>
+</body>
+</html>

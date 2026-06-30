@@ -1,0 +1,86 @@
+<svg width="1240" height="770" viewBox="0 0 1240 770" xmlns="http://www.w3.org/2000/svg" font-family="Apple SD Gothic Neo, AppleSDGothicNeo, sans-serif">
+<rect x="0" y="0" width="1240" height="770" fill="#ffffff"/>
+<defs>
+<marker id="ag" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#3F9E5F"/></marker>
+<marker id="ad" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#5F5E5A"/></marker>
+</defs>
+
+<text x="40" y="26" font-size="16" font-weight="600" fill="#2C2C2A">인제스트 전체 흐름 — 독서기록 → 위계 정리(Wiki) → 넛지 → 루프 (BKT-342)</text>
+<line x1="40" y1="36" x2="1200" y2="36" stroke="#B4B2A9"/>
+
+<!-- Rich meta -->
+<text x="150" y="64" font-size="13" font-weight="600" fill="#2C2C2A">도서 정보 (Rich meta)</text>
+<g><rect x="140" y="72" width="262" height="150" rx="8" fill="#F6F5F1" stroke="#B4B2A9"/>
+<text x="160" y="98" font-size="12" fill="#5F5E5A">• 도서 카테고리</text>
+<text x="160" y="120" font-size="12" fill="#5F5E5A">• 목차</text>
+<text x="160" y="142" font-size="12" fill="#5F5E5A">• 출판사 서평 · 책속에서</text>
+<text x="160" y="164" font-size="12" fill="#5F5E5A">• 책 소개 전문</text>
+<text x="160" y="186" font-size="12" fill="#5F5E5A">• 책속 문장 리스트</text></g>
+<path d="M271 222 L271 296" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ad)"/>
+<text x="285" y="252" font-size="12" fill="#5F5E5A">도서 맥락 구체화</text>
+<text x="285" y="268" font-size="11" fill="#857F75">(책의 개념 정리에 필요)</text>
+
+<!-- main pipeline -->
+<text x="40" y="320" font-size="14" font-weight="600" fill="#2C2C2A">독서 기록</text>
+<text x="40" y="338" font-size="11" fill="#5F5E5A">문장 수집</text>
+<path d="M118 322 L142 322" stroke="#3F9E5F" stroke-width="2" marker-end="url(#ag)"/>
+
+<g><rect x="146" y="300" width="90" height="44" rx="6" fill="#E1F5EE" stroke="#3F9E5F"/>
+<text x="191" y="327" font-size="13" font-weight="500" fill="#0F6E56" text-anchor="middle">완료</text></g>
+<path d="M236 322 L296 322" stroke="#3F9E5F" stroke-width="2" marker-end="url(#ag)"/>
+
+<g><rect x="300" y="300" width="130" height="44" rx="6" fill="#E1F5EE" stroke="#3F9E5F"/>
+<text x="365" y="327" font-size="13" font-weight="500" fill="#0F6E56" text-anchor="middle">ingest 방식</text></g>
+<path d="M430 322 L496 322" stroke="#3F9E5F" stroke-width="2" marker-end="url(#ag)"/>
+
+<!-- Wiki container -->
+<text x="615" y="272" font-size="14" font-weight="600" fill="#2C2C2A" text-anchor="middle">Wiki</text>
+<g><rect x="500" y="280" width="230" height="118" rx="8" fill="#FBF0E1" stroke="#E0BC85"/>
+<rect x="512" y="292" width="206" height="50" rx="6" fill="#E1F5EE" stroke="#3F9E5F"/>
+<text x="615" y="322" font-size="12.5" font-weight="500" fill="#0F6E56" text-anchor="middle">책의 주요 개념 노드로 정리</text>
+<rect x="512" y="348" width="206" height="40" rx="6" fill="#FAE3D3" stroke="#D79A6E"/>
+<text x="615" y="372" font-size="12.5" font-weight="500" fill="#9A5527" text-anchor="middle">사용자의 책에 대한 생각</text></g>
+
+<!-- ingest detail -->
+<text x="300" y="392" font-size="12" fill="#444441">· 책의 주요 개념 위계 파악</text>
+<text x="300" y="412" font-size="12" fill="#444441">· 사용자의 생각 정리</text>
+<text x="300" y="432" font-size="12" fill="#444441">· 문장에 포함된 개념·생각을</text>
+<text x="312" y="448" font-size="12" fill="#444441">이미 쌓인 위키에 위계에 맞게 추가</text>
+<g><rect x="300" y="462" width="220" height="118" rx="6" fill="#23232B"/>
+<text x="410" y="516" font-size="12" font-weight="500" fill="#CFCEDB" text-anchor="middle">마인드맵 레퍼런스</text>
+<text x="410" y="538" font-size="11" fill="#9C9BAC" text-anchor="middle">책 → 테마 → 키워드</text>
+<text x="410" y="556" font-size="11" fill="#9C9BAC" text-anchor="middle">인제스트할수록 자라남</text></g>
+
+<!-- Wiki -> nudge -->
+<path d="M730 360 L770 360 L770 452 L796 452" fill="none" stroke="#3F9E5F" stroke-width="2" marker-end="url(#ag)"/>
+<text x="748" y="416" font-size="11" fill="#5F5E5A">개념과 생각의 연결·확장</text>
+
+<g><rect x="800" y="430" width="130" height="44" rx="6" fill="#E1F5EE" stroke="#3F9E5F"/>
+<text x="865" y="457" font-size="12.5" font-weight="500" fill="#0F6E56" text-anchor="middle">넛지 생성 방식</text></g>
+<path d="M930 452 L956 452" stroke="#3F9E5F" stroke-width="2" marker-end="url(#ag)"/>
+<text x="800" y="512" font-size="11" fill="#857F75">연결 기준 · 등등</text>
+
+<g><rect x="960" y="425" width="124" height="54" rx="6" fill="#EEEDFE" stroke="#7F77DD"/>
+<text x="1022" y="448" font-size="13" font-weight="600" fill="#3C3489" text-anchor="middle">AI 넛지</text>
+<text x="1022" y="466" font-size="10.5" fill="#534AB7" text-anchor="middle">생각 방향 제안·질문 생성</text></g>
+<path d="M1084 452 L1112 452" stroke="#5F5E5A" stroke-width="2" marker-end="url(#ad)"/>
+<g><rect x="1116" y="430" width="104" height="44" rx="6" fill="#F1EFE8" stroke="#5F5E5A"/>
+<text x="1168" y="457" font-size="12.5" font-weight="500" fill="#444441" text-anchor="middle">사용자 답변</text></g>
+
+<!-- Loop -->
+<path d="M1168 430 L1168 252 L615 252 L615 278" fill="none" stroke="#3F9E5F" stroke-width="2" marker-end="url(#ag)"/>
+<text x="1150" y="330" font-size="13" font-weight="600" fill="#3F9E5F" text-anchor="end">Loop</text>
+
+<!-- data / dev band -->
+<line x1="40" y1="612" x2="1200" y2="612" stroke="#B4B2A9"/>
+<text x="40" y="636" font-size="14" font-weight="600" fill="#2C2C2A">데이터 · 개발 구조</text>
+
+<text x="40" y="666" font-size="12" font-weight="600" fill="#854F0B">데이터</text>
+<text x="120" y="666" font-size="11.5" fill="#5F5E5A">Highlight(문장) · Thought(생각)  →  WikiNode{ 개념명 · 상위개념 · level · 소속 책/문장 } + 엣지(backlink · 책 내 위계)  →  Nudge{ 해석 · 질문 · 선택지 }  →  Answer 재인제스트</text>
+
+<text x="40" y="696" font-size="12" font-weight="600" fill="#3C3489">개발</text>
+<text x="120" y="696" font-size="11.5" fill="#5F5E5A">[정리하기] 트리거  →  LLM 호출(백엔드 프록시)  →  위키 자동 반영 + 업데이트 로그(승인 시트 없음)  →  넛지 배치 생성(best-of-n → judge)  →  푸시 스케줄</text>
+
+<text x="40" y="726" font-size="12" font-weight="600" fill="#0F6E56">평가</text>
+<text x="120" y="726" font-size="11.5" fill="#5F5E5A">eval(BKT-346): 충실도 · 핵심성 · 커버리지 + "위계 구조 품질" 채점 축.  실사용 오류 케이스는 프롬프트 보정(BKT-173)으로 회수.</text>
+</svg>
