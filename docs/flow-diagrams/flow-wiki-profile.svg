@@ -1,0 +1,52 @@
+<svg width="680" height="312" viewBox="0 0 680 312" xmlns="http://www.w3.org/2000/svg" font-family="Apple SD Gothic Neo, AppleSDGothicNeo, sans-serif">
+<rect x="0" y="0" width="680" height="312" fill="#ffffff"/>
+<defs>
+<marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#5F5E5A"/></marker>
+<marker id="arp" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#7F77DD"/></marker>
+</defs>
+<text x="40" y="22" font-size="15" font-weight="500" fill="#2C2C2A">프로필 구조 — 행동 → 데이터 → 저장·연관 (BKT-344)</text>
+<line x1="40" y1="30" x2="640" y2="30" stroke="#B4B2A9"/>
+<text x="111" y="62" font-size="12" font-weight="500" fill="#0F6E56" text-anchor="middle">유저 행동</text>
+<text x="320" y="62" font-size="12" font-weight="500" fill="#854F0B" text-anchor="middle">데이터 변환</text>
+<text x="547" y="62" font-size="12" font-weight="500" fill="#534AB7" text-anchor="middle">저장 &amp; 연관</text>
+
+<g><rect x="36" y="72" width="150" height="54" rx="6" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="111" y="95" font-size="13" font-weight="500" fill="#085041" text-anchor="middle">온보딩 입력/수정</text>
+<text x="111" y="113" font-size="11" fill="#0F6E56" text-anchor="middle">설문 (1-3 온보딩)</text></g>
+<g><rect x="202" y="72" width="236" height="54" rx="6" fill="#FAEEDA" stroke="#BA7517"/>
+<text x="320" y="95" font-size="12" font-weight="500" fill="#854F0B" text-anchor="middle">Profile: 직군 · 관심사 · 고민</text>
+<text x="320" y="113" font-size="11" fill="#854F0B" text-anchor="middle">원천 입력 (직접 단어)</text></g>
+<g><rect x="454" y="72" width="186" height="54" rx="6" fill="#EEEDFE" stroke="#534AB7"/>
+<text x="547" y="95" font-size="12" font-weight="500" fill="#3C3489" text-anchor="middle">users/{uid}/profile</text>
+<text x="547" y="113" font-size="11" fill="#534AB7" text-anchor="middle">로컬+클라우드</text></g>
+<path d="M186 99 L200 99" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M438 99 L452 99" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<g><rect x="36" y="132" width="150" height="54" rx="6" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="111" y="152" font-size="12" font-weight="500" fill="#085041" text-anchor="middle">interpretProfile</text>
+<text x="111" y="167" font-size="11" fill="#0F6E56" text-anchor="middle">LLM, 변경 시에만</text>
+<text x="111" y="180" font-size="11" fill="#0F6E56" text-anchor="middle">(안 바뀌면 skip)</text></g>
+<g><rect x="202" y="132" width="236" height="54" rx="6" fill="#FAEEDA" stroke="#BA7517"/>
+<text x="320" y="153" font-size="12" font-weight="500" fill="#854F0B" text-anchor="middle">derivedKeywords[]</text>
+<text x="320" y="169" font-size="11" fill="#854F0B" text-anchor="middle">{ keyword, axis, reasoning }</text>
+<text x="320" y="182" font-size="11" fill="#BA7517" text-anchor="middle">직접 용어 누출 방지(추상화)</text></g>
+<g><rect x="454" y="132" width="186" height="54" rx="6" fill="#EEEDFE" stroke="#534AB7"/>
+<text x="547" y="153" font-size="11" font-weight="500" fill="#3C3489" text-anchor="middle">profile.derivedKeywords</text>
+<text x="547" y="171" font-size="11" fill="#534AB7" text-anchor="middle">캐시 (재사용)</text></g>
+<path d="M186 159 L200 159" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M438 159 L452 159" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M464 126 L464 131" stroke="#7F77DD" stroke-width="1.5" marker-end="url(#arp)"/>
+<text x="470" y="131" font-size="10" fill="#534AB7">추상화</text>
+
+<g><rect x="36" y="192" width="150" height="44" rx="6" fill="#F1EFE8" stroke="#5F5E5A"/>
+<text x="111" y="219" font-size="12" font-weight="500" fill="#444441" text-anchor="middle">(소비) 넛지 생성</text></g>
+<g><rect x="202" y="192" width="236" height="44" rx="6" fill="#F1EFE8" stroke="#5F5E5A"/>
+<text x="320" y="219" font-size="11" font-weight="500" fill="#444441" text-anchor="middle">축별 키워드 → profile 각도 넛지</text></g>
+<g><rect x="454" y="192" width="186" height="44" rx="6" fill="#EEEDFE" stroke="#534AB7"/>
+<text x="547" y="219" font-size="12" font-weight="500" fill="#3C3489" text-anchor="middle">→ 4-3 넛지 입력</text></g>
+<path d="M186 214 L200 214" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M438 214 L452 214" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<text x="40" y="266" font-size="11" fill="#5F5E5A">핵심: 직군 단어를 그대로 쓰지 않고 사고패턴·정서·실무방식으로 추상화. 프로필 안 바뀌면 LLM 호출 skip(비용·일관성).</text>
+<text x="40" y="286" font-size="11" fill="#5F5E5A">연관: Profile → derivedKeywords → Nudge(4-3)의 개인화 입력. 품질은 eval B축(4-5)으로 채점.</text>
+</svg>
