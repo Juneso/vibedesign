@@ -8,6 +8,9 @@
 //           · 같은 메모 출신 개념쌍은 sim 문턱 무시하고 동의어 검사
 //           · 고아→고아 중첩 구멍 제거(테마 생성 경로로만 수직 이동)
 // 사용: runHierIngest({ book, memos, llm, embedFn, variant })  → { nodes, rootId, stats, log }
+//
+// ⚠ 구조도 동기화: 이 엔진의 단계·프롬프트·파라미터를 바꾸면 반드시
+//   eval/pipelines/hier-ingest-v7.json (eval 대시보드 왼쪽 구조도)도 같이 갱신할 것.
 
 const MAX_LEVEL = 3;
 
