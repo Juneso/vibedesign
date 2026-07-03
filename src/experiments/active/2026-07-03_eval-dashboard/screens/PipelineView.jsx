@@ -1,244 +1,113 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { VStack, HStack } from '@astryxdesign/core/Stack';
+import React, { useEffect, useState } from 'react';
+import { VStack } from '@astryxdesign/core/Stack';
 import { Text, Heading } from '@astryxdesign/core/Text';
-import { Banner } from '@astryxdesign/core/Banner';
 import { Spinner } from '@astryxdesign/core/Spinner';
 import { listPipelines } from '../lib/api.js';
 
-// 깔때기 수치 포맷: null은 '—'
-function fmtFunnel(funnel) {
-  if (!funnel) return null;
-  const inV = funnel.in == null ? '—' : String(funnel.in);
-  const outV = funnel.out == null ? '—' : String(funnel.out);
-  if (funnel.in == null && funnel.out == null) return null;
-  return `${inV} → ${outV}`;
-}
-
-// 단계의 대표 통과 수치: out 우선, 없으면 in
-function passValue(funnel) {
-  if (!funnel) return null;
-  if (funnel.out != null) return funnel.out;
-  if (funnel.in != null) return funnel.in;
-  return null;
-}
-
-// 노드 폭 스케일: 로그 스케일로 [min,max] 폭에 매핑. 값이 없으면 균일(최대폭).
-function widthScaler(stages) {
-  const vals = stages.map((s) => passValue(s.funnel)).filter((v) => v != null && v > 0);
-  const NODE_MIN = 120;
-  const NODE_MAX = 280;
-  if (vals.length === 0) {
-    return () => NODE_MAX; // funnel 전무 → 균일 폭
-  }
-  const logs = vals.map((v) => Math.log(v));
-  const lo = Math.min(...logs);
-  const hi = Math.max(...logs);
-  return (funnel) => {
-    const v = passValue(funnel);
-    if (v == null || v <= 0) return NODE_MAX;
-    if (hi === lo) return NODE_MAX;
-    const t = (Math.log(v) - lo) / (hi - lo);
-    return NODE_MIN + t * (NODE_MAX - NODE_MIN);
-  };
-}
-
-function ellipsize(str, n) {
-  if (!str) return '';
-  return str.length > n ? str.slice(0, n - 1) + '…' : str;
-}
-
-// ── SVG 구조도 ─────────────────────────────────────────────────
-function PipelineDiagram({ stages, selectedIndex, onSelect }) {
-  const VIEW_W = 320;
-  const NODE_H = 56;
-  const V_GAP = 52; // 노드 간 세로 간격(연결선 + 전이 라벨 공간)
-  const PAD_TOP = 16;
-  const scale = useMemo(() => widthScaler(stages), [stages]);
-
-  const rows = stages.map((s, i) => {
-    const w = scale(s.funnel);
-    const y = PAD_TOP + i * (NODE_H + V_GAP);
-    const x = (VIEW_W - w) / 2;
-    return { stage: s, index: i, w, x, y };
-  });
-
-  const VIEW_H = PAD_TOP * 2 + stages.length * NODE_H + (stages.length - 1) * V_GAP;
-
-  return (
-    <svg
-      className="pl-diagram"
-      role="img"
-      viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
-      preserveAspectRatio="xMidYMin meet"
-    >
-      <title>파이프라인 단계 흐름 구조도 — 노드 폭은 통과 수치에 비례</title>
-      <defs>
-        <marker id="pl-arrow" viewBox="0 0 10 10" refX="8" refY="5"
-          markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-          <path d="M0,0 L10,5 L0,10 z" fill="var(--color-border)" />
-        </marker>
-      </defs>
-
-      {/* 연결선 + 전이 라벨 */}
-      {rows.slice(0, -1).map((r, i) => {
-        const next = rows[i + 1];
-        const x = VIEW_W / 2;
-        const y1 = r.y + NODE_H;
-        const y2 = next.y;
-        const funnel = fmtFunnel(next.stage.funnel);
-        return (
-          <g key={`edge-${i}`}>
-            <line
-              x1={x} y1={y1} x2={x} y2={y2 - 2}
-              stroke="var(--color-border)" strokeWidth="1.5"
-              markerEnd="url(#pl-arrow)"
-            />
-            {funnel && (
-              <text
-                x={x + 8} y={(y1 + y2) / 2 + 4}
-                fontSize="11" fill="var(--color-text-secondary)"
-              >
-                {funnel}
-              </text>
-            )}
-          </g>
-        );
-      })}
-
-      {/* 노드 */}
-      {rows.map((r) => {
-        const isSel = r.index === selectedIndex;
-        const pass = passValue(r.stage.funnel);
-        return (
-          <g
-            key={r.stage.id || r.index}
-            className="pl-node"
-            onClick={() => onSelect(r.index)}
-            style={{ cursor: 'pointer' }}
-          >
-            <rect
-              x={r.x} y={r.y} width={r.w} height={NODE_H} rx="10"
-              fill="var(--color-background-card)"
-              stroke={isSel ? 'var(--color-accent)' : 'var(--color-border)'}
-              strokeWidth={isSel ? 2 : 1}
-            />
-            <text
-              x={r.x + 12} y={r.y + 22}
-              fontSize="11" fill="var(--color-text-secondary)"
-            >
-              {r.index + 1}단계
-            </text>
-            <text
-              x={r.x + 12} y={r.y + 40}
-              fontSize="13" fontWeight="600" fill="var(--color-text-primary)"
-            >
-              {ellipsize(r.stage.name, Math.max(6, Math.floor(r.w / 12)))}
-            </text>
-            {pass != null && (
-              <g>
-                <rect
-                  x={r.x + r.w - 46} y={r.y + 10} width="36" height="18" rx="9"
-                  fill="var(--color-accent-muted)"
-                />
-                <text
-                  x={r.x + r.w - 28} y={r.y + 23}
-                  fontSize="10" textAnchor="middle" fill="var(--color-text-accent)"
-                >
-                  {pass}
-                </text>
-              </g>
-            )}
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
-
-// ── 파라미터 테이블 (name · value · meaning · effect) ──────────
-function ParamTable({ params }) {
+// ── 파라미터: 처리 노드에 붙은 작은 노드. 클릭하면 의미·effect 펼침 ──
+function ParamChips({ params }) {
+  const [openIdx, setOpenIdx] = useState(null);
   if (!Array.isArray(params) || params.length === 0) return null;
+  const open = openIdx != null ? params[openIdx] : null;
   return (
-    <div className="pl-param-table-wrap">
-      <table className="pl-param-table">
-        <thead>
-          <tr>
-            <th>파라미터</th>
-            <th>값</th>
-            <th>의미</th>
-            <th>바꾸면</th>
-          </tr>
-        </thead>
-        <tbody>
-          {params.map((p, i) => (
-            <tr key={i}>
-              <td><code>{p.name}</code></td>
-              <td><code>{String(p.value)}</code></td>
-              <td>{p.meaning}</td>
-              <td>{p.effect}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div>
+      <div className="pl-params">
+        {params.map((p, i) => (
+          <button
+            key={i}
+            type="button"
+            className={`pl-param-chip${openIdx === i ? ' is-open' : ''}`}
+            onClick={() => setOpenIdx((cur) => (cur === i ? null : i))}
+          >
+            <code>{p.name}</code>
+            <span>= {String(p.value)}</span>
+          </button>
+        ))}
+      </div>
+      {open && (
+        <div className="pl-param-detail">
+          <span><span className="k">의미</span>{open.meaning}</span>
+          <span><span className="k">바꾸면</span>{open.effect}</span>
+        </div>
+      )}
     </div>
   );
 }
 
-// ── 선택된 단계 상세 (항상 펼쳐진 패널) ─────────────────────────
-function StageDetail({ stage, index }) {
-  if (!stage) return null;
+// 입력/출력 포트: 수치가 있으면 큰 숫자, 없으면 짧은 텍스트
+function Port({ cap, num, text }) {
   return (
-    <VStack gap={3}>
-      <HStack gap={2} vAlign="center">
-        <span className="pl-stage-num">{index + 1}</span>
-        <Heading level={3}>{stage.name}</Heading>
-      </HStack>
-
-      {stage.why && (
-        <div className="pl-why">
-          <Text type="label" weight="semibold" color="accent">왜 이 단계가 있는가</Text>
-          <Text>{stage.why}</Text>
-        </div>
-      )}
-
-      {stage.how && (
-        <VStack gap={0.5}>
-          <Text type="supporting" weight="semibold">어떻게 (how)</Text>
-          <Text type="supporting">{stage.how}</Text>
-        </VStack>
-      )}
-
-      <ParamTable params={stage.params} />
-
-      {stage.prompt && (
-        <details className="pl-prompt">
-          <summary>프롬프트 전문 보기</summary>
-          <pre className="pl-prompt-pre">{stage.prompt}</pre>
-        </details>
-      )}
-
-      {stage.output && (
-        <VStack gap={0.5}>
-          <Text type="supporting" weight="semibold">출력</Text>
-          <Text type="supporting">{stage.output}</Text>
-        </VStack>
-      )}
-    </VStack>
+    <div className="pl-port">
+      <span className="pl-port-cap">{cap}</span>
+      {num != null
+        ? <span className="pl-port-num">{num}</span>
+        : <span className="pl-port-text">{text}</span>}
+    </div>
   );
 }
 
-// ── 단일 파이프라인 상세 ───────────────────────────────────────
+// ── 한 단계 = 내부(입력→처리→출력)를 펼친 패널 ──
+function StagePanel({ stage, index, isFirst }) {
+  const f = stage.funnel || {};
+  const inNum = f.in != null ? f.in : null;
+  const outNum = f.out != null ? f.out : null;
+  const dropped = (inNum != null && outNum != null && inNum > outNum) ? inNum - outNum : null;
+
+  return (
+    <div className="pl-stage">
+      <div className="pl-stage-top">
+        <span className="pl-stage-num">{index + 1}</span>
+        <span className="pl-stage-title">{stage.name}</span>
+        {outNum != null && <span className="pl-stage-badge">{outNum}개 통과</span>}
+      </div>
+
+      {stage.why && (
+        <p className="pl-stage-why"><b>왜 </b>{stage.why}</p>
+      )}
+
+      <div className="pl-flow">
+        <Port cap="입력" num={inNum} text={isFirst ? '원천 메모' : '이전 출력'} />
+        <span className="pl-flow-arrow">▶</span>
+        <div className="pl-op">
+          {stage.how && <div className="pl-op-how">{stage.how}</div>}
+          <ParamChips params={stage.params} />
+          {dropped != null && (
+            <div className="pl-op-drop">→ {inNum}개 중 {dropped}개 탈락, {outNum}개 통과</div>
+          )}
+          {stage.prompt && (
+            <details className="pl-prompt">
+              <summary>이 단계의 프롬프트 전문 보기</summary>
+              <pre className="pl-prompt-pre">{stage.prompt}</pre>
+            </details>
+          )}
+        </div>
+        <span className="pl-flow-arrow">▶</span>
+        <Port cap="출력" num={outNum} text="산출물" />
+      </div>
+
+      {stage.output && (
+        <p className="pl-stage-out"><b>출력물 </b>{stage.output}</p>
+      )}
+    </div>
+  );
+}
+
+// 단계 사이 연결선: 흘러가는 수량(이전 단계 출력) 표시
+function Connector({ flow }) {
+  return (
+    <div className="pl-connector">
+      <span className="pl-connector-line" />
+      <span className="pl-connector-arrow">▼</span>
+      {flow != null && <span className="pl-connector-label">{flow}개 전달</span>}
+    </div>
+  );
+}
+
 function PipelineDetail({ pipeline }) {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-
-  useEffect(() => { setSelectedIndex(0); }, [pipeline.file]);
-
   if (pipeline.error) {
     return <Text color="accent">파이프라인 파싱 오류: {pipeline.error}</Text>;
   }
-
   const stages = pipeline.stages || [];
-  const selected = stages[selectedIndex];
 
   return (
     <VStack gap={4}>
@@ -262,31 +131,28 @@ function PipelineDetail({ pipeline }) {
         )}
       </VStack>
 
-      {/* 본문 2열: SVG 구조도 + 선택 단계 상세 */}
-      <div className="pl-body">
-        <div className="pl-diagram-col">
-          <Text type="supporting" weight="semibold">단계 흐름</Text>
-          {stages.length > 0 && (
-            <PipelineDiagram
-              stages={stages}
-              selectedIndex={selectedIndex}
-              onSelect={setSelectedIndex}
-            />
-          )}
-        </div>
-        <div className="pl-detail-col">
-          <StageDetail stage={selected} index={selectedIndex} />
-        </div>
+      {/* 상세 구조도: 각 단계 내부를 펼침 */}
+      <div className="pl-stages">
+        {stages.map((s, i) => (
+          <React.Fragment key={s.id || i}>
+            <StagePanel stage={s} index={i} isFirst={i === 0} />
+            {i < stages.length - 1 && (
+              <Connector flow={s.funnel?.out != null ? s.funnel.out : null} />
+            )}
+          </React.Fragment>
+        ))}
       </div>
 
-      {/* 알려진 한계 */}
+      {/* 알려진 한계 — 노란 배경 없이 중립 리스트 */}
       {Array.isArray(pipeline.knownIssues) && pipeline.knownIssues.length > 0 && (
-        <VStack gap={2}>
-          <Heading level={3}>알려진 한계</Heading>
-          {pipeline.knownIssues.map((issue, i) => (
-            <Banner key={i} status="warning" title={`한계 ${i + 1}`} description={issue} />
-          ))}
-        </VStack>
+        <div className="pl-issues">
+          <p className="pl-issues-title">알려진 한계</p>
+          <ul>
+            {pipeline.knownIssues.map((issue, i) => (
+              <li key={i}>{issue}</li>
+            ))}
+          </ul>
+        </div>
       )}
     </VStack>
   );
