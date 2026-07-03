@@ -9,6 +9,14 @@ import { TextInput } from '@astryxdesign/core/TextInput';
 import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
 import { Spinner } from '@astryxdesign/core/Spinner';
 import { listRuns, getRun, getLabels, saveLabels } from '../lib/api.js';
+import { SERIES_META, seriesTitle, iterationLabel } from '../lib/seriesMeta.js';
+
+// mtime → 'M월 D일'
+function fmtMonthDay(mtimeMs) {
+  if (!mtimeMs) return null;
+  const d = new Date(mtimeMs);
+  return `${d.getMonth() + 1}월 ${d.getDate()}일`;
+}
 
 const CONNECTIONS_SERIES = 'connections-qf';
 
@@ -70,7 +78,12 @@ function RunList({ runs, selected, onSelect }) {
           <div key={series} className="eval-runlist-group">
             <button className="eval-series-toggle" onClick={() => toggle(series)}>
               <span>{isOpen ? '▾' : '▸'}</span>
-              <span>{series}</span>
+              <span className="eval-series-title">
+                {seriesTitle(series)}
+                {SERIES_META[series]?.purpose && (
+                  <span className="eval-series-purpose">{SERIES_META[series].purpose}</span>
+                )}
+              </span>
               <Badge variant="neutral" label={String(items.length)} />
             </button>
             {isOpen && items.map((r) => (
@@ -79,7 +92,10 @@ function RunList({ runs, selected, onSelect }) {
                 className={`eval-run-item${selected === r.file ? ' is-active' : ''}`}
                 onClick={() => onSelect(r)}
               >
-                <span>{r.file}</span>
+                <span>{iterationLabel(r.file)}</span>
+                {fmtMonthDay(r.mtimeMs) && (
+                  <span className="eval-run-date">{fmtMonthDay(r.mtimeMs)}</span>
+                )}
               </button>
             ))}
           </div>
@@ -151,7 +167,7 @@ function CandidateCard({ item, runFile, label, onChange }) {
   );
 }
 
-function ConnectionsDetail({ runFile, json, labels, setLabels, onSave, saving, savedAt }) {
+function ConnectionsDetail({ runFile, series, json, labels, setLabels, onSave, saving, savedAt }) {
   const kept = json.kept || [];
   const dropped = json.dropped || [];
 
@@ -165,7 +181,7 @@ function ConnectionsDetail({ runFile, json, labels, setLabels, onSave, saving, s
   return (
     <VStack gap={3}>
       <HStack gap={2} vAlign="center" hAlign="between">
-        <Heading level={2}>{runFile}</Heading>
+        <Heading level={2}>{seriesTitle(series)} · {iterationLabel(runFile)}</Heading>
         <HStack gap={2} vAlign="center">
           {savedAt && <Text type="supporting">저장됨 {savedAt}</Text>}
           <Button label="저장" variant="primary" isLoading={saving} onClick={onSave} />
@@ -213,10 +229,10 @@ function ConnectionsDetail({ runFile, json, labels, setLabels, onSave, saving, s
 }
 
 // ── 제네릭 뷰 (md 우선, 없으면 JSON pretty) ──────────────────
-function GenericDetail({ runFile, json, md }) {
+function GenericDetail({ runFile, series, json, md }) {
   return (
     <VStack gap={2}>
-      <Heading level={2}>{runFile}</Heading>
+      <Heading level={2}>{seriesTitle(series)} · {iterationLabel(runFile)}</Heading>
       <pre className="eval-md-pre">{md != null ? md : JSON.stringify(json, null, 2)}</pre>
     </VStack>
   );
@@ -295,6 +311,7 @@ export default function RunBrowser() {
             ? (labelsLoaded
                 ? <ConnectionsDetail
                     runFile={selected.file}
+                    series={series}
                     json={runData.json}
                     labels={labels}
                     setLabels={setLabels}
@@ -303,7 +320,7 @@ export default function RunBrowser() {
                     savedAt={savedAt}
                   />
                 : <Spinner />)
-            : <GenericDetail runFile={selected.file} json={runData.json} md={runData.md} />
+            : <GenericDetail runFile={selected.file} series={series} json={runData.json} md={runData.md} />
         )}
       </main>
     </div>
