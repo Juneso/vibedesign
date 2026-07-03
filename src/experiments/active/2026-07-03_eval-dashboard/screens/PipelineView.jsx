@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { VStack } from '@astryxdesign/core/Stack';
 import { Text, Heading } from '@astryxdesign/core/Text';
-import { Spinner } from '@astryxdesign/core/Spinner';
-import { listPipelines } from '../lib/api.js';
 
 // ── 파라미터: 처리 노드에 붙은 작은 노드. 클릭하면 의미·effect 펼침 ──
 function ParamChips({ params }) {
@@ -263,7 +261,7 @@ function DiagramView({ pipeline }) {
   );
 }
 
-function PipelineDetail({ pipeline }) {
+export function PipelineDetail({ pipeline }) {
   if (pipeline.error) {
     return <Text color="accent">파이프라인 파싱 오류: {pipeline.error}</Text>;
   }
@@ -319,54 +317,5 @@ function PipelineDetail({ pipeline }) {
         </div>
       )}
     </VStack>
-  );
-}
-
-export default function PipelineView() {
-  const [pipelines, setPipelines] = useState([]);
-  const [error, setError] = useState(null);
-  const [loaded, setLoaded] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
-
-  useEffect(() => {
-    listPipelines()
-      .then((data) => {
-        setPipelines(data);
-        if (data.length > 0) setSelectedId(data[0].file);
-      })
-      .catch((e) => setError(String(e.message || e)))
-      .finally(() => setLoaded(true));
-  }, []);
-
-  const selected = pipelines.find((p) => p.file === selectedId);
-
-  return (
-    <div className="pl-shell">
-      <aside className="eval-sidebar">
-        <VStack gap={2}>
-          <Heading level={3}>파이프라인</Heading>
-          {error && <Text type="supporting" color="accent">{error} (dev 서버에서만 동작)</Text>}
-          <VStack gap={0.5}>
-            {pipelines.map((p) => (
-              <button
-                key={p.file}
-                className={`eval-run-item${selectedId === p.file ? ' is-active' : ''}`}
-                onClick={() => setSelectedId(p.file)}
-              >
-                <span>{p.title || p.file}</span>
-              </button>
-            ))}
-          </VStack>
-        </VStack>
-      </aside>
-
-      <main className="eval-detail">
-        {!loaded && <Spinner />}
-        {loaded && !error && pipelines.length === 0 && (
-          <Text type="supporting">등록된 파이프라인이 없습니다.</Text>
-        )}
-        {selected && <PipelineDetail pipeline={selected} />}
-      </main>
-    </div>
   );
 }

@@ -7,8 +7,7 @@ import { Badge } from '@astryxdesign/core/Badge';
 import { TextArea } from '@astryxdesign/core/TextArea';
 import { TextInput } from '@astryxdesign/core/TextInput';
 import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
-import { Spinner } from '@astryxdesign/core/Spinner';
-import { listRuns, getRun, getLabels, saveLabels } from '../lib/api.js';
+import { getLabels } from '../lib/api.js';
 import { SERIES_META, seriesTitle, iterationLabel } from '../lib/seriesMeta.js';
 
 // mtime → 'M월 D일'
@@ -18,7 +17,7 @@ function fmtMonthDay(mtimeMs) {
   return `${d.getMonth() + 1}월 ${d.getDate()}일`;
 }
 
-const CONNECTIONS_SERIES = 'connections-qf';
+export const CONNECTIONS_SERIES = 'connections-qf';
 
 // 후보 카드의 안정적 key: canonical|memberUnits.join('-')
 function candKey(item) {
@@ -26,7 +25,7 @@ function candKey(item) {
   return `${item.canonical || ''}|${units}`;
 }
 
-function useLabelMap(series) {
+export function useLabelMap(series) {
   const [labels, setLabels] = useState({}); // key -> {verdict, comment, questionFix}
   const [loaded, setLoaded] = useState(false);
 
@@ -49,7 +48,7 @@ function useLabelMap(series) {
 }
 
 // ── 좌측: 시리즈 그룹 런 목록 ────────────────────────────────
-function RunList({ runs, selected, onSelect }) {
+export function RunList({ runs, selected, onSelect }) {
   const groups = useMemo(() => {
     const m = new Map();
     runs.forEach((r) => {
@@ -167,7 +166,7 @@ function CandidateCard({ item, runFile, label, onChange }) {
   );
 }
 
-function ConnectionsDetail({ runFile, series, json, labels, setLabels, onSave, saving, savedAt }) {
+export function ConnectionsDetail({ runFile, series, json, labels, setLabels, onSave, saving, savedAt }) {
   const kept = json.kept || [];
   const dropped = json.dropped || [];
 
@@ -229,100 +228,11 @@ function ConnectionsDetail({ runFile, series, json, labels, setLabels, onSave, s
 }
 
 // ── 제네릭 뷰 (md 우선, 없으면 JSON pretty) ──────────────────
-function GenericDetail({ runFile, series, json, md }) {
+export function GenericDetail({ runFile, series, json, md }) {
   return (
     <VStack gap={2}>
       <Heading level={2}>{seriesTitle(series)} · {iterationLabel(runFile)}</Heading>
       <pre className="eval-md-pre">{md != null ? md : JSON.stringify(json, null, 2)}</pre>
     </VStack>
-  );
-}
-
-export default function RunBrowser() {
-  const [runs, setRuns] = useState([]);
-  const [runsError, setRunsError] = useState(null);
-  const [selected, setSelected] = useState(null); // {file, series}
-  const [runData, setRunData] = useState(null); // {json, md}
-  const [loadingRun, setLoadingRun] = useState(false);
-
-  useEffect(() => {
-    listRuns().then(setRuns).catch((e) => setRunsError(String(e.message || e)));
-  }, []);
-
-  const series = selected?.series || '';
-  const isConnections = series === CONNECTIONS_SERIES;
-  const [labels, setLabels, labelsLoaded] = useLabelMap(series || '_none');
-
-  const [saving, setSaving] = useState(false);
-  const [savedAt, setSavedAt] = useState(null);
-
-  useEffect(() => {
-    if (!selected) return;
-    setLoadingRun(true);
-    setRunData(null);
-    getRun(selected.file)
-      .then(setRunData)
-      .catch((e) => setRunData({ error: String(e.message || e) }))
-      .finally(() => setLoadingRun(false));
-  }, [selected]);
-
-  const onSave = useCallback(async () => {
-    if (!selected) return;
-    setSaving(true);
-    const body = {
-      series: selected.series,
-      updatedAt: new Date().toISOString(),
-      labels: Object.values(labels).map((l) => ({
-        runFile: l.runFile || selected.file,
-        key: l.key,
-        verdict: l.verdict || '',
-        comment: l.comment || '',
-        questionFix: l.questionFix || '',
-      })),
-    };
-    try {
-      await saveLabels(selected.series, body);
-      setSavedAt(new Date().toLocaleTimeString('ko-KR'));
-    } catch (e) {
-      setSavedAt(`저장 실패: ${e.message || e}`);
-    } finally {
-      setSaving(false);
-    }
-  }, [selected, labels]);
-
-  return (
-    <div className="eval-shell">
-      <aside className="eval-sidebar">
-        <VStack gap={2}>
-          <Heading level={3}>Eval 런</Heading>
-          {runsError && <Text type="supporting" color="accent">{runsError} (dev 서버에서만 동작)</Text>}
-          <RunList runs={runs} selected={selected?.file} onSelect={setSelected} />
-        </VStack>
-      </aside>
-
-      <main className="eval-detail">
-        {!selected && <Text type="supporting">좌측에서 런을 선택하세요.</Text>}
-        {selected && (loadingRun || !runData) && <Spinner />}
-        {selected && runData?.error && (
-          <Text color="accent">{runData.error}</Text>
-        )}
-        {selected && runData && !runData.error && (
-          isConnections
-            ? (labelsLoaded
-                ? <ConnectionsDetail
-                    runFile={selected.file}
-                    series={series}
-                    json={runData.json}
-                    labels={labels}
-                    setLabels={setLabels}
-                    onSave={onSave}
-                    saving={saving}
-                    savedAt={savedAt}
-                  />
-                : <Spinner />)
-            : <GenericDetail runFile={selected.file} series={series} json={runData.json} md={runData.md} />
-        )}
-      </main>
-    </div>
   );
 }
