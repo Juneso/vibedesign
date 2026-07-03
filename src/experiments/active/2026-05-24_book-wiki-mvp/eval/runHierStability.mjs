@@ -9,7 +9,7 @@
 //  - 깊이 분포·op 카운트(merge/child/parent/attach/flip).
 // 출력: eval/runs/hier-stability-{variant}.md + 개별 트리 JSON
 
-import { writeFile, mkdir } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { openaiNodeTransport, loadDotEnvLocal } from './lib/transport.mjs';
@@ -81,18 +81,63 @@ const RUNS = [
 ];
 
 // ─── 실행 ──────────────────────────────────────────────────────
-const outDir = resolve(__dir, 'runs/hier-stability');
-await mkdir(outDir, { recursive: true });
+// 대시보드 연동: runs/ 평면에 hier-stability-{variant}-{n}.json + 같은 이름 .md 를 run마다 즉시 기록.
+// (eval-dashboard 가 runs/*.json 을 시리즈로 묶고 짝 .md 를 본문으로 렌더링)
+const runsDir = resolve(__dir, 'runs');
+function renderTreeText(tree) {
+  const byId = new Map(tree.nodes.map((n) => [n.id, n]));
+  const kids = (pid) => tree.nodes.filter((n) => n.parentId === pid);
+  const lines = [];
+  (function walk(id, d) {
+    const n = byId.get(id);
+    lines.push(`${'  '.repeat(d)}${n.kind === 'root' ? '■' : '•'} ${n.title}${n.sources?.length ? ' ·p' + n.sources.join(',p') : ''}`);
+    kids(id).forEach((k) => walk(k.id, d + 1));
+  })(tree.rootId, 0);
+  return lines.join('\n');
+}
+function runMd(r, idx) {
+  const s = r.stats;
+  const themes = [];
+  for (let i = 0; i < r.log.length; i++) {
+    if (r.log[i].startsWith('[theme]')) themes.push(`- ${r.log[i].replace('[theme] ', '')}${r.log[i + 1]?.startsWith('[theme.desc]') ? `\n  ${r.log[i + 1].replace('[theme.desc]   ↳ ', '— ')}` : ''}`);
+    if (r.log[i].startsWith('[theme✗]')) themes.push(`- (기각) ${r.log[i].replace('[theme✗] ', '')}`);
+  }
+  return `# 위계 셔플 안정성 · ${variant} · ${r.name} (${idx}회차)
+
+> 모델 ${MODEL} · 메모 순서: [${r.memos.map((m) => m.p).join(', ')}] · ${r.secs}s
+> 개념 ${s.conceptCount} · 최대 깊이 L${s.maxDepth} · merge ${s.merge}+${s.mergeGlobal} · child ${s.child} · parent ${s.parent} · attach ${s.attach}${variant !== 'v5' ? ` · flip ${s.flip}` : ''}${variant === 'v7' ? ` · theme ${s.theme}(기각 ${s.themeRejected})` : ''}
+
+## 트리
+
+\`\`\`
+${renderTreeText(r.tree)}
+\`\`\`
+${themes.length ? `\n## 테마 (anchor + description)\n\n${themes.join('\n')}\n` : ''}
+## 로그
+
+\`\`\`
+${r.log.join('\n')}
+\`\`\`
+
+> 시리즈 종합(3-run 안정성 지표): runs/hier-stability-${variant}.md
+`;
+}
+
 const results = [];
+let runIdx = 0;
 for (const run of RUNS) {
+  runIdx++;
   console.log(`\n━━━ ${variant} · ${run.name} · 순서: [${run.memos.map((m) => m.p).join(',')}] ━━━`);
   const t0 = Date.now();
   const r = await runHierIngest({ book, memos: run.memos, llm, embedFn, variant, onProgress: (msg) => process.stdout.write(`  ${msg}\r`) });
   const secs = ((Date.now() - t0) / 1000).toFixed(0);
   const rel = memoPairRelations(r.nodes, r.rootId);
-  results.push({ ...run, stats: r.stats, rel, tree: serializeTree(r.nodes, r.rootId), log: r.log, secs });
+  const result = { ...run, stats: r.stats, rel, tree: serializeTree(r.nodes, r.rootId), log: r.log, secs };
+  results.push(result);
   console.log(`\n  개념 ${r.stats.conceptCount} · L${r.stats.maxDepth} · merge ${r.stats.merge}+${r.stats.mergeGlobal} child ${r.stats.child} parent ${r.stats.parent} attach ${r.stats.attach} cluster ${r.stats.cluster}${variant !== 'v5' ? ` flip ${r.stats.flip}` : ''}${variant === 'v7' ? ` theme ${r.stats.theme}(-${r.stats.themeRejected})` : ''} · ${secs}s`);
-  await writeFile(resolve(outDir, `${variant}-${run.name}.json`), JSON.stringify({ stats: r.stats, tree: results.at(-1).tree, rel, log: r.log }, null, 1));
+  const base = `hier-stability-${variant}-${runIdx}`;
+  await writeFile(resolve(runsDir, `${base}.json`), JSON.stringify({ run: run.name, order: run.memos.map((m) => m.p), stats: r.stats, tree: result.tree, rel, log: r.log }, null, 1));
+  await writeFile(resolve(runsDir, `${base}.md`), runMd(result, runIdx));
 }
 
 // ─── 안정성 계산 ───────────────────────────────────────────────
