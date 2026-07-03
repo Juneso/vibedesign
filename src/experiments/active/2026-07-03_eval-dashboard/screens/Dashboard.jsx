@@ -31,11 +31,16 @@ function RunResults({ runs, statusMap }) {
   );
 }
 
+// 셸 사이드바가 URL ?pipeline=<file|__misc__> 로 선택을 구동할 때의 값.
+// 값이 있으면 대시보드 내부 파이프라인 선택 컬럼을 숨기고 이 파이프라인을 고정한다.
+const URL_PIPELINE = new URLSearchParams(typeof location !== 'undefined' ? location.search : '').get('pipeline');
+
 export default function Dashboard() {
   const [pipelines, setPipelines] = useState([]);
   const [plError, setPlError] = useState(null);
   const [plLoaded, setPlLoaded] = useState(false);
   const [activeId, setActiveId] = useState(null); // pipeline.file 또는 MISC_ID
+  const drivenByUrl = URL_PIPELINE != null && URL_PIPELINE !== '';
 
   const [runs, setRuns] = useState([]);
   const [runsError, setRunsError] = useState(null);
@@ -49,8 +54,18 @@ export default function Dashboard() {
     listPipelines()
       .then((data) => {
         setPipelines(data);
-        if (data.length > 0) setActiveId(data[0].id ?? data[0].file);
-        else setActiveId(MISC_ID);
+        if (drivenByUrl) {
+          if (URL_PIPELINE === MISC_ID) {
+            setActiveId(MISC_ID);
+          } else {
+            const match = data.find((p) => p.file === URL_PIPELINE);
+            setActiveId(match ? (match.id ?? match.file) : MISC_ID);
+          }
+        } else if (data.length > 0) {
+          setActiveId(data[0].id ?? data[0].file);
+        } else {
+          setActiveId(MISC_ID);
+        }
       })
       .catch((e) => setPlError(String(e.message || e)))
       .finally(() => setPlLoaded(true));
@@ -78,7 +93,7 @@ export default function Dashboard() {
       {/* 좌측: 파이프라인 선택 + 구조도 */}
       <section className="eval-split-col eval-pipeline-col">
         <VStack gap={3}>
-          <VStack gap={1}>
+          {!drivenByUrl && <VStack gap={1}>
             <Heading level={3}>파이프라인</Heading>
             {plError && <Text type="supporting" color="accent">{plError} (dev 서버에서만 동작)</Text>}
             <div className="eval-pl-chips">
@@ -103,7 +118,7 @@ export default function Dashboard() {
                 기타 eval
               </button>
             </div>
-          </VStack>
+          </VStack>}
 
           {!plLoaded && <Spinner />}
           {isMisc && (

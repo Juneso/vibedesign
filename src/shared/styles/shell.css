@@ -52,6 +52,34 @@
   letter-spacing: -0.2px;
 }
 
+/* ---- Canvas / Logic 모드 세그먼트 토글 ---- */
+.lab-mode-toggle {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--shell-elevated);
+  border: 1px solid var(--shell-border);
+  border-radius: var(--shell-radius-sm);
+}
+.lab-mode-btn {
+  flex: 1 1 auto;
+  padding: 4px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--shell-fg-muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+.lab-mode-btn:hover { color: var(--shell-fg); }
+.lab-mode-btn.active {
+  background: var(--shell-accent);
+  color: var(--shell-fg);
+}
+
 .lab-nav {
   flex: 1;
   display: flex;
@@ -1422,4 +1450,52 @@ body[data-theme="dark"] .lab-theme-switch__icon--moon { display: block; }
   background-size: 6px 6px;
   background-position: 0 0, 0 3px;
 }
+
+/* ===================================================================
+   LOGIC 모드 — eval 대시보드(라이트) 톤에 맞춘 사이드바 + 인스펙터 숨김
+   =================================================================== */
+.lab-layout.mode-logic .lab-inspector { display: none; }
+
+.lab-layout.mode-logic .lab-sidebar {
+  background: #f1f4f7;
+  border-right: 1px solid #dfe4ea;
+}
+.lab-layout.mode-logic .lab-sidebar-header,
+.lab-layout.mode-logic .lab-sidebar-footer {
+  border-color: #dfe4ea;
+}
+
+.lab-layout.mode-logic .lab-mode-toggle {
+  background: #e6ebf1;
+  border-color: #dfe4ea;
+}
+.lab-layout.mode-logic .lab-mode-btn { color: #5b6673; }
+.lab-layout.mode-logic .lab-mode-btn:hover { color: #0a1317; }
+.lab-layout.mode-logic .lab-mode-btn.active {
+  background: #ffffff;
+  color: #0a1317;
+}
+
+.lab-layout.mode-logic .nav-section-title { color: #8a95a1; }
+
+.lab-layout.mode-logic .lab-nav-item { color: #4a5560; }
+.lab-layout.mode-logic .lab-nav-item:hover {
+  background: #e6ebf1;
+  color: #0a1317;
+}
+.lab-layout.mode-logic .lab-nav-item.active {
+  background: #e2e8f0;
+  color: #0a1317;
+}
+
+.lab-layout.mode-logic .theme-toggle-btn {
+  color: #4a5560;
+  border-color: #dfe4ea;
+}
+.lab-layout.mode-logic .theme-toggle-btn:hover {
+  background: #e6ebf1;
+  color: #0a1317;
+  border-color: #ccd3db;
+}
+.lab-layout.mode-logic .lab-version { color: #8a95a1; }
 
