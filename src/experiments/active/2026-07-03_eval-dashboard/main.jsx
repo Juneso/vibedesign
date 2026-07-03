@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
 import RunBrowser from './screens/RunBrowser.jsx';
+import PipelineView from './screens/PipelineView.jsx';
 import './style.css';
 
 class ErrorBoundary extends React.Component {
@@ -18,8 +20,25 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+function App() {
+  const [tab, setTab] = useState('runs');
+  return (
+    <div className="eval-app">
+      <div className="eval-tabbar">
+        <SegmentedControl label="화면" isLabelHidden size="sm" value={tab} onChange={setTab}>
+          <SegmentedControlItem value="runs" label="런 결과" />
+          <SegmentedControlItem value="pipeline" label="파이프라인" />
+        </SegmentedControl>
+      </div>
+      <div className="eval-tabpanel">
+        {tab === 'runs' ? <RunBrowser /> : <PipelineView />}
+      </div>
+    </div>
+  );
+}
+
 createRoot(document.getElementById('app-root')).render(
   <ErrorBoundary>
-    <RunBrowser />
+    <App />
   </ErrorBoundary>
 );

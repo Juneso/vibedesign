@@ -15,6 +15,10 @@ export function getRun(file) {
   return get(`/runs/${encodeURIComponent(file)}`);
 }
 
+export function listPipelines() {
+  return get('/pipelines');
+}
+
 export function getLabels(series) {
   return get(`/labels/${encodeURIComponent(series)}`);
 }

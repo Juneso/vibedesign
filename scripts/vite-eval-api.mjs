@@ -9,6 +9,7 @@ const REPO_ROOT = resolve(__dirname, '..');
 const EVAL_DIR = resolve(REPO_ROOT, 'src/experiments/active/2026-05-24_book-wiki-mvp/eval');
 const RUNS_DIR = join(EVAL_DIR, 'runs');
 const LABELS_DIR = join(EVAL_DIR, 'labels');
+const PIPELINES_DIR = join(EVAL_DIR, 'pipelines');
 
 // 파일명에서 숫자 접미(-1, -12 등) 제거 → 시리즈명
 function seriesOf(fileName) {
@@ -57,6 +58,23 @@ export function evalApiPlugin() {
               })
               .sort((a, b) => b.mtimeMs - a.mtimeMs);
             return sendJson(res, 200, runs);
+          }
+
+          // GET /api/eval/pipelines
+          if (req.method === 'GET' && url === '/api/eval/pipelines') {
+            if (!existsSync(PIPELINES_DIR)) return sendJson(res, 200, []);
+            const pipelines = readdirSync(PIPELINES_DIR)
+              .filter((f) => f.endsWith('.json'))
+              .sort()
+              .map((f) => {
+                try {
+                  const content = JSON.parse(readFileSync(join(PIPELINES_DIR, f), 'utf8'));
+                  return { file: f, ...content };
+                } catch (e) {
+                  return { file: f, error: String(e?.message || e) };
+                }
+              });
+            return sendJson(res, 200, pipelines);
           }
 
           // GET /api/eval/runs/:file

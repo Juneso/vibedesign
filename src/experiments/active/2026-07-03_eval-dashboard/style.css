@@ -13,11 +13,31 @@ body {
   background: var(--color-background-primary, #fff);
 }
 
+/* 탭 셸 — 상단 탭바 + 아래 화면 패널 */
+.eval-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.eval-tabbar {
+  flex: 0 0 auto;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--color-border-primary, #e5e5e5);
+}
+
+.eval-tabpanel {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 /* 대시보드 2분할 레이아웃 (astryx 토큰 위에 최소한의 커스텀만) */
-.eval-shell {
+.eval-shell,
+.pl-shell {
   display: grid;
   grid-template-columns: 300px 1fr;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -88,4 +108,127 @@ body {
 .eval-dropped {
   opacity: 0.6;
   margin-top: 24px;
+}
+
+/* ── PipelineView ─────────────────────────────────────────── */
+.pl-goal,
+.pl-intent {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--color-background-secondary, #f7f7f7);
+}
+
+.pl-intent {
+  background: var(--color-background-accent-subtle, #eef);
+  border-left: 3px solid var(--color-border-accent, #6366f1);
+}
+
+.pl-funnel {
+  margin-top: 8px;
+}
+
+.pl-stage-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.pl-arrow {
+  text-align: center;
+  color: var(--color-text-secondary, #888);
+  font-size: 18px;
+  line-height: 1;
+  padding: 6px 0;
+}
+
+.pl-stage-head {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 14px 16px;
+}
+
+.pl-stage-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-background-accent-subtle, #eef);
+  color: var(--color-text-accent, #4f46e5);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pl-stage-caret {
+  color: var(--color-text-secondary, #888);
+  font-size: 13px;
+}
+
+.pl-stage-body {
+  padding: 0 16px 16px 16px;
+}
+
+.pl-why {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--color-background-accent-subtle, #eef);
+  border-left: 3px solid var(--color-border-accent, #6366f1);
+}
+
+.pl-param-table-wrap {
+  overflow-x: auto;
+}
+
+.pl-param-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.pl-param-table th,
+.pl-param-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--color-border-primary, #ececec);
+}
+
+.pl-param-table th {
+  font-weight: 600;
+  color: var(--color-text-secondary, #666);
+  white-space: nowrap;
+}
+
+.pl-param-table code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  background: var(--color-background-secondary, #f2f2f2);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.pl-prompt summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-accent, #4f46e5);
+}
+
+.pl-prompt-pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  background: var(--color-background-secondary, #f7f7f7);
+  padding: 14px;
+  border-radius: 8px;
+  margin-top: 8px;
 }
