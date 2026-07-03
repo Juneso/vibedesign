@@ -27,7 +27,9 @@ export function openaiNodeTransport({ apiKey, model } = {}) {
         body,
       });
       const data = await r.json();
-      if (r.status === 429) {
+      // 429 중 insufficient_quota(크레딧 소진)는 재시도해도 회복 불가 → 즉시 실패.
+      // 진짜 rate limit(요청·토큰 한도 초과)만 백오프 재시도.
+      if (r.status === 429 && data?.error?.code !== 'insufficient_quota') {
         const wait = (attempt + 1) * 15000; // 15s, 30s, 45s
         console.warn(`  ⚠ rate limit, ${wait/1000}s 대기 후 재시도...`);
         await new Promise(res => setTimeout(res, wait));
