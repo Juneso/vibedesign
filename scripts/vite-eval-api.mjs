@@ -60,6 +60,13 @@ export function evalApiPlugin() {
             return sendJson(res, 200, runs);
           }
 
+          // GET /api/eval/run-status
+          if (req.method === 'GET' && url === '/api/eval/run-status') {
+            const statusPath = join(LABELS_DIR, 'run-status.json');
+            if (!existsSync(statusPath)) return sendJson(res, 200, {});
+            return sendJson(res, 200, JSON.parse(readFileSync(statusPath, 'utf8')));
+          }
+
           // GET /api/eval/pipelines
           if (req.method === 'GET' && url === '/api/eval/pipelines') {
             if (!existsSync(PIPELINES_DIR)) return sendJson(res, 200, []);

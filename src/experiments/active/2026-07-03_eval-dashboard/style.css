@@ -130,6 +130,31 @@ body {
 
 .eval-run-item {
   justify-content: space-between;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.eval-run-row {
+  border-radius: 6px;
+}
+
+.eval-run-row.is-expanded {
+  background: var(--color-background-muted, #fafafa);
+}
+
+.eval-run-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.eval-run-action {
+  flex: 0 0 auto;
+  padding-right: 6px;
+}
+
+.eval-run-body {
+  padding: 8px 12px 16px;
 }
 
 .eval-run-date {

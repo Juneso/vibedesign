@@ -1,17 +1,11 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { VStack } from '@astryxdesign/core/Stack';
 import { Text, Heading } from '@astryxdesign/core/Text';
 import { Spinner } from '@astryxdesign/core/Spinner';
-import { listPipelines, listRuns, getRun, saveLabels } from '../lib/api.js';
+import { listPipelines, listRuns, getRunStatus } from '../lib/api.js';
 import { SERIES_META } from '../lib/seriesMeta.js';
 import { PipelineDetail } from './PipelineView.jsx';
-import {
-  RunList,
-  ConnectionsDetail,
-  GenericDetail,
-  useLabelMap,
-  CONNECTIONS_SERIES,
-} from './RunBrowser.jsx';
+import { RunList } from './RunBrowser.jsx';
 
 // "기타 eval" — 파이프라인 미연결(pipelineId=null) 시리즈를 모으는 가상 항목
 const MISC_ID = '__misc__';
@@ -24,88 +18,15 @@ function seriesForPipeline(pipelineId) {
     .map(([series]) => series);
 }
 
-// ── 우측: 활성 파이프라인에 연결된 런 결과 + 라벨링 ──────────────
-function RunResults({ runs }) {
-  const [selected, setSelected] = useState(null); // {file, series}
-  const [runData, setRunData] = useState(null);
-  const [loadingRun, setLoadingRun] = useState(false);
-
-  const series = selected?.series || '';
-  const isConnections = series === CONNECTIONS_SERIES;
-  const [labels, setLabels, labelsLoaded] = useLabelMap(series || '_none');
-
-  const [saving, setSaving] = useState(false);
-  const [savedAt, setSavedAt] = useState(null);
-
-  // 활성 파이프라인(=runs 목록) 변경 시 선택 초기화 + 최신 런 자동 선택
-  useEffect(() => {
-    if (runs.length === 0) { setSelected(null); return; }
-    const latest = runs.reduce((a, b) => (b.mtimeMs > a.mtimeMs ? b : a));
-    setSelected({ file: latest.file, series: latest.series });
-  }, [runs]);
-
-  useEffect(() => {
-    if (!selected) { setRunData(null); return; }
-    setLoadingRun(true);
-    setRunData(null);
-    getRun(selected.file)
-      .then(setRunData)
-      .catch((e) => setRunData({ error: String(e.message || e) }))
-      .finally(() => setLoadingRun(false));
-  }, [selected]);
-
-  const onSave = useCallback(async () => {
-    if (!selected) return;
-    setSaving(true);
-    const body = {
-      series: selected.series,
-      updatedAt: new Date().toISOString(),
-      labels: Object.values(labels).map((l) => ({
-        runFile: l.runFile || selected.file,
-        key: l.key,
-        verdict: l.verdict || '',
-        comment: l.comment || '',
-        questionFix: l.questionFix || '',
-      })),
-    };
-    try {
-      await saveLabels(selected.series, body);
-      setSavedAt(new Date().toLocaleTimeString('ko-KR'));
-    } catch (e) {
-      setSavedAt(`저장 실패: ${e.message || e}`);
-    } finally {
-      setSaving(false);
-    }
-  }, [selected, labels]);
-
+// ── 우측: 활성 파이프라인에 연결된 런 아코디언 목록 + 행별 라벨링 ────
+function RunResults({ runs, statusMap }) {
   return (
     <VStack gap={3}>
       <Heading level={3}>Eval 런</Heading>
       {runs.length === 0 && (
         <Text type="supporting">이 파이프라인에 연결된 런이 없습니다.</Text>
       )}
-      {runs.length > 0 && (
-        <RunList runs={runs} selected={selected?.file} onSelect={setSelected} />
-      )}
-
-      {selected && (loadingRun || !runData) && <Spinner />}
-      {selected && runData?.error && <Text color="accent">{runData.error}</Text>}
-      {selected && runData && !runData.error && (
-        isConnections
-          ? (labelsLoaded
-              ? <ConnectionsDetail
-                  runFile={selected.file}
-                  series={series}
-                  json={runData.json}
-                  labels={labels}
-                  setLabels={setLabels}
-                  onSave={onSave}
-                  saving={saving}
-                  savedAt={savedAt}
-                />
-              : <Spinner />)
-          : <GenericDetail runFile={selected.file} series={series} json={runData.json} md={runData.md} />
-      )}
+      {runs.length > 0 && <RunList runs={runs} statusMap={statusMap} />}
     </VStack>
   );
 }
@@ -118,6 +39,11 @@ export default function Dashboard() {
 
   const [runs, setRuns] = useState([]);
   const [runsError, setRunsError] = useState(null);
+  const [statusMap, setStatusMap] = useState({});
+
+  useEffect(() => {
+    getRunStatus().then(setStatusMap).catch(() => setStatusMap({}));
+  }, []);
 
   useEffect(() => {
     listPipelines()
@@ -196,7 +122,7 @@ export default function Dashboard() {
       <section className="eval-split-col eval-runs-col">
         {runsError
           ? <Text type="supporting" color="accent">{runsError} (dev 서버에서만 동작)</Text>
-          : <RunResults key={activeId} runs={filteredRuns} />}
+          : <RunResults key={activeId} runs={filteredRuns} statusMap={statusMap} />}
       </section>
     </div>
   );

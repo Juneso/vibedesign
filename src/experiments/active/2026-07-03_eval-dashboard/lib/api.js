@@ -19,6 +19,10 @@ export function listPipelines() {
   return get('/pipelines');
 }
 
+export function getRunStatus() {
+  return get('/run-status');
+}
+
 export function getLabels(series) {
   return get(`/labels/${encodeURIComponent(series)}`);
 }
