@@ -103,6 +103,154 @@ function Connector({ flow }) {
   );
 }
 
+// ── 엣지: 두 노드의 가장 가까운 변 중점끼리 ㄴ자(직교) 경로 ──
+function edgePath(a, b) {
+  // 각 노드의 4변 중점
+  const pts = (n) => ({
+    top: { x: n.x + n.w / 2, y: n.y },
+    bottom: { x: n.x + n.w / 2, y: n.y + n.h },
+    left: { x: n.x, y: n.y + n.h / 2 },
+    right: { x: n.x + n.w, y: n.y + n.h / 2 },
+  });
+  const pa = pts(a), pb = pts(b);
+  let best = null;
+  for (const ka of Object.keys(pa)) {
+    for (const kb of Object.keys(pb)) {
+      const dx = pa[ka].x - pb[kb].x, dy = pa[ka].y - pb[kb].y;
+      const d = dx * dx + dy * dy;
+      if (!best || d < best.d) best = { d, s: pa[ka], sk: ka, e: pb[kb], ek: kb };
+    }
+  }
+  return best;
+}
+
+// ── 2D 구조도 렌더러 ──
+function DiagramSVG({ diagram, selectedNodeId, onSelectNode }) {
+  const { canvas, nodes, edges } = diagram;
+  const nodeById = Object.fromEntries(nodes.map((n) => [n.id, n]));
+
+  return (
+    <svg
+      className="pl-diagram"
+      viewBox={`0 0 ${canvas.w} ${canvas.h}`}
+      width="100%"
+      role="img"
+      aria-label="파이프라인 구조도"
+    >
+      <defs>
+        <marker id="pl-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+          markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--color-text-secondary)" />
+        </marker>
+      </defs>
+
+      {/* 엣지 먼저 (노드 아래) */}
+      {edges.map((e, i) => {
+        const a = nodeById[e.from], b = nodeById[e.to];
+        if (!a || !b) return null;
+        const seg = edgePath(a, b);
+        if (!seg) return null;
+        const { s, sk, e: ep, ek } = seg;
+        // ㄴ자: 출발이 수직변(top/bottom)이면 세로→가로, 수평변이면 가로→세로
+        const vertOut = sk === 'top' || sk === 'bottom';
+        const mid = vertOut ? { x: s.x, y: ep.y } : { x: ep.x, y: s.y };
+        const d = `M ${s.x} ${s.y} L ${mid.x} ${mid.y} L ${ep.x} ${ep.y}`;
+        const lx = (s.x + ep.x) / 2;
+        const ly = (s.y + ep.y) / 2;
+        const labelW = (e.label ? e.label.length * 6.2 : 0) + (e.count ? e.count.length * 7 + 14 : 0) + 12;
+        return (
+          <g key={i} className="pl-edge">
+            <path d={d} fill="none" stroke="var(--color-text-secondary)"
+              strokeWidth="1.2" markerEnd="url(#pl-arrow)" />
+            {(e.label || e.count) && (
+              <g>
+                <rect x={lx - labelW / 2} y={ly - 9} width={labelW} height={18} rx="3"
+                  fill="var(--color-background-body)" />
+                {e.label && (
+                  <text x={e.count ? lx - 4 : lx} y={ly + 3}
+                    textAnchor={e.count ? 'end' : 'middle'}
+                    fontSize="11" fill="var(--color-text-secondary)">{e.label}</text>
+                )}
+                {e.count && (
+                  <g>
+                    <rect x={lx + (e.label ? 2 : -(e.count.length * 7 + 12) / 2)} y={ly - 8}
+                      width={e.count.length * 7 + 12} height={16} rx="8"
+                      fill="var(--color-accent-muted)" />
+                    <text x={lx + (e.label ? 2 : 0) + (e.count.length * 7 + 12) / 2} y={ly + 3}
+                      textAnchor="middle" fontSize="10.5" fontWeight="600"
+                      fill="var(--color-text-accent)">{e.count}</text>
+                  </g>
+                )}
+              </g>
+            )}
+          </g>
+        );
+      })}
+
+      {/* 노드 */}
+      {nodes.map((n) => {
+        const isProcess = n.kind === 'process';
+        const isHuman = n.kind === 'human';
+        const clickable = !!n.stageId;
+        const isSel = clickable && selectedNodeId === n.id;
+        const rx = n.kind === 'data' ? 2 : 10;
+        let fill = 'var(--color-background-card)';
+        let stroke = 'var(--color-border-emphasized)';
+        let sw = 1;
+        if (isProcess) { fill = 'var(--color-accent-muted)'; stroke = 'var(--color-accent)'; sw = 1.5; }
+        if (isHuman) { fill = 'var(--color-background-muted)'; stroke = 'var(--color-border-emphasized)'; sw = 1.2; }
+        if (isSel) sw = 2.5;
+        return (
+          <g key={n.id}
+            className={`pl-node${clickable ? ' is-clickable' : ''}`}
+            onClick={clickable ? () => onSelectNode(isSel ? null : n.id) : undefined}
+          >
+            <rect x={n.x} y={n.y} width={n.w} height={n.h} rx={rx}
+              fill={fill} stroke={stroke} strokeWidth={sw}
+              strokeDasharray={isHuman ? '5 4' : undefined} />
+            <foreignObject x={n.x} y={n.y} width={n.w} height={n.h}>
+              <div className="pl-node-body">
+                <span className="pl-node-label">{n.label}</span>
+                {n.sub && <span className="pl-node-sub">{n.sub}</span>}
+              </div>
+            </foreignObject>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function DiagramView({ pipeline }) {
+  const stages = pipeline.stages || [];
+  const diagram = pipeline.diagram;
+  const [selectedNodeId, setSelectedNodeId] = useState(null);
+
+  const selNode = diagram.nodes.find((n) => n.id === selectedNodeId);
+  const selStage = selNode && stages.find((s) => s.id === selNode.stageId);
+  const selIndex = selStage ? stages.indexOf(selStage) : -1;
+
+  return (
+    <VStack gap={3}>
+      <div className="pl-diagram-legend">
+        <span className="pl-legend-item"><span className="pl-swatch data" />산출물·데이터</span>
+        <span className="pl-legend-item"><span className="pl-swatch process" />처리 단계 (클릭 가능)</span>
+        <span className="pl-legend-item"><span className="pl-swatch human" />사람 개입</span>
+      </div>
+      <div className="pl-diagram-wrap">
+        <DiagramSVG diagram={diagram} selectedNodeId={selectedNodeId} onSelectNode={setSelectedNodeId} />
+      </div>
+      {selStage ? (
+        <div className="pl-node-detail">
+          <StagePanel stage={selStage} index={selIndex} isFirst={selIndex === 0} />
+        </div>
+      ) : (
+        <Text type="supporting">처리 노드를 클릭하면 상세 설명이 여기에 표시됩니다.</Text>
+      )}
+    </VStack>
+  );
+}
+
 function PipelineDetail({ pipeline }) {
   if (pipeline.error) {
     return <Text color="accent">파이프라인 파싱 오류: {pipeline.error}</Text>;
@@ -131,17 +279,21 @@ function PipelineDetail({ pipeline }) {
         )}
       </VStack>
 
-      {/* 상세 구조도: 각 단계 내부를 펼침 */}
-      <div className="pl-stages">
-        {stages.map((s, i) => (
-          <React.Fragment key={s.id || i}>
-            <StagePanel stage={s} index={i} isFirst={i === 0} />
-            {i < stages.length - 1 && (
-              <Connector flow={s.funnel?.out != null ? s.funnel.out : null} />
-            )}
-          </React.Fragment>
-        ))}
-      </div>
+      {/* 2D 구조도 (diagram 있으면) 또는 세로 패널 폴백 */}
+      {pipeline.diagram ? (
+        <DiagramView pipeline={pipeline} />
+      ) : (
+        <div className="pl-stages">
+          {stages.map((s, i) => (
+            <React.Fragment key={s.id || i}>
+              <StagePanel stage={s} index={i} isFirst={i === 0} />
+              {i < stages.length - 1 && (
+                <Connector flow={s.funnel?.out != null ? s.funnel.out : null} />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      )}
 
       {/* 알려진 한계 — 노란 배경 없이 중립 리스트 */}
       {Array.isArray(pipeline.knownIssues) && pipeline.knownIssues.length > 0 && (

@@ -4,6 +4,31 @@
   "script": "runConnectionsQF.mjs",
   "goal": "여러 책의 메모 문장들 사이에서 '하나의 공유질문 앞에 두 책이 서로 다르게 답하는' 연결을 찾아낸다. 억지로 같다고 묶는 게 아니라, 먼저 질문이 존재하고 그 질문에 두 책이 긴장·대조·보강 관계로 답하는 쌍만 남긴다.",
   "designIntent": "공유질문이 짝짓기보다 먼저 존재해야 한다 — 질문 없이 '두 책 모두 X를 다룬다'는 이유로 연결하면 억지 상위추상으로 귀결되지만, 질문을 먼저 세우면 두 책이 다른 말을 해도 오히려 좋은 연결이 된다.",
+  "diagram": {
+    "canvas": { "w": 880, "h": 620 },
+    "nodes": [
+      { "id": "memo",     "kind": "data",    "label": "메모 unit 61개",        "sub": "8책 · thesis + 보편질문",      "x": 330, "y": 20,  "w": 220, "h": 60 },
+      { "id": "embed",    "kind": "process", "label": "임베딩",                "sub": "text-embedding-3-small",      "x": 330, "y": 130, "w": 220, "h": 60, "stageId": "embed" },
+      { "id": "tvec",     "kind": "data",    "label": "thesis 벡터",           "sub": "unit당 1개",                  "x": 120, "y": 240, "w": 180, "h": 56 },
+      { "id": "qvec",     "kind": "data",    "label": "보편질문 벡터",          "sub": "질문당 1개",                  "x": 580, "y": 240, "w": 180, "h": 56 },
+      { "id": "score",    "kind": "process", "label": "cross-book 쌍 점수화",   "sub": "0.5·질문유사 + 0.5·논지유사", "x": 330, "y": 350, "w": 220, "h": 60, "stageId": "score" },
+      { "id": "top60",    "kind": "data",    "label": "상위 후보 60쌍",         "sub": "전체 1855쌍 중",              "x": 60,  "y": 460, "w": 180, "h": 56 },
+      { "id": "confirm",  "kind": "process", "label": "LLM 확정 (gpt-4o)",     "sub": "공유질문을 실제로 만들 수 있나", "x": 330, "y": 458, "w": 220, "h": 60, "stageId": "confirm" },
+      { "id": "critic",   "kind": "process", "label": "Critic 게이트 (gpt-4o)", "sub": "G1 응답성 · G2 품질 · G2b 완결성 · G3 도발성", "x": 600, "y": 458, "w": 240, "h": 60, "stageId": "critic" },
+      { "id": "final",    "kind": "human",   "label": "연결 후보 7개",          "sub": "사람 라벨링 → labels/*.json",  "x": 600, "y": 560, "w": 240, "h": 56 }
+    ],
+    "edges": [
+      { "from": "memo",   "to": "embed",   "label": "thesis·질문 분리 추출" },
+      { "from": "embed",  "to": "tvec",    "label": "논지 신호" },
+      { "from": "embed",  "to": "qvec",    "label": "질문 신호" },
+      { "from": "tvec",   "to": "score",   "label": "코사인 유사도" },
+      { "from": "qvec",   "to": "score",   "label": "질문쌍 max-pooling" },
+      { "from": "score",  "to": "top60",   "label": "score 상위 선별", "count": "1855 → 60" },
+      { "from": "top60",  "to": "confirm", "label": "쌍별 검토" },
+      { "from": "confirm","to": "critic",  "label": "keep + 공유질문 부여", "count": "60 → 9" },
+      { "from": "critic", "to": "final",   "label": "게이트 통과", "count": "9 → 7" }
+    ]
+  },
   "stages": [
     {
       "id": "embed",

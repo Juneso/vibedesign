@@ -4,6 +4,32 @@
   "script": "runNudgeV8.mjs",
   "goal": "유저가 저장한 책 문장을 다시 마주칠 때 보여줄 '넛지 메시지(풀이→질문 흐름 + 해석 방향 3선택지)'를 생성하고, 결정적 체커 5개 + 독립 judge 3개로 채점해 '좋은 넛지'만 통과시킨다.",
   "designIntent": "V7은 자극성(QD 정지력) 점수가 높으면 다른 결함을 가렸다 — 멈추게 하는 것과 좋은 넛지는 다른 것이었다. V8은 QD를 폐기하고 풀이 정확도·공감·응용 거리 세 축을 각각 독립 LLM 호출로 채점해, 한 축의 높은 점수가 다른 약점을 가리지 못하게 한다.",
+  "diagram": {
+    "canvas": { "w": 880, "h": 700 },
+    "nodes": [
+      { "id": "memo",    "kind": "data",    "label": "저장한 문장 6개",       "sub": "책+page 타깃 · 유저 생각 포함", "x": 340, "y": 20,  "w": 200, "h": 60 },
+      { "id": "gen",     "kind": "process", "label": "넛지 생성",             "sub": "gpt-4o · 풀이→질문 흐름",      "x": 340, "y": 130, "w": 200, "h": 60, "stageId": "generate" },
+      { "id": "nudge",   "kind": "data",    "label": "넛지 6개",              "sub": "message + choices 3개",       "x": 340, "y": 240, "w": 200, "h": 60 },
+      { "id": "det",     "kind": "process", "label": "결정적 체커 F1~F5",     "sub": "개수·길이·금지어·책제목",      "x": 340, "y": 350, "w": 200, "h": 60, "stageId": "deterministic" },
+      { "id": "passed",  "kind": "data",    "label": "형식 통과 넛지",         "sub": "judge로 넘길 후보",           "x": 340, "y": 460, "w": 200, "h": 56 },
+      { "id": "j1",      "kind": "process", "label": "J1 풀이 정확도",         "sub": "gpt-4o · 0~2점",              "x": 40,  "y": 560, "w": 180, "h": 56, "stageId": "judge" },
+      { "id": "j2",      "kind": "process", "label": "J2 공감",               "sub": "gpt-4o · 0~2점",              "x": 250, "y": 560, "w": 180, "h": 56, "stageId": "judge" },
+      { "id": "j3",      "kind": "process", "label": "J3 응용거리·결격",       "sub": "체크리스트 + L1~L7 레벨",      "x": 460, "y": 560, "w": 200, "h": 56, "stageId": "judge" },
+      { "id": "dist",    "kind": "process", "label": "레벨 분포 검사",         "sub": "라운드 단위 · L7=0 등",       "x": 690, "y": 460, "w": 170, "h": 60, "stageId": "dist_check" },
+      { "id": "final",   "kind": "human",   "label": "통과 넛지",             "sub": "합격선 넘은 것만 채택",        "x": 690, "y": 560, "w": 170, "h": 56 }
+    ],
+    "edges": [
+      { "from": "memo",   "to": "gen",    "label": "타깃 지정" },
+      { "from": "gen",    "to": "nudge",  "label": "생성 (재시도 최대 3)" },
+      { "from": "nudge",  "to": "det",    "label": "형식 검사" },
+      { "from": "det",    "to": "passed", "label": "F1~F5 통과만" },
+      { "from": "passed", "to": "j1",     "label": "축별 병렬 채점" },
+      { "from": "passed", "to": "j2",     "label": "축별 병렬 채점" },
+      { "from": "passed", "to": "j3",     "label": "축별 병렬 채점" },
+      { "from": "j3",     "to": "dist",   "label": "level 집계" },
+      { "from": "dist",   "to": "final",  "label": "분포 통과 시 채택" }
+    ]
+  },
   "stages": [
     {
       "id": "generate",
