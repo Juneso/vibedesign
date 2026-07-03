@@ -1,0 +1,142 @@
+{
+  "id": "hier-ingest-v5",
+  "title": "책별 개념 위계 인제스트 — 위계 이원화 (V5)",
+  "script": "protoHierIngestV5.mjs",
+  "goal": "독서 메모 문장들을 하나씩 읽어가며 '책별 개념 트리'를 점진적으로 쌓는다. 각 메모에서 핵심 개념을 뽑고, 그 개념이 기존 트리 어디에 속하는지(같은 개념인가, 좁은 하위인가, 넓은 상위인가, 관계없는 새 잎인가) LLM이 판단해 위계를 만든다. 목차는 트리 노드가 되지 않고 위계 판단의 '숨은 척추'로만 쓰인다.",
+  "designIntent": "위계 생성 책임을 '개념 배치(Phase 1)'와 '고아 군집화(Phase 2)'로 이원화한다 — V4까지는 군집화가 place 단계에서 만든 위계를 무시하고 덮어썼으나, V5는 Phase 2가 Phase 1의 결과를 존중하고 root 직속 고아만 묶는다. 이를 통해 억지 상위추상 없이 진짜 포함관계만 트리에 남긴다.",
+  "stages": [
+    {
+      "id": "extract",
+      "name": "개념 추출",
+      "why": "메모 문장은 서술형이라 트리 노드로 쓸 수 없다. '재발견으로서의 디자인', '촉각 정보'처럼 이 문장만의 구체적 명사구를 뽑아야 나중에 위계를 만들 수 있다. 너무 일반적인 단어('디자인', '정보')는 모든 메모에 다 걸려서 위계가 무너지므로 금지한다.",
+      "how": "메모 문장과 유저 생각을 LLM에 전달해 핵심 개념을 1~2개 추출한다(온도 0.1). 별개 개념이 실제로 섞인 경우만 2개 허용. 각 개념은 짧은 명사구(name)와 한 줄 설명(gloss)으로 구성된다.",
+      "params": [
+        {
+          "name": "MODEL",
+          "value": "gpt-4o-mini",
+          "meaning": "추출·배치에 사용하는 LLM (환경변수 EVAL_MODEL로 덮어쓸 수 있음)",
+          "effect": "gpt-4o로 올리면 개념 명사구의 구체성과 일반어 회피 품질이 높아지나 비용이 약 15배 증가한다"
+        },
+        {
+          "name": "temperature_extract",
+          "value": 0.1,
+          "meaning": "개념 추출 LLM 온도",
+          "effect": "0에 가까울수록 같은 메모에서 일관된 개념이 나온다. 높이면 다양한 각도의 개념이 나올 수 있으나 일반어 금지 위반 빈도가 높아진다"
+        },
+        {
+          "name": "max_concepts_per_memo",
+          "value": 2,
+          "meaning": "메모 1개당 추출할 최대 개념 수",
+          "effect": "3 이상으로 올리면 개념이 세분화되나 트리가 넓어지고 중복 병합 비용이 증가한다"
+        }
+      ],
+      "prompt": "너는 독서 메모를 \"책별 개념 위계 트리\"에 점진적으로 끼워넣는 사서다. 보이는 노드는 오직 메모에서 나온 개념뿐 — 책 목차는 위계를 잡는 참고용 숨은 척추일 뿐 절대 노드로 만들지 않는다. 같은 개념은 반드시 병합하고, 위계는 진짜 포함관계(상위=넓음, 하위=좁음)일 때만 만든다. JSON만 출력.",
+      "output": "메모마다 {name, gloss} 형태의 개념 배열 (1~2개).",
+      "funnel": { "in": 14, "out": null }
+    },
+    {
+      "id": "embed_concept",
+      "name": "개념 임베딩",
+      "why": "새로 추출한 개념이 기존 트리의 어떤 노드와 가장 가까운지 수천 번 비교하면 LLM 호출이 너무 많아진다. 임베딩으로 코사인 유사도를 먼저 계산해 '관련도 상위 4개'만 LLM에 보여주면, LLM은 전체 트리를 볼 필요 없이 가장 유력한 후보만 보고 판단할 수 있다.",
+      "how": "추출된 개념의 'name: gloss' 문자열을 text-embedding-3-small로 벡터화한다. 기존 트리의 concept 노드들과 코사인 유사도를 계산해 0.3 이상인 것 중 상위 4개를 후보(cand)로 선택한다.",
+      "params": [
+        {
+          "name": "embed_model",
+          "value": "text-embedding-3-small",
+          "meaning": "개념 임베딩 모델",
+          "effect": "text-embedding-3-large로 바꾸면 유사한 개념 탐지 품질이 높아지나 API 비용과 지연이 증가한다"
+        },
+        {
+          "name": "sim_threshold",
+          "value": 0.3,
+          "meaning": "후보 최소 유사도 컷오프",
+          "effect": "낮추면 더 다양한 후보가 LLM에 노출되나 관계없는 노드도 포함된다. 높이면 후보가 줄어 cand가 없어질 수 있다"
+        },
+        {
+          "name": "top_k_cand",
+          "value": 4,
+          "meaning": "LLM에 넘길 유사 후보 수",
+          "effect": "늘리면 LLM이 더 많은 선택지를 보지만 프롬프트가 길어지고 혼란을 줄 수 있다"
+        }
+      ],
+      "prompt": null,
+      "output": "새 개념 벡터 1개 + 기존 트리에서 유사도 상위 4개 후보(cand) 리스트.",
+      "funnel": { "in": null, "out": null }
+    },
+    {
+      "id": "place",
+      "name": "위계 배치 (Place)",
+      "why": "임베딩은 '유사하다'는 것만 알지, 새 개념이 기존 개념보다 넓은지 좁은지는 모른다. LLM이 개념의 포함관계를 보고 merge·child·parent·attach 중 하나를 결정해야 진짜 위계 트리가 만들어진다. 확신이 없으면 attach(root 직속 잎)로 보내 안전하게 처리한다.",
+      "how": "새 개념, 임베딩 상위 후보 4개, 현재 트리 전체 노드를 LLM(온도 0.1)에 보낸다. LLM은 op(merge/child/parent/attach), targetId, adoptIds, reason을 JSON으로 반환한다. 깊이 상한(MAX_LEVEL=3) 초과 시 parent 연산이 root 직속으로 강등된다.",
+      "params": [
+        {
+          "name": "MAX_LEVEL",
+          "value": 3,
+          "meaning": "개념 위계 최대 깊이 (root=L0, 개념 L1~L3)",
+          "effect": "낮추면 트리가 얕아지고 parent 연산이 자주 root 직속으로 강등된다. 높이면 더 세밀한 위계가 가능하나 LLM이 깊이를 잘못 판단해 트리가 지저분해질 수 있다"
+        },
+        {
+          "name": "temperature_place",
+          "value": 0.1,
+          "meaning": "배치 판단 LLM 온도",
+          "effect": "0으로 낮추면 같은 입력에 일관된 op가 나오나, 경계 케이스에서 창의적 위계 발견이 줄어든다"
+        }
+      ],
+      "prompt": "[숨은 척추 — 참고만, 노드로 만들지 마라]\n책: ${book.title} (${book.category})\n목차 흐름: ${book.toc.join(' · ')}\n\n[새 개념] ${c.name} — ${c.gloss}\n(출처 문장: ${memo.text})\n\n[관련 후보 (임베딩 유사도 상위)]\n${cand.length ? cand.map((x) => `${x.id} | ${ancestry(x.node)} › ${x.node.title} (유사도 ${x.sim.toFixed(2)})`).join('\\n') : '(없음)'}\n\n[현재 트리의 모든 개념]\n${existing}\n\n이 새 개념을 트리에 어떻게 꽂을지 판단하라. 위계는 **진짜 포함관계**일 때만 만든다:\n- op=\"merge\": 후보가 **같은 한 단어로 부를 같은 개념**(동의어·바꿔말하기)일 때만. targetId=그 후보. 관련·인접일 뿐이면 절대 merge 아님.\n- op=\"child\": 새 개념이 후보보다 **좁은 하위 개념**일 때. targetId=상위가 될 후보. (새 개념이 후보의 한 종류/사례/부분)\n- op=\"parent\": 새 개념이 후보(들)보다 **넓은 상위 개념**일 때. targetId=대표 후보, adoptIds=이 새 상위 아래로 함께 넣을 다른 기존 개념 id들(없으면 []). 남발 금지 — 명백히 상위일 때만.\n- op=\"attach\": 위 어디에도 안 맞으면 root 직속 leaf. targetId=\"${root.id}\".\n확신 없으면 attach. 위계는 최대 ${MAX_LEVEL}단까지만.\n출력 JSON: {\"op\":\"merge|child|parent|attach\",\"targetId\":\"n?\",\"adoptIds\":[\"n?\"],\"reason\":\"한 줄\"}",
+      "output": "메모별로 트리에 op 연산 적용. 각 새 개념이 merge/child/parent/attach 중 하나로 처리된 결과 트리.",
+      "funnel": { "in": null, "out": null }
+    },
+    {
+      "id": "dedup_merge",
+      "name": "동의어 사후 병합 (Phase 1.5)",
+      "why": "Place 단계는 새 개념이 들어올 때만 기존 노드와 비교하므로, 순서에 따라 동의어가 서로 다른 노드로 쌓일 수 있다. 전체 개념 쌍을 임베딩 유사도로 다시 스캔해서 누락된 동의어를 잡아낸다.",
+      "how": "모든 concept 노드 쌍에 코사인 유사도를 계산해 0.55 이상인 쌍을 후보로 올린다. 위계관계(조상-자손)인 쌍은 제외한다. 각 후보 쌍에 LLM(온도 0)을 호출해 '같은 한 단어로 부를 같은 개념'인지 yes/no 판정받는다. same=true면 keep 노드를 정해 drop 노드의 자식·소스를 이관하고 drop을 삭제한다.",
+      "params": [
+        {
+          "name": "sim_dedup_threshold",
+          "value": 0.55,
+          "meaning": "동의어 후보 최소 유사도",
+          "effect": "낮추면 더 많은 쌍이 LLM 호출을 받아 비용이 증가하고 관련 개념이 잘못 병합될 수 있다. 높이면 명백한 동의어만 잡힌다"
+        },
+        {
+          "name": "temperature_dedup",
+          "value": 0,
+          "meaning": "동의어 판정 LLM 온도",
+          "effect": "0으로 고정해 판정을 일관되게 유지"
+        }
+      ],
+      "prompt": "책 \"${book.title}\"에서 나온 두 개념이 **같은 한 단어로 부를 같은 개념**(동의어·바꿔말하기)인가, 아니면 관련될 뿐 다른 개념인가?\n관련·인접·같은 테마일 뿐이면 \"다름\"이다. 확신 없으면 \"다름\".\nA: ${a.title} — ${a.gloss || ''}\nB: ${b.title} — ${b.gloss || ''}\n출력 JSON: {\"same\":true|false,\"keep\":\"A|B\",\"reason\":\"한 줄\"}",
+      "output": "동의어로 판정된 쌍의 두 노드가 한 노드로 합쳐진 트리.",
+      "funnel": { "in": null, "out": null }
+    },
+    {
+      "id": "cluster",
+      "name": "고아 군집화 (Phase 2 — 존중형)",
+      "why": "Phase 1 이후에도 root 직속 잎(=어떤 위계에도 속하지 못한 개념)들이 남는다. 이들을 그대로 두면 트리 최상위가 너무 넓어진다. Phase 2는 Place가 이미 만든 위계는 건드리지 않고, 고아만 묶는다. 억지 편입이 V4의 핵심 문제였으므로 '확신 없으면 최상위에 남겨라'를 강조한다.",
+      "how": "root 직속이면서 자식 없는 노드만 고아로 분류한다. LLM(온도 0.1)에 고아 목록과 기존 상위 테마를 보여주고, 기존 테마의 명백한 하위이면 편입(themeId), ≥2개 고아가 자명하게 묶이면 새 테마 생성(newTheme)을 요청한다. 멤버가 1개뿐이거나 테마명이 자식명과 같으면 스킵한다.",
+      "params": [
+        {
+          "name": "temperature_cluster",
+          "value": 0.1,
+          "meaning": "군집화 LLM 온도",
+          "effect": "높이면 더 많은 고아를 묶으려 하나 억지 편입이 늘어난다"
+        },
+        {
+          "name": "min_members_for_new_theme",
+          "value": 2,
+          "meaning": "새 테마 생성을 위한 최소 고아 수",
+          "effect": "1로 낮추면 고아가 1개인 테마가 생겨 단일노드 중첩이 발생한다"
+        }
+      ],
+      "prompt": "[숨은 척추 — 참고만, 제목을 노드로 복붙 금지] 책 \"${book.title}\" 목차 흐름: ${book.toc.join(' · ')}\n\nplace 단계가 이미 만든 위계는 건드리지 않는다. 아래 [고아 개념]들만 상위 테마로 묶어라.\n⚠ 무리한 편입 절대 금지 — 대부분의 고아는 최상위에 그대로 남는 게 정상이다. 억지로 다 묶지 마라.\n- 편입은 그 고아가 기존 테마의 **명백한 하위 구성원**일 때만(themeId). 단지 관련·인접이면 편입하지 마라.\n- 여러 고아(≥2)가 **하나의 자명한 상위 개념**으로 자연히 묶일 때만 새 테마 생성(newTheme). 테마명은 자식 이름과 달라야 하고 목차 복붙 금지.\n- 확신이 조금이라도 없으면 둘 다 비워 최상위에 남겨라.\n\n[기존 상위 테마]\n${existingThemes.length ? existingThemes.map((n) => `${n.id} | ${n.title} — 자식: ${childrenOf(n.id).map((k) => k.title).join(', ')}`).join('\\n') : '(없음)'}\n\n[고아 개념]\n${orphans.map((k) => `${k.id}: ${k.title} — ${k.gloss || ''}`).join('\\n')}\n\n출력 JSON: {\"assign\":[{\"id\":\"고아 id\",\"themeId\":\"기존 테마 id 또는 빈문자열\",\"newTheme\":\"새 테마명 또는 빈문자열\"}]}",
+      "output": "고아 중 편입·신규테마 조건을 만족한 것들이 트리에 연결된 최종 트리. 나머지 고아는 root 직속에 그대로 남는다.",
+      "funnel": { "in": null, "out": null }
+    }
+  ],
+  "knownIssues": [
+    "Place 단계는 처리 순서에 의존한다 — 먼저 들어온 개념이 나중 개념의 상위로 자리잡으면, 실제론 더 넓은 개념이 나중에 들어와도 parent 연산이 깊이 제한에 걸려 root 직속으로 강등될 수 있다",
+    "동의어 사후 병합(Phase 1.5) LLM이 '관련 개념'을 동의어로 잘못 판정하면 다른 개념이 합쳐진다 — '확신 없으면 다름'을 강조했으나 완전히 제거되지 않음",
+    "목차(숨은 척추)가 프롬프트에 들어가지만 LLM이 무의식적으로 목차 단어를 노드명에 반영하는 경향이 있다 — '목차 복붙 금지' 지시를 넣었으나 추정으로 쓴 부분",
+    "funnel 수치 없음 — 이 스크립트는 runs/ 에 별도 MD를 저장하지 않고 콘솔에만 출력하므로 최근 런의 in/out 수치를 파악하지 못했다"
+  ]
+}
