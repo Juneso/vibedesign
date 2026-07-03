@@ -129,6 +129,26 @@ function DiagramSVG({ diagram, selectedNodeId, onSelectNode }) {
   const { canvas, nodes, edges } = diagram;
   const nodeById = Object.fromEntries(nodes.map((n) => [n.id, n]));
 
+  // 엣지 기하 선계산: 라벨은 ㄴ자 경로의 "긴 세그먼트" 중점에 — 항상 선 위에 놓인다
+  const edgeGeo = edges.map((e) => {
+    const a = nodeById[e.from], b = nodeById[e.to];
+    if (!a || !b) return null;
+    const seg = edgePath(a, b);
+    if (!seg) return null;
+    const { s, sk, e: ep } = seg;
+    const vertOut = sk === 'top' || sk === 'bottom';
+    const mid = vertOut ? { x: s.x, y: ep.y } : { x: ep.x, y: s.y };
+    const len1 = Math.abs(mid.x - s.x) + Math.abs(mid.y - s.y);
+    const len2 = Math.abs(ep.x - mid.x) + Math.abs(ep.y - mid.y);
+    const [p1, p2] = len1 >= len2 ? [s, mid] : [mid, ep];
+    return {
+      e,
+      d: `M ${s.x} ${s.y} L ${mid.x} ${mid.y} L ${ep.x} ${ep.y}`,
+      lx: (p1.x + p2.x) / 2,
+      ly: (p1.y + p2.y) / 2,
+    };
+  }).filter(Boolean);
+
   return (
     <svg
       className="pl-diagram"
@@ -144,48 +164,12 @@ function DiagramSVG({ diagram, selectedNodeId, onSelectNode }) {
         </marker>
       </defs>
 
-      {/* 엣지 먼저 (노드 아래) */}
-      {edges.map((e, i) => {
-        const a = nodeById[e.from], b = nodeById[e.to];
-        if (!a || !b) return null;
-        const seg = edgePath(a, b);
-        if (!seg) return null;
-        const { s, sk, e: ep, ek } = seg;
-        // ㄴ자: 출발이 수직변(top/bottom)이면 세로→가로, 수평변이면 가로→세로
-        const vertOut = sk === 'top' || sk === 'bottom';
-        const mid = vertOut ? { x: s.x, y: ep.y } : { x: ep.x, y: s.y };
-        const d = `M ${s.x} ${s.y} L ${mid.x} ${mid.y} L ${ep.x} ${ep.y}`;
-        const lx = (s.x + ep.x) / 2;
-        const ly = (s.y + ep.y) / 2;
-        const labelW = (e.label ? e.label.length * 6.2 : 0) + (e.count ? e.count.length * 7 + 14 : 0) + 12;
-        return (
-          <g key={i} className="pl-edge">
-            <path d={d} fill="none" stroke="var(--color-text-secondary)"
-              strokeWidth="1.2" markerEnd="url(#pl-arrow)" />
-            {(e.label || e.count) && (
-              <g>
-                <rect x={lx - labelW / 2} y={ly - 9} width={labelW} height={18} rx="3"
-                  fill="var(--color-background-body)" />
-                {e.label && (
-                  <text x={e.count ? lx - 4 : lx} y={ly + 3}
-                    textAnchor={e.count ? 'end' : 'middle'}
-                    fontSize="11" fill="var(--color-text-secondary)">{e.label}</text>
-                )}
-                {e.count && (
-                  <g>
-                    <rect x={lx + (e.label ? 2 : -(e.count.length * 7 + 12) / 2)} y={ly - 8}
-                      width={e.count.length * 7 + 12} height={16} rx="8"
-                      fill="var(--color-accent-muted)" />
-                    <text x={lx + (e.label ? 2 : 0) + (e.count.length * 7 + 12) / 2} y={ly + 3}
-                      textAnchor="middle" fontSize="10.5" fontWeight="600"
-                      fill="var(--color-text-accent)">{e.count}</text>
-                  </g>
-                )}
-              </g>
-            )}
-          </g>
-        );
-      })}
+      {/* 엣지 선 (노드 아래) */}
+      {edgeGeo.map((g, i) => (
+        <path key={i} className="pl-edge" d={g.d} fill="none"
+          stroke="var(--color-text-secondary)" strokeWidth="1.2"
+          markerEnd="url(#pl-arrow)" />
+      ))}
 
       {/* 노드 */}
       {nodes.map((n) => {
@@ -214,6 +198,34 @@ function DiagramSVG({ diagram, selectedNodeId, onSelectNode }) {
                 {n.sub && <span className="pl-node-sub">{n.sub}</span>}
               </div>
             </foreignObject>
+          </g>
+        );
+      })}
+
+      {/* 엣지 라벨 (노드 위 — 박스에 가려지지 않게 마지막에 그림) */}
+      {edgeGeo.map((g, i) => {
+        const { e, lx, ly } = g;
+        if (!e.label && !e.count) return null;
+        const labelW = (e.label ? e.label.length * 6.2 : 0) + (e.count ? e.count.length * 7 + 14 : 0) + 12;
+        return (
+          <g key={`lbl-${i}`}>
+            <rect x={lx - labelW / 2} y={ly - 9} width={labelW} height={18} rx="3"
+              fill="var(--color-background-body)" />
+            {e.label && (
+              <text x={e.count ? lx - 4 : lx} y={ly + 3}
+                textAnchor={e.count ? 'end' : 'middle'}
+                fontSize="11" fill="var(--color-text-secondary)">{e.label}</text>
+            )}
+            {e.count && (
+              <g>
+                <rect x={lx + (e.label ? 2 : -(e.count.length * 7 + 12) / 2)} y={ly - 8}
+                  width={e.count.length * 7 + 12} height={16} rx="8"
+                  fill="var(--color-accent-muted)" />
+                <text x={lx + (e.label ? 2 : 0) + (e.count.length * 7 + 12) / 2} y={ly + 3}
+                  textAnchor="middle" fontSize="10.5" fontWeight="600"
+                  fill="var(--color-text-accent)">{e.count}</text>
+              </g>
+            )}
           </g>
         );
       })}
