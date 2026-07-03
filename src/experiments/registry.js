@@ -49,4 +49,13 @@ export const experiments = [
     folder: 'src/experiments/active/2026-06-21_book-wiki-mvp',
     files: ['index.html', 'main.jsx', 'App.jsx', 'style.css', 'meta.json', 'screens/MindMapScreen.jsx', 'lib/mindmaps.json']
   },
+  {
+    id: '2026-07-03_eval-dashboard',
+    title: 'Eval 대시보드',
+    chip: 'eval',
+    status: 'active',
+    path: 'src/experiments/active/2026-07-03_eval-dashboard/index.html',
+    folder: 'src/experiments/active/2026-07-03_eval-dashboard',
+    files: ['index.html', 'main.jsx', 'style.css', 'meta.json', 'lib/api.js', 'screens/RunBrowser.jsx']
+  },
 ];

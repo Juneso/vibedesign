@@ -1,0 +1,6 @@
+{
+  "id": "2026-07-03_eval-dashboard",
+  "title": "Eval 대시보드",
+  "summary": "book-wiki-mvp LLM eval 런을 브라우저에서 열람하고 사람이 pass/fail/hold + 코멘트 라벨을 로컬 파일로 남기는 로컬 전용 대시보드. (dev 서버 전용)",
+  "created": "2026-07-03"
+}

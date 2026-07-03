@@ -1,0 +1,91 @@
+/* astryx 디자인시스템 — 이 실험 폴더 전용 (다른 실험 페이지로 새지 않도록 여기서만 import) */
+@import '@astryxdesign/core/reset.css';
+@import '@astryxdesign/core/astryx.css';
+@import '@astryxdesign/theme-neutral/theme.css';
+
+html, body, #app-root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  background: var(--color-background-primary, #fff);
+}
+
+/* 대시보드 2분할 레이아웃 (astryx 토큰 위에 최소한의 커스텀만) */
+.eval-shell {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.eval-sidebar {
+  border-right: 1px solid var(--color-border-primary, #e5e5e5);
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.eval-detail {
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.eval-runlist-group + .eval-runlist-group {
+  margin-top: 8px;
+}
+
+.eval-run-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  padding: 6px 10px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--color-text-primary, #111);
+}
+
+.eval-run-item:hover {
+  background: var(--color-background-secondary, #f5f5f5);
+}
+
+.eval-run-item.is-active {
+  background: var(--color-background-accent-subtle, #eef);
+  font-weight: 600;
+}
+
+.eval-series-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+  padding: 6px 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-text-primary, #111);
+  font-size: 13px;
+}
+
+.eval-md-pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  background: var(--color-background-secondary, #f7f7f7);
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.eval-dropped {
+  opacity: 0.6;
+  margin-top: 24px;
+}
