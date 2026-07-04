@@ -675,3 +675,67 @@ body {
   height: auto;
   font-family: inherit;
 }
+
+/* ── 트리 노드 상세 카드 ──────────────────────────────────── */
+.eval-tree-block {
+  margin-top: 8px;
+}
+
+.eval-tree-detail {
+  margin-top: 8px;
+  border: 1px solid var(--color-border, #e5e5e5);
+  border-left: 3px solid var(--color-accent, #2563eb);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--color-background-card, #fafafa);
+}
+
+.eval-tree-detail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.eval-tree-detail-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary, #111);
+}
+
+.eval-tree-detail-close {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-text-secondary, #666);
+  padding: 0 4px;
+}
+
+.eval-tree-detail-close:hover {
+  color: var(--color-text-primary, #111);
+}
+
+.eval-tree-detail-src {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--color-text-tertiary, #9ca3af);
+}
+
+.eval-tree-detail-gloss {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-primary, #333);
+}
+
+.eval-tree-detail-anchor {
+  margin-top: 6px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  font-style: italic;
+  color: var(--color-text-secondary, #666);
+  border-left: 2px solid var(--color-border-emphasized, #ccc);
+  padding-left: 8px;
+}

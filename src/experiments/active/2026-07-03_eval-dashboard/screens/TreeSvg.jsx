@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 // ── 상수 ─────────────────────────────────────────────────────
-const COL_W = 220;
-const ROW_H = 54;
+const COL_W = 230;
+const ROW_H = 46;   // 박스 낮아진 만큼 형제 간격은 넉넉히
 const NODE_W = 195;
-const NODE_H = 40;
+const NODE_H = 30;  // 제목 1줄 중앙정렬
 const PAD_X = 16;
 const PAD_Y = 20;
 
@@ -28,8 +28,8 @@ const COLORS = {
   edge: 'var(--color-neutral-border, #d1d5db)',
 };
 
-// ── 텍스트 말줄임 (한글 기준 ~13자) ──────────────────────────
-function truncate(text, maxLen = 13) {
+// ── 텍스트 말줄임 (한글 기준 ~14자) ──────────────────────────
+function truncate(text, maxLen = 14) {
   if (!text) return '';
   if (text.length <= maxLen) return text;
   return text.slice(0, maxLen - 1) + '…';
@@ -40,7 +40,6 @@ function truncate(text, maxLen = 13) {
 // 2) 리프에 순서대로 row 인덱스
 // 3) 내부 노드 y = 자식 y 평균
 function computeLayout(rootId, nodes) {
-  const map = new Map(nodes.map((n) => [n.id, n]));
   const childMap = new Map(nodes.map((n) => [n.id, []]));
 
   nodes.forEach((n) => {
@@ -87,34 +86,33 @@ function Edge({ x1, y1, x2, y2 }) {
   return <path d={d} fill="none" stroke={COLORS.edge} strokeWidth={1.5} />;
 }
 
-// ── 노드 박스 ─────────────────────────────────────────────────
-function NodeBox({ node, x, y, hasChildren }) {
+// ── 노드 박스 (제목 1줄, 클릭 가능) ──────────────────────────
+function NodeBox({ node, x, y, hasChildren, selected, onSelect }) {
   const isRoot = node.kind === 'root';
   const color = isRoot ? COLORS.root : hasChildren ? COLORS.branch : COLORS.leaf;
-  const label = truncate(node.title, 13);
-  const srcText = node.sources?.length ? node.sources.map((p) => `p${p}`).join(',') : null;
-
-  const nodeH = srcText ? NODE_H + 14 : NODE_H;
+  const label = truncate(node.title, 14);
 
   return (
-    <g>
+    <g
+      className="eval-tree-node"
+      onClick={() => onSelect(node.id)}
+      style={{ cursor: 'pointer' }}
+    >
       <rect
         x={x}
         y={y}
         width={NODE_W}
-        height={nodeH}
+        height={NODE_H}
         rx={6}
         ry={6}
         fill={color.fill}
-        stroke={color.stroke}
-        strokeWidth={isRoot ? 2 : 1.5}
+        stroke={selected ? 'var(--color-accent, #2563eb)' : color.stroke}
+        strokeWidth={selected ? 2.5 : isRoot ? 2 : 1.5}
       />
-      {/* 전체 제목 툴팁 */}
       <title>{node.title}{node.gloss ? ` — ${node.gloss}` : ''}</title>
-      {/* 제목 텍스트 */}
       <text
         x={x + NODE_W / 2}
-        y={y + (srcText ? NODE_H / 2 - 1 : NODE_H / 2 + 1)}
+        y={y + NODE_H / 2 + 1}
         textAnchor="middle"
         dominantBaseline="middle"
         fontSize={13}
@@ -123,25 +121,35 @@ function NodeBox({ node, x, y, hasChildren }) {
       >
         {label}
       </text>
-      {/* sources 페이지 표기 */}
-      {srcText && (
-        <text
-          x={x + NODE_W / 2}
-          y={y + NODE_H - 3}
-          textAnchor="middle"
-          dominantBaseline="hanging"
-          fontSize={10}
-          fill="var(--color-text-tertiary, #9ca3af)"
-        >
-          {srcText}
-        </text>
-      )}
     </g>
+  );
+}
+
+// ── 선택 노드 상세 카드 ───────────────────────────────────────
+function NodeDetail({ node, onClose }) {
+  if (!node) return null;
+  const srcText = node.sources?.length ? node.sources.map((p) => `p${p}`).join(', ') : null;
+  const desc = node.gloss; // 개념=gloss / 테마=description (동일 필드)
+
+  return (
+    <div className="eval-tree-detail">
+      <div className="eval-tree-detail-head">
+        <strong className="eval-tree-detail-title">{node.title}</strong>
+        <button className="eval-tree-detail-close" onClick={onClose} aria-label="닫기">×</button>
+      </div>
+      {srcText && <div className="eval-tree-detail-src">{srcText}</div>}
+      {desc && <div className="eval-tree-detail-gloss">{desc}</div>}
+      {node.anchor && (
+        <div className="eval-tree-detail-anchor">“{node.anchor}”</div>
+      )}
+    </div>
   );
 }
 
 // ── TreeSvg 메인 컴포넌트 ─────────────────────────────────────
 export function TreeSvg({ tree }) {
+  const [selectedId, setSelectedId] = useState(null);
+
   if (!tree || !tree.nodes || tree.nodes.length === 0) return null;
 
   const { rootId, nodes } = tree;
@@ -169,41 +177,47 @@ export function TreeSvg({ tree }) {
     });
   });
 
+  const selectedNode = selectedId ? nodes.find((n) => n.id === selectedId) : null;
+  const toggle = (id) => setSelectedId((cur) => (cur === id ? null : id));
+
   return (
-    <div className="eval-tree-wrap">
-      <svg
-        className="eval-tree-svg"
-        viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-        width={svgWidth}
-        height={svgHeight}
-        role="img"
-        aria-label="개념 위계 트리"
-      >
-        <title>개념 위계 트리</title>
-        {/* 엣지 먼저 (노드 아래) */}
-        <g className="eval-tree-edges">
-          {edges.map((e) => (
-            <Edge key={e.key} x1={e.x1} y1={e.y1} x2={e.x2} y2={e.y2} />
-          ))}
-        </g>
-        {/* 노드 박스 */}
-        <g className="eval-tree-nodes">
-          {nodes.map((n) => {
-            const pos = layout.get(n.id);
-            if (!pos) return null;
-            const hasChildren = (childMap.get(n.id) || []).length > 0;
-            return (
-              <NodeBox
-                key={n.id}
-                node={n}
-                x={pos.x}
-                y={pos.y}
-                hasChildren={hasChildren}
-              />
-            );
-          })}
-        </g>
-      </svg>
+    <div className="eval-tree-block">
+      <div className="eval-tree-wrap">
+        <svg
+          className="eval-tree-svg"
+          viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+          width={svgWidth}
+          height={svgHeight}
+          role="img"
+          aria-label="개념 위계 트리"
+        >
+          <title>개념 위계 트리</title>
+          <g className="eval-tree-edges">
+            {edges.map((e) => (
+              <Edge key={e.key} x1={e.x1} y1={e.y1} x2={e.x2} y2={e.y2} />
+            ))}
+          </g>
+          <g className="eval-tree-nodes">
+            {nodes.map((n) => {
+              const pos = layout.get(n.id);
+              if (!pos) return null;
+              const hasChildren = (childMap.get(n.id) || []).length > 0;
+              return (
+                <NodeBox
+                  key={n.id}
+                  node={n}
+                  x={pos.x}
+                  y={pos.y}
+                  hasChildren={hasChildren}
+                  selected={selectedId === n.id}
+                  onSelect={toggle}
+                />
+              );
+            })}
+          </g>
+        </svg>
+      </div>
+      <NodeDetail node={selectedNode} onClose={() => setSelectedId(null)} />
     </div>
   );
 }
