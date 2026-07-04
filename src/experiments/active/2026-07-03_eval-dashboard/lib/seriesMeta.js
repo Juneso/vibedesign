@@ -12,6 +12,7 @@ export const SERIES_META = {
   'hier-stability-v5':    { title: 'ingest V5', purpose: '셔플 안정성 베이스라인 — LLM 재량 위계가 재현되는지', pipelineId: 'hier-ingest-v5' },
   'hier-stability-v6':    { title: 'ingest V6', purpose: '셔플 안정성 — 치환 테스트 + 양방향 교차검증', pipelineId: 'hier-ingest-v7' },
   'hier-stability-v7':    { title: 'ingest V7', purpose: '셔플 안정성 — 책 인용 anchor 테마 + critic 반증', pipelineId: 'hier-ingest-v7' },
+  'hier-stability-v8':    { title: 'ingest V8', purpose: '개요(리치데이터) + 위계 통합 — planIngest 위에 테마', pipelineId: 'hier-ingest-v8' },
 };
 
 // 파일명에서 회차 라벨 도출: 'nudge-v7-13.json' → '13회차', 'connections-qf.json' → '단일'

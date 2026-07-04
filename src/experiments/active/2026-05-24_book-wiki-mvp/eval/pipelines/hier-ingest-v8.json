@@ -1,0 +1,259 @@
+{
+  "id": "hier-ingest-v8",
+  "title": "책별 개념 위계 인제스트 — planIngest 개요 로직 + V7 테마 통합 (V8)",
+  "script": "lib/hierEngine.mjs (variant=v8) · 실행: runHierStability.mjs v8",
+  "goal": "독서 메모에서 개념을 뽑되, Phase 1을 miniExtract 루프 대신 M2 검증된 planIngest(알라딘 리치데이터 → 개념 페이지 + ## 개요) 1회 호출로 대체한다. 개념 노드 gloss = planIngest 개요 전문(리치데이터 기반 3~5문장 디스크립션). 그 위에 V7 하이브리드 테마(anchor+critic)를 그대로 얹어 두 계보를 통합한다.",
+  "designIntent": "두 계보 통합: M2에서 검증된 개요 로직(planIngest — 알라딘 리치데이터 주입 → 개념 페이지 ## 개요 생성) + V7에서 검증된 테마 로직(하이브리드 anchor + gpt-4o critic 반증). V5~V7의 miniExtract는 name+한 줄 gloss만 뽑아 개념 페이지에 디스크립션이 없었다. V8은 planIngest의 ## 개요(책 맥락·관점·긴장을 3~5문장으로 서술)를 gloss로 그대로 이어받아 대시보드 TreeSvg 클릭 상세에 자동 노출된다. Phase 1.5(동의어 병합)과 Phase 2(테마 생성·critic)는 v7 코드를 수정 없이 재사용한다.",
+  "diagram": {
+    "canvas": {
+      "w": 880,
+      "h": 760
+    },
+    "nodes": [
+      {
+        "id": "memo",
+        "kind": "data",
+        "label": "독서 메모 문장",
+        "sub": "책별 · 전체 일괄 투입",
+        "x": 40,
+        "y": 40,
+        "w": 200,
+        "h": 60
+      },
+      {
+        "id": "rich",
+        "kind": "data",
+        "label": "알라딘 리치데이터",
+        "sub": "책소개·출판사서평·책속에서·추천사",
+        "x": 340,
+        "y": 40,
+        "w": 200,
+        "h": 60
+      },
+      {
+        "id": "plan",
+        "kind": "process",
+        "label": "planIngest (gpt-4o)",
+        "sub": "리치데이터 → 개념 페이지 + ## 개요",
+        "x": 640,
+        "y": 40,
+        "w": 200,
+        "h": 60,
+        "stageId": "plan_ingest"
+      },
+      {
+        "id": "pages",
+        "kind": "data",
+        "label": "개념 페이지 draft",
+        "sub": "title · body(## 개요 포함) · sources",
+        "x": 640,
+        "y": 160,
+        "w": 200,
+        "h": 60
+      },
+      {
+        "id": "nodes",
+        "kind": "data",
+        "label": "개념 노드 (root 직속)",
+        "sub": "gloss = ## 개요 전문 · emb 부여",
+        "x": 340,
+        "y": 160,
+        "w": 200,
+        "h": 60,
+        "stageId": "node_build"
+      },
+      {
+        "id": "dedup",
+        "kind": "process",
+        "label": "동의어 사후 병합 (Phase 1.5)",
+        "sub": "전체 쌍 + 같은 메모 쌍 강제검사",
+        "x": 40,
+        "y": 160,
+        "w": 200,
+        "h": 60,
+        "stageId": "dedup_merge"
+      },
+      {
+        "id": "tree2",
+        "kind": "data",
+        "label": "정리된 트리",
+        "sub": "동의어 합쳐진 위계",
+        "x": 40,
+        "y": 290,
+        "w": 200,
+        "h": 60
+      },
+      {
+        "id": "themegen",
+        "kind": "process",
+        "label": "테마 생성 (앵커 필수)",
+        "sub": "V7 하이브리드 anchor + description",
+        "x": 340,
+        "y": 290,
+        "w": 200,
+        "h": 60,
+        "stageId": "theme_gen"
+      },
+      {
+        "id": "themes",
+        "kind": "data",
+        "label": "테마 후보",
+        "sub": "name · anchor · desc · 멤버≥2",
+        "x": 640,
+        "y": 290,
+        "w": 200,
+        "h": 60
+      },
+      {
+        "id": "critic",
+        "kind": "process",
+        "label": "테마 critic 반증",
+        "sub": "gpt-4o · 인용해야만 기각 가능",
+        "x": 640,
+        "y": 430,
+        "w": 200,
+        "h": 60,
+        "stageId": "theme_critic"
+      },
+      {
+        "id": "final",
+        "kind": "data",
+        "label": "최종 개념 트리",
+        "sub": "책 → 검증된 테마 → 개념(개요 포함)",
+        "x": 340,
+        "y": 430,
+        "w": 200,
+        "h": 60
+      }
+    ],
+    "edges": [
+      {
+        "from": "memo",
+        "to": "plan",
+        "label": "메모 전체"
+      },
+      {
+        "from": "rich",
+        "to": "plan",
+        "label": "리치데이터 주입"
+      },
+      {
+        "from": "plan",
+        "to": "pages",
+        "label": "create patches"
+      },
+      {
+        "from": "pages",
+        "to": "nodes",
+        "label": "## 개요 파싱 + 임베딩"
+      },
+      {
+        "from": "nodes",
+        "to": "dedup",
+        "label": "전체 개념 쌍"
+      },
+      {
+        "from": "dedup",
+        "to": "tree2",
+        "label": "동의어 병합"
+      },
+      {
+        "from": "tree2",
+        "to": "themegen",
+        "label": "root 직속 개념들"
+      },
+      {
+        "from": "themegen",
+        "to": "themes",
+        "label": "anchor 인용 가능한 축만"
+      },
+      {
+        "from": "themes",
+        "to": "critic",
+        "label": "테마별 독립 검증"
+      },
+      {
+        "from": "critic",
+        "to": "final",
+        "label": "승인 편성 · 기각 해체"
+      }
+    ]
+  },
+  "stages": [
+    {
+      "id": "plan_ingest",
+      "name": "planIngest — 리치데이터 → 개념 페이지 + ## 개요",
+      "why": "V5~V7의 miniExtract는 한 줄 gloss만 뽑아 개념 페이지에 디스크립션이 없었다. planIngest는 알라딘 책소개·출판사서평·책속에서를 주입해 각 개념마다 3~5문장 ## 개요(정의·책의 각도·긴장/질문)를 생성한다. M2 인제스트에서 검증된 로직을 eval 파이프라인에 재사용한다.",
+      "how": "memos 전체를 book(aladin 리치데이터 포함)과 함께 planIngest 1회 호출(gpt-4o). patches의 action==='create' pageDraft를 개념 노드로 변환: title=pageDraft.title, gloss=body의 ## 개요 섹션 파싱, sources=kind==='memo' id → 페이지 번호. 임베딩은 'title: gloss'로 생성.",
+      "params": [
+        {
+          "name": "INGEST_MODEL",
+          "value": "gpt-4o",
+          "meaning": "planIngest 전용 모델",
+          "effect": "mini는 patches 과소생성 + sources 누락으로 개념 커버리지 하락. gpt-4o 필수"
+        }
+      ],
+      "output": "개념 노드 배열 (root 직속 leaf). gloss = ## 개요 전문."
+    },
+    {
+      "id": "node_build",
+      "name": "개념 노드 빌드 + analyses 보강",
+      "why": "planIngest의 create patches가 커버 못한 메모(analyses에만 있는 메모)를 analyses.thesis+bookContextLink로 보완해 커버리지를 높인다.",
+      "how": "create patch → 노드. covered 집합 추적 → 누락 메모는 analyses에서 keyConcepts[0] / thesis를 title로, thesis+bookContextLink를 gloss로 보완 노드 생성.",
+      "params": [],
+      "output": "전체 개념 노드 (patch 기반 + analyses 보강)."
+    },
+    {
+      "id": "dedup_merge",
+      "name": "동의어 사후 병합 (Phase 1.5 — v7 동일)",
+      "why": "planIngest가 같은 개념을 다른 이름으로 중복 생성할 수 있다. 임베딩 유사도 0.55 이상 또는 같은 메모 출신 쌍을 강제 검사해 합친다.",
+      "how": "v7 Phase 1.5 코드 그대로 재사용. same_memo_force_check=true.",
+      "params": [
+        {
+          "name": "sim_dedup_threshold",
+          "value": 0.55
+        },
+        {
+          "name": "same_memo_force_check",
+          "value": true
+        }
+      ],
+      "output": "동의어 합쳐진 트리."
+    },
+    {
+      "id": "theme_gen",
+      "name": "테마 생성 — V7 하이브리드 anchor (재사용)",
+      "why": "V7에서 검증된 로직. 책 논지 인용(book) 또는 독자 반복(reader≥3메모) 중 하나면 유효. 수정 없이 재사용.",
+      "how": "v7 Phase 2 코드 그대로. richBlock(알라딘 리치데이터)을 anchor 근거로 사용.",
+      "params": [
+        {
+          "name": "min_root_kids",
+          "value": 3
+        },
+        {
+          "name": "min_members",
+          "value": 2
+        }
+      ],
+      "output": "anchor·description을 갖춘 테마 후보."
+    },
+    {
+      "id": "theme_critic",
+      "name": "테마 critic 반증 — V7 gpt-4o (재사용)",
+      "why": "V7에서 검증된 로직. 인용해야만 기각 가능. 수정 없이 재사용.",
+      "how": "v7 critic 코드 그대로. gpt-4o, 온도 0.",
+      "params": [
+        {
+          "name": "critic_model",
+          "value": "gpt-4o"
+        }
+      ],
+      "output": "승인된 테마만 트리에 편성."
+    }
+  ],
+  "knownIssues": [
+    "planIngest가 gpt-4o 필수라 run당 비용이 v7 대비 높다 — 메모 17개 기준 약 2배 예상",
+    "planIngest 응답 파싱 실패 시 개념 노드가 0이 될 수 있다 — analyses 보강 경로가 fallback이나 개요는 없음",
+    "테마 이름 표현이 실행마다 다를 수 있다 — v7과 동일 알려진 문제"
+  ]
+}

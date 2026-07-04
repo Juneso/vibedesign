@@ -22,7 +22,17 @@ const KEY = process.env.OPENAI_API_KEY;
 const llm = openaiNodeTransport({ model: MODEL });
 
 const variant = (process.argv[2] || 'v5').toLowerCase();
-if (!['v5', 'v6', 'v7'].includes(variant)) { console.error('usage: node eval/runHierStability.mjs v5|v6|v7'); process.exit(1); }
+if (!['v5', 'v6', 'v7', 'v8'].includes(variant)) { console.error('usage: node eval/runHierStability.mjs v5|v6|v7|v8'); process.exit(1); }
+
+// v8 전용: planIngest 로더 (gpt-4o 필수)
+let planIngestFn = null;
+if (variant === 'v8') {
+  const { planIngest, setLLMTransport } = await import('../lib/llm.js');
+  const INGEST_MODEL = process.env.INGEST_MODEL || 'gpt-4o';
+  setLLMTransport(openaiNodeTransport({ model: INGEST_MODEL }));
+  planIngestFn = planIngest;
+  console.log(`[v8] planIngest 모델: ${INGEST_MODEL}`);
+}
 
 async function embedFn(text) {
   const r = await fetch('https://api.openai.com/v1/embeddings', {
@@ -117,20 +127,34 @@ function runMd(r, idx) {
   } else if (variant === 'v6') {
     check.push(`- **flip ${s.flip}건** — 교차검증이 기각·강등한 위계 제안 수. 남은 child ${s.child}·parent ${s.parent}건만 검증 통과 위계 (로그 [flip] 참조)`);
     check.push(`- **트리가 평면화됐는가** — V6는 가짜 위계를 걸러내는 대신 정리감을 잃는 트레이드오프. 테마가 없는 것이 정상`);
+  } else if (variant === 'v8') {
+    check.push(`- **planIngest 페이지 ${s.pages}개** — 개념 노드들에 개요(## 개요 디스크립션)가 실제로 붙었는가. 아래 "개념별 개요" 섹션에서 gloss가 비어있으면 실패`);
+    check.push(`- **테마 ${s.theme}개 (기각 ${s.themeRejected})** — V7과 동일 하이브리드 anchor 테마. 이름·anchor·설명이 책 논지 축(재발견/정보의 건축/비움)과 일치하는지 확인`);
+    check.push(`- **다른 회차와 같은 축인가** — 재발견 / 정보의 건축+감각 / 비움 3축 재현 여부`);
+    check.push(`- merge ${s.merge + s.mergeGlobal}건 (Phase 1.5 동의어 병합) · planIngest가 겹치는 페이지를 별도 create했을 경우 여기서 합쳐져야 정상`);
   } else {
     check.push(`- **테마 ${s.theme}개 (기각 ${s.themeRejected})** — 아래 테마 목록의 이름·anchor·설명이 책의 논지 축과 일치하는지가 핵심. 뜬금없는 우산 개념이 있으면 실패`);
     check.push(`- **anchor가 실제 인용인가** — 책 요약·목차에 없는 구절을 지어냈으면 critic이 놓친 것`);
     check.push(`- **다른 회차와 같은 축인가** — 재발견 / 정보의 건축+감각 / 비움 3축이 재현되어야 안정`);
     check.push(`- flip ${s.flip}건 · merge ${s.merge + s.mergeGlobal}건 — 같은 메모 중복(엑스포메이션=미지화 류)이 합쳐졌는지 트리에서 확인`);
   }
+  // v8: 개념별 개요 섹션 (gloss가 개요 전문)
+  let overviewSection = '';
+  if (variant === 'v8') {
+    const conceptNodes = r.tree.nodes.filter((n) => n.kind === 'concept' && n.gloss);
+    if (conceptNodes.length) {
+      overviewSection = `\n## 개념별 개요\n\n${conceptNodes.map((n) => `**${n.title}**\n${n.gloss.slice(0, 200)}${n.gloss.length > 200 ? '…' : ''}`).join('\n\n')}\n`;
+    }
+  }
+
   return `# ingest ${variant} · 셔플 ${idx}회차
 
-> ${MODEL} · 순서 [${r.memos.map((m) => m.p).join(',')}] · ${r.secs}s · 개념 ${s.conceptCount} · 깊이 L${s.maxDepth}
+> ${MODEL} · 순서 [${r.memos.map((m) => m.p).join(',')}] · ${r.secs}s · 개념 ${s.conceptCount} · 깊이 L${s.maxDepth}${variant === 'v8' ? ` · planIngest 페이지 ${s.pages}` : ''}
 
 ## 👀 체크포인트
 
 ${check.join('\n')}
-${themes.length ? `\n## 테마 (anchor + description)\n\n${themes.join('\n')}\n` : ''}
+${themes.length ? `\n## 테마 (anchor + description)\n\n${themes.join('\n')}\n` : ''}${overviewSection}
 ## 트리
 
 \`\`\`
@@ -153,12 +177,12 @@ for (const run of RUNS) {
   runIdx++;
   console.log(`\n━━━ ${variant} · ${run.name} · 순서: [${run.memos.map((m) => m.p).join(',')}] ━━━`);
   const t0 = Date.now();
-  const r = await runHierIngest({ book, memos: run.memos, llm, embedFn, variant, onProgress: (msg) => process.stdout.write(`  ${msg}\r`) });
+  const r = await runHierIngest({ book, memos: run.memos, llm, embedFn, variant, planIngestFn, onProgress: (msg) => process.stdout.write(`  ${msg}\r`) });
   const secs = ((Date.now() - t0) / 1000).toFixed(0);
   const rel = memoPairRelations(r.nodes, r.rootId);
   const result = { ...run, stats: r.stats, rel, tree: serializeTree(r.nodes, r.rootId), log: r.log, secs };
   results.push(result);
-  console.log(`\n  개념 ${r.stats.conceptCount} · L${r.stats.maxDepth} · merge ${r.stats.merge}+${r.stats.mergeGlobal} child ${r.stats.child} parent ${r.stats.parent} attach ${r.stats.attach} cluster ${r.stats.cluster}${variant !== 'v5' ? ` flip ${r.stats.flip}` : ''}${variant === 'v7' ? ` theme ${r.stats.theme}(-${r.stats.themeRejected})` : ''} · ${secs}s`);
+  console.log(`\n  개념 ${r.stats.conceptCount} · L${r.stats.maxDepth} · merge ${r.stats.merge}+${r.stats.mergeGlobal} child ${r.stats.child} parent ${r.stats.parent} attach ${r.stats.attach} cluster ${r.stats.cluster}${variant !== 'v5' ? ` flip ${r.stats.flip}` : ''}${(variant === 'v7' || variant === 'v8') ? ` theme ${r.stats.theme}(-${r.stats.themeRejected})` : ''}${variant === 'v8' ? ` pages ${r.stats.pages}` : ''} · ${secs}s`);
   const base = `hier-stability-${variant}-${runIdx}`;
   await writeFile(resolve(runsDir, `${base}.json`), JSON.stringify({ run: run.name, order: run.memos.map((m) => m.p), stats: r.stats, tree: result.tree, rel, log: r.log }, null, 1));
   await writeFile(resolve(runsDir, `${base}.md`), runMd(result, runIdx));
@@ -217,10 +241,10 @@ const md = `# 위계 인제스트 셔플 안정성 — ${variant}
 
 ## run별 구조 통계
 
-| run | 개념 수 | 최대 깊이 | merge | merge* | child | parent | attach | cluster${variant !== 'v5' ? ' | flip' : ''}${variant === 'v7' ? ' | theme(기각)' : ''} | 시간 |
-|---|---|---|---|---|---|---|---|---${variant !== 'v5' ? '|---' : ''}${variant === 'v7' ? '|---' : ''}|---|
-${results.map((r) => `| ${r.name} | ${r.stats.conceptCount} | L${r.stats.maxDepth} | ${r.stats.merge} | ${r.stats.mergeGlobal} | ${r.stats.child} | ${r.stats.parent} | ${r.stats.attach} | ${r.stats.cluster}${variant !== 'v5' ? ` | ${r.stats.flip}` : ''}${variant === 'v7' ? ` | ${r.stats.theme}(${r.stats.themeRejected})` : ''} | ${r.secs}s |`).join('\n')}
-${variant === 'v7' ? `\n## run별 테마 (name + description)\n\n${results.map((r) => {
+| run | 개념 수 | 최대 깊이 | merge | merge* | child | parent | attach | cluster${variant !== 'v5' ? ' | flip' : ''}${(variant === 'v7' || variant === 'v8') ? ' | theme(기각)' : ''}${variant === 'v8' ? ' | planIngest 페이지' : ''} | 시간 |
+|---|---|---|---|---|---|---|---|---${variant !== 'v5' ? '|---' : ''}${(variant === 'v7' || variant === 'v8') ? '|---' : ''}${variant === 'v8' ? '|---' : ''}|---|
+${results.map((r) => `| ${r.name} | ${r.stats.conceptCount} | L${r.stats.maxDepth} | ${r.stats.merge} | ${r.stats.mergeGlobal} | ${r.stats.child} | ${r.stats.parent} | ${r.stats.attach} | ${r.stats.cluster}${variant !== 'v5' ? ` | ${r.stats.flip}` : ''}${(variant === 'v7' || variant === 'v8') ? ` | ${r.stats.theme}(${r.stats.themeRejected})` : ''}${variant === 'v8' ? ` | ${r.stats.pages}` : ''} | ${r.secs}s |`).join('\n')}
+${(variant === 'v7' || variant === 'v8') ? `\n## run별 테마 (name + description)\n\n${results.map((r) => {
   const lines = [];
   for (let i = 0; i < r.log.length; i++) {
     if (r.log[i].startsWith('[theme]')) lines.push(`- ${r.log[i].replace('[theme] ', '**')}**${r.log[i + 1]?.startsWith('[theme.desc]') ? `\n  - ${r.log[i + 1].replace('[theme.desc]   ↳ ', '')}` : ''}`.replace('**"', '**"').replace(')**', ')**'));

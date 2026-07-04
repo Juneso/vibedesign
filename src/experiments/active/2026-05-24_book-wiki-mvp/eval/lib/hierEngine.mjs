@@ -7,16 +7,21 @@
 //           · 테마별 독립 critic 반증(책 핵심 부합? 억지 멤버?) — 탈락 테마 해체
 //           · 같은 메모 출신 개념쌍은 sim 문턱 무시하고 동의어 검사
 //           · 고아→고아 중첩 구멍 제거(테마 생성 경로로만 수직 이동)
-// 사용: runHierIngest({ book, memos, llm, embedFn, variant })  → { nodes, rootId, stats, log }
+//  - 'v8' : planIngest(알라딘 리치데이터 → 개념 페이지 + ## 개요) 위에 V7 테마 로직을 얹는 통합.
+//           · Phase 1 대체: miniExtract 루프 대신 planIngest 1회 호출 (gpt-4o 필수)
+//           · 개념 노드 gloss = planIngest ## 개요 디스크립션 (리치데이터 기반)
+//           · Phase 1.5(동의어 병합) + Phase 2(하이브리드 anchor 테마 + critic): v7 그대로 재사용
+// 사용: runHierIngest({ book, memos, llm, embedFn, variant, planIngestFn? })  → { nodes, rootId, stats, log }
 //
 // ⚠ 구조도 동기화: 이 엔진의 단계·프롬프트·파라미터를 바꾸면 반드시
 //   eval/pipelines/hier-ingest-v7.json (eval 대시보드 왼쪽 구조도)도 같이 갱신할 것.
+//   v8은 eval/pipelines/hier-ingest-v8.json 참조.
 
 const MAX_LEVEL = 3;
 
 const cos = (a, b) => { let s = 0, na = 0, nb = 0; for (let i = 0; i < a.length; i++) { s += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; } return s / (Math.sqrt(na) * Math.sqrt(nb)); };
 
-export async function runHierIngest({ book, memos, llm, embedFn, variant = 'v5', onProgress }) {
+export async function runHierIngest({ book, memos, llm, embedFn, variant = 'v5', planIngestFn, onProgress }) {
   let SEQ = 0; const id = () => `n${++SEQ}`;
   const nodes = new Map(); const log = [];
   const root = { id: id(), title: book.title, parentId: null, level: 0, kind: 'root', sources: [], emb: null };
@@ -107,57 +112,107 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
 
   // ─── Phase 1 ────────────────────────────────────────────────
   log.push(`[Phase0] variant=${variant} · 목차=숨은 척추. root=책 1개. 최대 ${MAX_LEVEL}단.`);
-  let memoIdx = 0;
-  for (const memo of memos) {
-    memoIdx++; onProgress?.(`memo ${memoIdx}/${memos.length} (p${memo.p})`);
-    for (const c of await extract(memo)) {
-      const emb = await embedFn(`${c.name}: ${c.gloss}`);
-      const cand = concepts().map((n) => ({ id: n.id, node: n, sim: cos(emb, n.emb) })).filter((x) => x.node.emb).sort((a, b) => b.sim - a.sim).slice(0, 4).filter((x) => x.sim > 0.3);
-      let d = await place(memo, c, cand);
-      const tgt = nodes.get(d.targetId);
-      const validConcept = tgt && tgt.kind === 'concept';
 
-      // B. v6+: child/parent는 양방향 교차검증을 통과해야 확정
-      if ((variant === 'v6' || variant === 'v7') && validConcept && (d.op === 'child' || d.op === 'parent')) {
-        const asConcept = (n) => ({ name: n.title, gloss: n.gloss });
-        const verdict = d.op === 'child'
-          ? await verifyDirection(c, asConcept(tgt))          // 새 개념 ⊂ 후보
-          : await verifyDirection(asConcept(tgt), c);         // 후보 ⊂ 새 개념
-        if (verdict === 'synonym') {
-          log.push(`[flip]   p${memo.p} · "${c.name}" ${d.op}→merge (양방향 자연스러움=동의어 의심)`);
-          d = { op: 'merge', targetId: d.targetId, reason: 'B검증: 양방향 포함 → 동의어' };
-        } else if (verdict === 'rejected') {
-          log.push(`[flip]   p${memo.p} · "${c.name}" ${d.op}→attach (교차검증 불일치)`);
-          d = { op: 'attach', targetId: root.id, reason: 'B검증: 방향 불일치' };
+  // v8: planIngest 1회 호출 → 개념 페이지(## 개요 포함) → 노드화
+  let v8PageCount = 0;
+  if (variant === 'v8') {
+    if (!planIngestFn) throw new Error('v8 requires planIngestFn');
+    // memos에 id 부여 (planIngest가 소비하는 형식: id='m'+p)
+    const memosWithId = memos.map((m) => ({ ...m, id: `m${m.p}`, chapter: m.chapter || '', myThought: m.my || '' }));
+    onProgress?.('phase 1 — planIngest 호출(gpt-4o)...');
+    const out = await planIngestFn({ memos: memosWithId, book, existingPages: [], contexts: [], profile: {} });
+    log.push(`[plan] planIngest 완료 · patches=${out.patches?.length ?? 0} analyses=${out.analyses?.length ?? 0}`);
+
+    // ## 개요 파서 (protoRealMeta 와 동일)
+    const overview = (body = '') => {
+      const m = body.match(/##\s*개요\s*([\s\S]*?)(\n##\s|$)/);
+      return (m ? m[1] : body).trim().replace(/\[\^[^\]]*\]/g, '').replace(/\s+/g, ' ').trim();
+    };
+    // pageOf: memo id → 페이지 번호
+    const pageOf = (memoId) => Number(String(memoId).replace(/^m/, ''));
+
+    // create 패치 → 개념 노드
+    for (const pt of out.patches || []) {
+      const pd = pt.pageDraft; if (!pd || pt.action !== 'create') continue;
+      const gloss = overview(pd.body || '');
+      const src = [...new Set((pd.sources || []).filter((s) => s.kind === 'memo').map((s) => pageOf(s.id)))].filter(Boolean);
+      const emb = await embedFn(`${pd.title}: ${gloss}`);
+      const n = addConcept(pd.title, root.id, emb, gloss);
+      n.sources.push(...src);
+      v8PageCount++;
+      log.push(`[plan] 페이지→노드 "${pd.title}" · 개요 ${gloss.slice(0, 50)}… · 소스 p${src.join(',p') || '(없음)'}`);
+    }
+
+    // analyses 보강: 어떤 패치에도 연결 안 된 메모는 analyses의 thesis/bookContextLink로 보완
+    const covered = new Set(concepts().flatMap((n) => n.sources));
+    for (const a of out.analyses || []) {
+      const p = pageOf(a.memoId); if (covered.has(p)) continue;
+      const title = (a.keyConcepts || [])[0] || (a.thesis || '').slice(0, 14) || '기타';
+      const gloss = [a.thesis, a.bookContextLink].filter(Boolean).join(' ');
+      // 같은 제목의 노드가 있으면 소스만 추가
+      const existing = [...nodes.values()].find((n) => n.kind === 'concept' && n.title === title);
+      if (existing) { existing.sources.push(p); covered.add(p); continue; }
+      const emb = await embedFn(`${title}: ${gloss}`);
+      const n = addConcept(title, root.id, emb, gloss);
+      n.sources.push(p); covered.add(p);
+      log.push(`[plan] analyses 보강 → "${title}" p${p}`);
+    }
+    log.push(`[plan] Phase1 완료 · 개념 노드 ${concepts().length}개 (planIngest 페이지 ${v8PageCount}개)`);
+
+  } else {
+    // v5/v6/v7: 기존 extract/place 루프
+    let memoIdx = 0;
+    for (const memo of memos) {
+      memoIdx++; onProgress?.(`memo ${memoIdx}/${memos.length} (p${memo.p})`);
+      for (const c of await extract(memo)) {
+        const emb = await embedFn(`${c.name}: ${c.gloss}`);
+        const cand = concepts().map((n) => ({ id: n.id, node: n, sim: cos(emb, n.emb) })).filter((x) => x.node.emb).sort((a, b) => b.sim - a.sim).slice(0, 4).filter((x) => x.sim > 0.3);
+        let d = await place(memo, c, cand);
+        const tgt = nodes.get(d.targetId);
+        const validConcept = tgt && tgt.kind === 'concept';
+
+        // B. v6+: child/parent는 양방향 교차검증을 통과해야 확정
+        if ((variant === 'v6' || variant === 'v7') && validConcept && (d.op === 'child' || d.op === 'parent')) {
+          const asConcept = (n) => ({ name: n.title, gloss: n.gloss });
+          const verdict = d.op === 'child'
+            ? await verifyDirection(c, asConcept(tgt))          // 새 개념 ⊂ 후보
+            : await verifyDirection(asConcept(tgt), c);         // 후보 ⊂ 새 개념
+          if (verdict === 'synonym') {
+            log.push(`[flip]   p${memo.p} · "${c.name}" ${d.op}→merge (양방향 자연스러움=동의어 의심)`);
+            d = { op: 'merge', targetId: d.targetId, reason: 'B검증: 양방향 포함 → 동의어' };
+          } else if (verdict === 'rejected') {
+            log.push(`[flip]   p${memo.p} · "${c.name}" ${d.op}→attach (교차검증 불일치)`);
+            d = { op: 'attach', targetId: root.id, reason: 'B검증: 방향 불일치' };
+          }
         }
-      }
 
-      if (d.op === 'merge' && validConcept) {
-        tgt.sources.push(memo.p);
-        log.push(`[merge]  p${memo.p} · "${c.name}" → ${tgt.id} ${tgt.title}  (${d.reason})`);
+        if (d.op === 'merge' && validConcept) {
+          tgt.sources.push(memo.p);
+          log.push(`[merge]  p${memo.p} · "${c.name}" → ${tgt.id} ${tgt.title}  (${d.reason})`);
 
-      } else if (d.op === 'child' && validConcept && tgt.level < MAX_LEVEL) {
-        const n = addConcept(c.name, tgt.id, emb, c.gloss); n.sources.push(memo.p);
-        log.push(`[child]  p${memo.p} · "${c.name}" → ${n.id} ⊂ ${tgt.title} (L${n.level})  (${d.reason})`);
+        } else if (d.op === 'child' && validConcept && tgt.level < MAX_LEVEL) {
+          const n = addConcept(c.name, tgt.id, emb, c.gloss); n.sources.push(memo.p);
+          log.push(`[child]  p${memo.p} · "${c.name}" → ${n.id} ⊂ ${tgt.title} (L${n.level})  (${d.reason})`);
 
-      } else if (d.op === 'parent' && validConcept) {
-        const grand = nodes.get(tgt.parentId) || root;
-        if (grand.level + 1 > MAX_LEVEL) {
-          const n = addConcept(c.name, root.id, emb, c.gloss); n.sources.push(memo.p);
-          log.push(`[attach*] p${memo.p} · "${c.name}" → ${n.id} (parent 승격이 깊이 초과 → root)  (${d.reason})`);
+        } else if (d.op === 'parent' && validConcept) {
+          const grand = nodes.get(tgt.parentId) || root;
+          if (grand.level + 1 > MAX_LEVEL) {
+            const n = addConcept(c.name, root.id, emb, c.gloss); n.sources.push(memo.p);
+            log.push(`[attach*] p${memo.p} · "${c.name}" → ${n.id} (parent 승격이 깊이 초과 → root)  (${d.reason})`);
+          } else {
+            const n = addConcept(c.name, grand.id, emb, c.gloss); n.sources.push(memo.p);
+            const adopt = [d.targetId, ...(d.adoptIds || [])]
+              .filter((aid, i, arr) => arr.indexOf(aid) === i)
+              .map((aid) => nodes.get(aid))
+              .filter((x) => x && x.kind === 'concept' && x.id !== n.id && x.id !== n.parentId && !isAncestor(x.id, n.id));
+            for (const a of adopt) if (n.level + 1 + subtreeDepth(a.id) <= MAX_LEVEL) reparent(a.id, n.id);
+            log.push(`[parent] p${memo.p} · "${c.name}"(${n.id},L${n.level}) ⊃ [${adopt.map((a) => a.title).join(', ')}]  (${d.reason})`);
+          }
+
         } else {
-          const n = addConcept(c.name, grand.id, emb, c.gloss); n.sources.push(memo.p);
-          const adopt = [d.targetId, ...(d.adoptIds || [])]
-            .filter((aid, i, arr) => arr.indexOf(aid) === i)
-            .map((aid) => nodes.get(aid))
-            .filter((x) => x && x.kind === 'concept' && x.id !== n.id && x.id !== n.parentId && !isAncestor(x.id, n.id));
-          for (const a of adopt) if (n.level + 1 + subtreeDepth(a.id) <= MAX_LEVEL) reparent(a.id, n.id);
-          log.push(`[parent] p${memo.p} · "${c.name}"(${n.id},L${n.level}) ⊃ [${adopt.map((a) => a.title).join(', ')}]  (${d.reason})`);
+          const n = addConcept(c.name, root.id, emb, c.gloss); n.sources.push(memo.p);
+          log.push(`[attach] p${memo.p} · "${c.name}" → ${n.id} (root)  (${d.reason})`);
         }
-
-      } else {
-        const n = addConcept(c.name, root.id, emb, c.gloss); n.sources.push(memo.p);
-        log.push(`[attach] p${memo.p} · "${c.name}" → ${n.id} (root)  (${d.reason})`);
       }
     }
   }
@@ -169,8 +224,8 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
     const pairs = [];
     for (let i = 0; i < cs.length; i++) for (let j = i + 1; j < cs.length; j++) {
       const sim = cos(cs[i].emb, cs[j].emb);
-      // v7: 같은 메모에서 나온 개념쌍은 extract 자기중복 가능성이 높다 — sim 문턱 무시하고 검사
-      const sameMemo = variant === 'v7' && cs[i].sources.some((p) => cs[j].sources.includes(p));
+      // v7/v8: 같은 메모에서 나온 개념쌍은 extract 자기중복 가능성이 높다 — sim 문턱 무시하고 검사
+      const sameMemo = (variant === 'v7' || variant === 'v8') && cs[i].sources.some((p) => cs[j].sources.includes(p));
       if (sim > 0.55 || sameMemo) pairs.push({ a: cs[i], b: cs[j], sim });
     }
     pairs.sort((x, y) => y.sim - x.sim);
@@ -190,8 +245,8 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
     }
   }
 
-  // ─── Phase 2 (v7): 테마 주역화 — Description 필수 + 책 논지 앵커링 + critic 반증 ──
-  if (variant === 'v7') {
+  // ─── Phase 2 (v7/v8): 테마 주역화 — Description 필수 + 책 논지 앵커링 + critic 반증 ──
+  if (variant === 'v7' || variant === 'v8') {
     onProgress?.('phase 2 — 테마 생성(v7)');
     // 테마 anchor 의 ground truth = 실제 책 리치데이터(알라딘 책소개·출판사서평·책속에서·추천사) + 요약 + 목차.
     // summary 하나만 쓰면 그 요약이 편향될 때 앵커 검증이 자기충족적이 된다 → 출판사 원문까지 근거로 제공.
@@ -287,7 +342,7 @@ B) 독자-근거: 책 맥락엔 없더라도, 멤버들이 **서로 다른 메�
   }
 
   // ─── Phase 2 (v5/v6): 존중형 군집화 ──────────────────────────
-  if (variant !== 'v7') {
+  if (variant !== 'v7' && variant !== 'v8') {
     onProgress?.('phase 2 — 군집화');
     const orphans = concepts().filter((n) => n.parentId === root.id && childrenOf(n.id).length === 0);
     const existingThemes = concepts().filter((n) => n.parentId === root.id && childrenOf(n.id).length > 0);
@@ -342,6 +397,7 @@ ${orphans.map((k) => `${k.id}: ${k.title} — ${k.gloss || ''}`).join('\n')}
     merge: cnt('merge'), mergeGlobal: cnt('merge*'), child: cnt('child'),
     parent: cnt('parent'), attach: cnt('attach'), cluster: cnt('cluster'), flip: cnt('flip'),
     theme: cnt('theme'), themeRejected: cnt('theme✗'),
+    ...(variant === 'v8' ? { pages: v8PageCount } : {}),
   };
   return { nodes, rootId: root.id, stats, log };
 }
