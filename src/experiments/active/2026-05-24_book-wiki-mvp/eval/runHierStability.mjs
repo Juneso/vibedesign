@@ -9,7 +9,7 @@
 //  - 깊이 분포·op 카운트(merge/child/parent/attach/flip).
 // 출력: eval/runs/hier-stability-{variant}.md + 개별 트리 JSON
 
-import { writeFile } from 'node:fs/promises';
+import { writeFile, readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { openaiNodeTransport, loadDotEnvLocal } from './lib/transport.mjs';
@@ -35,10 +35,12 @@ async function embedFn(text) {
   return d.data[0].embedding;
 }
 
-// ─── 데이터: protoHierIngestV5와 동일 (비교 공정성) ─────────────
+// ─── 데이터: 실제 옵시디언 발췌 (evalNoToc.mjs 와 동일 소스) ─────
+// ⚠ 이전엔 손질된 합성 메모를 썼으나(입력이 깔끔해 테마가 쉽게 나오는 편향), 실 발췌로 교체.
 const book = {
   title: '디자인의 디자인', author: '하라 켄야', category: '예술/디자인 > 디자인 이론',
-  toc: ['디자인이라는 것의 발견', 'RE-DESIGN: 21세기의 일상', '정보의 건축이라는 사고', 'HAPTIC: 감각의 깨어남', '무인양품의 비전', '엑스포메이션 — 미지화'],
+  // 실제 판본 목차 (evalNoToc META 와 동일). 발췌가 이 목차 범위를 실제로 커버.
+  toc: ['디자인이라는 것', 'RE-DESIGN — 21세기의 일상', '정보의 건축 그 가능성', '욕망의 에듀케이션', '일본의 디자인', '비주얼커뮤니케이션 디자인', '디자이너의 일'],
   // v7 테마 앵커링용 실제 책 리치데이터 — evalNoToc META.aladin 과 동일 출처(알라딘 실데이터) verbatim.
   // ⚠ summary 는 메모셋에 맞춰 손대지 않는다(편향 방지). anchor 검증의 ground truth 는 아래 리치데이터.
   // v5/v6 place 프롬프트에는 안 들어감 — 테마 단계(theme_gen·critic)에서만 사용.
@@ -50,22 +52,19 @@ const book = {
     recommend: '디자인을 ‘스타일링’이 아니라 ‘사고방식’으로 이해하게 해주는 책.',
   },
 };
-const memosBase = [
-  { p: 18, text: '디자인은 새로운 것을 만드는 일이 아니라, 이미 알고 있다고 여기는 것을 낯설게 되돌아보게 하는 일이다.', my: '창조보다 재발견' },
-  { p: 33, text: '익숙한 사물을 다시 디자인하면, 우리가 그것을 사실은 잘 모르고 있었다는 걸 깨닫는다.', my: '리디자인 = 무지의 자각' },
-  { p: 41, text: '화장지의 심을 사각형으로 바꾸자, 굴릴 때의 저항이 "아껴 쓰라"는 메시지가 되었다.', my: '형태가 곧 메시지' },
-  { p: 55, text: '정보는 시각만으로 전달되지 않는다. 손끝의 촉각, 무게, 질감이 의미를 만든다.', my: '오감으로 읽는 정보' },
-  { p: 60, text: 'HAPTIC 전시는 디자이너들에게 "감각을 깨우는" 사물을 의뢰한 실험이었다.', my: '촉각 디자인의 실천' },
-  { p: 72, text: '정보를 잘 설계한다는 것은, 사람의 감각이 그것을 자연스럽게 이해하도록 구조를 짓는 일이다.', my: '정보의 건축' },
-  { p: 88, text: '비어 있음은 부족함이 아니다. 빈 그릇이기에 무엇이든 담을 수 있다.', my: '여백 = 가능성의 그릇' },
-  { p: 90, text: '엠프티니스는 의미를 비워둠으로써 보는 사람이 스스로 의미를 채우게 한다.', my: '비움이 참여를 부른다' },
-  { p: 104, text: '무인양품은 "이것이 좋다"가 아니라 "이것으로 충분하다"라는 절제된 만족을 디자인한다.', my: '충분함의 미학' },
-  { p: 108, text: '브랜드의 색을 지우고 익명의 사물이 될 때, 오히려 더 넓은 사람에게 가닿는다.', my: '익명성의 힘' },
-  { p: 121, text: '엑스포메이션은 안다고 착각하던 대상을 다시 모르게 만들어, 호기심을 되살리는 방법이다.', my: '미지화 = 앎의 리셋' },
-  { p: 130, text: '평범한 일상의 사물 속에 디자인이 답해야 할 가장 어려운 질문이 들어 있다.', my: '일상이 곧 과제' },
-  { p: 142, text: '여백을 남긴 포스터가, 가득 채운 포스터보다 더 강하게 말을 건다.', my: '여백의 전달력' },
-  { p: 150, text: '촉각을 자극하는 종이의 질감은 시각 정보가 닿지 못하는 기억을 깨운다.', my: '질감과 기억' },
-];
+// 실제 발췌 파싱 (evalNoToc.mjs 와 동일 규칙). myThought 는 원본에 없음 → 빈 값.
+const MD = process.env.HOME + '/Library/Mobile Documents/iCloud~md~obsidian/Documents/Junseo/200 Literature/210 Books/디자인의 디자인_220308_191948.md';
+const rawMd = await readFile(MD, 'utf-8');
+const parsed = []; let cur = null;
+for (const line of rawMd.split(/\r?\n/)) {
+  const t = line.trim(); const m = t.match(/^(\d+)\.\s*(.*)$/);
+  if (m) { cur = { p: Number(m[1]), lines: [] }; parsed.push(cur); if (m[2] && m[2].length >= 25) cur.lines.push(m[2]); }
+  else if (t) { if (!cur) { cur = { p: 32, lines: [] }; parsed.push(cur); } cur.lines.push(t); }
+}
+const memosBase = parsed
+  .map((x) => ({ p: x.p, text: x.lines.join(' ').trim(), my: '' }))
+  .filter((x) => x.text.length > 10);
+console.log(`[데이터] 실 발췌 ${memosBase.length}개 (p${memosBase.map((m) => m.p).join(',p')})`);
 
 // 시드 고정 셔플 (mulberry32) — 재현 가능. run1은 원래 순서(=기존 결과와 비교 가능).
 function mulberry32(seed) {
