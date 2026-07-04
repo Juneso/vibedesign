@@ -657,3 +657,21 @@ body {
 .pl-node-detail {
   margin-top: 4px;
 }
+
+/* ── eval 개념 트리 SVG ───────────────────────────────────── */
+.eval-tree-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--color-border, #e5e5e5);
+  border-radius: 10px;
+  padding: 8px;
+  background: var(--color-background-body, #fff);
+  margin-top: 8px;
+}
+
+.eval-tree-svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  font-family: inherit;
+}

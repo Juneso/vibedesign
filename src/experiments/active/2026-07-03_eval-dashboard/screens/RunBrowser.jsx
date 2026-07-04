@@ -10,6 +10,7 @@ import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/Segme
 import { Spinner } from '@astryxdesign/core/Spinner';
 import { getLabels, getRun, saveLabels } from '../lib/api.js';
 import { SERIES_META, seriesTitle, iterationLabel } from '../lib/seriesMeta.js';
+import { TreeSvg } from './TreeSvg.jsx';
 
 // mtime → 'M월 D일'
 function fmtMonthDay(mtimeMs) {
@@ -484,11 +485,19 @@ function MdSection({ section }) {
 }
 
 // ── 제네릭 뷰 (md 우선, 없으면 JSON pretty) ──────────────────
+// tree가 있는 런: '트리' 섹션(ASCII 코드블록) 대신 SVG 트리 삽입
 export function GenericDetail({ json, md }) {
   if (md == null) {
     return <pre className="eval-md-pre">{JSON.stringify(json, null, 2)}</pre>;
   }
   const { meta, sections } = parseMd(md);
+  const hasTree = json?.tree?.nodes?.length > 0;
+
+  // '트리' 섹션 인덱스 찾기 (ASCII 코드블록 포함 섹션)
+  const treeSecIdx = hasTree
+    ? sections.findIndex((s) => s.title === '트리')
+    : -1;
+
   return (
     <div className="eval-md">
       {meta.length > 0 && (
@@ -496,7 +505,25 @@ export function GenericDetail({ json, md }) {
           {meta.map((c, i) => <span key={i} className="eval-md-chip">{mdInline(c)}</span>)}
         </div>
       )}
-      {sections.map((s, i) => <MdSection key={i} section={s} />)}
+      {sections.map((s, i) => {
+        // '트리' 섹션: ASCII 대신 SVG 트리
+        if (i === treeSecIdx) {
+          return (
+            <section key={i} className="eval-md-section">
+              <h4 className="eval-md-h">트리</h4>
+              <TreeSvg tree={json.tree} />
+            </section>
+          );
+        }
+        return <MdSection key={i} section={s} />;
+      })}
+      {/* tree는 있는데 '트리' 섹션이 md에 없는 경우 — 섹션 끝에 추가 */}
+      {hasTree && treeSecIdx === -1 && (
+        <section className="eval-md-section">
+          <h4 className="eval-md-h">트리</h4>
+          <TreeSvg tree={json.tree} />
+        </section>
+      )}
     </div>
   );
 }
