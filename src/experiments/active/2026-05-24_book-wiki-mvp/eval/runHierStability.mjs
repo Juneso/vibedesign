@@ -102,18 +102,35 @@ function runMd(r, idx) {
     if (r.log[i].startsWith('[theme]')) themes.push(`- ${r.log[i].replace('[theme] ', '')}${r.log[i + 1]?.startsWith('[theme.desc]') ? `\n  ${r.log[i + 1].replace('[theme.desc]   ↳ ', '— ')}` : ''}`);
     if (r.log[i].startsWith('[theme✗]')) themes.push(`- (기각) ${r.log[i].replace('[theme✗] ', '')}`);
   }
-  return `# 위계 셔플 안정성 · ${variant} · ${r.name} (${idx}회차)
+  // 👀 체크포인트 — 이 run에서 뭘 보면 결과를 알 수 있는지. variant별 관전 포인트.
+  const check = [];
+  if (variant === 'v5') {
+    check.push(`- **트리에서 억지 포함관계 찾기** — child ${s.child}·parent ${s.parent}건이 검증 없이 생성됨. "A ⊃ B"가 말이 되는지 눈으로 확인`);
+    check.push(`- **다른 회차와 위계가 같은가** — V5는 순서 의존이 심해 회차마다 위계가 달라지는 것이 알려진 문제`);
+  } else if (variant === 'v6') {
+    check.push(`- **flip ${s.flip}건** — 교차검증이 기각·강등한 위계 제안 수. 남은 child ${s.child}·parent ${s.parent}건만 검증 통과 위계 (로그 [flip] 참조)`);
+    check.push(`- **트리가 평면화됐는가** — V6는 가짜 위계를 걸러내는 대신 정리감을 잃는 트레이드오프. 테마가 없는 것이 정상`);
+  } else {
+    check.push(`- **테마 ${s.theme}개 (기각 ${s.themeRejected})** — 아래 테마 목록의 이름·anchor·설명이 책의 논지 축과 일치하는지가 핵심. 뜬금없는 우산 개념이 있으면 실패`);
+    check.push(`- **anchor가 실제 인용인가** — 책 요약·목차에 없는 구절을 지어냈으면 critic이 놓친 것`);
+    check.push(`- **다른 회차와 같은 축인가** — 재발견 / 정보의 건축+감각 / 비움 3축이 재현되어야 안정`);
+    check.push(`- flip ${s.flip}건 · merge ${s.merge + s.mergeGlobal}건 — 같은 메모 중복(엑스포메이션=미지화 류)이 합쳐졌는지 트리에서 확인`);
+  }
+  return `# ingest ${variant} · 셔플 ${idx}회차
 
-> 모델 ${MODEL} · 메모 순서: [${r.memos.map((m) => m.p).join(', ')}] · ${r.secs}s
-> 개념 ${s.conceptCount} · 최대 깊이 L${s.maxDepth} · merge ${s.merge}+${s.mergeGlobal} · child ${s.child} · parent ${s.parent} · attach ${s.attach}${variant !== 'v5' ? ` · flip ${s.flip}` : ''}${variant === 'v7' ? ` · theme ${s.theme}(기각 ${s.themeRejected})` : ''}
+> ${MODEL} · 순서 [${r.memos.map((m) => m.p).join(',')}] · ${r.secs}s · 개념 ${s.conceptCount} · 깊이 L${s.maxDepth}
 
+## 👀 체크포인트
+
+${check.join('\n')}
+${themes.length ? `\n## 테마 (anchor + description)\n\n${themes.join('\n')}\n` : ''}
 ## 트리
 
 \`\`\`
 ${renderTreeText(r.tree)}
 \`\`\`
-${themes.length ? `\n## 테마 (anchor + description)\n\n${themes.join('\n')}\n` : ''}
-## 로그
+
+## 로그 (op별 판단 근거)
 
 \`\`\`
 ${r.log.join('\n')}

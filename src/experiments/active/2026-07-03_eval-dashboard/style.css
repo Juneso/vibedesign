@@ -178,6 +178,113 @@ body {
   margin-top: 24px;
 }
 
+/* ── eval 문서 md 렌더링 ─────────────────────────────────── */
+.eval-md {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+/* 문서 상단 메타(모델·순서·시간 등) — 칩 나열 */
+.eval-md-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.eval-md-chip {
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--color-background-muted, #f1f4f7);
+  color: var(--color-text-secondary, #667);
+  border: 1px solid var(--color-border, #e5e5e5);
+}
+
+.eval-md-section .eval-md-h {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-primary, #111);
+}
+
+/* 👀 체크포인트 — 이번 eval에서 봐야 할 것. 최상위 시각 위계 */
+.eval-md-section.is-checkpoint {
+  background: var(--color-accent-muted, #eef2ff);
+  border: 1.5px solid var(--color-accent, #6366f1);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.eval-md-section.is-checkpoint .eval-md-h {
+  color: var(--color-text-accent, #4f46e5);
+  font-size: 14px;
+}
+
+.eval-md-list {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.eval-md-p { margin: 0; }
+
+.eval-md-quote {
+  border-left: 3px solid var(--color-border-emphasized, #ccd3db);
+  padding: 4px 12px;
+  color: var(--color-text-secondary, #667);
+  font-size: 12px;
+}
+
+.eval-md-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  background: var(--color-background-muted, #f1f4f7);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.eval-md-table {
+  border-collapse: collapse;
+  font-size: 12px;
+  width: 100%;
+}
+
+.eval-md-table th,
+.eval-md-table td {
+  border: 1px solid var(--color-border, #e5e5e5);
+  padding: 5px 10px;
+  text-align: left;
+}
+
+.eval-md-table th {
+  background: var(--color-background-muted, #f7f7f7);
+  font-weight: 600;
+}
+
+/* 긴 코드블록·로그 섹션 접기 */
+.eval-md-collapse > summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary, #667);
+  padding: 6px 0;
+  user-select: none;
+}
+
+.eval-md-collapse > summary:hover {
+  color: var(--color-text-primary, #111);
+}
+
+.eval-md-logsec {
+  border-top: 1px dashed var(--color-border, #e5e5e5);
+  padding-top: 4px;
+}
+
 /* ── PipelineView : 상세 구조도 ───────────────────────────── */
 .pl-goal,
 .pl-intent {

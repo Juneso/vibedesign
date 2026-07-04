@@ -9,9 +9,9 @@ export const SERIES_META = {
   'judge-calib':          { title: 'LLM 채점자 보정', purpose: '자동 채점을 사람 기준에 정렬', pipelineId: null },
   'calib-labeling-sheet': { title: '채점 보정용 라벨링 시트', purpose: '사람이 기준 케이스를 라벨링', pipelineId: null },
   'toc-ablation':         { title: '목차 유무 비교', purpose: '목차가 인제스트 품질에 주는 영향', pipelineId: null },
-  'hier-stability-v5':    { title: '위계 셔플 안정성 — V5 베이스라인', purpose: '메모 순서를 바꿔도 트리가 재현되는지 (LLM 재량 위계)', pipelineId: 'hier-ingest-v5' },
-  'hier-stability-v6':    { title: '위계 셔플 안정성 — V6 교차검증', purpose: '치환 테스트 + 양방향 검증으로 가짜 위계 걸러내기', pipelineId: 'hier-ingest-v7' },
-  'hier-stability-v7':    { title: '위계 셔플 안정성 — V7 테마 주역화', purpose: '책 인용 anchor + critic 승인 테마가 재현되는지', pipelineId: 'hier-ingest-v7' },
+  'hier-stability-v5':    { title: 'ingest V5', purpose: '셔플 안정성 베이스라인 — LLM 재량 위계가 재현되는지', pipelineId: 'hier-ingest-v5' },
+  'hier-stability-v6':    { title: 'ingest V6', purpose: '셔플 안정성 — 치환 테스트 + 양방향 교차검증', pipelineId: 'hier-ingest-v7' },
+  'hier-stability-v7':    { title: 'ingest V7', purpose: '셔플 안정성 — 책 인용 anchor 테마 + critic 반증', pipelineId: 'hier-ingest-v7' },
 };
 
 // 파일명에서 회차 라벨 도출: 'nudge-v7-13.json' → '13회차', 'connections-qf.json' → '단일'
