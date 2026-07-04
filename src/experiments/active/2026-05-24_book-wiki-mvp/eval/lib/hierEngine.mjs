@@ -193,31 +193,51 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
   // ─── Phase 2 (v7): 테마 주역화 — Description 필수 + 책 논지 앵커링 + critic 반증 ──
   if (variant === 'v7') {
     onProgress?.('phase 2 — 테마 생성(v7)');
+    // 테마 anchor 의 ground truth = 실제 책 리치데이터(알라딘 책소개·출판사서평·책속에서·추천사) + 요약 + 목차.
+    // summary 하나만 쓰면 그 요약이 편향될 때 앵커 검증이 자기충족적이 된다 → 출판사 원문까지 근거로 제공.
+    const richBlock = [
+      `책: ${book.title} (${book.author} · ${book.category})`,
+      book.summary ? `핵심 논지: ${book.summary}` : '',
+      book.aladin?.intro ? `책 소개(알라딘): ${book.aladin.intro}` : '',
+      book.aladin?.publisherIntro ? `출판사 서평: ${book.aladin.publisherIntro}` : '',
+      book.aladin?.excerpts ? `책 속에서: ${book.aladin.excerpts}` : '',
+      book.aladin?.recommend ? `추천사: ${book.aladin.recommend}` : '',
+      `목차 흐름: ${book.toc.join(' · ')}`,
+    ].filter(Boolean).join('\n');
+    // 멤버(및 그 하위) 서브트리가 걸친 서로 다른 메모 페이지 수 — 독자-근거 테마의 반복성 지표.
+    const subtreeSources = (nid) => {
+      const acc = new Set();
+      const walk = (id) => { for (const p of nodes.get(id)?.sources || []) acc.add(p); childrenOf(id).forEach((k) => walk(k.id)); };
+      walk(nid); return acc;
+    };
+    const themeMemoCount = (mems) => { const s = new Set(); for (const m of mems) for (const p of subtreeSources(m.id)) s.add(p); return s.size; };
     const rootKids = concepts().filter((n) => n.parentId === root.id);
     if (rootKids.length >= 3) {
       const desc = (n) => {
         const kids = childrenOf(n.id);
-        return `${n.id}: ${n.title} — ${n.gloss || ''}${kids.length ? ` (하위: ${kids.map((k) => k.title).join(', ')})` : ''}`;
+        const pages = [...subtreeSources(n.id)].sort((a, b) => a - b);
+        return `${n.id}: ${n.title} — ${n.gloss || ''}${kids.length ? ` (하위: ${kids.map((k) => k.title).join(', ')})` : ''}${pages.length ? ` [메모 p${pages.join(',p')}]` : ''}`;
       };
-      const genPrompt = `[책 맥락 — 테마의 근거는 반드시 여기서]
-책: ${book.title} (${book.author} · ${book.category})
-${book.summary ? `핵심 논지: ${book.summary}` : ''}
-목차 흐름: ${book.toc.join(' · ')}
+      const genPrompt = `[책 맥락 — 테마의 1차 근거]
+${richBlock}
 
-아래는 한 독자가 이 책에서 수집한 개념들이다(place가 만든 하위 위계는 유지된다).
+아래는 한 독자가 이 책에서 수집한 개념들이다(각 개념 뒤 [메모 pN]은 그 개념이 나온 실제 메모 페이지).
 **이 책을 읽은 독자의 머릿속에 자연스럽게 생기는 이해의 큰 축**만 테마로 만들어라.
 
+테마의 근거는 두 종류가 있다(하이브리드):
+- anchorType="book": 위 [책 맥락]에 근거가 있을 때 — 그 구절을 anchor에 **그대로 인용**.
+- anchorType="reader": 책 소개문엔 없지만 **독자가 여러 메모에서 반복적으로 파고든 축**일 때 — anchor에 그 축을 한 문장으로 쓰고, 근거가 되는 멤버 메모들이 최소 3개의 서로 다른 페이지에 걸쳐야 한다.
+
 규칙:
-- 테마는 이 책의 핵심 논지에서 직접 도출돼야 한다. 책과 무관한 일반 분류("기타", "다양한 관점", "삶의 지혜" 류) 절대 금지.
-- 테마마다 anchor 필수: 위 [책 맥락]의 핵심 논지·목차에서 이 테마의 근거가 되는 구절을 **그대로 인용**. 인용할 구절이 없으면 그 테마는 만들지 마라.
+- 책과 무관한 일반 분류("기타", "다양한 관점", "삶의 지혜" 류) 절대 금지 — book이든 reader든 이 책의 실제 내용/독자의 실제 메모에 뿌리내려야 한다.
 - 테마마다 description 필수: 이 책이 이 테마로 무엇을 말하는지 + 왜 이 멤버들이 여기 묶이는지, 2~3문장.
-- ⚠ memberIds가 2개 미만인 테마는 아예 출력하지 마라. 어울리는 테마가 없는 개념은 그냥 남겨라(억지 편입 금지). 다 묶일 필요 전혀 없다.
+- ⚠ memberIds 2개 미만 테마는 출력 금지. 어울리는 테마가 없는 개념은 그냥 남겨라(억지 편입 금지). 다 묶일 필요 없다.
 - 테마명은 멤버 이름 복사·목차 제목 복붙 금지. 멤버들을 실제로 아우르는 이름.
 
 [개념들]
 ${rootKids.map(desc).join('\n')}
 
-출력 JSON: {"themes":[{"name":"테마명","anchor":"책 맥락에서 그대로 인용한 근거 구절","description":"2~3문장","memberIds":["n?","n?"]}]}`;
+출력 JSON: {"themes":[{"name":"테마명","anchorType":"book|reader","anchor":"book이면 책 맥락 인용 / reader면 독자가 반복한 축 한 문장","description":"2~3문장","memberIds":["n?","n?"]}]}`;
       const raw = await llm({ system: SYS, user: genPrompt, temperature: 0.1 });
       let out; try { out = JSON.parse(raw); } catch { out = { themes: [] }; }
 
@@ -227,33 +247,39 @@ ${rootKids.map(desc).join('\n')}
         if (members.length < 2 || !t.name?.trim() || !t.description?.trim()) {
           log.push(`[theme✗] "${t.name || '?'}" 스킵(멤버<2 또는 name/description 누락)`); continue;
         }
-        const criticPrompt = `아래 "테마"가 이 책의 핵심 내용에 부합하는 우산 개념인지 검증하라. 판정은 반드시 **인용 근거**로 한다 — 분위기로 판단하지 마라.
+        // 하이브리드 검증에 쓸 코드 계산값 — LLM 자기선언(anchorType)을 그대로 믿지 않는다.
+        const memoSpan = themeMemoCount(members); // 멤버들이 걸친 서로 다른 메모 페이지 수
+        const READER_MIN = 3;
+        const criticPrompt = `아래 "테마"가 이 독자의 위키에 남길 만한 우산 개념인지 검증하라. 판정은 반드시 **인용 근거**로 한다 — 분위기로 판단하지 마라.
+테마의 정당성 근거는 두 갈래 중 **하나만** 충족해도 유효하다(하이브리드):
 
 [책 맥락]
-${book.title} — ${book.summary || ''}
-목차: ${book.toc.join(' · ')}
+${richBlock}
 
-[제안된 테마] ${t.name}
+[제안된 테마] ${t.name}  (제안된 근거 유형: ${t.anchorType || '미지정'})
 [테마의 근거 주장(anchor)] ${t.anchor || '(없음)'}
 [테마 설명] ${t.description}
 [멤버들]
-${members.map((m) => `${m.id}: ${m.title} — ${m.gloss || ''}`).join('\n')}
+${members.map((m) => { const ps = [...subtreeSources(m.id)].sort((a, b) => a - b); return `${m.id}: ${m.title} — ${m.gloss || ''}${ps.length ? ` [메모 p${ps.join(',p')}]` : ''}`; }).join('\n')}
+[코드 계산] 이 테마 멤버들이 걸친 서로 다른 메모 페이지 수 = ${memoSpan}개
 
-판정 절차:
-1) anchor가 위 [책 맥락]의 실제 구절과 대응하는가? 대응하면 이 테마는 책에 근거한 것이다 → 기각하지 마라.
-2) 기각(valid=false)은 다음을 **구체적 인용과 함께** 보일 수 있을 때만: anchor가 책 맥락에 없는 지어낸 구절이다 / description이 책 맥락의 특정 구절과 정면으로 어긋난다 / 테마명이 멤버 절반 이상과 무관하다.
-3) 테마 전체는 타당한데 일부 멤버만 억지 편입이면 valid=true + 그 id를 dropMemberIds에.
-출력 JSON: {"valid":true|false,"dropMemberIds":["n?"],"reason":"판정 근거 인용 포함 한 줄"}`;
-        const craw = await llm({ system: '독서 위키 품질 검증자. 인용 근거 기반으로만 판정. JSON만 출력.', user: criticPrompt, temperature: 0, model: 'gpt-4o' });
+판정 절차 (아래 A 또는 B 중 하나라도 성립하면 valid=true):
+A) 책-근거: anchor가 위 [책 맥락]의 실제 구절과 대응한다. → 유효.
+B) 독자-근거: 책 맥락엔 없더라도, 멤버들이 **서로 다른 메모 ${READER_MIN}개 이상**(코드 계산값 ${memoSpan}≥${READER_MIN})에 걸쳐 있고, 테마명이 그 멤버들을 실제로 아우른다. → 유효. (독자가 반복해서 파고든 진짜 축)
+기각(valid=false)은 A·B 둘 다 실패할 때만: 책 맥락에도 없고(A✗) 멤버 메모 span도 ${READER_MIN} 미만이거나 테마명이 멤버 절반 이상과 무관(B✗). 또는 description이 책 맥락과 정면으로 어긋날 때.
+일부 멤버만 억지 편입이면 valid=true + 그 id를 dropMemberIds에.
+출력 JSON: {"valid":true|false,"basis":"book|reader|none","dropMemberIds":["n?"],"reason":"판정 근거 한 줄"}`;
+        const craw = await llm({ system: '독서 위키 품질 검증자. 책-근거 또는 독자-근거(메모 반복) 중 하나면 유효. 인용·수치 근거로만 판정. JSON만 출력.', user: criticPrompt, temperature: 0, model: 'gpt-4o' });
         let verdict; try { verdict = JSON.parse(craw); } catch { verdict = { valid: false, reason: 'parse-fail' }; }
         if (!verdict.valid) { log.push(`[theme✗] "${t.name}" 기각 — ${verdict.reason}`); continue; }
         const keep = members.filter((m) => !(verdict.dropMemberIds || []).includes(m.id));
         if (keep.length < 2) { log.push(`[theme✗] "${t.name}" 기각(억지 멤버 제외 후 <2)`); continue; }
         const th = addConcept(t.name.trim(), root.id, null, t.description.trim());
         th.anchor = (t.anchor || '').trim();
+        th.anchorBasis = verdict.basis || t.anchorType || 'book'; // book | reader
         let moved = 0;
         for (const m of keep) if (safeReparent(m.id, th.id)) moved++;
-        log.push(`[theme] "${t.name}"(${th.id}) ← ${keep.map((m) => m.title).join(', ')}${(verdict.dropMemberIds || []).length ? ` (억지 제외: ${verdict.dropMemberIds.join(',')})` : ''}`);
+        log.push(`[theme] "${t.name}"(${th.id}) [${th.anchorBasis}·메모${memoSpan}] ← ${keep.map((m) => m.title).join(', ')}${(verdict.dropMemberIds || []).length ? ` (억지 제외: ${verdict.dropMemberIds.join(',')})` : ''}`);
         log.push(`[theme.desc]   ↳ anchor: ${th.anchor || '(없음)'} | ${t.description.trim()}`);
         if (!moved) { nodes.delete(th.id); log.push(`[theme✗] "${t.name}" 롤백(깊이 초과로 이동 0)`); }
       }
