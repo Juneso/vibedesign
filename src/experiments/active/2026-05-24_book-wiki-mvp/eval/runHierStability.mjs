@@ -2,6 +2,7 @@
 // "트리가 얼마나 같은 모양으로 재현되는가"를 잰다. (BKT-342 위계 품질 개선의 측정 기준)
 //
 // 실행: node eval/runHierStability.mjs v5   (또는 v6)
+// 책 선택: node eval/runHierStability.mjs v8 [bookSlug]  — bookSlug 생략 시 기존 동작(디자인의 디자인) 유지.
 // 지표:
 //  - 메모쌍 관계 일치율: 페이지쌍 (p,q)의 관계 라벨(merged/조상/형제/무관)이 run 간 일치하는 비율.
 //    개념 "이름"은 실행마다 흔들리므로 항상 안정적인 메모 페이지를 기준으로 잰다.
@@ -45,25 +46,71 @@ async function embedFn(text) {
   return d.data[0].embedding;
 }
 
-// ─── 데이터: 실제 옵시디언 발췌 (evalNoToc.mjs 와 동일 소스) ─────
-// ⚠ 이전엔 손질된 합성 메모를 썼으나(입력이 깔끔해 테마가 쉽게 나오는 편향), 실 발췌로 교체.
-const book = {
-  title: '디자인의 디자인', author: '하라 켄야', category: '예술/디자인 > 디자인 이론',
-  // 실제 판본 목차 (evalNoToc META 와 동일). 발췌가 이 목차 범위를 실제로 커버.
-  toc: ['디자인이라는 것', 'RE-DESIGN — 21세기의 일상', '정보의 건축 그 가능성', '욕망의 에듀케이션', '일본의 디자인', '비주얼커뮤니케이션 디자인', '디자이너의 일'],
-  // v7 테마 앵커링용 실제 책 리치데이터 — evalNoToc META.aladin 과 동일 출처(알라딘 실데이터) verbatim.
-  // ⚠ summary 는 메모셋에 맞춰 손대지 않는다(편향 방지). anchor 검증의 ground truth 는 아래 리치데이터.
-  // v5/v6 place 프롬프트에는 안 들어감 — 테마 단계(theme_gen·critic)에서만 사용.
-  summary: '하라 켄야가 디자인의 본질을 다시 묻는 책. 디자인을 "새로운 것을 만드는 일"이 아니라 "이미 알고 있다고 여기는 것을 미지의 것으로 되돌려 다시 보게 하는 일(RE-DESIGN)"로 재정의한다. 정보를 받는 사람의 머릿속에 구축되는 구조로 보는 "정보의 건축", 일상의 미지화, 미디어를 횡단하는 커뮤니케이션 디자인, 생활에 기초한 문명 비평으로서의 디자인을 다룬다.',
-  aladin: {
-    intro: '그래픽 디자이너 하라 켄야가 "디자인이란 무엇인가"라는 물음을 정면으로 다룬 디자인 사상서. 새로움의 생산이 아니라 익숙한 일상을 낯설게 되돌아보는 RE-DESIGN의 관점에서 디자인의 가능성을 탐색한다.',
-    publisherIntro: '하라 켄야는 첨단 테크놀로지가 끊임없이 "신기한 과일"을 식탁에 올리듯 새로움만을 좇는 현대 디자인을 비판하고, 평범한 일상 속에 잠든 무수한 디자인의 가능성을 "미지화"를 통해 일깨운다. 정보는 대량 저장·고속 이동이 아니라 받는 사람의 머릿속에 구축되는 "정보의 건축"이며, 디자인은 미디어에 종속되지 않고 그 본질을 탐색하는 횡단적 커뮤니케이션이다.',
-    excerpts: '"익숙한 것을 미지의 것으로 재발견할 수 있는 감성 또한 똑같은 창조성이다." / "정보의 건축은 그 정보를 접한 사람들의 머릿속에 구축되어 가는 것이다."',
-    recommend: '디자인을 ‘스타일링’이 아니라 ‘사고방식’으로 이해하게 해주는 책.',
+// ─── 책 레지스트리: slug → { book 메타 loader, mdPath, 출력 접두사 } ─────
+// bookSlug 인자 생략 시 'design'(기존 디자인의 디자인 하드코딩) — 기존 동작 불변.
+const OBSIDIAN_BOOKS_DIR = process.env.HOME + '/Library/Mobile Documents/iCloud~md~obsidian/Documents/Junseo/200 Literature/210 Books/';
+const bookSlug = (process.argv[3] || 'design').toLowerCase();
+
+const BOOK_REGISTRY = {
+  design: {
+    outputPrefix: 'hier-stability',
+    mdPath: OBSIDIAN_BOOKS_DIR + '디자인의 디자인_220308_191948.md',
+    async loadBook() {
+      // ⚠ 이전엔 손질된 합성 메모를 썼으나(입력이 깔끔해 테마가 쉽게 나오는 편향), 실 발췌로 교체.
+      return {
+        title: '디자인의 디자인', author: '하라 켄야', category: '예술/디자인 > 디자인 이론',
+        // 실제 판본 목차 (evalNoToc META 와 동일). 발췌가 이 목차 범위를 실제로 커버.
+        toc: ['디자인이라는 것', 'RE-DESIGN — 21세기의 일상', '정보의 건축 그 가능성', '욕망의 에듀케이션', '일본의 디자인', '비주얼커뮤니케이션 디자인', '디자이너의 일'],
+        // v7 테마 앵커링용 실제 책 리치데이터 — evalNoToc META.aladin 과 동일 출처(알라딘 실데이터) verbatim.
+        // ⚠ summary 는 메모셋에 맞춰 손대지 않는다(편향 방지). anchor 검증의 ground truth 는 아래 리치데이터.
+        // v5/v6 place 프롬프트에는 안 들어감 — 테마 단계(theme_gen·critic)에서만 사용.
+        summary: '하라 켄야가 디자인의 본질을 다시 묻는 책. 디자인을 "새로운 것을 만드는 일"이 아니라 "이미 알고 있다고 여기는 것을 미지의 것으로 되돌려 다시 보게 하는 일(RE-DESIGN)"로 재정의한다. 정보를 받는 사람의 머릿속에 구축되는 구조로 보는 "정보의 건축", 일상의 미지화, 미디어를 횡단하는 커뮤니케이션 디자인, 생활에 기초한 문명 비평으로서의 디자인을 다룬다.',
+        aladin: {
+          intro: '그래픽 디자이너 하라 켄야가 "디자인이란 무엇인가"라는 물음을 정면으로 다룬 디자인 사상서. 새로움의 생산이 아니라 익숙한 일상을 낯설게 되돌아보는 RE-DESIGN의 관점에서 디자인의 가능성을 탐색한다.',
+          publisherIntro: '하라 켄야는 첨단 테크놀로지가 끊임없이 "신기한 과일"을 식탁에 올리듯 새로움만을 좇는 현대 디자인을 비판하고, 평범한 일상 속에 잠든 무수한 디자인의 가능성을 "미지화"를 통해 일깨운다. 정보는 대량 저장·고속 이동이 아니라 받는 사람의 머릿속에 구축되는 "정보의 건축"이며, 디자인은 미디어에 종속되지 않고 그 본질을 탐색하는 횡단적 커뮤니케이션이다.',
+          excerpts: '"익숙한 것을 미지의 것으로 재발견할 수 있는 감성 또한 똑같은 창조성이다." / "정보의 건축은 그 정보를 접한 사람들의 머릿속에 구축되어 가는 것이다."',
+          recommend: '디자인을 ‘스타일링’이 아니라 ‘사고방식’으로 이해하게 해주는 책.',
+        },
+      };
+    },
+  },
+  money: {
+    outputPrefix: 'hier-money',
+    mdPath: OBSIDIAN_BOOKS_DIR + '돈으로 살 수 없는 것들_200905_171227.md',
+    async loadBook() {
+      const seed = JSON.parse(await readFile(resolve(__dir, 'golden/seed-v1.json'), 'utf-8'));
+      const b = seed.books.find((x) => x.title && x.title.includes('돈으로'));
+      if (!b) throw new Error('seed-v1.json에서 "돈으로" 책을 찾지 못함');
+      return {
+        title: b.title, author: b.author, category: b.categoryName,
+        toc: b.toc, summary: b.summary,
+        aladin: {
+          intro: b.aladin?.intro || '', publisherIntro: b.aladin?.publisherIntro || '',
+          excerpts: b.aladin?.excerpts || '', recommend: b.aladin?.recommend || '',
+        },
+      };
+    },
+  },
+  desire: {
+    outputPrefix: 'hier-desire',
+    mdPath: OBSIDIAN_BOOKS_DIR + '욕망의 사물, 디자인의 사회사_210325_162228.md',
+    async loadBook() {
+      const meta = JSON.parse(await readFile(resolve(__dir, 'golden/book-meta-desire.json'), 'utf-8'));
+      return {
+        title: meta.title, author: meta.author, category: meta.category,
+        toc: meta.toc, summary: meta.summary, aladin: meta.aladin,
+      };
+    },
   },
 };
+
+if (!BOOK_REGISTRY[bookSlug]) { console.error(`usage: node eval/runHierStability.mjs v5|v6|v7|v8 [design|money|desire]`); process.exit(1); }
+const bookEntry = BOOK_REGISTRY[bookSlug];
+const book = await bookEntry.loadBook();
+const OUTPUT_PREFIX = bookEntry.outputPrefix;
+
 // 실제 발췌 파싱 (evalNoToc.mjs 와 동일 규칙). myThought 는 원본에 없음 → 빈 값.
-const MD = process.env.HOME + '/Library/Mobile Documents/iCloud~md~obsidian/Documents/Junseo/200 Literature/210 Books/디자인의 디자인_220308_191948.md';
+const MD = bookEntry.mdPath;
 const rawMd = await readFile(MD, 'utf-8');
 const parsed = []; let cur = null;
 for (const line of rawMd.split(/\r?\n/)) {
@@ -167,7 +214,7 @@ ${renderTreeText(r.tree)}
 ${r.log.join('\n')}
 \`\`\`
 
-> 시리즈 종합(3-run 안정성 지표): runs/hier-stability-${variant}.md
+> 시리즈 종합(3-run 안정성 지표): runs/${OUTPUT_PREFIX}-${variant}.md
 `;
 }
 
@@ -183,7 +230,7 @@ for (const run of RUNS) {
   const result = { ...run, stats: r.stats, rel, tree: serializeTree(r.nodes, r.rootId), log: r.log, secs };
   results.push(result);
   console.log(`\n  개념 ${r.stats.conceptCount} · L${r.stats.maxDepth} · merge ${r.stats.merge}+${r.stats.mergeGlobal} child ${r.stats.child} parent ${r.stats.parent} attach ${r.stats.attach} cluster ${r.stats.cluster}${variant !== 'v5' ? ` flip ${r.stats.flip}` : ''}${(variant === 'v7' || variant === 'v8') ? ` theme ${r.stats.theme}(-${r.stats.themeRejected})` : ''}${variant === 'v8' ? ` pages ${r.stats.pages}` : ''} · ${secs}s`);
-  const base = `hier-stability-${variant}-${runIdx}`;
+  const base = `${OUTPUT_PREFIX}-${variant}-${runIdx}`;
   await writeFile(resolve(runsDir, `${base}.json`), JSON.stringify({ run: run.name, order: run.memos.map((m) => m.p), stats: r.stats, tree: result.tree, rel, log: r.log }, null, 1));
   await writeFile(resolve(runsDir, `${base}.md`), runMd(result, runIdx));
 }
@@ -258,7 +305,7 @@ ${results.map((r) => `## ${r.name} — 트리\n\n\`\`\`\n${renderTree(r.tree)}\n
 
 ${results.map((r) => `<details><summary>${r.name}</summary>\n\n\`\`\`\n${r.log.join('\n')}\n\`\`\`\n</details>`).join('\n\n')}
 `;
-const mdPath = resolve(__dir, `runs/hier-stability-${variant}.md`);
+const mdPath = resolve(__dir, `runs/${OUTPUT_PREFIX}-${variant}.md`);
 await writeFile(mdPath, md);
 console.log(`\n═══ ${variant} 안정성: 라벨 일치 ${(avg(agr) * 100).toFixed(0)}% · 자카드 ${(avg(jac) * 100).toFixed(0)}% · 3-run 동일 ${(allSame / pairKeys.length * 100).toFixed(0)}% ═══`);
 console.log(`→ ${mdPath}`);
