@@ -390,6 +390,6 @@ export function createEngine({ llm, embed, book, log = () => {}, params = {} }) 
     return lines.join('\n');
   }
 
-  return { ingest, consolidate, relations, snapshot, renderTree, cache, stats,
+  return { ingest, consolidate, relations, snapshot, renderTree, cache, stats, lift,
     get nodes() { return nodes; }, get shelf() { return shelf; }, get overlay() { return linkQ; }, get digest() { return digest; } };
 }
