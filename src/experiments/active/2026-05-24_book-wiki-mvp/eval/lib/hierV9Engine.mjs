@@ -86,6 +86,9 @@ export function createEngine({ llm, embed, book, log = () => {}, params = {} }) 
 
   // ─── 2. 장 친화도: 메모 1건 × 목차 전체 → 점수 배열 ────────────
   async function affinity(memo, lifted) {
+    // 메모에 장 정보가 있으면(앱의 memo.chapter 필드, 독자의 장 마커) 부착 = 순수 조회, LLM 0
+    if (memo.anchorCh != null && memo.anchorCh < book.toc.length)
+      return book.toc.map((_, i) => (i === memo.anchorCh ? 1 : 0));
     const key = `${memo.p}|${lifted.headword}`;
     if (cache.aff.has(key)) return cache.aff.get(key);
     const out = await llmJson({
@@ -126,12 +129,18 @@ export function createEngine({ llm, embed, book, log = () => {}, params = {} }) 
     const dp = Array.from({ length: n + 1 }, () => new Array(k + 1).fill(NEG));
     const bk = Array.from({ length: n + 1 }, () => new Array(k + 1).fill(null));
     dp[0][0] = 0;
-    for (let i = 1; i <= n; i++) {
-      // 내용 점수가 평평하면(변별력 없음) 축소 — 위치 prior가 지배 ("모르겠으면 쪽수로 어림")
-      const raw = items[i - 1].scores;
-      const srt = [...raw].sort((a, b) => b - a);
+    // 전처리 1: 메모별 평평한 점수 축소 — 위치 prior가 지배 ("모르겠으면 쪽수로 어림")
+    const pre = items.map((it) => {
+      const srt = [...it.scores].sort((a, b) => b - a);
       const flat = srt[0] < P.flatMax && (srt[0] - (srt[1] ?? 0)) < P.flatMargin;
-      const sc = raw.map((s, j) => (flat ? s * P.flatScale : s) + posPrior(items[i - 1].p, j));
+      return it.scores.map((s) => (flat ? s * P.flatScale : s));
+    });
+    // 전처리 2: 열 중심화 — 특정 장(책의 논지를 제목으로 단 장)이 전 메모에서 높은 점수를 받으면
+    // 그 열은 변별 정보가 없다(TF-IDF 직관). 장별 평균을 빼 고유 신호만 남긴다.
+    const mu = Array.from({ length: k }, (_, j) => pre.reduce((s, row) => s + row[j], 0) / n);
+    const adj = pre.map((row) => row.map((s, j) => Math.max(0, s - mu[j])));
+    for (let i = 1; i <= n; i++) {
+      const sc = adj[i - 1].map((s, j) => s + posPrior(items[i - 1].p, j));
       // prefix max of dp[i-1]
       const pref = new Array(k + 1); const prefArg = new Array(k + 1);
       let best = NEG, arg = 0;
@@ -173,20 +182,23 @@ export function createEngine({ llm, embed, book, log = () => {}, params = {} }) 
   // ─── 온라인 패스: 메모 1건 인제스트 (add-only) ──────────────────
   async function ingest(memo) {
     const lifted = await lift(memo);
-    const scores = await affinity(memo, lifted);
-    // 온라인 장 추정: 단독 argmax + 확신 게이트 (전역 단조 검증은 통합 패스가)
-    const order = scores.map((s, i) => [s, i]).sort((a, b) => b[0] - a[0]);
-    const [top, second] = [order[0], order[1] || [0, -1]];
-    const entry = { p: memo.p, quote: memo.text, my: memo.my || '', lift: lifted, scores };
-
-    if (top[0] < P.onlineAttachMin || top[0] - second[0] < P.onlineAttachMargin) {
-      shelf.push(entry);
-      log(`[온라인] p${memo.p} "${lifted.headword}" → 미분류 (top ${top[0].toFixed(2)} margin ${(top[0] - second[0]).toFixed(2)})`);
-      return { action: 'shelf' };
+    let chapterIdx = 0, scores = [];
+    if (book.toc.length) {
+      scores = await affinity(memo, lifted);
+      // 온라인 장 추정: 단독 argmax + 확신 게이트 (전역 단조 검증은 통합 패스가)
+      const order = scores.map((s, i) => [s, i]).sort((a, b) => b[0] - a[0]);
+      const [top, second] = [order[0], order[1] || [0, -1]];
+      if (top[0] < P.onlineAttachMin || top[0] - second[0] < P.onlineAttachMargin) {
+        shelf.push({ p: memo.p, quote: memo.text, my: memo.my || '', lift: lifted, scores });
+        log(`[온라인] p${memo.p} "${lifted.headword}" → 미분류 (top ${top[0].toFixed(2)} margin ${(top[0] - second[0]).toFixed(2)})`);
+        return { action: 'shelf' };
+      }
+      chapterIdx = top[1];
     }
-    const chapterIdx = top[1];
+    // 목차 없는 책(toc=[])은 전체가 한 그룹 — 부착 없이 바로 동화 시도
+    const entry = { p: memo.p, quote: memo.text, my: memo.my || '', lift: lifted, scores };
     // 동화 시도: 같은 장의 기존 개념과 매칭
-    const cands = nodes.filter((nd) => nd.chapterIdx === chapterIdx);
+    const cands = nodes.filter((nd) => nd.chapterIdx === chapterIdx && !nd.virtual);
     if (cands.length) {
       const ev = await embCached(conceptEmbText(lifted));
       let best = null, bs = -1;
@@ -205,16 +217,17 @@ export function createEngine({ llm, embed, book, log = () => {}, params = {} }) 
         }
       }
     }
-    const node = { id: `n${++seq}`, chapterIdx, title: lifted.headword, claim: lifted.claim, role: lifted.role, memos: [entry] };
+    const node = { id: `n${++seq}`, chapterIdx, title: lifted.headword, claim: lifted.claim, role: lifted.role, memos: [entry], parentId: null, virtual: false };
     nodes.push(node);
-    log(`[온라인] p${memo.p} "${lifted.headword}" → 신규 노드 (${book.toc[chapterIdx]})`);
+    log(`[온라인] p${memo.p} "${lifted.headword}" → 신규 노드${book.toc.length ? ` (${book.toc[chapterIdx]})` : ''}`);
     return { action: 'new', node: node.id };
   }
 
   // ─── 통합 패스: 유일하게 구조를 바꿀 수 있는 시점 ─────────────────
   async function consolidate() {
     digest.length = 0;
-    // 1) 부착 전역 재정렬 (DP) — 미분류 포함 전 메모
+    // 1) 부착 전역 재정렬 (DP) — 미분류 포함 전 메모 (목차 없는 책은 스킵)
+    if (book.toc.length) {
     const all = [];
     for (const nd of nodes) for (const m of nd.memos) all.push({ ...m, _node: nd });
     for (const m of shelf) all.push({ ...m, _node: null });
@@ -234,15 +247,16 @@ export function createEngine({ llm, embed, book, log = () => {}, params = {} }) 
         shelf.push(entry);
         digest.push(`p${m.p} "${m.lift.headword}" → 미분류로 이동(전역 정렬 근거 부족)`);
       } else {
-        const node = { id: `n${++seq}`, chapterIdx: to, title: m.lift.headword, claim: m.lift.claim, role: m.lift.role, memos: [entry] };
+        const node = { id: `n${++seq}`, chapterIdx: to, title: m.lift.headword, claim: m.lift.claim, role: m.lift.role, memos: [entry], parentId: null, virtual: false };
         nodes.push(node);
         digest.push(`p${m.p} "${m.lift.headword}" → ${book.toc[to]}로 이동(단조 정렬)`);
       }
     }
     for (let i = nodes.length - 1; i >= 0; i--) if (!nodes[i].memos.length) nodes.splice(i, 1);
+    } // if (book.toc.length)
 
     // 2) 장내 동의어 병합 — 임베딩 후보 → 보수적 판정 → 결정적 제목 규칙
-    for (let ci = 0; ci < book.toc.length; ci++) {
+    for (let ci = 0; ci < Math.max(1, book.toc.length); ci++) {
       const group = nodes.filter((nd) => nd.chapterIdx === ci).sort((a, b) => a.memos[0].p - b.memos[0].p);
       for (let i = 0; i < group.length; i++) for (let j = i + 1; j < group.length; j++) {
         const A = group[i], B = group[j];
@@ -266,11 +280,58 @@ export function createEngine({ llm, embed, book, log = () => {}, params = {} }) 
     }
     for (let i = nodes.length - 1; i >= 0; i--) if (!nodes[i].memos.length) nodes.splice(i, 1);
 
-    // 3) 테마 승격 — v9.0 미구현(근거 게이트 통과 사례가 실험상 희소). 로그만.
+    // 3) 상향 승격 (v9.1) — 사람 패턴 "반복을 눈치챈다 → 반복되는 말이 부모가 된다".
+    //    부모 이름은 자식들의 자구에서만(닫힌 후보 집합, 발명 금지). 통합 패스 전용, 매회 결정적 재구축.
+    for (let i = nodes.length - 1; i >= 0; i--) { if (nodes[i].virtual) nodes.splice(i, 1); else nodes[i].parentId = null; }
+    const STRIP = /(들|의|이라는|라는|과|와|은|는|이|가|을|를|에서|으로|로)$/;
+    const stop = new Set(['것', '수', '그', '이것', '자신', '사람', '우리',
+      ...book.title.split(/\s+/).map((w) => w.replace(STRIP, ''))]); // 책 제목 어휘 = 그 책에선 무의미하게 포괄적
+    const tok = (s) => [...new Set(String(s).split(/[\s·,.'"()\[\]—-]+/).map((w) => w.replace(STRIP, '')).filter((w) => w.length >= 2 && !stop.has(w)))];
+    for (let ci = 0; ci < Math.max(1, book.toc.length); ci++) {
+      const group = nodes.filter((nd) => nd.chapterIdx === ci && !nd.virtual && nd.memos.length);
+      if (group.length < 3) continue; // 마디가 적으면 위계 불필요 — 평면이 정답
+      // 후보: 표제어 토큰(강한 신호, 자식 ≥2) → 표제어+논지 토큰(약한 신호, 자식 ≥3 + span ≥4)
+      const byToken = (getText, minChildren, minSpan) => {
+        const map = new Map();
+        for (const nd of group) if (!nd.parentId) for (const w of tok(getText(nd))) {
+          if (!map.has(w)) map.set(w, []);
+          map.get(w).push(nd);
+        }
+        return [...map.entries()].filter(([, ns]) => ns.length >= minChildren &&
+          ns.reduce((s, n) => s + n.memos.length, 0) >= minSpan)
+          .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0])); // 결정적 순서
+      };
+      const tryPromote = async (cands, kind) => {
+        for (const [w] of cands) {
+          // 자식 수집은 부분 문자열로 확장 — "자유로움"·"자유의지"처럼 붙여 쓴 파생어 포함
+          const free = group.filter((nd) => !nd.parentId &&
+            (kind === 'title' ? nd.title.includes(w) : `${nd.title} ${nd.claim}`.includes(w)));
+          if (free.length < (kind === 'title' ? 2 : 3)) continue;
+          if (group.every((nd) => free.includes(nd))) continue; // 전원 승격 = 장 이름 중복일 뿐
+          const key = `hyper|${w}|${free.map((n) => n.title).sort().join(',')}`;
+          if (!cache.judge.has(key)) {
+            const out = await llmJson({
+              system: `개념 묶음의 상위어 후보를 검증한다. 후보가 이 개념들의 자연스러운 공통 상위 개념이면 ok=true. 억지스럽거나 너무 포괄적이면 false(보수적). JSON: {"ok": true|false}`,
+              user: `후보 상위어: "${w}"\n개념들:\n${free.map((n) => `- ${n.title}: ${n.claim}`).join('\n')}`,
+            });
+            cache.judge.set(key, !!out.ok);
+          }
+          if (!cache.judge.get(key)) continue;
+          const parent = { id: `n${++seq}`, chapterIdx: ci, title: w, claim: '', role: '주장', memos: [], parentId: null, virtual: true };
+          nodes.push(parent);
+          for (const nd of free) nd.parentId = parent.id;
+          digest.push(`승격(${kind === 'title' ? '표제어 공유' : '논지 공유'}): "${w}" ← ${free.map((n) => n.title).join(', ')}`);
+        }
+      };
+      await tryPromote(byToken((nd) => nd.title, 2, 2), 'title');
+      await tryPromote(byToken((nd) => `${nd.title} ${nd.claim}`, 3, 4), 'claim');
+    }
+
     // 4) 오버레이 — 장 경계를 넘는 같은/유사 표제어 → 확정
     linkQ.length = 0;
     for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) {
       const A = nodes[i], B = nodes[j];
+      if (A.virtual || B.virtual) continue;
       if (A.chapterIdx === B.chapterIdx) continue;
       const s = cos(await embCached(conceptEmbText({ headword: A.title, claim: A.claim })),
                     await embCached(conceptEmbText({ headword: B.title, claim: B.claim })));
@@ -298,7 +359,7 @@ export function createEngine({ llm, embed, book, log = () => {}, params = {} }) 
 
   function snapshot() {
     return {
-      nodes: nodes.map((nd) => ({ id: nd.id, chapter: book.toc[nd.chapterIdx], chapterIdx: nd.chapterIdx, title: nd.title, claim: nd.claim, role: nd.role, memos: nd.memos.map((m) => ({ p: m.p, headword: m.lift.headword, role: m.lift.role, exampleOf: m.lift.exampleOf })) })),
+      nodes: nodes.map((nd) => ({ id: nd.id, chapter: book.toc[nd.chapterIdx] || '', chapterIdx: nd.chapterIdx, title: nd.title, claim: nd.claim, role: nd.role, parentId: nd.parentId || null, virtual: !!nd.virtual, memos: nd.memos.map((m) => ({ p: m.p, headword: m.lift.headword, role: m.lift.role, exampleOf: m.lift.exampleOf })) })),
       shelf: shelf.map((m) => ({ p: m.p, headword: m.lift.headword })),
       overlay: linkQ.map((l) => ({ a: l.a, b: l.b, score: +l.score.toFixed(3) })),
       stats: { ...stats },
@@ -307,13 +368,21 @@ export function createEngine({ llm, embed, book, log = () => {}, params = {} }) 
 
   function renderTree() {
     const lines = [`■ ${book.title}`];
-    for (let ci = 0; ci < book.toc.length; ci++) {
-      const group = nodes.filter((nd) => nd.chapterIdx === ci).sort((a, b) => Math.min(...a.memos.map((m) => m.p)) - Math.min(...b.memos.map((m) => m.p)));
-      if (!group.length) continue; // fog-of-war: 미물질화 장은 출력 안 함
-      lines.push(`├─ ${book.toc[ci]}`);
-      for (const nd of group) {
-        const ex = nd.memos.filter((m) => m.lift.exampleOf).map((m) => m.lift.exampleOf);
-        lines.push(`│   • ${nd.title} · ${nd.memos.map((m) => 'p' + m.p).join(',')}${ex.length ? ` (예시: ${[...new Set(ex)].join(', ')})` : ''}`);
+    const minP = (nd) => nd.memos.length ? Math.min(...nd.memos.map((m) => m.p))
+      : Math.min(...nodes.filter((c) => c.parentId === nd.id).flatMap((c) => c.memos.map((m) => m.p)), 9999);
+    const nodeLine = (nd, indent) => {
+      const ex = nd.memos.filter((m) => m.lift.exampleOf).map((m) => m.lift.exampleOf);
+      return `${indent}• ${nd.title}${nd.virtual ? ' ▸' : ''} · ${nd.memos.map((m) => 'p' + m.p).join(',') || '(승격)'}${ex.length ? ` (예시: ${[...new Set(ex)].join(', ')})` : ''}`;
+    };
+    for (let ci = 0; ci < Math.max(1, book.toc.length); ci++) {
+      const top = nodes.filter((nd) => nd.chapterIdx === ci && !nd.parentId).sort((a, b) => minP(a) - minP(b));
+      if (!top.length) continue; // fog-of-war: 미물질화 장은 출력 안 함
+      const base = book.toc.length ? '│   ' : '';
+      if (book.toc.length) lines.push(`├─ ${book.toc[ci]}`);
+      for (const nd of top) {
+        lines.push(nodeLine(nd, base));
+        for (const c of nodes.filter((x) => x.parentId === nd.id).sort((a, b) => minP(a) - minP(b)))
+          lines.push(nodeLine(c, base + '  '));
       }
     }
     if (shelf.length) lines.push(`└─ ⚠ 미분류 · ${shelf.map((m) => `p${m.p}(${m.lift.headword})`).join(', ')}`);
