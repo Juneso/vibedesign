@@ -15,6 +15,7 @@ export const SERIES_META = {
   'hier-stability-v8':    { title: 'ingest V8', purpose: '개요(리치데이터) + 위계 통합 — planIngest 위에 테마', pipelineId: 'hier-ingest-v8' },
   'hier-money-v8':        { title: 'ingest V8 · 돈으로', purpose: '돈으로 살 수 없는 것들 — 실 발췌 개요+테마', pipelineId: 'hier-ingest-v8' },
   'hier-desire-v8':       { title: 'ingest V8 · 욕망의사물', purpose: '욕망의 사물 — 실 발췌 개요+테마 (알라딘 메타 빈약)', pipelineId: 'hier-ingest-v8' },
+  'obsidian-ingest':      { title: '옵시디언 실 발췌 인제스트', purpose: '210 Books 실 발췌 → planIngest 위키 (자동선정)', pipelineId: null },
 };
 
 // 파일명에서 회차 라벨 도출: 'nudge-v7-13.json' → '13회차', 'connections-qf.json' → '단일'

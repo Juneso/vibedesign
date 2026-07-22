@@ -1,0 +1,49 @@
+{
+  "kind": "ingest",
+  "source": "옵시디언 200 Literature/210 Books",
+  "genModel": "gpt-4o",
+  "nBooks": 10,
+  "nPages": 102,
+  "books": [
+    {
+      "title": "짓기와 거주하기",
+      "pages": 5
+    },
+    {
+      "title": "호모 루덴스",
+      "pages": 5
+    },
+    {
+      "title": "디자인과 인간 심리",
+      "pages": 5
+    },
+    {
+      "title": "심리 정치",
+      "pages": 38
+    },
+    {
+      "title": "존중받지 못하는 자들을 위한 정치학",
+      "pages": 5
+    },
+    {
+      "title": "욕망의 사물, 디자인의 사회사",
+      "pages": 7
+    },
+    {
+      "title": "피로사회",
+      "pages": 5
+    },
+    {
+      "title": "기술적복제시대의 예술작품",
+      "pages": 5
+    },
+    {
+      "title": "현대 미학 강의",
+      "pages": 13
+    },
+    {
+      "title": "서양미술사",
+      "pages": 14
+    }
+  ]
+}
