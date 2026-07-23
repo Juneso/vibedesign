@@ -18,6 +18,18 @@ export const SERIES_META = {
   'obsidian-ingest':      { title: '옵시디언 실 발췌 — planIngest만', purpose: '210 Books 실 발췌 10권 — Phase 1만 실행(위계 없음)', pipelineId: 'hier-ingest-v8' },
   'obsidian-hier-v8':     { title: '옵시디언 V8 전체 · 위계 4o-mini', purpose: '리치데이터 주입 + Phase 1→1.5→2 (위계 모델 gpt-4o-mini)', pipelineId: 'hier-ingest-v8' },
   'obsidian-hier-v8-4o':  { title: '옵시디언 V8 전체 · 위계 4o', purpose: '같은 입력, 위계 모델만 gpt-4o 로 상향 — 테마 밀도 비교', pipelineId: 'hier-ingest-v8' },
+  // V9 — 동화 우선. 등록이 없으면 대시보드가 아예 노출하지 않아 그동안 안 보였다.
+  'hier-v9-batch':        { title: 'V9 전수 · 56권', purpose: '데이터셋 56권 887메모 배치 — 순서 바꿔도 같은 트리인지', pipelineId: 'hier-ingest-v9' },
+  'hier-v9':              { title: 'V9 · 디자인의 디자인', purpose: '도착 순서 3종으로 수렴 안정성 + 오라클 일치', pipelineId: 'hier-ingest-v9' },
+  'hier-v9-money':        { title: 'V9 · 돈으로', purpose: '돈으로 살 수 없는 것들 — 순서 3종 수렴 검증', pipelineId: 'hier-ingest-v9' },
+  'hier-v9-justice':      { title: 'V9 · 정의란 무엇인가', purpose: '정의란 무엇인가 — 순서 3종 수렴 검증', pipelineId: 'hier-ingest-v9' },
+  'hier-v9-zorba':        { title: 'V9 · 조르바', purpose: '목차 없는 소설 — 평면 폴백 + 상향 승격 테스트베드', pipelineId: 'hier-ingest-v9' },
+  'hier-v9-toc':          { title: 'V9 목차 A/B', purpose: '알라딘 목차를 뼈대로 넣었을 때의 효과 — 메모 고정, 목차만 변경', pipelineId: 'hier-ingest-v9' },
+  'predict-v9':           { title: '전이 채점 · V9 산출', purpose: 'V9 위키로 새 상황을 설명할 수 있는지', pipelineId: null },
+  'predict-v9-v2':        { title: '전이 채점 v2 · V9 산출', purpose: '전이 채점 2차 — 오라클 갭 재측정', pipelineId: null },
+  'predict-oracle':       { title: '전이 채점 · 오라클', purpose: '사람이 만든 정답 트리 기준선', pipelineId: null },
+  'predict-oracle-v2':    { title: '전이 채점 v2 · 오라클', purpose: '오라클 기준선 2차', pipelineId: null },
+  'predict':              { title: '전이 채점 · 초기', purpose: '전이 채점 축 초안', pipelineId: null },
 };
 
 // 파일명에서 회차 라벨 도출: 'nudge-v7-13.json' → '13회차', 'connections-qf.json' → '단일'

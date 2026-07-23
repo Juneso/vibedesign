@@ -108,6 +108,22 @@ for (const { m, b } of targets) {
     withoutToc: { ...withoutToc, snap: undefined }, withToc: { ...withToc, snap: undefined },
     tree: withToc.tree,
   }, null, 2) + '\n', 'utf-8');
+  // 런별 md — 없으면 대시보드가 raw JSON 을 그대로 덤프한다
+  const pct = (v) => (v * 100).toFixed(0) + '%';
+  let rmd = `# ${N(b.title)} — V9 목차 A/B\n\n`;
+  rmd += `- 저자: ${m.author || '미상'}\n`;
+  rmd += `- 메모 ${b.memos.length}개 · 목차 ${m.toc.length}줄 · 모델 ${MODEL} · ${sec}초\n`;
+  rmd += `- 메모는 데이터셋 고정, **목차만** 넣고 뺐다\n\n`;
+  rmd += `## 목차 유무 비교\n\n| 지표 | 목차 없음 | 목차 있음 |\n|---|---|---|\n`;
+  rmd += `| 관계쌍 자카드 | ${pct(withoutToc.jac)} | ${pct(withToc.jac)} |\n`;
+  rmd += `| 라벨 일치 | ${pct(withoutToc.agree)} | ${pct(withToc.agree)} |\n`;
+  rmd += `| 노드 | ${withoutToc.nodes} | ${withToc.nodes} |\n`;
+  rmd += `| 두꺼운 노드(메모≥2) | ${withoutToc.thick} | ${withToc.thick} |\n`;
+  rmd += `| 상향 승격 | ${withoutToc.promoted} | ${withToc.promoted} |\n`;
+  rmd += `| 미분류 | ${withoutToc.unfiled} | ${withToc.unfiled} |\n\n`;
+  rmd += `## 트리 (목차 있음)\n\n\`\`\`\n${String(withToc.tree || '').trim()}\n\`\`\`\n`;
+  await writeFile(resolve(__dir, `runs/hier-v9-toc-${i}.md`), rmd, 'utf-8');
+
   console.log(`  [${i}/${targets.length}] ${N(b.title)} — 목차 ${m.toc.length}줄 · 메모 ${b.memos.length}`);
   console.log(`      목차X 자카드 ${(withoutToc.jac * 100).toFixed(0)}% 노드 ${withoutToc.nodes} 두꺼움 ${withoutToc.thick} 승격 ${withoutToc.promoted}`);
   console.log(`      목차O 자카드 ${(withToc.jac * 100).toFixed(0)}% 노드 ${withToc.nodes} 두꺼움 ${withToc.thick} 승격 ${withToc.promoted}  (${sec}s)`);
