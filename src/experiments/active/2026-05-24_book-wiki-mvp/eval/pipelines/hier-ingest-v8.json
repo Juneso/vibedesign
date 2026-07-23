@@ -7,7 +7,7 @@
   "goal": "Phase 1을 한 문장씩 도는 키워드 추출 대신 **planIngest 한 번 호출**로 바꾼다. 키워드 설명은 알라딘 리치데이터로 쓴 개요 전문이 되고, 그 위에 V7 테마를 그대로 얹는다.",
   "designIntent": "- 검증된 두 계보를 합친다.\n  - **M2의 개요 로직** — 알라딘 리치데이터를 넣어 키워드 페이지의 개요를 만든다.\n  - **V7의 테마 로직** — 인용 필수 + gpt-4o critic 반증.\n- V5~V7의 키워드 추출은 이름과 한 줄 설명만 뽑아서, 키워드 페이지에 본문이 없었다.\n- V8은 planIngest 의 개요(책 맥락·관점·긴장을 3~5문장으로 쓴 글)를 키워드 설명으로 그대로 이어받는다. 이 글이 대시보드 트리 클릭 상세에 자동으로 뜬다.\n- 동의어 병합과 테마 생성·critic 은 **v7 코드를 고치지 않고 그대로 재사용**한다.",
   "diagram": {
-    "flowchart": "flowchart TD\n  subgraph G1[\"① 키워드 뽑기\"]\n    memo[\"독서 메모 문장<br/>책별 · 전체 일괄 투입\"]:::data\n    rich[\"알라딘 리치데이터<br/>책소개 · 출판사서평 · 책속에서 · 추천사\"]:::data\n    plan(\"1 · planIngest · gpt-4o<br/>리치데이터 → 키워드 페이지 + 개요\"):::proc\n    pages[\"키워드 페이지 초안<br/>제목 · 본문(개요 포함) · 출처\"]:::data\n    nodes(\"2 · 키워드 노드 빌드<br/>개요 파싱 + 누락 메모 보강\"):::proc\n  end\n  subgraph G2[\"② 중복 정리\"]\n    dedup(\"3 · 동의어 사후 병합<br/>같은 메모 출신은 무조건 검사\"):::proc\n  end\n  subgraph G3[\"③ 테마 만들기\"]\n    themegen(\"4 · 테마 생성<br/>V7 인용 방식 그대로\"):::proc\n    themes[\"테마 후보<br/>이름 · 인용 · 설명 · 멤버 2개 이상\"]:::data\n  end\n  subgraph G4[\"④ 테마 검증\"]\n    critic(\"5 · 테마 critic 반증<br/>gpt-4o · 인용해야만 기각\"):::proc\n    final[\"최종 키워드 트리<br/>책 → 검증된 테마 → 키워드(개요 포함)\"]:::data\n  end\n  memo -->|\"메모 전체\"| plan\n  rich -->|\"리치데이터 주입\"| plan\n  plan --> pages\n  pages -->|\"개요 파싱 + 임베딩\"| nodes\n  nodes -->|\"전체 키워드 쌍\"| dedup\n  dedup -->|\"root 직속 키워드들\"| themegen\n  themegen -->|\"인용 가능한 축만\"| themes\n  themes -->|\"테마별 독립 검증\"| critic\n  critic -->|\"승인 편성 · 기각 해체\"| final",
+    "flowchart": "flowchart TD\n  subgraph G1[\"① 키워드 뽑기\"]\n    memo[\"독서 메모 문장<br/>책별 · 전체 일괄 투입\"]:::data\n    rich[\"알라딘 리치데이터<br/>책소개 · 출판사서평 · 책속에서 · 추천사\"]:::data\n    plan(\"<b>1 · planIngest · gpt-4o</b><br/>리치데이터 → 키워드 페이지 + 개요\"):::proc\n    pages[\"키워드 페이지 초안<br/>제목 · 본문(개요 포함) · 출처\"]:::data\n    nodes(\"<b>2 · 키워드 노드 빌드</b><br/>개요 파싱 + 누락 메모 보강\"):::proc\n  end\n  subgraph G2[\"② 중복 정리\"]\n    dedup(\"<b>3 · 동의어 사후 병합</b><br/>같은 메모 출신은 무조건 검사\"):::proc\n  end\n  subgraph G3[\"③ 테마 만들기\"]\n    themegen(\"<b>4 · 테마 생성</b><br/>V7 인용 방식 그대로\"):::proc\n    themes[\"테마 후보<br/>이름 · 인용 · 설명 · 멤버 2개 이상\"]:::data\n  end\n  subgraph G4[\"④ 테마 검증\"]\n    critic(\"<b>5 · 테마 critic 반증</b><br/>gpt-4o · 인용해야만 기각\"):::proc\n    final[\"최종 키워드 트리<br/>책 → 검증된 테마 → 키워드(개요 포함)\"]:::data\n  end\n  memo -->|\"메모 전체\"| plan\n  rich -->|\"리치데이터 주입\"| plan\n  plan --> pages\n  pages -->|\"개요 파싱 + 임베딩\"| nodes\n  nodes -->|\"전체 키워드 쌍\"| dedup\n  dedup -->|\"root 직속 키워드들\"| themegen\n  themegen -->|\"인용 가능한 축만\"| themes\n  themes -->|\"테마별 독립 검증\"| critic\n  critic -->|\"승인 편성 · 기각 해체\"| final",
     "stageOf": {
       "plan": "plan_ingest",
       "nodes": "node_build",
@@ -43,7 +43,7 @@
     {
       "id": "dedup_merge",
       "name": "동의어 사후 병합 (Phase 1.5 — v7 동일)",
-      "why": "- planIngest 가 같은 키워드을 다른 이름으로 두 번 만들 수 있다.\n- 유사도 0.55 이상이거나 같은 메모 출신인 쌍을 검사해 합친다.",
+      "why": "- planIngest 가 같은 키워드를 다른 이름으로 두 번 만들 수 있다.\n- 유사도 0.55 이상이거나 같은 메모 출신인 쌍을 검사해 합친다.",
       "how": "- v7의 동의어 병합 코드를 그대로 쓴다. 같은 메모 출신 쌍은 문턱과 무관하게 검사한다.",
       "params": [
         {
