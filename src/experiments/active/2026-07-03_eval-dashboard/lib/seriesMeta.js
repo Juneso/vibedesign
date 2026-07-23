@@ -16,7 +16,8 @@ export const SERIES_META = {
   'hier-money-v8':        { title: 'ingest V8 · 돈으로', purpose: '돈으로 살 수 없는 것들 — 실 발췌 개요+테마', pipelineId: 'hier-ingest-v8' },
   'hier-desire-v8':       { title: 'ingest V8 · 욕망의사물', purpose: '욕망의 사물 — 실 발췌 개요+테마 (알라딘 메타 빈약)', pipelineId: 'hier-ingest-v8' },
   'obsidian-ingest':      { title: '옵시디언 실 발췌 — planIngest만', purpose: '210 Books 실 발췌 10권 — Phase 1만 실행(위계 없음)', pipelineId: 'hier-ingest-v8' },
-  'obsidian-hier-v8':     { title: '옵시디언 실 발췌 — V8 전체', purpose: '알라딘 리치데이터 주입 + Phase 1→1.5→2 위계 생성', pipelineId: 'hier-ingest-v8' },
+  'obsidian-hier-v8':     { title: '옵시디언 V8 전체 · 위계 4o-mini', purpose: '리치데이터 주입 + Phase 1→1.5→2 (위계 모델 gpt-4o-mini)', pipelineId: 'hier-ingest-v8' },
+  'obsidian-hier-v8-4o':  { title: '옵시디언 V8 전체 · 위계 4o', purpose: '같은 입력, 위계 모델만 gpt-4o 로 상향 — 테마 밀도 비교', pipelineId: 'hier-ingest-v8' },
 };
 
 // 파일명에서 회차 라벨 도출: 'nudge-v7-13.json' → '13회차', 'connections-qf.json' → '단일'

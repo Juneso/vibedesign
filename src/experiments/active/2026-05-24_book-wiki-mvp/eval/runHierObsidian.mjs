@@ -19,7 +19,9 @@ await loadDotEnvLocal(__dir);
 
 const VAULT = '/Users/junseo/Library/Mobile Documents/iCloud~md~obsidian/Documents/Junseo/200 Literature/210 Books';
 const RUNS = resolve(__dir, 'runs');
-const PREFIX = 'obsidian-hier-v8-';
+// 모델 비교처럼 결과를 나란히 남겨야 할 때 접두사를 바꾼다(시리즈가 갈린다).
+// 예: RUN_PREFIX=obsidian-hier-v8-4o- → 시리즈 obsidian-hier-v8-4o
+const PREFIX = process.env.RUN_PREFIX || 'obsidian-hier-v8-';
 const LIMIT = Number(process.env.LIMIT || 10);
 const FORCE = !!process.env.FORCE;
 const MAX_MEMOS = Number(process.env.MAX_MEMOS || 14);
