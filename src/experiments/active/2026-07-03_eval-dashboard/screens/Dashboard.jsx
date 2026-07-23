@@ -81,9 +81,20 @@ export default function Dashboard() {
   const isMisc = activeId === MISC_ID;
 
   // 우측에 표시할 런: 활성 파이프라인에 연결된 시리즈의 런만
+  // seriesMeta 에 등록되지 않은 시리즈는 그동안 어디에도 안 나왔다 —
+  // V9 계열이 2주 넘게 보이지 않은 원인. 미등록분은 "기타 eval" 로 흘려보내
+  // 최소한 눈에는 띄게 한다(등록하면 제대로 된 이름·파이프라인으로 옮겨간다).
+  const unregistered = useMemo(() => {
+    const known = new Set(Object.keys(SERIES_META));
+    return [...new Set(runs.map((r) => r.series).filter((s) => !known.has(s)))];
+  }, [runs]);
+
   const activeSeries = useMemo(
-    () => new Set(seriesForPipeline(activeId)),
-    [activeId]
+    () => new Set([
+      ...seriesForPipeline(activeId),
+      ...(activeId === MISC_ID ? unregistered : []),
+    ]),
+    [activeId, unregistered]
   );
   const filteredRuns = useMemo(
     () => runs.filter((r) => activeSeries.has(r.series)),
@@ -124,9 +135,16 @@ export default function Dashboard() {
 
           {!plLoaded && <Spinner />}
           {isMisc && (
-            <Text type="supporting">
-              파이프라인 미연결 eval 목록입니다. 우측에서 미매핑 시리즈의 런을 확인하세요.
-            </Text>
+            <VStack gap={1}>
+              <Text type="supporting">
+                파이프라인 미연결 eval 목록입니다. 우측에서 미매핑 시리즈의 런을 확인하세요.
+              </Text>
+              {unregistered.length > 0 && (
+                <Text type="supporting" color="accent">
+                  seriesMeta 미등록 {unregistered.length}종이 여기 섞여 있습니다 — {unregistered.join(', ')}
+                </Text>
+              )}
+            </VStack>
           )}
           {!isMisc && active && (
             <PipelineDetail

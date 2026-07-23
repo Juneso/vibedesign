@@ -97,12 +97,36 @@ function wrapText(text, per = SENT_CHARS, maxLines = SENT_LINES) {
 // 3) 내부 노드 y = 자식 y 평균
 function computeLayout(rootId, nodes) {
   const childMap = new Map(nodes.map((n) => [n.id, []]));
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+  const order = new Map(nodes.map((n, i) => [n.id, i]));
 
   nodes.forEach((n) => {
     if (n.parentId && childMap.has(n.parentId)) {
       childMap.get(n.parentId).push(n.id);
     }
   });
+
+  // 형제 정렬: 하위 트리의 최소 페이지 순(= 책에서 읽은 순서).
+  // 승격 노드는 정리 패스에서 나중에 만들어져 배열 뒤쪽에 오므로, 배열 순서대로
+  // 그리면 페이지가 뒤섞여 보인다. 페이지가 없는 노드(문장 등)는 원래 순서를 지킨다.
+  const minPageCache = new Map();
+  function minPage(id) {
+    if (minPageCache.has(id)) return minPageCache.get(id);
+    minPageCache.set(id, Infinity); // 순환 방어
+    const n = byId.get(id);
+    const own = (n?.sources || []).length ? Math.min(...n.sources) : Infinity;
+    const kids = childMap.get(id) || [];
+    const v = Math.min(own, ...kids.map(minPage));
+    minPageCache.set(id, v);
+    return v;
+  }
+  for (const [, kids] of childMap) {
+    kids.sort((a, b) => {
+      const pa = minPage(a), pb = minPage(b);
+      if (pa !== pb) return pa - pb;          // 페이지 순
+      return order.get(a) - order.get(b);      // 동률·무페이지는 원래 순서 유지
+    });
+  }
 
   // row 인덱스 부여 (DFS in-order, 리프만)
   let rowIdx = 0;
