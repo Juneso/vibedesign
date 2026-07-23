@@ -7,7 +7,7 @@
   "goal": "저장한 문장을 다시 마주칠 때 보여줄 **넛지 메시지**(풀이→질문 + 해석 방향 3선택지)를 만들고, 결정적 체커 5개와 독립 judge 3개로 채점해 좋은 것만 통과시킨다.",
   "designIntent": "- V7은 자극성(정지력) 점수가 높으면 다른 결함이 가려졌다.\n- 멈추게 하는 것과 좋은 넛지는 다른 것이었다.\n- 그래서 V8은 자극성 축을 없앴다.\n- 대신 **풀이 정확도 · 공감 · 응용 거리** 세 축을 각각 따로 LLM 호출로 채점한다.\n- 한 축의 높은 점수가 다른 축의 약점을 덮지 못하게 하는 것이 목적이다.",
   "diagram": {
-    "flowchart": "flowchart TD\n  subgraph G1[\"① 넛지 만들기\"]\n    memo[\"저장한 문장 6개<br/>책 + 페이지 · 유저 생각 포함\"]:::data\n    gen(\"<b>1 · 넛지 생성</b><br/>gpt-4o · 풀이 → 질문 흐름\"):::proc\n    nudge[\"넛지 6개<br/>메시지 + 선택지 3개\"]:::data\n  end\n  subgraph G2[\"② 형식 거르기 (코드)\"]\n    det(\"<b>2 · 결정적 체커 F1~F5</b><br/>개수 · 길이 · 금지어 · 책제목\"):::proc\n    passed[\"형식 통과 넛지<br/>judge 로 넘길 후보\"]:::data\n  end\n  subgraph G3[\"③ 내용 채점 (축별 독립)\"]\n    j1(\"<b>3 · J1 풀이 정확도</b><br/>gpt-4o · 0~2점\"):::proc\n    j2(\"<b>3 · J2 공감</b><br/>gpt-4o · 0~2점\"):::proc\n    j3(\"<b>3 · J3 응용거리 · 결격</b><br/>체크리스트 + L1~L7 레벨\"):::proc\n  end\n  subgraph G4[\"④ 라운드 판정\"]\n    dist(\"<b>4 · 레벨 분포 검사</b><br/>라운드 단위\"):::proc\n    final{{\"통과 넛지<br/>합격선 넘은 것만 채택\"}}:::human\n  end\n  memo -->|\"타깃 지정\"| gen\n  gen -->|\"재시도 최대 3회\"| nudge\n  nudge -->|\"형식 검사\"| det\n  det -->|\"F1~F5 모두 통과만\"| passed\n  passed -->|\"축별 병렬 채점\"| j1\n  passed -->|\"축별 병렬 채점\"| j2\n  passed -->|\"축별 병렬 채점\"| j3\n  j3 -->|\"레벨 집계\"| dist\n  dist -->|\"분포 통과 시 채택\"| final",
+    "flowchart": "flowchart TD\n  subgraph G1[\"① 넛지 만들기\"]\n    memo[\"저장한 문장 6개<br/>책 + 페이지 · 유저 생각 포함\"]:::data\n    gen(\"<b>1 · 넛지 생성</b> <span class='pl-llm'>LLM</span><br/>gpt-4o · 풀이 → 질문 흐름\"):::proc\n    nudge[\"넛지 6개<br/>메시지 + 선택지 3개\"]:::data\n  end\n  subgraph G2[\"② 형식 거르기 (코드)\"]\n    det(\"<b>2 · 결정적 체커 F1~F5</b><br/>개수 · 길이 · 금지어 · 책제목\"):::proc\n    passed[\"형식 통과 넛지<br/>judge 로 넘길 후보\"]:::data\n  end\n  subgraph G3[\"③ 내용 채점 (축별 독립)\"]\n    j1(\"<b>3 · J1 풀이 정확도</b> <span class='pl-llm'>LLM</span><br/>gpt-4o · 0~2점\"):::proc\n    j2(\"<b>3 · J2 공감</b> <span class='pl-llm'>LLM</span><br/>gpt-4o · 0~2점\"):::proc\n    j3(\"<b>3 · J3 응용거리 · 결격</b> <span class='pl-llm'>LLM</span><br/>체크리스트 + L1~L7 레벨\"):::proc\n  end\n  subgraph G4[\"④ 라운드 판정\"]\n    dist(\"<b>4 · 레벨 분포 검사</b><br/>라운드 단위\"):::proc\n    final{{\"통과 넛지<br/>합격선 넘은 것만 채택\"}}:::human\n  end\n  memo -->|\"타깃 지정\"| gen\n  gen -->|\"재시도 최대 3회\"| nudge\n  nudge -->|\"형식 검사\"| det\n  det -->|\"F1~F5 모두 통과만\"| passed\n  passed -->|\"축별 병렬 채점\"| j1\n  passed -->|\"축별 병렬 채점\"| j2\n  passed -->|\"축별 병렬 채점\"| j3\n  j3 -->|\"레벨 집계\"| dist\n  dist -->|\"분포 통과 시 채택\"| final",
     "stageOf": {
       "gen": "generate",
       "det": "deterministic",
@@ -54,7 +54,8 @@
       "funnel": {
         "in": 6,
         "out": 6
-      }
+      },
+      "llm": true
     },
     {
       "id": "deterministic",
@@ -104,7 +105,8 @@
       "funnel": {
         "in": 6,
         "out": 6
-      }
+      },
+      "llm": false
     },
     {
       "id": "judge",
@@ -148,7 +150,8 @@
       "funnel": {
         "in": 6,
         "out": null
-      }
+      },
+      "llm": true
     },
     {
       "id": "dist_check",
@@ -180,7 +183,8 @@
       "funnel": {
         "in": 6,
         "out": null
-      }
+      },
+      "llm": false
     }
   ],
   "knownIssues": [

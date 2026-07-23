@@ -188,7 +188,10 @@ function StageDetail({ stage, index }) {
 
   return (
     <section className="eval-md-section pl-stage-detail">
-      <h4 className="eval-md-h">{index + 1}. {stage.name}</h4>
+      <h4 className="eval-md-h">
+        {index + 1}. {stage.name}
+        {stage.llm && <span className="pl-llm" title="이 단계는 LLM 이 판단합니다">LLM</span>}
+      </h4>
 
       {stage.why && (
         <>
@@ -254,6 +257,7 @@ function FlowSection({ pipeline }) {
       <p className="eval-md-p pl-flow-hint">
         큰 상자는 <b>역할 묶음</b>(①②③…)이고, 그 안에서 번호가 붙은 <b>처리 단계</b>를 누르면 아래에 설명이 열립니다.
         번호는 아래 상세 제목의 번호와 같습니다. 옅은 테두리는 데이터, 점선은 사람이 보는 지점입니다.
+        <span className="pl-llm">LLM</span> 뱃지는 그 단계에서 LLM 이 판단한다는 뜻이고, 없는 단계는 코드나 임베딩으로만 정해집니다.
       </p>
       <MermaidFlow
         code={diagram.flowchart}

@@ -411,6 +411,24 @@ body {
   color: var(--color-text-secondary, #667);
 }
 
+/* LLM 뱃지 — 흐름도 노드 라벨 안(mermaid 가 그린 span)과 상세 제목 옆에서 같은 모양을 쓴다.
+   "이 단계는 LLM 이 판단한다"는 표시라, 뱃지 없는 단계는 코드·임베딩으로만 정해진다는 뜻이 된다. */
+.pl-llm {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 0 5px;
+  border-radius: 4px;
+  border: 1px solid var(--color-accent, #6366f1);
+  background: var(--color-accent-muted, #eef2ff);
+  color: var(--color-text-accent, #4f46e5);
+  font-size: 9.5px;
+  font-weight: 700;
+  line-height: 15px;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
 /* 처리 단계만 클릭 가능 */
 .pl-mermaid .node.is-clickable {
   cursor: pointer;

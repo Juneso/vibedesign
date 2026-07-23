@@ -7,7 +7,7 @@
   "goal": "메모를 넣을 때마다 위키 구조가 통째로 바뀌면 유저는 매번 구조를 새로 익혀야 한다. 새 메모가 와도 기존 구조가 흔들리지 않게 만든다.",
   "designIntent": "V8까지는 트리를 AI에게 작문시켰다. 그래서 같은 메모를 순서만 바꿔 넣어도 다른 트리가 나왔다(관계쌍 자카드 10%). V9는 **트리를 만드는 데 LLM을 쓰지 않는다**. 위계는 목차에서 빌려오고, AI 판단은 메모 한 건 크기로만 쪼갠다. 새 메모는 일단 기존 키워드에 붙이기만 하고(동화), 구조를 바꾸는 일은 유저가 예측할 수 있는 '정리' 시점에만 한다. 애매하면 억지로 분류하지 않고 미분류로 남기는 것도 정식 기능이다.",
   "diagram": {
-    "flowchart": "flowchart TD\n  subgraph G1[\"① 키워드 뽑기\"]\n    memo[\"새 메모 한 건<br/>도착할 때마다\"]:::data\n    toc[\"책 목차<br/>확정된 뼈대 · 없으면 평면 폴백\"]:::data\n    lift(\"<b>1 · 표제어 뽑기</b><br/>문장에서 이름 · 논지 · 역할 추출\"):::proc\n  end\n  subgraph G2[\"② 위계에 붙이기 (추가만)\"]\n    attach(\"<b>2 · 목차에 붙이기</b><br/>페이지 순서를 지키는 배치\"):::proc\n    assim(\"<b>3 · 기존 키워드에 동화</b><br/>붙을 곳 없으면 새로, 애매하면 미분류\"):::proc\n    tree[\"온라인 트리<br/>추가만 · 기존 구조 불변\"]:::data\n  end\n  subgraph G3[\"③ 정리 (예측 가능한 시점에만)\"]\n    consol(\"<b>4 · 정리 패스</b><br/>완독·유저 요청 때만 실행\"):::proc\n    merge(\"<b>5 · 동의어 병합 · 상향 승격</b><br/>제목 선택 규칙은 고정\"):::proc\n    final[\"최종 트리<br/>순서를 바꿔 넣어도 같은 결과\"]:::data\n  end\n  memo --> lift\n  toc --> attach\n  lift --> attach\n  attach --> assim\n  assim -->|\"추가만\"| tree\n  tree -->|\"완독 시점\"| consol\n  consol --> merge\n  merge --> final",
+    "flowchart": "flowchart TD\n  subgraph G1[\"① 키워드 뽑기\"]\n    memo[\"새 메모 한 건<br/>도착할 때마다\"]:::data\n    toc[\"책 목차<br/>확정된 뼈대 · 없으면 평면 폴백\"]:::data\n    lift(\"<b>1 · 표제어 뽑기</b> <span class='pl-llm'>LLM</span><br/>문장에서 이름 · 논지 · 역할 추출\"):::proc\n  end\n  subgraph G2[\"② 위계에 붙이기 (추가만)\"]\n    attach(\"<b>2 · 목차에 붙이기</b> <span class='pl-llm'>LLM</span><br/>페이지 순서를 지키는 배치\"):::proc\n    assim(\"<b>3 · 기존 키워드에 동화</b> <span class='pl-llm'>LLM</span><br/>붙을 곳 없으면 새로, 애매하면 미분류\"):::proc\n    tree[\"온라인 트리<br/>추가만 · 기존 구조 불변\"]:::data\n  end\n  subgraph G3[\"③ 정리 (예측 가능한 시점에만)\"]\n    consol(\"<b>4 · 정리 패스</b><br/>완독·유저 요청 때만 실행\"):::proc\n    merge(\"<b>5 · 동의어 병합 · 상향 승격</b> <span class='pl-llm'>LLM</span><br/>제목 선택 규칙은 고정\"):::proc\n    final[\"최종 트리<br/>순서를 바꿔 넣어도 같은 결과\"]:::data\n  end\n  memo --> lift\n  toc --> attach\n  lift --> attach\n  attach --> assim\n  assim -->|\"추가만\"| tree\n  tree -->|\"완독 시점\"| consol\n  consol --> merge\n  merge --> final",
     "stageOf": {
       "lift": "lift",
       "attach": "attach",
@@ -30,7 +30,8 @@
           "effect": "범위를 넓히면 순서에 따라 결과가 달라진다"
         }
       ],
-      "output": "표제어 · 논지 · 역할"
+      "output": "표제어 · 논지 · 역할",
+      "llm": true
     },
     {
       "id": "attach",
@@ -51,7 +52,8 @@
           "effect": "좁히면 애매한 배치가 늘어난다"
         }
       ],
-      "output": "장에 배치된 메모 · 미분류 버킷"
+      "output": "장에 배치된 메모 · 미분류 버킷",
+      "llm": true
     },
     {
       "id": "assimilate",
@@ -66,7 +68,8 @@
           "effect": "낮추면 다른 키워드가 뭉친다"
         }
       ],
-      "output": "추가만 반영된 온라인 트리"
+      "output": "추가만 반영된 온라인 트리",
+      "llm": true
     },
     {
       "id": "consolidate",
@@ -81,7 +84,8 @@
           "effect": "상시 실행하면 V8과 같은 불안정으로 되돌아간다"
         }
       ],
-      "output": "재배치된 트리 · 변경 요약"
+      "output": "재배치된 트리 · 변경 요약",
+      "llm": false
     },
     {
       "id": "promote",
@@ -96,7 +100,8 @@
           "effect": "AI에게 맡기면 실행마다 이름이 바뀐다"
         }
       ],
-      "output": "동의어가 합쳐지고 상위 키워드가 생긴 최종 트리"
+      "output": "동의어가 합쳐지고 상위 키워드가 생긴 최종 트리",
+      "llm": true
     }
   ],
   "knownIssues": [

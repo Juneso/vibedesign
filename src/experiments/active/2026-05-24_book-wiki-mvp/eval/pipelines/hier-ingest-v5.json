@@ -7,7 +7,7 @@
   "goal": "독서 메모를 한 문장씩 읽어가며 **책별 키워드 트리**를 조금씩 쌓는다. 목차는 트리에 넣지 않고 위계 판단의 숨은 기준으로만 쓴다.",
   "designIntent": "- 위계를 만드는 책임을 둘로 나눈다 — **Phase 1 키워드 배치**와 **Phase 2 고아 군집화**.\n- V4까지는 군집화가 배치 결과를 무시하고 덮어썼다.\n- V5의 Phase 2는 배치 결과를 그대로 두고, root 바로 아래 남은 고아만 묶는다.\n- 목표는 억지 상위추상 없이 **진짜 포함관계만** 남기는 것.",
   "diagram": {
-    "flowchart": "flowchart TD\n  subgraph G1[\"① 키워드 뽑기\"]\n    memo[\"독서 메모 문장<br/>책별 · 한 문장씩 순차 투입\"]:::data\n    extract(\"<b>1 · 키워드 추출</b><br/>gpt-4o-mini · 일반어 금지\"):::proc\n    concepts[\"핵심 키워드 1~2개<br/>명사구 + 한 줄 설명\"]:::data\n  end\n  subgraph G2[\"② 위계 만들기\"]\n    embed(\"<b>2 · 키워드 임베딩 · 후보 검색</b><br/>비슷한 노드 상위 4개\"):::proc\n    place(\"<b>3 · 위계 배치</b><br/>합치기 · 아래 · 위 · 그냥 붙이기\"):::proc\n    tree1[\"1차 키워드 트리<br/>포함관계 + root 직속 잎\"]:::data\n  end\n  subgraph G3[\"③ 정리\"]\n    dedup(\"<b>4 · 동의어 사후 병합</b><br/>전체 쌍 다시 훑기\"):::proc\n    orphans[\"root 직속 고아<br/>위계에 못 든 키워드\"]:::data\n    cluster(\"<b>5 · 고아 군집화</b><br/>기존 위계는 건드리지 않음\"):::proc\n    final[\"최종 키워드 트리<br/>편입 · 새 테마 · 남은 고아\"]:::data\n  end\n  memo -->|\"문장 + 유저 생각\"| extract\n  extract --> concepts\n  concepts -->|\"벡터화\"| embed\n  embed -->|\"유사도 0.3 이상 상위 4개\"| place\n  place -->|\"연산 적용\"| tree1\n  tree1 -->|\"전체 키워드 쌍\"| dedup\n  dedup -->|\"고아만 추출\"| orphans\n  orphans --> cluster\n  cluster -->|\"편입 또는 최상위 유지\"| final",
+    "flowchart": "flowchart TD\n  subgraph G1[\"① 키워드 뽑기\"]\n    memo[\"독서 메모 문장<br/>책별 · 한 문장씩 순차 투입\"]:::data\n    extract(\"<b>1 · 키워드 추출</b> <span class='pl-llm'>LLM</span><br/>gpt-4o-mini · 일반어 금지\"):::proc\n    concepts[\"핵심 키워드 1~2개<br/>명사구 + 한 줄 설명\"]:::data\n  end\n  subgraph G2[\"② 위계 만들기\"]\n    embed(\"<b>2 · 키워드 임베딩 · 후보 검색</b><br/>비슷한 노드 상위 4개\"):::proc\n    place(\"<b>3 · 위계 배치</b> <span class='pl-llm'>LLM</span><br/>합치기 · 아래 · 위 · 그냥 붙이기\"):::proc\n    tree1[\"1차 키워드 트리<br/>포함관계 + root 직속 잎\"]:::data\n  end\n  subgraph G3[\"③ 정리\"]\n    dedup(\"<b>4 · 동의어 사후 병합</b> <span class='pl-llm'>LLM</span><br/>전체 쌍 다시 훑기\"):::proc\n    orphans[\"root 직속 고아<br/>위계에 못 든 키워드\"]:::data\n    cluster(\"<b>5 · 고아 군집화</b> <span class='pl-llm'>LLM</span><br/>기존 위계는 건드리지 않음\"):::proc\n    final[\"최종 키워드 트리<br/>편입 · 새 테마 · 남은 고아\"]:::data\n  end\n  memo -->|\"문장 + 유저 생각\"| extract\n  extract --> concepts\n  concepts -->|\"벡터화\"| embed\n  embed -->|\"유사도 0.3 이상 상위 4개\"| place\n  place -->|\"연산 적용\"| tree1\n  tree1 -->|\"전체 키워드 쌍\"| dedup\n  dedup -->|\"고아만 추출\"| orphans\n  orphans --> cluster\n  cluster -->|\"편입 또는 최상위 유지\"| final",
     "stageOf": {
       "extract": "extract",
       "embed": "embed_concept",
@@ -47,7 +47,8 @@
       "funnel": {
         "in": 14,
         "out": null
-      }
+      },
+      "llm": true
     },
     {
       "id": "embed_concept",
@@ -79,7 +80,8 @@
       "funnel": {
         "in": null,
         "out": null
-      }
+      },
+      "llm": false
     },
     {
       "id": "place",
@@ -105,7 +107,8 @@
       "funnel": {
         "in": null,
         "out": null
-      }
+      },
+      "llm": true
     },
     {
       "id": "dedup_merge",
@@ -131,7 +134,8 @@
       "funnel": {
         "in": null,
         "out": null
-      }
+      },
+      "llm": true
     },
     {
       "id": "cluster",
@@ -157,7 +161,8 @@
       "funnel": {
         "in": null,
         "out": null
-      }
+      },
+      "llm": true
     }
   ],
   "knownIssues": [

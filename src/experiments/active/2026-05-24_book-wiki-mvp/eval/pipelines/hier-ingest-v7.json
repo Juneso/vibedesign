@@ -7,7 +7,7 @@
   "goal": "키워드 트리를 쌓되 **위아래 위계는 교차검증을 통과한 것만** 만들고, \"정리되는 느낌\"은 책 논지에 붙인 **테마**가 맡는다. 테마는 이름뿐 아니라 근거 인용과 설명을 반드시 갖는다.",
   "designIntent": "- V5 셔플 측정에서 배치가 만든 위계 대부분이 재현되지 않았다 — 위계쌍 자카드 **11%**, 사실상 지어낸 위계.\n- V6에서 치환 테스트와 양방향 교차검증을 넣자 배치발 위계가 전원 기각됐다. 수집 문장의 키워드 사이에 엄밀한 포함관계가 드물다는 뜻이다.\n- 그래서 V7은 둘로 나눴다 — 위아래 위계는 **검증 통과분만** 남기고, 정리되는 느낌은 **테마**가 맡는다.\n- 테마는 책 요약·목차에서 근거 구절을 그대로 인용해야만 만들어진다.\n- 독립 critic(gpt-4o)이 인용을 근거로 반증한다. \"확신 없으면 기각\"식 지시는 mini 에게 기각 도장이 되어버려 \"인용해야만 기각 가능\"으로 고쳤다.\n- 결과 — 책의 3대 논지 축이 셔플 3회 모두 테마로 재현, 뜬금없는 우산 키워드 0건, 위계쌍 자카드 **32%**.",
   "diagram": {
-    "flowchart": "flowchart TD\n  subgraph G1[\"① 키워드 뽑기\"]\n    memo[\"독서 메모 문장<br/>책별 · 한 문장씩 순차 투입\"]:::data\n    extract(\"<b>1 · 키워드 추출</b><br/>gpt-4o-mini · 일반어 금지\"):::proc\n    concepts[\"핵심 키워드 1~2개<br/>명사구 + 한 줄 설명\"]:::data\n  end\n  subgraph G2[\"② 위계 만들기\"]\n    embed(\"<b>2 · 키워드 임베딩 · 후보 검색</b><br/>비슷한 노드 상위 4개\"):::proc\n    place(\"<b>3 · 위계 배치 · 치환 테스트</b><br/>합치기 · 아래 · 위 · 그냥 붙이기\"):::proc\n  end\n  subgraph G3[\"③ 위계 검증\"]\n    verify(\"<b>4 · 양방향 교차검증</b><br/>어긋나면 강등\"):::proc\n    tree1[\"1차 키워드 트리<br/>검증 통과 위계 + root 직속 잎\"]:::data\n  end\n  subgraph G4[\"④ 중복 정리\"]\n    dedup(\"<b>5 · 동의어 사후 병합</b><br/>같은 메모 출신은 무조건 검사\"):::proc\n  end\n  subgraph G5[\"⑤ 테마 만들기\"]\n    themegen(\"<b>6 · 테마 생성</b><br/>책 인용(anchor) 필수\"):::proc\n    themes[\"테마 후보<br/>이름 · 인용 · 설명 · 멤버 2개 이상\"]:::data\n  end\n  subgraph G6[\"⑥ 테마 검증\"]\n    critic(\"<b>7 · 테마 critic 반증</b><br/>gpt-4o · 인용해야만 기각\"):::proc\n    final[\"최종 키워드 트리<br/>책 → 검증된 테마 → 키워드\"]:::data\n  end\n  memo -->|\"문장 + 유저 생각\"| extract\n  extract --> concepts\n  concepts -->|\"벡터화\"| embed\n  embed -->|\"유사도 0.3 이상 상위 4개\"| place\n  place -->|\"위·아래 제안만\"| verify\n  verify -->|\"확정 또는 강등\"| tree1\n  tree1 -->|\"전체 키워드 쌍\"| dedup\n  dedup -->|\"root 직속 키워드들\"| themegen\n  themegen -->|\"인용 가능한 축만\"| themes\n  themes -->|\"테마별 독립 검증\"| critic\n  critic -->|\"승인 편성 · 기각 해체\"| final",
+    "flowchart": "flowchart TD\n  subgraph G1[\"① 키워드 뽑기\"]\n    memo[\"독서 메모 문장<br/>책별 · 한 문장씩 순차 투입\"]:::data\n    extract(\"<b>1 · 키워드 추출</b> <span class='pl-llm'>LLM</span><br/>gpt-4o-mini · 일반어 금지\"):::proc\n    concepts[\"핵심 키워드 1~2개<br/>명사구 + 한 줄 설명\"]:::data\n  end\n  subgraph G2[\"② 위계 만들기\"]\n    embed(\"<b>2 · 키워드 임베딩 · 후보 검색</b><br/>비슷한 노드 상위 4개\"):::proc\n    place(\"<b>3 · 위계 배치 · 치환 테스트</b> <span class='pl-llm'>LLM</span><br/>합치기 · 아래 · 위 · 그냥 붙이기\"):::proc\n  end\n  subgraph G3[\"③ 위계 검증\"]\n    verify(\"<b>4 · 양방향 교차검증</b> <span class='pl-llm'>LLM</span><br/>어긋나면 강등\"):::proc\n    tree1[\"1차 키워드 트리<br/>검증 통과 위계 + root 직속 잎\"]:::data\n  end\n  subgraph G4[\"④ 중복 정리\"]\n    dedup(\"<b>5 · 동의어 사후 병합</b> <span class='pl-llm'>LLM</span><br/>같은 메모 출신은 무조건 검사\"):::proc\n  end\n  subgraph G5[\"⑤ 테마 만들기\"]\n    themegen(\"<b>6 · 테마 생성</b> <span class='pl-llm'>LLM</span><br/>책 인용(anchor) 필수\"):::proc\n    themes[\"테마 후보<br/>이름 · 인용 · 설명 · 멤버 2개 이상\"]:::data\n  end\n  subgraph G6[\"⑥ 테마 검증\"]\n    critic(\"<b>7 · 테마 critic 반증</b> <span class='pl-llm'>LLM</span><br/>gpt-4o · 인용해야만 기각\"):::proc\n    final[\"최종 키워드 트리<br/>책 → 검증된 테마 → 키워드\"]:::data\n  end\n  memo -->|\"문장 + 유저 생각\"| extract\n  extract --> concepts\n  concepts -->|\"벡터화\"| embed\n  embed -->|\"유사도 0.3 이상 상위 4개\"| place\n  place -->|\"위·아래 제안만\"| verify\n  verify -->|\"확정 또는 강등\"| tree1\n  tree1 -->|\"전체 키워드 쌍\"| dedup\n  dedup -->|\"root 직속 키워드들\"| themegen\n  themegen -->|\"인용 가능한 축만\"| themes\n  themes -->|\"테마별 독립 검증\"| critic\n  critic -->|\"승인 편성 · 기각 해체\"| final",
     "stageOf": {
       "extract": "extract",
       "embed": "embed_concept",
@@ -49,7 +49,8 @@
       "funnel": {
         "in": 14,
         "out": null
-      }
+      },
+      "llm": true
     },
     {
       "id": "embed_concept",
@@ -81,7 +82,8 @@
       "funnel": {
         "in": null,
         "out": null
-      }
+      },
+      "llm": false
     },
     {
       "id": "place",
@@ -107,7 +109,8 @@
       "funnel": {
         "in": null,
         "out": null
-      }
+      },
+      "llm": true
     },
     {
       "id": "verify_direction",
@@ -133,7 +136,8 @@
       "funnel": {
         "in": null,
         "out": null
-      }
+      },
+      "llm": true
     },
     {
       "id": "dedup_merge",
@@ -159,7 +163,8 @@
       "funnel": {
         "in": null,
         "out": null
-      }
+      },
+      "llm": true
     },
     {
       "id": "theme_gen",
@@ -191,7 +196,8 @@
       "funnel": {
         "in": null,
         "out": null
-      }
+      },
+      "llm": true
     },
     {
       "id": "theme_critic",
@@ -217,7 +223,8 @@
       "funnel": {
         "in": null,
         "out": null
-      }
+      },
+      "llm": true
     }
   ],
   "knownIssues": [
