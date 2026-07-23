@@ -22,7 +22,12 @@ function loadMermaid() {
         securityLevel: 'strict',
         theme: 'neutral',
         fontFamily: 'inherit',
-        flowchart: { htmlLabels: true, curve: 'basis', nodeSpacing: 34, rankSpacing: 44, padding: 8 },
+        flowchart: {
+          htmlLabels: true, curve: 'basis', nodeSpacing: 34, rankSpacing: 44, padding: 8,
+          // 역할 묶음 제목이 묶음 위쪽 테두리에 걸쳐 그려져서, 여백을 주지 않으면
+          // 바깥에서 들어오는 화살표가 제목 글자를 관통한다.
+          subGraphTitleMargin: { top: 6, bottom: 12 },
+        },
       });
       return mermaid;
     });
@@ -247,7 +252,8 @@ function FlowSection({ pipeline }) {
     <section className="eval-md-section">
       <h4 className="eval-md-h">흐름도</h4>
       <p className="eval-md-p pl-flow-hint">
-        테두리가 진한 <b>처리 단계</b>를 누르면 아래에 설명이 열립니다. 옅은 테두리는 데이터, 점선은 사람이 보는 지점입니다.
+        큰 상자는 <b>역할 묶음</b>(①②③…)이고, 그 안에서 번호가 붙은 <b>처리 단계</b>를 누르면 아래에 설명이 열립니다.
+        번호는 아래 상세 제목의 번호와 같습니다. 옅은 테두리는 데이터, 점선은 사람이 보는 지점입니다.
       </p>
       <MermaidFlow
         code={diagram.flowchart}

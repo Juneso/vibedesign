@@ -396,6 +396,21 @@ body {
   stroke-dasharray: 5 4 !important;
 }
 
+/* 역할 묶음(subgraph) — 단계들이 무슨 일을 하는 덩어리인지 보이게 하는 게 목적이라
+   테두리는 옅게 두고 제목만 또렷하게 한다. */
+.pl-mermaid .cluster > rect {
+  fill: var(--color-background-muted, #f7f9fb) !important;
+  stroke: var(--color-border, #e5e5e5) !important;
+  stroke-width: 1px !important;
+  rx: 10px;
+}
+
+.pl-mermaid .cluster-label .nodeLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-secondary, #667);
+}
+
 /* 처리 단계만 클릭 가능 */
 .pl-mermaid .node.is-clickable {
   cursor: pointer;
@@ -428,7 +443,7 @@ body {
   margin-top: 10px;
 }
 
-/* ── eval 개념 트리 SVG ───────────────────────────────────── */
+/* ── eval 키워드 트리 SVG ───────────────────────────────────── */
 .eval-tree-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;

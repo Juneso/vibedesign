@@ -266,9 +266,9 @@ export function TreeSvg({ tree }) {
           width={svgWidth}
           height={svgHeight}
           role="img"
-          aria-label="개념 위계 트리"
+          aria-label="키워드 위계 트리"
         >
-          <title>개념 위계 트리</title>
+          <title>키워드 위계 트리</title>
           <g className="eval-tree-edges">
             {edges.map((e) => (
               <Edge key={e.key} x1={e.x1} y1={e.y1} x2={e.x2} y2={e.y2} />
