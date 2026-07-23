@@ -27,6 +27,7 @@ export const SERIES_META = {
   'hier-v9-toc':          { title: 'V9 목차 A/B', purpose: '알라딘 목차를 뼈대로 넣었을 때의 효과 — 메모 고정, 목차만 변경', pipelineId: 'hier-ingest-v9' },
   'hier-v9-tree':         { title: 'V9 위계 트리 · 9권', purpose: 'V8 과 같은 책·같은 형식으로 그린 트리 — 나란히 비교용', pipelineId: 'hier-ingest-v9' },
   'hier-v8-full':         { title: 'V8 · 메모 전량 (공정비교)', purpose: 'V9 와 같은 메모를 넣은 V8 — MAX_MEMOS 로 자르지 않음', pipelineId: 'hier-ingest-v8' },
+  'hier-v10':             { title: 'V10 · 전개 방식 기반', purpose: '책이 이야기를 풀어가는 방식을 판정해 그 축으로 위계 구성', pipelineId: 'hier-ingest-v10' },
   'predict-v9':           { title: '전이 채점 · V9 산출', purpose: 'V9 위키로 새 상황을 설명할 수 있는지', pipelineId: null },
   'predict-v9-v2':        { title: '전이 채점 v2 · V9 산출', purpose: '전이 채점 2차 — 오라클 갭 재측정', pipelineId: null },
   'predict-oracle':       { title: '전이 채점 · 오라클', purpose: '사람이 만든 정답 트리 기준선', pipelineId: null },

@@ -128,8 +128,8 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
 
   // v8: planIngest 1회 호출 → 개념 페이지(## 개요 포함) → 노드화
   let v8PageCount = 0;
-  if (variant === 'v8') {
-    if (!planIngestFn) throw new Error('v8 requires planIngestFn');
+  if (variant === 'v8' || variant === 'v10') {
+    if (!planIngestFn) throw new Error(`${variant} requires planIngestFn`);
     // memos에 id 부여 (planIngest가 소비하는 형식: id='m'+p)
     const memosWithId = memos.map((m) => ({ ...m, id: `m${m.p}`, chapter: m.chapter || '', myThought: m.my || '' }));
     onProgress?.('phase 1 — planIngest 호출(gpt-4o)...');
@@ -316,7 +316,7 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
     for (let i = 0; i < cs.length; i++) for (let j = i + 1; j < cs.length; j++) {
       const sim = cos(cs[i].emb, cs[j].emb);
       // v7/v8: 같은 메모에서 나온 개념쌍은 extract 자기중복 가능성이 높다 — sim 문턱 무시하고 검사
-      const sameMemo = (variant === 'v7' || variant === 'v8') && cs[i].sources.some((p) => cs[j].sources.includes(p));
+      const sameMemo = (variant === 'v7' || variant === 'v8' || variant === 'v10') && cs[i].sources.some((p) => cs[j].sources.includes(p));
       if (sim > 0.55 || sameMemo) pairs.push({ a: cs[i], b: cs[j], sim });
     }
     pairs.sort((x, y) => y.sim - x.sim);
@@ -333,6 +333,73 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
       keep.sources.push(...drop.sources);
       nodes.delete(drop.id); dead.add(drop.id);
       log.push(`[merge*] "${drop.title}" → "${keep.title}" (sim ${sim.toFixed(2)}, ${d.reason})`);
+    }
+  }
+
+  // ─── Phase 2 (v10): 책의 논지 전개 방식에 맞춘 위계 (BKT-380) ──────
+  // v7/v8 은 "테마"라는 한 가지 모양으로만 상위를 만든다. 책마다 이야기를 풀어가는
+  // 방식이 다른데(통시·분류·비교…) 결과가 늘 같은 모양이면 책의 척추가 드러나지 않는다.
+  // 예: 사상사를 시간 순으로 훑는 책인데 루소·칸트가 키워드로 올라오지 못하고 문장에만 남는다.
+  let v10Mode = null;
+  if (variant === 'v10') {
+    const ORDERED = new Set(['통시', '과정', '인과']); // 순서가 의미를 갖는 방식 → 번호를 붙인다
+    const MODES = ['정의', '분석', '분류', '비교', '대조', '유추', '예시', '묘사', '통시', '과정', '인과', '인용', '문답', '통념 반박'];
+    const rich = [book.summary, book.aladin?.intro, book.aladin?.publisherIntro, book.aladin?.excerpts]
+      .filter(Boolean).join('\n').slice(0, 3000);
+    const kws = concepts().filter((n) => n.parentId === root.id);
+    const kwLine = kws.map((n) => `${n.id} | ${n.title} — ${(n.gloss || '').slice(0, 70)} [p${[...new Set(n.sources)].sort((a, b) => a - b).join(',')}]`).join('\n');
+
+    // 1) 전개 방식 판정 — 리치데이터 + 실제 뽑힌 키워드를 함께 보고 정한다
+    onProgress?.('phase 2 — 전개 방식 판정');
+    const modeRaw = await llm({
+      system: '비문학 책이 내용을 풀어가는 방식을 판정한다. 책 소개와 실제 발췌 키워드를 함께 보고 가장 지배적인 방식 하나를 고른다. 확신이 없으면 confidence 를 낮게 준다. JSON만 출력.',
+      user: `책: ${book.title}\n목차: ${(book.toc || []).join(' · ') || '(없음)'}\n\n[책 소개·서평]\n${rich || '(없음)'}\n\n[발췌에서 뽑힌 키워드]\n${kwLine}\n\n후보: ${MODES.join(' / ')}\n출력 JSON: {"mode":"후보 중 하나","confidence":"high|med|low","reason":"한 줄"}`,
+      temperature: 0,
+    });
+    let m = {}; try { m = JSON.parse(modeRaw); } catch { /* 판정 실패 */ }
+    v10Mode = MODES.includes(m.mode) ? { mode: m.mode, confidence: m.confidence || 'low', reason: m.reason || '' } : null;
+    log.push(`[v10] 전개 방식 판정: ${v10Mode ? `${v10Mode.mode} (${v10Mode.confidence}) — ${v10Mode.reason}` : '판정 실패'}`);
+
+    // ⚠ 판정이 틀리면 구조가 통째로 어긋난다. 확신이 낮으면 상위를 만들지 않고 평면으로 둔다.
+    if (v10Mode && v10Mode.confidence === 'low') {
+      log.push('[v10] confidence=low → 위계 구성 생략(평면 유지)');
+    } else if (v10Mode && kws.length >= 3) {
+      const ordered = ORDERED.has(v10Mode.mode);
+      onProgress?.(`phase 2 — ${v10Mode.mode} 위계 구성`);
+      const want = Math.min(5, Math.max(2, Math.round(kws.length / 3)));
+      const guide = ordered
+        ? `이 책은 "${v10Mode.mode}" 방식이다. 키워드를 **책이 전개되는 순서대로** 묶어 단계를 만들어라. 단계 이름은 그 시기·국면을 가리키는 짧은 명사구(예: "고대의 투모스", "근대 시민혁명").`
+        : `이 책은 "${v10Mode.mode}" 방식이다. 그 방식에 맞는 축으로 키워드를 묶어라(분류=갈래, 비교/대조=견주는 대상, 인과=원인과 결과, 정의/분석=구성 요소).`;
+      const stageRaw = await llm({
+        system: '키워드를 책의 전개 방식에 맞는 상위 묶음으로 편성한다. 억지로 다 묶지 말고, 어울리지 않는 키워드는 남겨라. JSON만 출력.',
+        user: `책: ${book.title}\n\n[책 소개·서평]\n${rich.slice(0, 1500) || '(없음)'}\n\n[키워드]\n${kwLine}\n\n${guide}\n묶음은 **정확히 ${want}개**, 각 묶음에 키워드 **최소 2개**. 어디에도 안 맞는 키워드는 memberIds 에서 빼라.\n각 묶음: name(짧은 명사구) · description(2~3문장, 이 책이 이 단계/축으로 무엇을 말하는지) · memberIds\n${ordered ? '순서대로 배열하라 — 배열 순서가 곧 책의 전개 순서다.' : ''}\n출력 JSON: {"stages":[{"name":"...","description":"...","memberIds":["n?"]}]}`,
+        temperature: 0.1,
+      });
+      let stages = []; try { stages = (JSON.parse(stageRaw).stages || []); } catch { /* 파싱 실패 */ }
+
+      // ⚠ 개수·크기 제약은 프롬프트로 지켜지지 않는다(이번 세션에서 2개 요청에 7개가 온 적 있다).
+      //   코드로 강제: 유효 멤버 2개 이상 · want 개까지 · 멤버 중복 금지.
+      const used = new Set();
+      const valid = [];
+      for (const st of stages) {
+        const ids = (st.memberIds || []).filter((id) => kws.some((k) => k.id === id) && !used.has(id));
+        if (ids.length < 2 || !st.name) continue;
+        ids.forEach((id) => used.add(id));
+        valid.push({ ...st, ids });
+        if (valid.length >= want) break;
+      }
+      if (valid.length < 2) {
+        log.push(`[v10] 단계 편성 포기(유효 ${valid.length}개) — 평면 유지`);
+      } else {
+        valid.forEach((st, i) => {
+          const title = ordered ? `${i + 1} · ${String(st.name).trim()}` : String(st.name).trim();
+          const node = addConcept(title, root.id, null, String(st.description || '').trim());
+          node.stageIndex = ordered ? i + 1 : null;
+          for (const id of st.ids) safeReparent(id, node.id);
+          for (const id of st.ids) for (const p of nodes.get(id).sources) if (!node.sources.includes(p)) node.sources.push(p);
+        });
+        log.push(`[v10] ${v10Mode.mode} → 단계 ${valid.length}개 편성 · 미편입 키워드 ${kws.length - used.size}개`);
+      }
     }
   }
 
@@ -488,9 +555,9 @@ ${orphans.map((k) => `${k.id}: ${k.title} — ${k.gloss || ''}`).join('\n')}
     merge: cnt('merge'), mergeGlobal: cnt('merge*'), child: cnt('child'),
     parent: cnt('parent'), attach: cnt('attach'), cluster: cnt('cluster'), flip: cnt('flip'),
     theme: cnt('theme'), themeRejected: cnt('theme✗'),
-    ...(variant === 'v8' ? { pages: v8PageCount } : {}),
+    ...(variant === 'v8' || variant === 'v10' ? { pages: v8PageCount } : {}),
   };
-  return { nodes, rootId: root.id, stats, log };
+  return { nodes, rootId: root.id, stats, log, mode: v10Mode };
 }
 
 // ─── 직렬화: nodes Map → 저장 가능한 트리 JSON (emb 제외) ─────
