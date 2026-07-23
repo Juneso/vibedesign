@@ -116,6 +116,7 @@ for (const [i, b] of BOOKS.entries()) {
 
     await writeFile(`${base}.json`, JSON.stringify({
       label: b.title,
+      runAt: new Date().toISOString(),
       kind: 'hier-ingest',
       variant: 'v8',
       source: '옵시디언 200 Literature/210 Books',

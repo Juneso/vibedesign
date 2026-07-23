@@ -35,6 +35,60 @@ function truncate(text, maxLen = 14) {
   return text.slice(0, maxLen - 1) + '…';
 }
 
+// ── 말단 키워드의 설명 → 문장 노드 ───────────────────────────
+// 자식이 없는 키워드는 설명이 노드 안에 갇혀 클릭해야만 보인다.
+// 렌더 시점에만 문장으로 쪼개 자식 노드로 펼친다(원본 트리 데이터는 건드리지 않는다).
+const SENT_MAX = 6;       // 노드 폭발 방지
+const SENT_CHARS = 22;    // 한 줄 글자 수
+const SENT_LINES = 3;     // 문장당 최대 줄
+
+function splitSentences(gloss) {
+  const cleaned = String(gloss || '')
+    .replace(/^\s*\([^)]*\)\s*/, '')      // 앞머리 유형 표기 "(concept)"
+    .replace(/^\s*핵심개념\s*:.*$/gm, '')  // 메타 줄
+    .replace(/^\s*#{1,6}\s*.*$/gm, '')     // "## 개요" 같은 헤더
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!cleaned) return [];
+  return cleaned
+    .split(/(?<=[.!?])\s+/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 1)
+    .slice(0, SENT_MAX);
+}
+
+// 원본 노드 + 합성 문장 노드. 색상 판정이 뒤집히지 않도록 원래 자식 유무도 함께 돌려준다.
+function withSentenceNodes(nodes) {
+  const hadChild = new Set(nodes.map((n) => n.parentId).filter(Boolean));
+  const out = [...nodes];
+  for (const n of nodes) {
+    if (hadChild.has(n.id)) continue;          // 말단(자식 없음)만 대상
+    const sents = splitSentences(n.gloss);
+    if (sents.length < 2) continue;            // 한 문장뿐이면 쪼갤 이유가 없다
+    sents.forEach((s, i) => out.push({
+      id: `${n.id}__s${i}`, title: s, parentId: n.id,
+      level: (n.level ?? 0) + 1, kind: 'sentence', sources: [],
+    }));
+  }
+  return { nodes: out, hadChild };
+}
+
+function wrapText(text, per = SENT_CHARS, maxLines = SENT_LINES) {
+  const words = String(text).split(' ');
+  const lines = []; let cur = '';
+  for (const w of words) {
+    if ((cur + ' ' + w).trim().length > per) { if (cur) lines.push(cur.trim()); cur = w; }
+    else cur = (cur + ' ' + w).trim();
+    if (lines.length === maxLines) break;
+  }
+  if (cur && lines.length < maxLines) lines.push(cur.trim());
+  if (lines.length === maxLines) {
+    const last = lines[maxLines - 1];
+    if (last.length >= per - 1) lines[maxLines - 1] = last.slice(0, per - 1) + '…';
+  }
+  return lines;
+}
+
 // ── 레이아웃 계산 ─────────────────────────────────────────────
 // 1) parentId → children 맵
 // 2) 리프에 순서대로 row 인덱스
@@ -125,6 +179,23 @@ function NodeBox({ node, x, y, hasChildren, selected, onSelect }) {
   );
 }
 
+// ── 문장 노드: 박스 대신 점 + 여러 줄 텍스트 ──────────────────
+function SentenceNode({ node, x, y, selected, onSelect }) {
+  const lines = wrapText(node.title);
+  const top = y + NODE_H / 2 - ((lines.length - 1) * 13) / 2;
+  return (
+    <g className="eval-tree-node" onClick={() => onSelect(node.id)} style={{ cursor: 'pointer' }}>
+      <title>{node.title}</title>
+      <circle cx={x + 5} cy={y + NODE_H / 2} r={selected ? 4 : 3} fill={COLORS.branch.stroke} />
+      <text x={x + 16} y={top} fontSize={11.5} fill={COLORS.leaf.text}>
+        {lines.map((ln, i) => (
+          <tspan key={i} x={x + 16} dy={i === 0 ? 0 : 13}>{ln}</tspan>
+        ))}
+      </text>
+    </g>
+  );
+}
+
 // ── 선택 노드 상세 카드 ───────────────────────────────────────
 function NodeDetail({ node, onClose }) {
   if (!node) return null;
@@ -152,13 +223,19 @@ export function TreeSvg({ tree }) {
 
   if (!tree || !tree.nodes || tree.nodes.length === 0) return null;
 
-  const { rootId, nodes } = tree;
+  const { rootId } = tree;
+  // 말단 키워드의 설명을 문장 노드로 펼친 뒤 레이아웃한다
+  const { nodes, hadChild } = withSentenceNodes(tree.nodes);
   const { layout, childMap } = computeLayout(rootId, nodes);
 
   // viewBox 크기 계산
   const maxLevel = Math.max(...nodes.map((n) => n.level));
   const leafCount = nodes.filter((n) => (childMap.get(n.id) || []).length === 0).length;
-  const svgWidth = (maxLevel + 1) * COL_W + PAD_X * 2 + NODE_W;
+  // 문장 열은 박스가 아니라 텍스트라 NODE_W 보다 넓게 잡아야 잘리지 않는다
+  const hasSentence = nodes.some((n) => n.kind === 'sentence');
+  // 한글은 11.5px 폰트에서 글자당 약 12px + 점/여백 — 넉넉히 잡아 마지막 열이 잘리지 않게 한다
+  const lastColW = hasSentence ? SENT_CHARS * 13 + 48 : NODE_W;
+  const svgWidth = maxLevel * COL_W + PAD_X * 2 + lastColW;
   const svgHeight = leafCount * ROW_H + PAD_Y * 2;
 
   // 엣지 목록
@@ -201,14 +278,26 @@ export function TreeSvg({ tree }) {
             {nodes.map((n) => {
               const pos = layout.get(n.id);
               if (!pos) return null;
-              const hasChildren = (childMap.get(n.id) || []).length > 0;
+              if (n.kind === 'sentence') {
+                return (
+                  <SentenceNode
+                    key={n.id}
+                    node={n}
+                    x={pos.x}
+                    y={pos.y}
+                    selected={selectedId === n.id}
+                    onSelect={toggle}
+                  />
+                );
+              }
               return (
                 <NodeBox
                   key={n.id}
                   node={n}
                   x={pos.x}
                   y={pos.y}
-                  hasChildren={hasChildren}
+                  /* 문장 노드가 붙었다고 말단 키워드가 가지 색으로 바뀌면 안 된다 */
+                  hasChildren={hadChild.has(n.id)}
                   selected={selectedId === n.id}
                   onSelect={toggle}
                 />

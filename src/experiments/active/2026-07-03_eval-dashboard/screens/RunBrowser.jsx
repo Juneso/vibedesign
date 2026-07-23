@@ -11,12 +11,29 @@ import { Spinner } from '@astryxdesign/core/Spinner';
 import { getLabels, getRun, saveLabels } from '../lib/api.js';
 import { SERIES_META, seriesTitle, iterationLabel } from '../lib/seriesMeta.js';
 import { TreeSvg } from './TreeSvg.jsx';
+import { parseMd, mdInline, MdSection } from '../lib/md.jsx';
 
 // mtime → 'M월 D일'
-function fmtMonthDay(mtimeMs) {
-  if (!mtimeMs) return null;
-  const d = new Date(mtimeMs);
-  return `${d.getMonth() + 1}월 ${d.getDate()}일`;
+// 실행 시각 — API 가 runAt(json runAt → git 커밋 → mtime 순)으로 해석해 내려준다.
+// mtime 만 쓰면 체크아웃·리베이스로 전부 현재 시각이 되어 최신순 정렬이 무너진다.
+function runTime(run) {
+  const t = run?.runAt ? Date.parse(run.runAt) : (run?.mtimeMs || 0);
+  return Number.isFinite(t) ? t : 0;
+}
+
+function fmtDateTime(run) {
+  const t = runTime(run);
+  if (!t) return null;
+  const d = new Date(t);
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  return `${d.getMonth() + 1}월 ${d.getDate()}일 ${hh}:${mm}`;
+}
+
+// 시리즈 그룹 헤더에 붙일 "가장 최근 실행" 시각
+function latestOf(items) {
+  if (!items?.length) return null;
+  return fmtDateTime(items.reduce((a, b) => (runTime(b) > runTime(a) ? b : a)));
 }
 
 export const CONNECTIONS_SERIES = 'connections-qf';
@@ -136,8 +153,8 @@ function RunRow({ run, expanded, onToggle }) {
           onClick={onToggle}
         >
           <span>{expanded ? '▾' : '▸'} {run.label || iterationLabel(file)}</span>
-          {fmtMonthDay(run.mtimeMs) && (
-            <span className="eval-run-date">{fmtMonthDay(run.mtimeMs)}</span>
+          {fmtDateTime(run) && (
+            <span className="eval-run-date">{fmtDateTime(run)}</span>
           )}
         </button>
         <div className="eval-run-action">{action}</div>
@@ -175,9 +192,11 @@ export function RunList({ runs, statusMap }) {
       if (!m.has(r.series)) m.set(r.series, []);
       m.get(r.series).push(r);
     });
+    // 그룹 안은 최신 런이 위로, 그룹끼리는 가장 최근에 돈 시리즈가 위로
+    for (const [, items] of m) items.sort((x, y) => runTime(y) - runTime(x));
     return [...m.entries()].sort((a, b) => {
-      const am = Math.max(...a[1].map((r) => r.mtimeMs));
-      const bm = Math.max(...b[1].map((r) => r.mtimeMs));
+      const am = Math.max(...a[1].map(runTime));
+      const bm = Math.max(...b[1].map(runTime));
       return bm - am;
     });
   }, [runs]);
@@ -209,9 +228,11 @@ export function RunList({ runs, statusMap }) {
               <span>{isOpen ? '▾' : '▸'}</span>
               <span className="eval-series-title">
                 {seriesTitle(series)}
-                {SERIES_META[series]?.purpose && (
-                  <span className="eval-series-purpose">{SERIES_META[series].purpose}</span>
-                )}
+                <span className="eval-series-purpose">
+                  {SERIES_META[series]?.purpose}
+                  {SERIES_META[series]?.purpose && latestOf(items) ? ' · ' : ''}
+                  {latestOf(items) && `최근 실행 ${latestOf(items)}`}
+                </span>
               </span>
               <Badge variant="neutral" label={String(items.length)} />
             </button>
@@ -352,141 +373,6 @@ export function ConnectionsDetail({ runFile, json, labels, setLabels, readOnly }
         </div>
       )}
     </VStack>
-  );
-}
-
-// ── 경량 md 렌더러 ───────────────────────────────────────────
-// eval 문서 전용: 체크포인트 섹션 강조 + 긴 코드블록(로그) 접기.
-// 외부 md 라이브러리 없이 이 문서들이 쓰는 패턴만 지원 (h1/h2, >인용, 표, ```펜스, 리스트, **굵게**, `코드`).
-
-function mdInline(text) {
-  const out = [];
-  let rest = text;
-  let k = 0;
-  const rx = /\*\*(.+?)\*\*|`([^`]+)`/;
-  while (rest) {
-    const m = rest.match(rx);
-    if (!m) { out.push(rest); break; }
-    if (m.index > 0) out.push(rest.slice(0, m.index));
-    if (m[1] !== undefined) out.push(<strong key={k++}>{m[1]}</strong>);
-    else out.push(<code key={k++} className="eval-md-code">{m[2]}</code>);
-    rest = rest.slice(m.index + m[0].length);
-  }
-  return out;
-}
-
-// md → { title, meta[], sections[{title, blocks[]}] }
-function parseMd(md) {
-  const lines = md.split(/\r?\n/);
-  let title = null;
-  const meta = [];
-  const sections = [];
-  let cur = { title: null, blocks: [] }; // h2 이전 본문
-
-  const pushSection = () => { if (cur.title !== null || cur.blocks.length) sections.push(cur); };
-
-  let i = 0;
-  while (i < lines.length) {
-    const line = lines[i];
-
-    if (line.startsWith('# ') && title === null) { title = line.slice(2).trim(); i++; continue; }
-    if (line.startsWith('## ')) { pushSection(); cur = { title: line.slice(3).trim(), blocks: [] }; i++; continue; }
-
-    // 인용(>) — 문서 상단 메타는 · 구분 칩으로, 본문 중간은 인용 블록으로
-    if (line.startsWith('>')) {
-      const quote = [];
-      while (i < lines.length && lines[i].startsWith('>')) { quote.push(lines[i].replace(/^>\s?/, '')); i++; }
-      if (sections.length === 0 && cur.title === null && cur.blocks.length === 0) {
-        quote.join(' · ').split(' · ').forEach((c) => c.trim() && meta.push(c.trim()));
-      } else {
-        cur.blocks.push({ type: 'quote', lines: quote });
-      }
-      continue;
-    }
-
-    if (line.startsWith('```')) {
-      const code = [];
-      i++;
-      while (i < lines.length && !lines[i].startsWith('```')) { code.push(lines[i]); i++; }
-      i++; // 닫는 펜스
-      cur.blocks.push({ type: 'fence', code: code.join('\n') });
-      continue;
-    }
-
-    if (line.startsWith('|')) {
-      const rows = [];
-      while (i < lines.length && lines[i].startsWith('|')) {
-        const cells = lines[i].split('|').slice(1, -1).map((c) => c.trim());
-        if (!cells.every((c) => /^:?-{2,}:?$/.test(c))) rows.push(cells); // 구분줄 제외
-        i++;
-      }
-      cur.blocks.push({ type: 'table', rows });
-      continue;
-    }
-
-    if (/^\s*- /.test(line)) {
-      const items = [];
-      while (i < lines.length && (/^\s*- /.test(lines[i]) || /^\s{2,}\S/.test(lines[i]))) {
-        if (/^\s*- /.test(lines[i])) items.push(lines[i].replace(/^\s*- /, ''));
-        else items[items.length - 1] += ' ' + lines[i].trim(); // 들여쓴 연속줄
-        i++;
-      }
-      cur.blocks.push({ type: 'list', items });
-      continue;
-    }
-
-    if (line.trim()) cur.blocks.push({ type: 'p', text: line.trim() });
-    i++;
-  }
-  pushSection();
-  return { title, meta, sections };
-}
-
-function MdBlock({ block }) {
-  if (block.type === 'fence') {
-    const long = block.code.split('\n').length > 24;
-    const pre = <pre className="eval-md-pre">{block.code}</pre>;
-    return long
-      ? <details className="eval-md-collapse"><summary>펼쳐 보기 ({block.code.split('\n').length}줄)</summary>{pre}</details>
-      : pre;
-  }
-  if (block.type === 'table') {
-    const [head, ...body] = block.rows;
-    return (
-      <table className="eval-md-table">
-        <thead><tr>{head.map((c, i) => <th key={i}>{mdInline(c)}</th>)}</tr></thead>
-        <tbody>{body.map((r, i) => <tr key={i}>{r.map((c, j) => <td key={j}>{mdInline(c)}</td>)}</tr>)}</tbody>
-      </table>
-    );
-  }
-  if (block.type === 'list') {
-    return <ul className="eval-md-list">{block.items.map((it, i) => <li key={i}>{mdInline(it)}</li>)}</ul>;
-  }
-  if (block.type === 'quote') {
-    return <div className="eval-md-quote">{block.lines.map((l, i) => <div key={i}>{mdInline(l)}</div>)}</div>;
-  }
-  return <p className="eval-md-p">{mdInline(block.text)}</p>;
-}
-
-function MdSection({ section }) {
-  const t = section.title || '';
-  const isCheckpoint = /체크포인트|요약|판정/.test(t);
-  const isLog = /로그/.test(t);
-  const body = section.blocks.map((b, i) => <MdBlock key={i} block={b} />);
-
-  if (isLog) {
-    return (
-      <details className="eval-md-collapse eval-md-logsec">
-        <summary>{t}</summary>
-        {body}
-      </details>
-    );
-  }
-  return (
-    <section className={`eval-md-section${isCheckpoint ? ' is-checkpoint' : ''}`}>
-      {t && <h4 className="eval-md-h">{isCheckpoint ? t : t}</h4>}
-      {body}
-    </section>
   );
 }
 

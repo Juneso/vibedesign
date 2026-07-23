@@ -3,6 +3,7 @@
 import { resolve, join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { readdirSync, statSync, existsSync, readFileSync, writeFileSync, mkdirSync, openSync, readSync, closeSync } from 'fs';
+import { execFileSync } from 'child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
@@ -16,21 +17,54 @@ function seriesOf(fileName) {
   return fileName.replace(/\.json$/, '').replace(/-\d+$/, '');
 }
 
-// 런 목록용 표시 라벨. 파일 전체를 파싱하지 않고 선두 1KB만 읽어 "label" 키를 찾는다
-// (런 파일이 78개·4.6MB라 목록 요청마다 전량 파싱하면 낭비). 없으면 null → 회차 라벨 폴백.
-function peekLabel(filePath) {
+// 런 목록용 메타. 파일 전체를 파싱하지 않고 선두 1KB만 읽어 키를 찾는다
+// (런 파일이 78개·4.6MB라 목록 요청마다 전량 파싱하면 낭비).
+function peekField(filePath, name) {
   let fd;
   try {
     fd = openSync(filePath, 'r');
     const buf = Buffer.alloc(1024);
     const n = readSync(fd, buf, 0, 1024, 0);
-    const m = buf.slice(0, n).toString('utf8').match(/"label"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+    const m = buf.slice(0, n).toString('utf8').match(new RegExp(`"${name}"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"`));
     return m ? JSON.parse(`"${m[1]}"`) : null;
   } catch {
     return null;
   } finally {
     if (fd !== undefined) try { closeSync(fd); } catch { /* noop */ }
   }
+}
+
+// 실행 시각의 신뢰 순서: ① json 의 runAt ② git 최종 커밋 시각 ③ 파일 mtime.
+// mtime 은 체크아웃·리베이스만 해도 전부 현재 시각으로 바뀌어 실행 시각과 무관해진다.
+// git 시각은 author date(%aI) — committer date 는 리베이스 때 전부 갱신되어 무의미해진다.
+// 한 번의 log 순회로 경로별 최종 시각을 모아 캐시한다(파일당 호출 금지).
+let gitDateCache = { at: 0, map: new Map() };
+function gitDates() {
+  if (Date.now() - gitDateCache.at < 30000) return gitDateCache.map;
+  const map = new Map();
+  try {
+    const out = execFileSync('git', ['log', '--format=%aI', '--name-only', '--', RUNS_DIR], {
+      cwd: REPO_ROOT, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024,
+    });
+    let cur = null;
+    for (const line of out.split('\n')) {
+      const t = line.trim();
+      if (!t) continue;
+      if (/^\d{4}-\d{2}-\d{2}T/.test(t)) { cur = t; continue; }
+      if (cur && !map.has(t)) map.set(t, cur); // 최신 커밋이 먼저 나오므로 최초 등장만 취한다
+    }
+  } catch { /* git 없음/실패 시 mtime 폴백 */ }
+  gitDateCache = { at: Date.now(), map };
+  return map;
+}
+
+function resolveRunAt(file, fullPath, st) {
+  const inJson = peekField(fullPath, 'runAt');
+  if (inJson) return { runAt: inJson, runAtSource: 'json' };
+  const rel = `src/experiments/active/2026-05-24_book-wiki-mvp/eval/runs/${file}`;
+  const g = gitDates().get(rel);
+  if (g) return { runAt: g, runAtSource: 'git' };
+  return { runAt: new Date(st.mtimeMs).toISOString(), runAtSource: 'mtime' };
 }
 
 // path traversal 방지: '..' 또는 슬래시 포함 시 거부
@@ -70,10 +104,15 @@ export function evalApiPlugin() {
             const runs = readdirSync(RUNS_DIR)
               .filter((f) => f.endsWith('.json'))
               .map((f) => {
-                const st = statSync(join(RUNS_DIR, f));
-                return { file: f, series: seriesOf(f), mtimeMs: st.mtimeMs, size: st.size, label: peekLabel(join(RUNS_DIR, f)) };
+                const full = join(RUNS_DIR, f);
+                const st = statSync(full);
+                const { runAt, runAtSource } = resolveRunAt(f, full, st);
+                return {
+                  file: f, series: seriesOf(f), mtimeMs: st.mtimeMs, size: st.size,
+                  label: peekField(full, 'label'), runAt, runAtSource,
+                };
               })
-              .sort((a, b) => b.mtimeMs - a.mtimeMs);
+              .sort((a, b) => new Date(b.runAt) - new Date(a.runAt));
             return sendJson(res, 200, runs);
           }
 

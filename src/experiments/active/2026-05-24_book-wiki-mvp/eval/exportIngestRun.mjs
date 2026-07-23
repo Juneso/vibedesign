@@ -43,6 +43,7 @@ for (const [i, b] of books.entries()) {
   // label 을 첫 키로 — 목록 API 가 선두 1KB만 읽어 라벨을 뽑는다
   const runJson = {
     label: b.title,
+    runAt: new Date().toISOString(),
     kind: 'ingest',
     source: '옵시디언 200 Literature/210 Books',
     genModel: 'gpt-4o',
