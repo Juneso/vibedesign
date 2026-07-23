@@ -71,11 +71,14 @@ for (const t of titles) {
     const tree = serializeTree(r.nodes, r.rootId);
     const sec = Math.round((Date.now() - t0) / 1000);
 
-    const kids = (id) => tree.nodes.filter((n) => n.parentId === id);
-    const L1 = tree.nodes.filter((n) => n.level === 1);
-    const themes = L1.filter((n) => kids(n.id).length > 0).length;
-    const orphans = L1.filter((n) => kids(n.id).length === 0).length;
-    const deep = tree.nodes.filter((n) => n.level >= 2).length;
+    // 위계 집계는 개념 자식만 센다 — 문장 노드를 세면 문장 달린 키워드가 전부 테마로 잡힌다
+    const conceptKids = (id) => tree.nodes.filter((n) => n.parentId === id && n.kind === 'concept');
+    const C = tree.nodes.filter((n) => n.kind === 'concept');
+    const themes = C.filter((n) => conceptKids(n.id).length > 0).length;
+    const keywords = C.length - themes;
+    const orphans = C.filter((n) => n.parentId === tree.rootId && conceptKids(n.id).length === 0).length;
+    const sentences = tree.nodes.filter((n) => n.kind === 'sentence').length;
+    const covered = new Set(tree.nodes.filter((n) => n.kind === 'sentence').map((n) => n.memoId)).size;
 
     const base = resolve(__dir, `runs/hier-v8-full-${++i}`);
     await writeFile(`${base}.json`, JSON.stringify({
@@ -83,7 +86,8 @@ for (const t of titles) {
       kind: 'hier-v8-full', variant: 'v8',
       note: 'V9 와 같은 메모 전량을 넣은 V8 — MAX_MEMOS 로 자르지 않았다',
       hierModel: MODEL, ingestModel: INGEST_MODEL,
-      nMemos: memos.length, counts: { themes, orphans, deep }, sec,
+      nMemos: memos.length,
+      counts: { themes, keywords, sentences, orphans, coveredMemos: covered }, sec,
       tree, log: r.log,
     }, null, 2) + '\n', 'utf-8');
 
@@ -91,11 +95,11 @@ for (const t of titles) {
     md += `- 메모 ${memos.length}개 · 위계 ${MODEL} · planIngest ${INGEST_MODEL} · ${sec}초\n`;
     md += `- V9 와 같은 메모를 넣어 노드 수를 공정하게 비교하기 위한 런\n\n`;
     md += `## 구조\n\n| 지표 | 값 |\n|---|---|\n`;
-    md += `| 테마(자식 있는 상위) | ${themes} |\n| 고아 키워드 | ${orphans} |\n| 하위 키워드 | ${deep} |\n| 전체 노드 | ${tree.nodes.length} |\n\n`;
+    md += `| 테마 | ${themes} |\n| 키워드 | ${keywords} |\n| 문장 노드 | ${sentences} |\n| 고아 키워드 | ${orphans} |\n| 메모 커버리지 | ${covered} / ${memos.length} |\n| 전체 노드 | ${tree.nodes.length} |\n\n`;
     md += `## 트리\n\n말단 키워드는 설명이 문장별로 펼쳐진다.\n\n`;
     await writeFile(`${base}.md`, md, 'utf-8');
 
-    console.log(`      → 테마 ${themes} · 고아 ${orphans} · 하위 ${deep} · 노드 ${tree.nodes.length} (${sec}초)`);
+    console.log(`      → 테마 ${themes} · 키워드 ${keywords} · 문장 ${sentences} · 메모커버 ${covered}/${memos.length} · 노드 ${tree.nodes.length} (${sec}초)`);
   } catch (e) {
     console.log(`      ✗ 실패: ${e.message}`);
   }

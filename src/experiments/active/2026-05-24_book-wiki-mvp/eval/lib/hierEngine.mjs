@@ -28,6 +28,10 @@ export async function runHierIngest({ book, memos, llm, embedFn, variant = 'v5',
   nodes.set(root.id, root);
   const concepts = () => [...nodes.values()].filter((n) => n.kind === 'concept');
   const childrenOf = (pid) => [...nodes.values()].filter((n) => n.parentId === pid);
+  // 위계 판정(고아/테마 여부, 프롬프트의 "하위:" 나열)은 개념 자식만 본다.
+  // 문장 노드까지 세면 문장이 달린 키워드가 전부 "테마"로 오인되고,
+  // 고아 구제 단계도 대상이 사라져 무력화된다.
+  const conceptChildrenOf = (pid) => childrenOf(pid).filter((n) => n.kind === 'concept');
   const ancestry = (n) => { const path = []; let c = n; while (c && c.parentId) { c = nodes.get(c.parentId); if (c && c.kind === 'concept') path.unshift(c.title); } return path.join(' › ') || '(최상위)'; };
   const isAncestor = (aId, bId) => { let c = nodes.get(bId); while (c && c.parentId) { if (c.parentId === aId) return true; c = nodes.get(c.parentId); } return false; };
   function addConcept(title, parentId, emb, gloss) {
@@ -35,12 +39,21 @@ export async function runHierIngest({ book, memos, llm, embedFn, variant = 'v5',
     const n = { id: id(), title, parentId, level: lvl, kind: 'concept', sources: [], emb, gloss };
     nodes.set(n.id, n); return n;
   }
+  // 메모 한 건 = 문장 노드 한 개. 키워드(개념)의 자식으로 붙어 출처를 그대로 들고 있다.
+  // 개념과 달리 위계 연산(병합·테마·채택)의 대상이 아니다 — kind 로 구분된다.
+  function addSentence(title, parentId, { memoId, p, tocAnchor, gloss }) {
+    const lvl = nodes.get(parentId).level + 1;
+    const n = { id: id(), title, parentId, level: lvl, kind: 'sentence', sources: p ? [p] : [], emb: null, gloss, memoId, tocAnchor };
+    nodes.set(n.id, n); return n;
+  }
   function reparent(nodeId, newParentId) {
     nodes.get(nodeId).parentId = newParentId;
     const relevel = (nid) => { const x = nodes.get(nid); x.level = nodes.get(x.parentId).level + 1; childrenOf(nid).forEach((k) => relevel(k.id)); };
     relevel(nodeId);
   }
-  const subtreeDepth = (nid) => { const kids = childrenOf(nid); return kids.length ? 1 + Math.max(...kids.map((k) => subtreeDepth(k.id))) : 0; };
+  // 문장 노드는 표현용 잎이라 위계 깊이로 세지 않는다 —
+  // 세면 MAX_LEVEL 에 걸려 테마 편성·상위 채택이 막힌다.
+  const subtreeDepth = (nid) => { const kids = childrenOf(nid).filter((k) => k.kind !== 'sentence'); return kids.length ? 1 + Math.max(...kids.map((k) => subtreeDepth(k.id))) : 0; };
   function safeReparent(nodeId, newParentId) {
     const newLvl = nodes.get(newParentId).level + 1;
     if (newLvl + subtreeDepth(nodeId) > MAX_LEVEL) return false;
@@ -143,20 +156,48 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
       log.push(`[plan] 페이지→노드 "${pd.title}" · 개요 ${gloss.slice(0, 50)}… · 소스 p${src.join(',p') || '(없음)'}`);
     }
 
-    // analyses 보강: 어떤 패치에도 연결 안 된 메모는 analyses의 thesis/bookContextLink로 보완
-    const covered = new Set(concepts().flatMap((n) => n.sources));
+    // analyses → 문장 노드. 메모의 thesis 는 책 맥락에 앵커된 1~2문장이므로,
+    // 버리지 않고 해당 키워드의 자식으로 전부 남긴다.
+    // (이전에는 패치에 커버되지 않은 메모만 *개념 노드로 승격*시켰다 —
+    //  커버된 메모의 thesis 는 버려졌고, 승격된 것들은 키워드 수를 불렸다.)
+    let attached = 0, madeConcept = 0;
+    const pageHost = new Map(); // 페이지 → 그 메모를 소스로 가진 개념
+    for (const c of concepts()) for (const p of c.sources) if (!pageHost.has(p)) pageHost.set(p, c);
+
     for (const a of out.analyses || []) {
-      const p = pageOf(a.memoId); if (covered.has(p)) continue;
-      const title = (a.keyConcepts || [])[0] || (a.thesis || '').slice(0, 14) || '기타';
-      const gloss = [a.thesis, a.bookContextLink].filter(Boolean).join(' ');
-      // 같은 제목의 노드가 있으면 소스만 추가
-      const existing = [...nodes.values()].find((n) => n.kind === 'concept' && n.title === title);
-      if (existing) { existing.sources.push(p); covered.add(p); continue; }
-      const emb = await embedFn(`${title}: ${gloss}`);
-      const n = addConcept(title, root.id, emb, gloss);
-      n.sources.push(p); covered.add(p);
-      log.push(`[plan] analyses 보강 → "${title}" p${p}`);
+      const p = pageOf(a.memoId);
+      const text = String(a.thesis || '').trim();
+      if (!text) continue;
+
+      // 붙일 키워드 찾기: ① 이 메모를 소스로 가진 개념 ② keyConcepts 이름 일치 ③ 의미상 최근접
+      let host = pageHost.get(p)
+        || concepts().find((c) => (a.keyConcepts || []).some((k) => c.title === k));
+      if (!host) {
+        const pool = concepts().filter((c) => c.emb);
+        if (pool.length) {
+          const e = await embedFn(text);
+          host = pool.reduce((best, c) => (!best || cos(e, c.emb) > cos(e, best.emb) ? c : best), null);
+        }
+      }
+
+      // 개념이 하나도 없을 때만(패치 전멸) 최소한의 키워드를 만든다
+      if (!host) {
+        const title = (a.keyConcepts || [])[0] || text.slice(0, 14) || '기타';
+        host = addConcept(title, root.id, await embedFn(`${title}: ${text}`), text);
+        host.sources.push(p);
+        pageHost.set(p, host);
+        madeConcept++;
+        continue; // 이 경우 개념 자체가 그 문장이라 자식을 또 만들지 않는다
+      }
+
+      if (!host.sources.includes(p)) host.sources.push(p);
+      addSentence(text, host.id, {
+        memoId: a.memoId, p, tocAnchor: a.tocAnchor || '',
+        gloss: [a.thesis, a.bookContextLink].filter(Boolean).join(' '),
+      });
+      attached++;
     }
+    log.push(`[plan] 문장 노드 ${attached}개 부착 · 개념 신설 ${madeConcept}개`);
     log.push(`[plan] Phase1 완료 · 개념 노드 ${concepts().length}개 (planIngest 페이지 ${v8PageCount}개)`);
 
   } else {
@@ -269,7 +310,7 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
     const rootKids = concepts().filter((n) => n.parentId === root.id);
     if (rootKids.length >= 3) {
       const desc = (n) => {
-        const kids = childrenOf(n.id);
+        const kids = conceptChildrenOf(n.id); // 문장 노드는 위계가 아니므로 프롬프트에 넣지 않는다
         const pages = [...subtreeSources(n.id)].sort((a, b) => a - b);
         return `${n.id}: ${n.title} — ${n.gloss || ''}${kids.length ? ` (하위: ${kids.map((k) => k.title).join(', ')})` : ''}${pages.length ? ` [메모 p${pages.join(',p')}]` : ''}`;
       };
@@ -344,8 +385,8 @@ B) 독자-근거: 책 맥락엔 없더라도, 멤버들이 **서로 다른 메�
   // ─── Phase 2 (v5/v6): 존중형 군집화 ──────────────────────────
   if (variant !== 'v7' && variant !== 'v8') {
     onProgress?.('phase 2 — 군집화');
-    const orphans = concepts().filter((n) => n.parentId === root.id && childrenOf(n.id).length === 0);
-    const existingThemes = concepts().filter((n) => n.parentId === root.id && childrenOf(n.id).length > 0);
+    const orphans = concepts().filter((n) => n.parentId === root.id && conceptChildrenOf(n.id).length === 0);
+    const existingThemes = concepts().filter((n) => n.parentId === root.id && conceptChildrenOf(n.id).length > 0);
     if (orphans.length) {
       const prompt = `[숨은 척추 — 참고만, 제목을 노드로 복붙 금지] 책 "${book.title}" 목차 흐름: ${book.toc.join(' · ')}
 
@@ -356,7 +397,7 @@ place 단계가 이미 만든 위계는 건드리지 않는다. 아래 [고아 �
 - 확신이 조금이라도 없으면 둘 다 비워 최상위에 남겨라.
 
 [기존 상위 테마]
-${existingThemes.length ? existingThemes.map((n) => `${n.id} | ${n.title} — 자식: ${childrenOf(n.id).map((k) => k.title).join(', ')}`).join('\n') : '(없음)'}
+${existingThemes.length ? existingThemes.map((n) => `${n.id} | ${n.title} — 자식: ${conceptChildrenOf(n.id).map((k) => k.title).join(', ')}`).join('\n') : '(없음)'}
 
 [고아 개념]
 ${orphans.map((k) => `${k.id}: ${k.title} — ${k.gloss || ''}`).join('\n')}

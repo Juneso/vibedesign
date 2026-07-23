@@ -62,6 +62,7 @@ function withSentenceNodes(nodes) {
   const hadChild = new Set(nodes.map((n) => n.parentId).filter(Boolean));
   const out = [...nodes];
   for (const n of nodes) {
+    if (n.kind === 'sentence') continue;       // 이미 진짜 문장 노드면 또 쪼개지 않는다
     if (hadChild.has(n.id)) continue;          // 말단(자식 없음)만 대상
     // 한 문장짜리 설명도 노드로 낸다. V9 의 논지는 대개 한 문장이라
     // "2문장 이상"을 요구하면 말단 키워드의 설명이 통째로 사라진다.
