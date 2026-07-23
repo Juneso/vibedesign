@@ -21,7 +21,7 @@ const MAX_LEVEL = 3;
 
 const cos = (a, b) => { let s = 0, na = 0, nb = 0; for (let i = 0; i < a.length; i++) { s += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; } return s / (Math.sqrt(na) * Math.sqrt(nb)); };
 
-export async function runHierIngest({ book, memos, llm, embedFn, variant = 'v5', planIngestFn, onProgress }) {
+export async function runHierIngest({ book, memos, llm, embedFn, variant = 'v5', planIngestFn, onProgress, forceMode }) {
   let SEQ = 0; const id = () => `n${++SEQ}`;
   const nodes = new Map(); const log = [];
   const root = { id: id(), title: book.title, parentId: null, level: 0, kind: 'root', sources: [], emb: null };
@@ -350,8 +350,9 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
     const kwLine = kws.map((n) => `${n.id} | ${n.title} — ${(n.gloss || '').slice(0, 70)} [p${[...new Set(n.sources)].sort((a, b) => a - b).join(',')}]`).join('\n');
 
     // 1) 전개 방식 판정 — 리치데이터 + 실제 뽑힌 키워드를 함께 보고 정한다
+    // forceMode 가 주어지면 판정을 건너뛴다 — 판정이 결과를 실제로 바꾸는지 A/B 하기 위한 수동 오버라이드.
     onProgress?.('phase 2 — 전개 방식 판정');
-    const modeRaw = await llm({
+    const modeRaw = forceMode ? JSON.stringify({ mode: forceMode, confidence: 'high', reason: '수동 지정(A/B)' }) : await llm({
       system: '비문학 책이 내용을 풀어가는 방식을 판정한다. 책 소개와 실제 발췌 키워드를 함께 보고 가장 지배적인 방식 하나를 고른다. 확신이 없으면 confidence 를 낮게 준다. JSON만 출력.',
       user: `책: ${book.title}\n목차: ${(book.toc || []).join(' · ') || '(없음)'}\n\n[책 소개·서평]\n${rich || '(없음)'}\n\n[발췌에서 뽑힌 키워드]\n${kwLine}\n\n후보: ${MODES.join(' / ')}\n출력 JSON: {"mode":"후보 중 하나","confidence":"high|med|low","reason":"한 줄"}`,
       temperature: 0,
@@ -391,11 +392,23 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
       if (valid.length < 2) {
         log.push(`[v10] 단계 편성 포기(유효 ${valid.length}개) — 평면 유지`);
       } else {
+        const norm = (s) => String(s || '').normalize('NFC').replace(/\s+/g, '').toLowerCase();
         valid.forEach((st, i) => {
-          const title = ordered ? `${i + 1} · ${String(st.name).trim()}` : String(st.name).trim();
-          const node = addConcept(title, root.id, null, String(st.description || '').trim());
+          const name = String(st.name).trim();
+          // ⚠ LLM 이 단계 이름으로 기존 키워드명을 재사용한다("인정 욕구" 단계 + "인정 욕구" 키워드).
+          //   같은 이름이 두 노드로 뜨면 중복으로 보이므로, 이름이 겹치는 키워드가 멤버에 있으면
+          //   새 노드를 만들지 않고 그 키워드를 단계로 승격해 나머지를 그 아래로 넣는다.
+          const dupId = st.ids.find((id) => norm(nodes.get(id).title) === norm(name));
+          let node;
+          if (dupId) {
+            node = nodes.get(dupId);
+            if (ordered) node.title = `${i + 1} · ${node.title}`;
+            if (st.description && !node.gloss) node.gloss = String(st.description).trim();
+          } else {
+            node = addConcept(ordered ? `${i + 1} · ${name}` : name, root.id, null, String(st.description || '').trim());
+          }
           node.stageIndex = ordered ? i + 1 : null;
-          for (const id of st.ids) safeReparent(id, node.id);
+          for (const id of st.ids) if (id !== dupId) safeReparent(id, node.id);
           for (const id of st.ids) for (const p of nodes.get(id).sources) if (!node.sources.includes(p)) node.sources.push(p);
         });
         log.push(`[v10] ${v10Mode.mode} → 단계 ${valid.length}개 편성 · 미편입 키워드 ${kws.length - used.size}개`);

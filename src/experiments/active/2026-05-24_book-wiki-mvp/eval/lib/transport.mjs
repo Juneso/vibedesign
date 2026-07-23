@@ -13,6 +13,8 @@ export function openaiNodeTransport({ apiKey, model } = {}) {
     const body = JSON.stringify({
       model: useModel,
       ...(noTemp ? {} : { temperature: temperature ?? 0.3 }),
+      // 미지정 시 4096에서 잘림 — 메모 20개+ planIngest 응답이 중간에 끊겨 JSON 파싱 실패.
+      max_tokens: 16384,
       response_format: { type: 'json_object' },
       messages: [
         ...(system ? [{ role: 'system', content: system }] : []),

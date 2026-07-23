@@ -13,6 +13,7 @@ import { dirname, resolve } from 'node:path';
 
 import { runHierIngest, serializeTree } from './lib/hierEngine.mjs';
 import { openaiNodeTransport, loadDotEnvLocal } from './lib/transport.mjs';
+import { cachedPlanIngest } from './lib/planCache.mjs';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 await loadDotEnvLocal(__dir);
@@ -106,7 +107,8 @@ for (const [i, b] of BOOKS.entries()) {
   try {
     console.log(`  [${i + 1}/${BOOKS.length}] ${b.title} — 메모 ${memos.length}개 · 리치데이터 ${richChars}자 · 목차 ${book.toc.length}줄, V8 실행...`);
     const r = await runHierIngest({
-      book, memos, llm, embedFn, variant: 'v8', planIngestFn,
+      book, memos, llm, embedFn, variant: 'v8',
+      planIngestFn: cachedPlanIngest(planIngestFn, { book, memos, model: INGEST_MODEL }),
       onProgress: (msg) => process.stdout.write(`      ${msg}\r`),
     });
     const tree = serializeTree(r.nodes, r.rootId);

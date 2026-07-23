@@ -17,6 +17,7 @@ import { dirname, resolve } from 'node:path';
 
 import { runHierIngest, serializeTree } from './lib/hierEngine.mjs';
 import { openaiNodeTransport, loadDotEnvLocal } from './lib/transport.mjs';
+import { cachedPlanIngest } from './lib/planCache.mjs';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 await loadDotEnvLocal(__dir);
@@ -50,7 +51,10 @@ const meta = JSON.parse(await readFile(resolve(__dir, 'golden/obsidian-books-met
 
 console.log(`[V10] 위계 ${MODEL} · planIngest ${INGEST_MODEL} · ${titles.length}권`);
 
-let i = 0;
+// 항상 1부터 시작하면 부분 재실행이 기존 결과를 덮어쓴다 — 기존 번호 다음부터.
+const { readdir } = await import('node:fs/promises');
+const existing = (await readdir(resolve(__dir, 'runs'))).map((f) => f.match(/^hier-v10-(\d+)\.json$/)).filter(Boolean).map((m) => +m[1]);
+let i = existing.length ? Math.max(...existing) : 0;
 for (const t of titles) {
   const b = ds.books.find((x) => N(x.title) === N(t));
   if (!b) { console.log(`  ⚠ "${t}" — 데이터셋에 없음`); continue; }
@@ -66,7 +70,9 @@ for (const t of titles) {
   try {
     console.log(`  [${i + 1}/${titles.length}] ${N(b.title)} — 메모 ${memos.length}개 · 리치데이터 ${Object.values(book.aladin).join('').length}자`);
     const r = await runHierIngest({
-      book, memos, llm, embedFn, variant: 'v10', planIngestFn: planIngest,
+      book, memos, llm, embedFn, variant: 'v10',
+      forceMode: process.env.FORCE_MODE || undefined, // 판정 무시하고 방식 강제 — 판정 A/B용
+      planIngestFn: cachedPlanIngest(planIngest, { book, memos, model: INGEST_MODEL }),
       onProgress: (msg) => process.stdout.write(`      ${msg}\r`),
     });
     const tree = serializeTree(r.nodes, r.rootId);
