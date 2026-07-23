@@ -1,6 +1,8 @@
 {
   "id": "hier-ingest-v8",
   "title": "책별 개념 위계 인제스트 — planIngest 개요 로직 + V7 테마 통합 (V8)",
+  "shortTitle": "위계 인제스트 V8",
+  "order": 100,
   "script": "lib/hierEngine.mjs (variant=v8) · 실행: runHierStability.mjs v8",
   "goal": "독서 메모에서 개념을 뽑되, Phase 1을 miniExtract 루프 대신 M2 검증된 planIngest(알라딘 리치데이터 → 개념 페이지 + ## 개요) 1회 호출로 대체한다. 개념 노드 gloss = planIngest 개요 전문(리치데이터 기반 3~5문장 디스크립션). 그 위에 V7 하이브리드 테마(anchor+critic)를 그대로 얹어 두 계보를 통합한다.",
   "designIntent": "두 계보 통합: M2에서 검증된 개요 로직(planIngest — 알라딘 리치데이터 주입 → 개념 페이지 ## 개요 생성) + V7에서 검증된 테마 로직(하이브리드 anchor + gpt-4o critic 반증). V5~V7의 miniExtract는 name+한 줄 gloss만 뽑아 개념 페이지에 디스크립션이 없었다. V8은 planIngest의 ## 개요(책 맥락·관점·긴장을 3~5문장으로 서술)를 gloss로 그대로 이어받아 대시보드 TreeSvg 클릭 상세에 자동 노출된다. Phase 1.5(동의어 병합)과 Phase 2(테마 생성·critic)는 v7 코드를 수정 없이 재사용한다.",

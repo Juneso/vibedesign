@@ -1,37 +1,199 @@
 {
   "id": "hier-ingest-v5",
   "title": "책별 개념 위계 인제스트 — 위계 이원화 (V5)",
+  "shortTitle": "위계 인제스트 V5",
+  "order": 80,
   "script": "protoHierIngestV5.mjs",
   "goal": "독서 메모 문장들을 하나씩 읽어가며 '책별 개념 트리'를 점진적으로 쌓는다. 각 메모에서 핵심 개념을 뽑고, 그 개념이 기존 트리 어디에 속하는지(같은 개념인가, 좁은 하위인가, 넓은 상위인가, 관계없는 새 잎인가) LLM이 판단해 위계를 만든다. 목차는 트리 노드가 되지 않고 위계 판단의 '숨은 척추'로만 쓰인다.",
   "designIntent": "위계 생성 책임을 '개념 배치(Phase 1)'와 '고아 군집화(Phase 2)'로 이원화한다 — V4까지는 군집화가 place 단계에서 만든 위계를 무시하고 덮어썼으나, V5는 Phase 2가 Phase 1의 결과를 존중하고 root 직속 고아만 묶는다. 이를 통해 억지 상위추상 없이 진짜 포함관계만 트리에 남긴다.",
   "diagram": {
-    "canvas": { "w": 880, "h": 700 },
+    "canvas": {
+      "w": 880,
+      "h": 700
+    },
     "nodes": [
-      { "id": "memo",     "kind": "data",    "label": "독서 메모 문장",        "sub": "책별 · 한 문장씩 순차 투입",   "x": 40,  "y": 40,  "w": 200, "h": 60 },
-      { "id": "extract",  "kind": "process", "label": "개념 추출",             "sub": "gpt-4o-mini · 일반어 금지",   "x": 340, "y": 40,  "w": 200, "h": 60, "stageId": "extract" },
-      { "id": "concepts", "kind": "data",    "label": "핵심 개념 1~2개",       "sub": "명사구 name + 한 줄 gloss",   "x": 640, "y": 40,  "w": 200, "h": 60 },
-      { "id": "embed",    "kind": "process", "label": "개념 임베딩 · 후보 검색", "sub": "코사인 유사도 상위 4개",       "x": 640, "y": 170, "w": 200, "h": 60, "stageId": "embed_concept" },
-      { "id": "cand",     "kind": "data",    "label": "유사 후보 4개",          "sub": "기존 트리에서 근접 노드",      "x": 340, "y": 170, "w": 200, "h": 60 },
-      { "id": "place",    "kind": "process", "label": "위계 배치 (Place)",      "sub": "merge · child · parent · attach", "x": 340, "y": 300, "w": 200, "h": 60, "stageId": "place" },
-      { "id": "tree1",    "kind": "data",    "label": "1차 개념 트리",          "sub": "포함관계 위계 + root 직속 잎",  "x": 640, "y": 300, "w": 200, "h": 60 },
-      { "id": "dedup",    "kind": "process", "label": "동의어 사후 병합",        "sub": "Phase 1.5 · 전체 쌍 재스캔",   "x": 640, "y": 430, "w": 200, "h": 60, "stageId": "dedup_merge" },
-      { "id": "tree2",    "kind": "data",    "label": "정리된 트리",            "sub": "동의어 합쳐진 위계",           "x": 340, "y": 430, "w": 200, "h": 60 },
-      { "id": "orphans",  "kind": "data",    "label": "root 직속 고아",         "sub": "위계에 못 든 개념들",          "x": 40,  "y": 560, "w": 200, "h": 60 },
-      { "id": "cluster",  "kind": "process", "label": "고아 군집화 (존중형)",   "sub": "Phase 2 · 기존 위계 불변",     "x": 340, "y": 560, "w": 200, "h": 60, "stageId": "cluster" },
-      { "id": "final",    "kind": "data",    "label": "최종 개념 트리",         "sub": "편입·신규테마 + 남은 고아",     "x": 640, "y": 560, "w": 200, "h": 60 }
+      {
+        "id": "memo",
+        "kind": "data",
+        "label": "독서 메모 문장",
+        "sub": "책별 · 한 문장씩 순차 투입",
+        "x": 40,
+        "y": 40,
+        "w": 200,
+        "h": 60
+      },
+      {
+        "id": "extract",
+        "kind": "process",
+        "label": "개념 추출",
+        "sub": "gpt-4o-mini · 일반어 금지",
+        "x": 340,
+        "y": 40,
+        "w": 200,
+        "h": 60,
+        "stageId": "extract"
+      },
+      {
+        "id": "concepts",
+        "kind": "data",
+        "label": "핵심 개념 1~2개",
+        "sub": "명사구 name + 한 줄 gloss",
+        "x": 640,
+        "y": 40,
+        "w": 200,
+        "h": 60
+      },
+      {
+        "id": "embed",
+        "kind": "process",
+        "label": "개념 임베딩 · 후보 검색",
+        "sub": "코사인 유사도 상위 4개",
+        "x": 640,
+        "y": 170,
+        "w": 200,
+        "h": 60,
+        "stageId": "embed_concept"
+      },
+      {
+        "id": "cand",
+        "kind": "data",
+        "label": "유사 후보 4개",
+        "sub": "기존 트리에서 근접 노드",
+        "x": 340,
+        "y": 170,
+        "w": 200,
+        "h": 60
+      },
+      {
+        "id": "place",
+        "kind": "process",
+        "label": "위계 배치 (Place)",
+        "sub": "merge · child · parent · attach",
+        "x": 340,
+        "y": 300,
+        "w": 200,
+        "h": 60,
+        "stageId": "place"
+      },
+      {
+        "id": "tree1",
+        "kind": "data",
+        "label": "1차 개념 트리",
+        "sub": "포함관계 위계 + root 직속 잎",
+        "x": 640,
+        "y": 300,
+        "w": 200,
+        "h": 60
+      },
+      {
+        "id": "dedup",
+        "kind": "process",
+        "label": "동의어 사후 병합",
+        "sub": "Phase 1.5 · 전체 쌍 재스캔",
+        "x": 640,
+        "y": 430,
+        "w": 200,
+        "h": 60,
+        "stageId": "dedup_merge"
+      },
+      {
+        "id": "tree2",
+        "kind": "data",
+        "label": "정리된 트리",
+        "sub": "동의어 합쳐진 위계",
+        "x": 340,
+        "y": 430,
+        "w": 200,
+        "h": 60
+      },
+      {
+        "id": "orphans",
+        "kind": "data",
+        "label": "root 직속 고아",
+        "sub": "위계에 못 든 개념들",
+        "x": 40,
+        "y": 560,
+        "w": 200,
+        "h": 60
+      },
+      {
+        "id": "cluster",
+        "kind": "process",
+        "label": "고아 군집화 (존중형)",
+        "sub": "Phase 2 · 기존 위계 불변",
+        "x": 340,
+        "y": 560,
+        "w": 200,
+        "h": 60,
+        "stageId": "cluster"
+      },
+      {
+        "id": "final",
+        "kind": "data",
+        "label": "최종 개념 트리",
+        "sub": "편입·신규테마 + 남은 고아",
+        "x": 640,
+        "y": 560,
+        "w": 200,
+        "h": 60
+      }
     ],
     "edges": [
-      { "from": "memo",     "to": "extract",  "label": "문장 + 유저 생각" },
-      { "from": "extract",  "to": "concepts", "label": "개념 추출" },
-      { "from": "concepts", "to": "embed",    "label": "벡터화" },
-      { "from": "embed",    "to": "cand",     "label": "유사도 ≥ 0.3 상위 4" },
-      { "from": "cand",     "to": "place",    "label": "후보 + 트리 전달" },
-      { "from": "place",    "to": "tree1",    "label": "op 적용" },
-      { "from": "tree1",    "to": "dedup",    "label": "전체 개념 쌍" },
-      { "from": "dedup",    "to": "tree2",    "label": "동의어 병합" },
-      { "from": "tree2",    "to": "orphans",  "label": "고아만 추출" },
-      { "from": "orphans",  "to": "cluster",  "label": "고아 목록" },
-      { "from": "cluster",  "to": "final",    "label": "편입 or 최상위 유지" }
+      {
+        "from": "memo",
+        "to": "extract",
+        "label": "문장 + 유저 생각"
+      },
+      {
+        "from": "extract",
+        "to": "concepts",
+        "label": "개념 추출"
+      },
+      {
+        "from": "concepts",
+        "to": "embed",
+        "label": "벡터화"
+      },
+      {
+        "from": "embed",
+        "to": "cand",
+        "label": "유사도 ≥ 0.3 상위 4"
+      },
+      {
+        "from": "cand",
+        "to": "place",
+        "label": "후보 + 트리 전달"
+      },
+      {
+        "from": "place",
+        "to": "tree1",
+        "label": "op 적용"
+      },
+      {
+        "from": "tree1",
+        "to": "dedup",
+        "label": "전체 개념 쌍"
+      },
+      {
+        "from": "dedup",
+        "to": "tree2",
+        "label": "동의어 병합"
+      },
+      {
+        "from": "tree2",
+        "to": "orphans",
+        "label": "고아만 추출"
+      },
+      {
+        "from": "orphans",
+        "to": "cluster",
+        "label": "고아 목록"
+      },
+      {
+        "from": "cluster",
+        "to": "final",
+        "label": "편입 or 최상위 유지"
+      }
     ]
   },
   "stages": [
@@ -62,7 +224,10 @@
       ],
       "prompt": "너는 독서 메모를 \"책별 개념 위계 트리\"에 점진적으로 끼워넣는 사서다. 보이는 노드는 오직 메모에서 나온 개념뿐 — 책 목차는 위계를 잡는 참고용 숨은 척추일 뿐 절대 노드로 만들지 않는다. 같은 개념은 반드시 병합하고, 위계는 진짜 포함관계(상위=넓음, 하위=좁음)일 때만 만든다. JSON만 출력.",
       "output": "메모마다 {name, gloss} 형태의 개념 배열 (1~2개).",
-      "funnel": { "in": 14, "out": null }
+      "funnel": {
+        "in": 14,
+        "out": null
+      }
     },
     {
       "id": "embed_concept",
@@ -91,7 +256,10 @@
       ],
       "prompt": null,
       "output": "새 개념 벡터 1개 + 기존 트리에서 유사도 상위 4개 후보(cand) 리스트.",
-      "funnel": { "in": null, "out": null }
+      "funnel": {
+        "in": null,
+        "out": null
+      }
     },
     {
       "id": "place",
@@ -114,7 +282,10 @@
       ],
       "prompt": "[숨은 척추 — 참고만, 노드로 만들지 마라]\n책: ${book.title} (${book.category})\n목차 흐름: ${book.toc.join(' · ')}\n\n[새 개념] ${c.name} — ${c.gloss}\n(출처 문장: ${memo.text})\n\n[관련 후보 (임베딩 유사도 상위)]\n${cand.length ? cand.map((x) => `${x.id} | ${ancestry(x.node)} › ${x.node.title} (유사도 ${x.sim.toFixed(2)})`).join('\\n') : '(없음)'}\n\n[현재 트리의 모든 개념]\n${existing}\n\n이 새 개념을 트리에 어떻게 꽂을지 판단하라. 위계는 **진짜 포함관계**일 때만 만든다:\n- op=\"merge\": 후보가 **같은 한 단어로 부를 같은 개념**(동의어·바꿔말하기)일 때만. targetId=그 후보. 관련·인접일 뿐이면 절대 merge 아님.\n- op=\"child\": 새 개념이 후보보다 **좁은 하위 개념**일 때. targetId=상위가 될 후보. (새 개념이 후보의 한 종류/사례/부분)\n- op=\"parent\": 새 개념이 후보(들)보다 **넓은 상위 개념**일 때. targetId=대표 후보, adoptIds=이 새 상위 아래로 함께 넣을 다른 기존 개념 id들(없으면 []). 남발 금지 — 명백히 상위일 때만.\n- op=\"attach\": 위 어디에도 안 맞으면 root 직속 leaf. targetId=\"${root.id}\".\n확신 없으면 attach. 위계는 최대 ${MAX_LEVEL}단까지만.\n출력 JSON: {\"op\":\"merge|child|parent|attach\",\"targetId\":\"n?\",\"adoptIds\":[\"n?\"],\"reason\":\"한 줄\"}",
       "output": "메모별로 트리에 op 연산 적용. 각 새 개념이 merge/child/parent/attach 중 하나로 처리된 결과 트리.",
-      "funnel": { "in": null, "out": null }
+      "funnel": {
+        "in": null,
+        "out": null
+      }
     },
     {
       "id": "dedup_merge",
@@ -137,7 +308,10 @@
       ],
       "prompt": "책 \"${book.title}\"에서 나온 두 개념이 **같은 한 단어로 부를 같은 개념**(동의어·바꿔말하기)인가, 아니면 관련될 뿐 다른 개념인가?\n관련·인접·같은 테마일 뿐이면 \"다름\"이다. 확신 없으면 \"다름\".\nA: ${a.title} — ${a.gloss || ''}\nB: ${b.title} — ${b.gloss || ''}\n출력 JSON: {\"same\":true|false,\"keep\":\"A|B\",\"reason\":\"한 줄\"}",
       "output": "동의어로 판정된 쌍의 두 노드가 한 노드로 합쳐진 트리.",
-      "funnel": { "in": null, "out": null }
+      "funnel": {
+        "in": null,
+        "out": null
+      }
     },
     {
       "id": "cluster",
@@ -160,7 +334,10 @@
       ],
       "prompt": "[숨은 척추 — 참고만, 제목을 노드로 복붙 금지] 책 \"${book.title}\" 목차 흐름: ${book.toc.join(' · ')}\n\nplace 단계가 이미 만든 위계는 건드리지 않는다. 아래 [고아 개념]들만 상위 테마로 묶어라.\n⚠ 무리한 편입 절대 금지 — 대부분의 고아는 최상위에 그대로 남는 게 정상이다. 억지로 다 묶지 마라.\n- 편입은 그 고아가 기존 테마의 **명백한 하위 구성원**일 때만(themeId). 단지 관련·인접이면 편입하지 마라.\n- 여러 고아(≥2)가 **하나의 자명한 상위 개념**으로 자연히 묶일 때만 새 테마 생성(newTheme). 테마명은 자식 이름과 달라야 하고 목차 복붙 금지.\n- 확신이 조금이라도 없으면 둘 다 비워 최상위에 남겨라.\n\n[기존 상위 테마]\n${existingThemes.length ? existingThemes.map((n) => `${n.id} | ${n.title} — 자식: ${childrenOf(n.id).map((k) => k.title).join(', ')}`).join('\\n') : '(없음)'}\n\n[고아 개념]\n${orphans.map((k) => `${k.id}: ${k.title} — ${k.gloss || ''}`).join('\\n')}\n\n출력 JSON: {\"assign\":[{\"id\":\"고아 id\",\"themeId\":\"기존 테마 id 또는 빈문자열\",\"newTheme\":\"새 테마명 또는 빈문자열\"}]}",
       "output": "고아 중 편입·신규테마 조건을 만족한 것들이 트리에 연결된 최종 트리. 나머지 고아는 root 직속에 그대로 남는다.",
-      "funnel": { "in": null, "out": null }
+      "funnel": {
+        "in": null,
+        "out": null
+      }
     }
   ],
   "knownIssues": [

@@ -135,7 +135,7 @@ function RunRow({ run, expanded, onToggle }) {
           className={`eval-run-item${expanded ? ' is-active' : ''}`}
           onClick={onToggle}
         >
-          <span>{expanded ? '▾' : '▸'} {iterationLabel(file)}</span>
+          <span>{expanded ? '▾' : '▸'} {run.label || iterationLabel(file)}</span>
           {fmtMonthDay(run.mtimeMs) && (
             <span className="eval-run-date">{fmtMonthDay(run.mtimeMs)}</span>
           )}
@@ -182,21 +182,27 @@ export function RunList({ runs, statusMap }) {
     });
   }, [runs]);
 
-  // 시리즈 그룹 접힘 상태
-  const [openGroups, setOpenGroups] = useState(() => new Set());
-  const toggleGroup = (s) => setOpenGroups((prev) => {
+  // 기본 펼침. runs 는 비동기로 도착하므로 "열린 것"이 아니라 "사용자가 닫은 것"을 추적한다
+  // (열린 목록을 초기 state 로 잡으면 첫 렌더의 빈 배열로 굳어 아무것도 펼쳐지지 않는다)
+  const [closedGroups, setClosedGroups] = useState(() => new Set());
+  const toggleGroup = (s) => setClosedGroups((prev) => {
     const next = new Set(prev);
     next.has(s) ? next.delete(s) : next.add(s);
     return next;
   });
 
-  // 한 번에 하나의 런만 펼침
-  const [openRun, setOpenRun] = useState(null);
+  // 런도 기본 펼침. 아코디언이 아니라 여러 런을 동시에 열어둘 수 있다
+  const [closedRuns, setClosedRuns] = useState(() => new Set());
+  const toggleRun = (file) => setClosedRuns((prev) => {
+    const next = new Set(prev);
+    next.has(file) ? next.delete(file) : next.add(file);
+    return next;
+  });
 
   return (
     <VStack gap={0.5}>
       {groups.map(([series, items]) => {
-        const isOpen = openGroups.has(series);
+        const isOpen = !closedGroups.has(series);
         return (
           <div key={series} className="eval-runlist-group">
             <button className="eval-series-toggle" onClick={() => toggleGroup(series)}>
@@ -212,13 +218,13 @@ export function RunList({ runs, statusMap }) {
             {isOpen && items.map((r) => {
               const st = status[r.file];
               const readOnly = st === 'done' || st === 'applied';
-              const expanded = openRun === r.file;
+              const expanded = !closedRuns.has(r.file);
               return (
                 <RunRow
                   key={r.file}
                   run={{ ...r, status: st, readOnly }}
                   expanded={expanded}
-                  onToggle={() => setOpenRun(expanded ? null : r.file)}
+                  onToggle={() => toggleRun(r.file)}
                 />
               );
             })}

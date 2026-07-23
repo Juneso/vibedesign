@@ -2,7 +2,7 @@
 // 빌드에는 영향 없음 (configureServer 훅에서만 라우트 등록).
 import { resolve, join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { readdirSync, statSync, existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { readdirSync, statSync, existsSync, readFileSync, writeFileSync, mkdirSync, openSync, readSync, closeSync } from 'fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
@@ -14,6 +14,23 @@ const PIPELINES_DIR = join(EVAL_DIR, 'pipelines');
 // 파일명에서 숫자 접미(-1, -12 등) 제거 → 시리즈명
 function seriesOf(fileName) {
   return fileName.replace(/\.json$/, '').replace(/-\d+$/, '');
+}
+
+// 런 목록용 표시 라벨. 파일 전체를 파싱하지 않고 선두 1KB만 읽어 "label" 키를 찾는다
+// (런 파일이 78개·4.6MB라 목록 요청마다 전량 파싱하면 낭비). 없으면 null → 회차 라벨 폴백.
+function peekLabel(filePath) {
+  let fd;
+  try {
+    fd = openSync(filePath, 'r');
+    const buf = Buffer.alloc(1024);
+    const n = readSync(fd, buf, 0, 1024, 0);
+    const m = buf.slice(0, n).toString('utf8').match(/"label"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+    return m ? JSON.parse(`"${m[1]}"`) : null;
+  } catch {
+    return null;
+  } finally {
+    if (fd !== undefined) try { closeSync(fd); } catch { /* noop */ }
+  }
 }
 
 // path traversal 방지: '..' 또는 슬래시 포함 시 거부
@@ -54,7 +71,7 @@ export function evalApiPlugin() {
               .filter((f) => f.endsWith('.json'))
               .map((f) => {
                 const st = statSync(join(RUNS_DIR, f));
-                return { file: f, series: seriesOf(f), mtimeMs: st.mtimeMs, size: st.size };
+                return { file: f, series: seriesOf(f), mtimeMs: st.mtimeMs, size: st.size, label: peekLabel(join(RUNS_DIR, f)) };
               })
               .sort((a, b) => b.mtimeMs - a.mtimeMs);
             return sendJson(res, 200, runs);
@@ -82,6 +99,25 @@ export function evalApiPlugin() {
                 }
               });
             return sendJson(res, 200, pipelines);
+          }
+
+          // POST /api/eval/pipelines/:file — 사이드바에서 고친 이름을 정의 파일에 반영.
+          // 이름(shortTitle)만 덮어쓰고 나머지 키·순서는 그대로 둔다. 파일명과 id 는 건드리지 않는다
+          // (seriesMeta 의 pipelineId 가 id 를 참조하므로 바꾸면 런 연결이 끊긴다).
+          if (req.method === 'POST' && url.startsWith('/api/eval/pipelines/')) {
+            const file = decodeURIComponent(url.slice('/api/eval/pipelines/'.length));
+            if (!isSafeSegment(file) || !file.endsWith('.json')) return sendJson(res, 400, { error: 'invalid file' });
+            const jsonPath = join(PIPELINES_DIR, file);
+            if (!existsSync(jsonPath)) return sendJson(res, 404, { error: 'not found' });
+            const raw = await readBody(req);
+            let body;
+            try { body = JSON.parse(raw); } catch { return sendJson(res, 400, { error: 'invalid json' }); }
+            const name = typeof body?.shortTitle === 'string' ? body.shortTitle.trim() : '';
+            if (!name) return sendJson(res, 400, { error: 'shortTitle required' });
+            const content = JSON.parse(readFileSync(jsonPath, 'utf8'));
+            content.shortTitle = name;
+            writeFileSync(jsonPath, JSON.stringify(content, null, 2) + '\n', 'utf8');
+            return sendJson(res, 200, { ok: true, file, shortTitle: name });
           }
 
           // GET /api/eval/runs/:file

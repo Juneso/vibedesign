@@ -58,11 +58,36 @@ body {
   background: var(--color-background-card, #fff);
   cursor: pointer;
   font-size: 12px;
+  line-height: 1.5;
+  white-space: nowrap; /* pill 안에서 줄바꿈되면 서로 겹쳐 보임 */
   color: var(--color-text-primary, #111);
 }
 
 .eval-pl-chip:hover {
   background: var(--color-background-muted, #f5f5f5);
+}
+
+/* 문서 제목 더블클릭 편집 */
+.pl-title-editable {
+  cursor: text;
+  border-bottom: 1px dashed transparent;
+}
+
+.pl-title-editable:hover {
+  border-bottom-color: var(--color-border-emphasized, #ccd3db);
+}
+
+.pl-title-input {
+  font: inherit;
+  font-size: 1.4rem;
+  font-weight: 700;
+  width: 100%;
+  padding: 2px 6px;
+  border: 1px solid var(--color-accent, #6366f1);
+  border-radius: 6px;
+  background: var(--color-background-card, #fff);
+  color: var(--color-text-primary, #111);
+  outline: none;
 }
 
 .eval-pl-chip.is-active {

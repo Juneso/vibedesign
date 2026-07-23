@@ -348,11 +348,17 @@ export const initRouter = () => {
     header.textContent = 'Eval 파이프라인';
     desktopNav.appendChild(header);
 
+    // file → 라벨 span. 대시보드 본문에서 이름을 고치면 postMessage 로 여기 라벨도 갱신한다
+    const labelByFile = new Map();
+
     const makeItem = (label, pipelineParam) => {
       const item = document.createElement('a');
       item.href = '#';
       item.className = 'lab-nav-item logic-item';
-      item.innerHTML = `<span class="lab-nav-label">${label}</span>`;
+      item.innerHTML = `<span class="lab-nav-label"></span>`;
+      const labelEl = item.querySelector('.lab-nav-label');
+      labelEl.textContent = label;
+      labelByFile.set(pipelineParam, labelEl);
       const load = (e) => {
         e?.preventDefault();
         document.querySelectorAll('.nav-group-title, .lab-nav-item, .mobile-nav-list li').forEach(el => el.classList.remove('active'));
@@ -364,8 +370,19 @@ export const initRouter = () => {
       if (!firstLogicLoad) firstLogicLoad = load;
     };
 
-    pipelines.forEach((p) => makeItem(p.title || p.file, p.file));
+    // 대시보드 본문 제목과 같은 이름(shortTitle)을 쓰고, 같은 기준(order 내림차순)으로 정렬한다
+    [...pipelines]
+      .sort((a, b) => (b.order ?? 0) - (a.order ?? 0) || String(a.title || '').localeCompare(String(b.title || '')))
+      .forEach((p) => makeItem(p.shortTitle || p.title || p.file, p.file));
     makeItem('기타 eval', '__misc__');
+
+    // 대시보드(iframe)에서 이름을 고치면 사이드바 라벨도 즉시 따라간다
+    window.addEventListener('message', (e) => {
+      const d = e.data;
+      if (!d || d.type !== 'pipeline-renamed') return;
+      const el = labelByFile.get(d.file);
+      if (el && d.shortTitle) el.textContent = d.shortTitle;
+    });
 
     if (firstLogicLoad) firstLogicLoad();
   };

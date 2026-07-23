@@ -1,33 +1,170 @@
 {
   "id": "nudge-v8",
   "title": "넛지 V8 — 차원 분리 채점 (자극성 폐기)",
+  "shortTitle": "넛지 V8",
+  "order": 70,
   "script": "runNudgeV8.mjs",
   "goal": "유저가 저장한 책 문장을 다시 마주칠 때 보여줄 '넛지 메시지(풀이→질문 흐름 + 해석 방향 3선택지)'를 생성하고, 결정적 체커 5개 + 독립 judge 3개로 채점해 '좋은 넛지'만 통과시킨다.",
   "designIntent": "V7은 자극성(QD 정지력) 점수가 높으면 다른 결함을 가렸다 — 멈추게 하는 것과 좋은 넛지는 다른 것이었다. V8은 QD를 폐기하고 풀이 정확도·공감·응용 거리 세 축을 각각 독립 LLM 호출로 채점해, 한 축의 높은 점수가 다른 약점을 가리지 못하게 한다.",
   "diagram": {
-    "canvas": { "w": 880, "h": 700 },
+    "canvas": {
+      "w": 880,
+      "h": 700
+    },
     "nodes": [
-      { "id": "memo",    "kind": "data",    "label": "저장한 문장 6개",       "sub": "책+page 타깃 · 유저 생각 포함", "x": 340, "y": 20,  "w": 200, "h": 60 },
-      { "id": "gen",     "kind": "process", "label": "넛지 생성",             "sub": "gpt-4o · 풀이→질문 흐름",      "x": 340, "y": 130, "w": 200, "h": 60, "stageId": "generate" },
-      { "id": "nudge",   "kind": "data",    "label": "넛지 6개",              "sub": "message + choices 3개",       "x": 340, "y": 240, "w": 200, "h": 60 },
-      { "id": "det",     "kind": "process", "label": "결정적 체커 F1~F5",     "sub": "개수·길이·금지어·책제목",      "x": 340, "y": 350, "w": 200, "h": 60, "stageId": "deterministic" },
-      { "id": "passed",  "kind": "data",    "label": "형식 통과 넛지",         "sub": "judge로 넘길 후보",           "x": 340, "y": 460, "w": 200, "h": 56 },
-      { "id": "j1",      "kind": "process", "label": "J1 풀이 정확도",         "sub": "gpt-4o · 0~2점",              "x": 40,  "y": 560, "w": 180, "h": 56, "stageId": "judge" },
-      { "id": "j2",      "kind": "process", "label": "J2 공감",               "sub": "gpt-4o · 0~2점",              "x": 250, "y": 560, "w": 180, "h": 56, "stageId": "judge" },
-      { "id": "j3",      "kind": "process", "label": "J3 응용거리·결격",       "sub": "체크리스트 + L1~L7 레벨",      "x": 460, "y": 560, "w": 200, "h": 56, "stageId": "judge" },
-      { "id": "dist",    "kind": "process", "label": "레벨 분포 검사",         "sub": "라운드 단위 · L7=0 등",       "x": 690, "y": 460, "w": 170, "h": 60, "stageId": "dist_check" },
-      { "id": "final",   "kind": "human",   "label": "통과 넛지",             "sub": "합격선 넘은 것만 채택",        "x": 690, "y": 560, "w": 170, "h": 56 }
+      {
+        "id": "memo",
+        "kind": "data",
+        "label": "저장한 문장 6개",
+        "sub": "책+page 타깃 · 유저 생각 포함",
+        "x": 340,
+        "y": 20,
+        "w": 200,
+        "h": 60
+      },
+      {
+        "id": "gen",
+        "kind": "process",
+        "label": "넛지 생성",
+        "sub": "gpt-4o · 풀이→질문 흐름",
+        "x": 340,
+        "y": 130,
+        "w": 200,
+        "h": 60,
+        "stageId": "generate"
+      },
+      {
+        "id": "nudge",
+        "kind": "data",
+        "label": "넛지 6개",
+        "sub": "message + choices 3개",
+        "x": 340,
+        "y": 240,
+        "w": 200,
+        "h": 60
+      },
+      {
+        "id": "det",
+        "kind": "process",
+        "label": "결정적 체커 F1~F5",
+        "sub": "개수·길이·금지어·책제목",
+        "x": 340,
+        "y": 350,
+        "w": 200,
+        "h": 60,
+        "stageId": "deterministic"
+      },
+      {
+        "id": "passed",
+        "kind": "data",
+        "label": "형식 통과 넛지",
+        "sub": "judge로 넘길 후보",
+        "x": 340,
+        "y": 460,
+        "w": 200,
+        "h": 56
+      },
+      {
+        "id": "j1",
+        "kind": "process",
+        "label": "J1 풀이 정확도",
+        "sub": "gpt-4o · 0~2점",
+        "x": 40,
+        "y": 560,
+        "w": 180,
+        "h": 56,
+        "stageId": "judge"
+      },
+      {
+        "id": "j2",
+        "kind": "process",
+        "label": "J2 공감",
+        "sub": "gpt-4o · 0~2점",
+        "x": 250,
+        "y": 560,
+        "w": 180,
+        "h": 56,
+        "stageId": "judge"
+      },
+      {
+        "id": "j3",
+        "kind": "process",
+        "label": "J3 응용거리·결격",
+        "sub": "체크리스트 + L1~L7 레벨",
+        "x": 460,
+        "y": 560,
+        "w": 200,
+        "h": 56,
+        "stageId": "judge"
+      },
+      {
+        "id": "dist",
+        "kind": "process",
+        "label": "레벨 분포 검사",
+        "sub": "라운드 단위 · L7=0 등",
+        "x": 690,
+        "y": 460,
+        "w": 170,
+        "h": 60,
+        "stageId": "dist_check"
+      },
+      {
+        "id": "final",
+        "kind": "human",
+        "label": "통과 넛지",
+        "sub": "합격선 넘은 것만 채택",
+        "x": 690,
+        "y": 560,
+        "w": 170,
+        "h": 56
+      }
     ],
     "edges": [
-      { "from": "memo",   "to": "gen",    "label": "타깃 지정" },
-      { "from": "gen",    "to": "nudge",  "label": "생성 (재시도 최대 3)" },
-      { "from": "nudge",  "to": "det",    "label": "형식 검사" },
-      { "from": "det",    "to": "passed", "label": "F1~F5 통과만" },
-      { "from": "passed", "to": "j1",     "label": "축별 병렬 채점" },
-      { "from": "passed", "to": "j2",     "label": "축별 병렬 채점" },
-      { "from": "passed", "to": "j3",     "label": "축별 병렬 채점" },
-      { "from": "j3",     "to": "dist",   "label": "level 집계" },
-      { "from": "dist",   "to": "final",  "label": "분포 통과 시 채택" }
+      {
+        "from": "memo",
+        "to": "gen",
+        "label": "타깃 지정"
+      },
+      {
+        "from": "gen",
+        "to": "nudge",
+        "label": "생성 (재시도 최대 3)"
+      },
+      {
+        "from": "nudge",
+        "to": "det",
+        "label": "형식 검사"
+      },
+      {
+        "from": "det",
+        "to": "passed",
+        "label": "F1~F5 통과만"
+      },
+      {
+        "from": "passed",
+        "to": "j1",
+        "label": "축별 병렬 채점"
+      },
+      {
+        "from": "passed",
+        "to": "j2",
+        "label": "축별 병렬 채점"
+      },
+      {
+        "from": "passed",
+        "to": "j3",
+        "label": "축별 병렬 채점"
+      },
+      {
+        "from": "j3",
+        "to": "dist",
+        "label": "level 집계"
+      },
+      {
+        "from": "dist",
+        "to": "final",
+        "label": "분포 통과 시 채택"
+      }
     ]
   },
   "stages": [
@@ -64,7 +201,10 @@
       ],
       "prompt": "당신은 독서 기록 앱의 넛지 작성자다. 유저가 책에서 직접 옮겨 적은 문장을 다시 마주치게 해주는 알림을 만든다.\n유저는 \"${book.title}\" (${book.author}) 를 읽으며 아래 문장을 저장했다.\n\n[저장한 문장]\n\"${memo.quote}\"\n${memo.myThought ? `\\n[유저가 함께 적은 생각]\\n\"${memo.myThought}\"` : ''}\n\n[만들 것 — 2가지]\n\n1. **message (흐르는 2~3문장)**: 풀이와 질문이 한 호흡으로 자연스럽게 이어지는 글.\n   - 슬롯 형식(\"요약. 질문?\")이 아니다. 앞 문장이 뒷 문장을 부르는, 친구가 보낸 메시지 같은 흐름.\n   - 시작: 저장한 문장을 더 쉬운 말로 풀어주기. 유저가 읽으면 \"내가 왜 밑줄 쳤는지 이 앱이 안다\"고 느껴야 한다.\n     유저가 적은 생각이 있으면 그 관점을 자연스럽게 녹여서 (그대로 복창 금지).\n   - 끝: 그 흐름에서 자연스럽게 나오는 질문. **질문 문구는 앞 문장에 따라 매번 달라진다** —\n     \"어느 쪽이 더 가까웠어?\" / \"너는 ~라서 적어둔 거야, 아니면 ~?\" / \"뭐가 제일 걸렸어?\" / \"너라면 어느 쪽이야?\" 등.\n     고정 문구(\"이 문장이 너한테는 어떤 의미였어?\") 반복 금지.\n   - **질문은 메시지 전체에서 마지막 한 문장, 단 하나만.** 도입을 질문으로 시작하거나 질문을 연달아 쓰면 실패.\n   - 그 마지막 질문에 choices 3개가 그대로 답이 되어야 한다. 경험을 묻고(\"~한 적 있어?\") 해석을 선지로 주면 실패.\n   - 책 내용 확인 퀴즈 금지. 유저의 직업·일상으로 끌고 가지 말 것. 문장의 논점 밖 금지.\n   - 차분한 구어체 (\"~라는 얘기야\", \"~라는 거지\"). 과장·자극 금지 (\"무섭다\", \"서늘하다\", \"충격적\" X).\n   - 금지어: 흥미, 인상, 탐구, ~해보면 좋겠어.\n\n2. **choices (선지 3개 = 해석 방향 3분기)**: 이 문장을 저장한 사람이 가졌을 법한 **서로 다른 생각의 방향** 3개.\n   - 정답이 없어야 한다. 책 내용 요약·사실 확인이 아니라 \"내 생각이 뭐였을지\"의 후보다. 고르는 행위가 자기표현이 되도록.\n   - **3개의 방향이 실제로 갈라져야 한다.** 두 개가 같은 결이면 실패.\n   - 단순 긍정/부정/중립 금지. 각 선지는 구체적 관점을 담은 짧은 문장.\n   - 각 10~25자. 칩 버튼에 들어갈 길이.\n\n[출력 형식 — 정확히 이 모양의 JSON만]\n{\"message\": \"풀이와 질문이 자연스럽게 이어지는 2~3문장\", \"choices\": [\"해석 방향1\", \"해석 방향2\", \"해석 방향3\"]}",
       "output": "타깃 6개에 대한 넛지 {message, choices[3]}. 생성 실패 건은 null.",
-      "funnel": { "in": 6, "out": 6 }
+      "funnel": {
+        "in": 6,
+        "out": 6
+      }
     },
     {
       "id": "deterministic",
@@ -111,7 +251,10 @@
       ],
       "prompt": null,
       "output": "{F1, F2, F3, F4, F5, allPass} — 모두 true면 judge 단계로 진행.",
-      "funnel": { "in": 6, "out": 6 }
+      "funnel": {
+        "in": 6,
+        "out": 6
+      }
     },
     {
       "id": "judge",
@@ -152,7 +295,10 @@
       ],
       "prompt": "J1 (풀이 정확도):\n독서 앱 넛지 메시지의 풀이 부분을 **풀이 정확도** 단 하나의 축으로만 채점한다.\n다른 건 보지 말 것 — 공감/문체/재미는 채점 대상 아님.\n\n[유저가 저장한 문장]\n\"${memo.quote}\"\n\n[채점할 풀이]\n\"${body}\"\n\n[축 — 풀이 정확도] 저장한 문장을 정확히 풀었는가. 문장에 없는 내용을 사실처럼 더하지 않았는가.\n- 2 = 문장의 뜻을 정확히 풀이. 저장한 문장으로 모두 역추적 가능, 원문에 없는 추론 0건.\n- 1 = 대체로 맞으나 일부 비약·과잉 일반화.\n- 0 = 오독, 또는 문장에 없는 내용을 사실처럼 단정.\n\nJSON만: {score: 0|1|2, reasoning: string}\n\n---\n\nJ2 (공감):\n독서 앱 넛지 메시지의 풀이 부분을 **공감(마음 짚기)** 단 하나의 축으로만 채점한다.\n풀이가 사실로 정확한지는 보지 말 것 — 오직 \"유저의 마음을 짚었는가\"만.\n\n[유저가 저장한 문장] + [함께 적은 생각] + [채점할 풀이]\n\n- 2 = 밑줄 친 마음을 짚음. 적은 생각이 있으면 복창이 아닌 한 걸음으로 반영.\n- 1 = 무난한 풀이에 그침. 공감은 약하나 어긋나진 않음.\n- 0 = 마음과 어긋남, myThought 그대로 복창, 또는 자극적·평가적.\n\n---\n\nJ3 (응용 거리·결격 체크리스트):\n독서 앱 넛지의 \"마지막 질문 + 선택지 3개\"를 결격 사유 체크리스트로 검사하고 레벨(L1~L7)을 분류한다.\n결격 사유: quiz(퀴즈 나열), coreMiss(핵심 논점 이탈), disconnect(질문↔선지 연결 끊김), samefork(같은 결 2개), forced(억지 연결), burden(인지 부하).\n레벨: L1 순수 풀이 / L2 풀이+마음짚기 / L3 문장 안에서 묻기 / L4 같은 책 맥락 반걸음 / L5 보편 일상 / L6 유저 삶 / L7 전이·반론\n⚠️ 의심스러우면 true. 나쁜 넛지를 통과시키는 게 좋은 넛지를 탈락시키는 것보다 위험.",
       "output": "각 넛지에 대한 {j1: {score, reasoning}, j2: {score, reasoning}, j3: {quiz, coreMiss, disconnect, samefork, forced, burden, level, reasoning}, j3HasDefect, pass}.",
-      "funnel": { "in": 6, "out": null }
+      "funnel": {
+        "in": 6,
+        "out": null
+      }
     },
     {
       "id": "dist_check",
@@ -181,7 +327,10 @@
       ],
       "prompt": null,
       "output": "distPass(true/false) + 분포 상세(L별 건수). 최근 런 결과: L3:1 L4:5, distPass=true.",
-      "funnel": { "in": 6, "out": null }
+      "funnel": {
+        "in": 6,
+        "out": null
+      }
     }
   ],
   "knownIssues": [

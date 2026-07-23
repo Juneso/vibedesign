@@ -1,6 +1,67 @@
 import React, { useState } from 'react';
 import { VStack } from '@astryxdesign/core/Stack';
 import { Text, Heading } from '@astryxdesign/core/Text';
+import { savePipelineName } from '../lib/api.js';
+
+// ── 문서 제목 — 더블클릭하면 고칠 수 있고, 저장하면 pipelines/*.json 의 shortTitle 에 반영된다.
+// (사이드바 칩에서 편집하면 칩의 onClick 이 먼저 두 번 발화해 편집 진입이 방해받아 본문으로 옮겼다)
+function EditableTitle({ pipeline, onRenamed }) {
+  const name = pipeline.shortTitle || pipeline.title || pipeline.file;
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(name);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+
+  const commit = async () => {
+    const next = draft.trim();
+    if (!next || next === name) { setEditing(false); return; }
+    setSaving(true);
+    try {
+      await savePipelineName(pipeline.file, next);
+      onRenamed?.(next);
+      // 셸 사이드바(부모 프레임) 라벨도 같은 이름으로 맞춘다
+      try { window.parent?.postMessage({ type: 'pipeline-renamed', file: pipeline.file, shortTitle: next }, '*'); } catch { /* noop */ }
+      setEditing(false);
+    } catch (e) {
+      setError(String(e.message || e));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (editing) {
+    return (
+      <div>
+        <input
+          className="pl-title-input"
+          value={draft}
+          autoFocus
+          disabled={saving}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={commit}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') { e.preventDefault(); commit(); }
+            if (e.key === 'Escape') { e.preventDefault(); setDraft(name); setEditing(false); }
+          }}
+          aria-label="파이프라인 이름 편집"
+        />
+        {error && <Text type="supporting" color="accent">저장 실패: {error}</Text>}
+      </div>
+    );
+  }
+
+  return (
+    <Heading level={2}>
+      <span
+        className="pl-title-editable"
+        onDoubleClick={() => { setDraft(name); setError(null); setEditing(true); }}
+        title="더블클릭하면 이름을 고칠 수 있어요"
+      >
+        {name}
+      </span>
+    </Heading>
+  );
+}
 
 // ── 파라미터: 처리 노드에 붙은 작은 노드. 클릭하면 의미·effect 펼침 ──
 function ParamChips({ params }) {
@@ -261,7 +322,7 @@ function DiagramView({ pipeline }) {
   );
 }
 
-export function PipelineDetail({ pipeline }) {
+export function PipelineDetail({ pipeline, onRenamed }) {
   if (pipeline.error) {
     return <Text color="accent">파이프라인 파싱 오류: {pipeline.error}</Text>;
   }
@@ -271,7 +332,11 @@ export function PipelineDetail({ pipeline }) {
     <VStack gap={4}>
       {/* 헤더 */}
       <VStack gap={2}>
-        <Heading level={2}>{pipeline.title}</Heading>
+        {/* 문서 제목(더블클릭 편집). 원래의 긴 설명형 제목은 아래 줄에 남긴다 */}
+        <EditableTitle pipeline={pipeline} onRenamed={onRenamed} />
+        {pipeline.shortTitle && pipeline.title && pipeline.title !== pipeline.shortTitle && (
+          <Text type="supporting">{pipeline.title}</Text>
+        )}
         {pipeline.script && (
           <Text type="supporting"><code>{pipeline.script}</code></Text>
         )}

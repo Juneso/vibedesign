@@ -52,7 +52,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     listPipelines()
-      .then((data) => {
+      .then((raw) => {
+        // 최신 버전이 위로 — pipelines/*.json 의 order 내림차순 (없으면 0, 동률은 제목순)
+        const data = [...raw].sort((a, b) => (b.order ?? 0) - (a.order ?? 0) || String(a.title || '').localeCompare(String(b.title || '')));
         setPipelines(data);
         if (drivenByUrl) {
           if (URL_PIPELINE === MISC_ID) {
@@ -106,7 +108,7 @@ export default function Dashboard() {
                     className={`eval-pl-chip${activeId === id ? ' is-active' : ''}`}
                     onClick={() => setActiveId(id)}
                   >
-                    {p.title || p.file}
+                    {p.shortTitle || p.title || p.file}
                   </button>
                 );
               })}
@@ -126,7 +128,13 @@ export default function Dashboard() {
               파이프라인 미연결 eval 목록입니다. 우측에서 미매핑 시리즈의 런을 확인하세요.
             </Text>
           )}
-          {!isMisc && active && <PipelineDetail pipeline={active} />}
+          {!isMisc && active && (
+            <PipelineDetail
+              pipeline={active}
+              onRenamed={(name) => setPipelines((prev) =>
+                prev.map((q) => (q.file === active.file ? { ...q, shortTitle: name } : q)))}
+            />
+          )}
           {!isMisc && plLoaded && !active && !plError && (
             <Text type="supporting">등록된 파이프라인이 없습니다.</Text>
           )}
