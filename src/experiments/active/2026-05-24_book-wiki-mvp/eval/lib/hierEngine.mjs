@@ -442,7 +442,10 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
         // 3) 국소 방식 2층 위계 — 책은 한 방식으로만 전개되지 않는다(통시 뼈대 + 단계 안 분석).
         //    키워드가 몰린 단계(6개+)는 그 안에서 부차 방식의 축으로 한 번 더 묶는다.
         //    run 7 의 "미술의 본질" 16개 덤핑 버킷이 이 단계의 표적. MAX_LEVEL=3 안에 들어간다.
+        // ⚠ 2차 배정(2.7) 전에는 단계당 키워드가 2~3개뿐이라 발동 기준에 안 걸린다(run 12 실측)
+        //   → 함수로 묶고 2.7 이후에 호출한다.
         const SUB_MIN = 6;
+        const runSubgrouping = async () => {
         for (const stNode of [...nodes.values()].filter((n) => n.kind === 'concept' && n.parentId === root.id && n.stageIndex !== undefined)) {
           const members = conceptChildrenOf(stNode.id);
           if (members.length < SUB_MIN) continue;
@@ -471,7 +474,35 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
             made++;
           }
           if (made) log.push(`[v10] "${stNode.title}" 내부 축 ${made}개 편성(키워드 ${subUsed.size}/${members.length})`);
+          // 미발동이 "축 없음 판단"인지 "검증 탈락"인지 구분되지 않으면 디버깅이 안 된다(run 9에서 실측).
+          else log.push(`[v10] "${stNode.title}" 내부 축 미편성 — LLM 제안 ${groups.length}개, 검증 통과 0개`);
         }
+        };
+
+        // 4) 미편입 2차 배정 — 단계가 선 뒤에도 루트에 남은 키워드가 절반이면 위계가 무의미하다
+        //    (서양미술사 16/29, 피로사회 13/14 실측). LLM 재질의 대신 임베딩 근접 단계로 붙인다.
+        //    문턱 미달이면 그대로 둔다 — 억지 편입이 미편입보다 나쁘다는 원칙은 유지.
+        const stageNodes = [...nodes.values()].filter((n) => n.kind === 'concept' && n.parentId === root.id && n.stageIndex !== undefined);
+        const leftovers = kws.filter((k) => !used.has(k.id) && nodes.get(k.id)?.parentId === root.id);
+        if (stageNodes.length >= 2 && leftovers.length && embedFn) {
+          onProgress?.(`phase 2.7 — 미편입 ${leftovers.length}개 근접 단계 배정`);
+          const ASSIGN_MIN = 0.35;
+          const sEmbs = [];
+          for (const s of stageNodes) sEmbs.push(await embedFn(`${s.title.replace(/^\d+ · /, '')} — ${(s.gloss || '').slice(0, 200)}`));
+          let moved = 0;
+          for (const k of leftovers) {
+            const kn = nodes.get(k.id);
+            const e = await embedFn(`${kn.title} — ${(kn.gloss || '').slice(0, 200)}`);
+            let best = -1, bi = -1;
+            sEmbs.forEach((se, idx) => { const s = cos(e, se); if (s > best) { best = s; bi = idx; } });
+            if (best >= ASSIGN_MIN && safeReparent(k.id, stageNodes[bi].id)) {
+              for (const p of kn.sources) if (!stageNodes[bi].sources.includes(p)) stageNodes[bi].sources.push(p);
+              moved++;
+            }
+          }
+          log.push(`[v10] 미편입 2차 배정: ${moved}/${leftovers.length}개 이동(코사인 ≥ ${ASSIGN_MIN})`);
+        }
+        await runSubgrouping(); // 2층 위계는 단계가 채워진 뒤에야 의미가 있다
       }
     }
   }
