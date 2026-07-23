@@ -349,17 +349,28 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
     const kws = concepts().filter((n) => n.parentId === root.id);
     const kwLine = kws.map((n) => `${n.id} | ${n.title} — ${(n.gloss || '').slice(0, 70)} [p${[...new Set(n.sources)].sort((a, b) => a - b).join(',')}]`).join('\n');
 
-    // 1) 전개 방식 판정 — 리치데이터 + 실제 뽑힌 키워드를 함께 보고 정한다
-    // forceMode 가 주어지면 판정을 건너뛴다 — 판정이 결과를 실제로 바꾸는지 A/B 하기 위한 수동 오버라이드.
+    // 1) 전개 방식 판정 — 키워드가 아니라 **목차의 형태**에서 읽는다.
+    //    첫 실행에서 5회 중 5회가 "분석/분류(high)"로 쏠렸다(서양미술사조차 통시가 안 나옴).
+    //    키워드는 판정 근거에서 빼고, 목차 장 제목의 구조 신호(시대·연도·계보=통시,
+    //    병렬 범주=분류, "~란 무엇인가"=분석…)를 근거로 삼되 근거 장 제목을 인용하게 강제한다.
+    //    인용이 실제 목차와 대조되지 않으면 코드에서 확신도를 강등 — "high 과신" 방어.
+    // forceMode 가 주어지면 판정을 건너뛴다(판정 A/B용 수동 오버라이드).
     onProgress?.('phase 2 — 전개 방식 판정');
+    const nrm = (s) => String(s || '').normalize('NFC').replace(/\s+/g, '').toLowerCase();
+    const toc = (book.toc || []).map(String).filter(Boolean);
     const modeRaw = forceMode ? JSON.stringify({ mode: forceMode, confidence: 'high', reason: '수동 지정(A/B)' }) : await llm({
-      system: '비문학 책이 내용을 풀어가는 방식을 판정한다. 책 소개와 실제 발췌 키워드를 함께 보고 가장 지배적인 방식 하나를 고른다. 확신이 없으면 confidence 를 낮게 준다. JSON만 출력.',
-      user: `책: ${book.title}\n목차: ${(book.toc || []).join(' · ') || '(없음)'}\n\n[책 소개·서평]\n${rich || '(없음)'}\n\n[발췌에서 뽑힌 키워드]\n${kwLine}\n\n후보: ${MODES.join(' / ')}\n출력 JSON: {"mode":"후보 중 하나","confidence":"high|med|low","reason":"한 줄"}`,
+      system: '비문학 책이 내용을 풀어가는 방식을 목차와 책 소개에서 판정한다. 가장 강한 신호는 목차 장 제목의 구조다: 시대·연도·인물 계보가 이어지면 통시, 병렬 범주 나열이면 분류, "~란 무엇인가"·구성 요소 해부면 분석, 두 대상이 오가면 비교. 통시·과정·인과처럼 순서가 성립하면 그것을 우선하라 — 순서는 다른 방식이 흉내낼 수 없는 정보다. tocEvidence 에는 판단 근거가 된 목차 장 제목을 그대로 옮겨 적어라(목차가 없으면 빈 배열). 부차적으로 섞인 방식이 있으면 secondaryMode 로 표시하라. JSON만 출력.',
+      user: `책: ${book.title}\n\n[목차]\n${toc.map((t, i) => `${i + 1}. ${t}`).join('\n') || '(없음)'}\n\n[책 소개·서평]\n${rich || '(없음)'}\n\n후보: ${MODES.join(' / ')}\n출력 JSON: {"mode":"후보 중 하나","secondaryMode":"후보 중 하나 또는 null","confidence":"high|med|low","tocEvidence":["근거가 된 목차 장 제목"],"reason":"한 줄"}`,
       temperature: 0,
     });
     let m = {}; try { m = JSON.parse(modeRaw); } catch { /* 판정 실패 */ }
-    v10Mode = MODES.includes(m.mode) ? { mode: m.mode, confidence: m.confidence || 'low', reason: m.reason || '' } : null;
-    log.push(`[v10] 전개 방식 판정: ${v10Mode ? `${v10Mode.mode} (${v10Mode.confidence}) — ${v10Mode.reason}` : '판정 실패'}`);
+    v10Mode = MODES.includes(m.mode) ? { mode: m.mode, secondaryMode: MODES.includes(m.secondaryMode) ? m.secondaryMode : null, confidence: m.confidence || 'low', reason: m.reason || '', tocEvidence: Array.isArray(m.tocEvidence) ? m.tocEvidence : [] } : null;
+    // 근거 검증: 목차가 있는데 인용한 장 제목이 실제 목차와 하나도 안 맞으면 지어낸 근거 → low 강등.
+    if (v10Mode && toc.length && !forceMode) {
+      const hit = v10Mode.tocEvidence.filter((e) => toc.some((t) => nrm(t).includes(nrm(e)) || nrm(e).includes(nrm(t))));
+      if (!hit.length) { v10Mode.confidence = 'low'; log.push('[v10] tocEvidence 가 실제 목차와 불일치 → confidence 강등(low)'); }
+    }
+    log.push(`[v10] 전개 방식 판정: ${v10Mode ? `${v10Mode.mode}${v10Mode.secondaryMode ? `(+${v10Mode.secondaryMode})` : ''} (${v10Mode.confidence}) — ${v10Mode.reason}` : '판정 실패'}`);
 
     // ⚠ 판정이 틀리면 구조가 통째로 어긋난다. 확신이 낮으면 상위를 만들지 않고 평면으로 둔다.
     if (v10Mode && v10Mode.confidence === 'low') {
@@ -372,8 +383,8 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
         ? `이 책은 "${v10Mode.mode}" 방식이다. 키워드를 **책이 전개되는 순서대로** 묶어 단계를 만들어라. 단계 이름은 그 시기·국면을 가리키는 짧은 명사구(예: "고대의 투모스", "근대 시민혁명").`
         : `이 책은 "${v10Mode.mode}" 방식이다. 그 방식에 맞는 축으로 키워드를 묶어라(분류=갈래, 비교/대조=견주는 대상, 인과=원인과 결과, 정의/분석=구성 요소).`;
       const stageRaw = await llm({
-        system: '키워드를 책의 전개 방식에 맞는 상위 묶음으로 편성한다. 억지로 다 묶지 말고, 어울리지 않는 키워드는 남겨라. JSON만 출력.',
-        user: `책: ${book.title}\n\n[책 소개·서평]\n${rich.slice(0, 1500) || '(없음)'}\n\n[키워드]\n${kwLine}\n\n${guide}\n묶음은 **정확히 ${want}개**, 각 묶음에 키워드 **최소 2개**. 어디에도 안 맞는 키워드는 memberIds 에서 빼라.\n각 묶음: name(짧은 명사구) · description(2~3문장, 이 책이 이 단계/축으로 무엇을 말하는지) · memberIds\n${ordered ? '순서대로 배열하라 — 배열 순서가 곧 책의 전개 순서다.' : ''}\n출력 JSON: {"stages":[{"name":"...","description":"...","memberIds":["n?"]}]}`,
+        system: '키워드를 책의 전개 방식에 맞는 상위 묶음으로 편성한다. 목차가 있으면 묶음은 목차의 장 흐름에 정렬돼야 한다. 억지로 다 묶지 말고, 어울리지 않는 키워드는 남겨라. JSON만 출력.',
+        user: `책: ${book.title}\n\n[목차]\n${toc.join(' · ') || '(없음)'}\n\n[책 소개·서평]\n${rich.slice(0, 1500) || '(없음)'}\n\n[키워드]\n${kwLine}\n\n${guide}\n묶음은 **정확히 ${want}개**, 각 묶음에 키워드 **최소 2개**. 어디에도 안 맞는 키워드는 memberIds 에서 빼라.\n각 묶음: name(짧은 명사구) · description(2~3문장, 이 책이 이 단계/축으로 무엇을 말하는지) · memberIds\n${ordered ? '순서대로 배열하라 — 배열 순서가 곧 책의 전개 순서다. 키워드 옆 [p숫자]가 책 속 위치이니 순서 판단에 활용하라.' : ''}\n출력 JSON: {"stages":[{"name":"...","description":"...","memberIds":["n?"]}]}`,
         temperature: 0.1,
       });
       let stages = []; try { stages = (JSON.parse(stageRaw).stages || []); } catch { /* 파싱 실패 */ }
@@ -389,6 +400,21 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
         valid.push({ ...st, ids });
         if (valid.length >= want) break;
       }
+      // 순서형 검증(공짜): 메모의 페이지 번호로 단계 순서가 진짜인지 확인한다.
+      // 통시가 진짜면 단계별 중앙 페이지가 대체로 단조증가한다. 뒤로 크게 되돌아가는
+      // 역전이 있으면 "순서인 척하는 가짜 단계"(존중정치학 강제 통시에서 실측) → 평면 유지.
+      if (ordered && valid.length >= 2) {
+        const median = (arr) => { const s = [...arr].sort((a, b) => a - b); return s[Math.floor(s.length / 2)]; };
+        const meds = valid.map((st) => median(st.ids.flatMap((id) => nodes.get(id).sources)));
+        const inversions = meds.filter((v, i) => i > 0 && v < meds[i - 1] - 15).length;
+        if (inversions > 0) {
+          log.push(`[v10] 순서 검증 실패(페이지 역전 ${inversions}건: ${meds.join('→')}) — 가짜 순서로 판단, 평면 유지`);
+          valid.length = 0;
+        } else {
+          log.push(`[v10] 순서 검증 통과(단계 중앙 페이지 ${meds.join('→')})`);
+        }
+      }
+
       if (valid.length < 2) {
         log.push(`[v10] 단계 편성 포기(유효 ${valid.length}개) — 평면 유지`);
       } else {
@@ -412,6 +438,40 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
           for (const id of st.ids) for (const p of nodes.get(id).sources) if (!node.sources.includes(p)) node.sources.push(p);
         });
         log.push(`[v10] ${v10Mode.mode} → 단계 ${valid.length}개 편성 · 미편입 키워드 ${kws.length - used.size}개`);
+
+        // 3) 국소 방식 2층 위계 — 책은 한 방식으로만 전개되지 않는다(통시 뼈대 + 단계 안 분석).
+        //    키워드가 몰린 단계(6개+)는 그 안에서 부차 방식의 축으로 한 번 더 묶는다.
+        //    run 7 의 "미술의 본질" 16개 덤핑 버킷이 이 단계의 표적. MAX_LEVEL=3 안에 들어간다.
+        const SUB_MIN = 6;
+        for (const stNode of [...nodes.values()].filter((n) => n.kind === 'concept' && n.parentId === root.id && n.stageIndex !== undefined)) {
+          const members = conceptChildrenOf(stNode.id);
+          if (members.length < SUB_MIN) continue;
+          onProgress?.(`phase 2.5 — "${stNode.title}" 내부 축 편성(${members.length}개)`);
+          const memberLine = members.map((n) => `${n.id} | ${n.title} — ${(n.gloss || '').slice(0, 60)}`).join('\n');
+          const localHint = v10Mode.secondaryMode ? `이 책의 부차 전개 방식은 "${v10Mode.secondaryMode}"다. 우선 그 축을 검토하라.` : '';
+          const subRaw = await llm({
+            system: '한 단계 안에 몰린 키워드를, 그 단계 내부의 전개 축(분석=구성 요소, 분류=갈래, 비교=견주는 대상…)으로 2~3개 하위 묶음으로 나눈다. 축이 정말 없으면 빈 배열을 내라 — 억지로 나누는 것이 안 나누는 것보다 나쁘다. JSON만 출력.',
+            user: `책: ${book.title}\n단계: ${stNode.title} — ${(stNode.gloss || '').slice(0, 200)}\n${localHint}\n\n[이 단계의 키워드]\n${memberLine}\n\n하위 묶음 2~3개, 각 묶음 키워드 최소 2개. 어디에도 안 맞으면 빼라.\n출력 JSON: {"groups":[{"name":"짧은 명사구","description":"1~2문장","memberIds":["n?"]}]}`,
+            temperature: 0.1,
+          });
+          let groups = []; try { groups = (JSON.parse(subRaw).groups || []); } catch { /* 파싱 실패 */ }
+          const subUsed = new Set();
+          let made = 0;
+          for (const g of groups.slice(0, 3)) {
+            const ids = (g.memberIds || []).filter((id) => members.some((mn) => mn.id === id) && !subUsed.has(id));
+            if (ids.length < 2 || !g.name) continue;
+            // 하위 묶음이 단계 전체를 삼키면 층만 늘어난다 — 전체와 같으면 만들지 않는다.
+            if (ids.length >= members.length) continue;
+            const dupId = ids.find((id) => norm(nodes.get(id).title) === norm(String(g.name).trim()));
+            let sub;
+            if (dupId) { sub = nodes.get(dupId); if (g.description && !sub.gloss) sub.gloss = String(g.description).trim(); }
+            else sub = addConcept(String(g.name).trim(), stNode.id, null, String(g.description || '').trim());
+            for (const id of ids) { if (id !== dupId) safeReparent(id, sub.id); subUsed.add(id); }
+            for (const id of ids) for (const p of nodes.get(id).sources) if (!sub.sources.includes(p)) sub.sources.push(p);
+            made++;
+          }
+          if (made) log.push(`[v10] "${stNode.title}" 내부 축 ${made}개 편성(키워드 ${subUsed.size}/${members.length})`);
+        }
       }
     }
   }
