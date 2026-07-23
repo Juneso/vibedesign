@@ -198,6 +198,56 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
       attached++;
     }
     log.push(`[plan] 문장 노드 ${attached}개 부착 · 개념 신설 ${madeConcept}개`);
+
+    // ─── Phase 1.2: 과부하 키워드 분할 ───────────────────────────
+    // 키워드 하나가 메모를 너무 많이 흡수하면(예: 23개 중 12개) 그건 요약이 아니라
+    // 잡동사니 서랍이다. 문장이 SPLIT_MAX 를 넘으면 새 키워드로 쪼갠다.
+    // 위계를 깊게 만들지 않도록 *형제*로 만든다 — 깊이는 테마 단계가 담당한다.
+    const SPLIT_MAX = Number(process.env.SPLIT_MAX || 6);
+    const sentencesOf = (nid) => childrenOf(nid).filter((k) => k.kind === 'sentence');
+    for (const kw of concepts()) {
+      const sents = sentencesOf(kw.id);
+      if (sents.length <= SPLIT_MAX) continue;
+      onProgress?.(`phase 1.2 — "${kw.title}" 분할(${sents.length}문장)`);
+      // 분할 후 키워드당 문장이 SPLIT_MAX 이하가 되는 최소 개수 — 더 잘게 쪼개면 1문장 키워드가 쏟아진다
+      const want = Math.min(4, Math.max(2, Math.ceil(sents.length / SPLIT_MAX)));
+      const raw = await llm({
+        system: '한 키워드에 메모가 과하게 몰렸다. 메모들을 의미가 통하는 하위 키워드로 나눈다. 모든 메모를 빠짐없이 배정하고, 억지 분류 대신 자연스러운 묶음을 만든다. JSON만 출력.',
+        user: `책: ${book.title}\n현재 키워드: ${kw.title}\n설명: ${kw.gloss || ''}\n\n[메모 문장]\n${sents.map((s, i) => `${i}: ${s.title}`).join('\n')}\n\n이 문장들을 **정확히 ${want}개** 키워드로 나눠라. 각 키워드에 문장이 **최소 2개** 들어가야 한다(1개짜리 금지). 각 키워드는:\n- name: 짧은 명사구. "${kw.title}" 를 그대로 쓰지 말 것.\n- overview: 2~3문장. 이 키워드가 무엇인지 **책의 맥락에서** 설명. "이 책은 …" 처럼 책 전체 주제와 연결할 것.\n- idx: 위 번호 배열 (모든 번호가 정확히 한 번씩 배정돼야 함)\n출력 JSON: {"groups":[{"name":"...","overview":"...","idx":[0,1]}]}`,
+        temperature: 0.1,
+      });
+      let groups = [];
+      try { groups = (JSON.parse(raw).groups || []).filter((g) => g.name && (g.idx || []).length); } catch { /* 파싱 실패 시 분할 포기 */ }
+
+      // ⚠ 프롬프트의 개수 요청은 지켜지지 않는다(2개 요청에 7개가 오기도 한다).
+      //   검증 없이 받으면 문장 1개짜리 키워드가 쏟아져 되레 키워드 폭발이 된다.
+      //   ① 문장 2개 미만 그룹은 버린다(그 문장은 원래 키워드에 남는다)
+      //   ② 큰 그룹부터 want 개까지만 채택한다
+      const MIN_GROUP = 2;
+      groups = groups
+        .filter((g) => (g.idx || []).length >= MIN_GROUP)
+        .sort((a, b) => (b.idx || []).length - (a.idx || []).length)
+        .slice(0, want);
+      if (groups.length < 2) { log.push(`[split] "${kw.title}" 분할 포기(유효 그룹 ${groups.length}) — 유지`); continue; }
+
+      const used = new Set();
+      for (const g of groups) {
+        const picked = (g.idx || []).map(Number).filter((i) => sents[i] && !used.has(i));
+        if (!picked.length) continue;
+        picked.forEach((i) => used.add(i));
+        const gloss = String(g.overview || '').trim();
+        const node = addConcept(String(g.name).trim(), kw.parentId, await embedFn(`${g.name}: ${gloss}`), gloss);
+        for (const i of picked) {
+          reparent(sents[i].id, node.id);
+          for (const p of sents[i].sources) if (!node.sources.includes(p)) node.sources.push(p);
+        }
+      }
+      // 배정 안 된 문장은 원래 키워드에 남긴다(유실 방지)
+      const left = sents.filter((_, i) => !used.has(i));
+      kw.sources = [...new Set(left.flatMap((s) => s.sources))];
+      log.push(`[split] "${kw.title}" ${sents.length}문장 → 새 키워드 ${groups.length}개 · 잔류 ${left.length}`);
+      if (!left.length && !conceptChildrenOf(kw.id).length) nodes.delete(kw.id); // 빈 껍데기 제거
+    }
     log.push(`[plan] Phase1 완료 · 개념 노드 ${concepts().length}개 (planIngest 페이지 ${v8PageCount}개)`);
 
   } else {

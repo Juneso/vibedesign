@@ -60,17 +60,24 @@ function splitSentences(gloss) {
 // 원본 노드 + 합성 문장 노드. 색상 판정이 뒤집히지 않도록 원래 자식 유무도 함께 돌려준다.
 function withSentenceNodes(nodes) {
   const hadChild = new Set(nodes.map((n) => n.parentId).filter(Boolean));
+  // 개요는 "말단 키워드"에만 붙인다 — 개념 자식을 가진 상위(테마)까지 붙이면 지저분해진다
+  const hasConceptChild = new Set(
+    nodes.filter((n) => n.kind !== 'sentence' && n.kind !== 'overview')
+      .map((n) => n.parentId).filter(Boolean)
+  );
   const out = [...nodes];
   for (const n of nodes) {
     if (n.kind === 'sentence') continue;       // 이미 진짜 문장 노드면 또 쪼개지 않는다
-    if (hadChild.has(n.id)) continue;          // 말단(자식 없음)만 대상
-    // 한 문장짜리 설명도 노드로 낸다. V9 의 논지는 대개 한 문장이라
-    // "2문장 이상"을 요구하면 말단 키워드의 설명이 통째로 사라진다.
+    if (hasConceptChild.has(n.id)) continue;   // 상위(테마)에는 개요를 붙이지 않는다
+    // 키워드의 개요(gloss)는 자식이 있어도 낸다. 개요 = "이 키워드가 무엇인지"를
+    // 책 맥락에서 설명하는 요약이고, 메모 문장 = "내가 무엇을 읽었는지"의 누적이라
+    // 둘은 성격이 달라 함께 보여야 한다. (자식이 생기면 개요가 사라지던 문제)
     const sents = splitSentences(n.gloss);
     if (sents.length < 1) continue;
     sents.forEach((s, i) => out.push({
-      id: `${n.id}__s${i}`, title: s, parentId: n.id,
-      level: (n.level ?? 0) + 1, kind: 'sentence', sources: [],
+      id: `${n.id}__o${i}`, title: s, parentId: n.id,
+      level: (n.level ?? 0) + 1, kind: 'overview', sources: [],
+      orderHint: -1000 + i, // 메모 문장보다 위에 오도록
     }));
   }
   return { nodes: out, hadChild };
@@ -123,8 +130,10 @@ function computeLayout(rootId, nodes) {
   }
   for (const [, kids] of childMap) {
     kids.sort((a, b) => {
-      const pa = minPage(a), pb = minPage(b);
-      if (pa !== pb) return pa - pb;          // 페이지 순
+      // orderHint 가 있으면 우선(개요는 메모 문장보다 위)
+      const ka = byId.get(a)?.orderHint ?? minPage(a);
+      const kb = byId.get(b)?.orderHint ?? minPage(b);
+      if (ka !== kb) return ka - kb;
       return order.get(a) - order.get(b);      // 동률·무페이지는 원래 순서 유지
     });
   }
@@ -213,7 +222,12 @@ function SentenceNode({ node, x, y, selected, onSelect }) {
   return (
     <g className="eval-tree-node" onClick={() => onSelect(node.id)} style={{ cursor: 'pointer' }}>
       <title>{node.title}</title>
-      <circle cx={x + 5} cy={y + NODE_H / 2} r={selected ? 4 : 3} fill={COLORS.branch.stroke} />
+      {/* 개요(키워드 설명) = 채운 점 · 메모 문장(출처) = 속 빈 점 */}
+      <circle
+        cx={x + 5} cy={y + NODE_H / 2} r={selected ? 4 : 3}
+        fill={node.kind === 'overview' ? COLORS.branch.stroke : 'var(--color-background-card, #fff)'}
+        stroke={COLORS.branch.stroke} strokeWidth={1.5}
+      />
       <text x={x + 16} y={top} fontSize={11.5} fill={COLORS.leaf.text}>
         {lines.map((ln, i) => (
           <tspan key={i} x={x + 16} dy={i === 0 ? 0 : 13}>{ln}</tspan>
@@ -305,7 +319,7 @@ export function TreeSvg({ tree }) {
             {nodes.map((n) => {
               const pos = layout.get(n.id);
               if (!pos) return null;
-              if (n.kind === 'sentence') {
+              if (n.kind === 'sentence' || n.kind === 'overview') {
                 return (
                   <SentenceNode
                     key={n.id}
