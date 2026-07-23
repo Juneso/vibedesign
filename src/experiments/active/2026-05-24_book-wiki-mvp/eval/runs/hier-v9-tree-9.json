@@ -1,0 +1,473 @@
+{
+  "label": "호모 루덴스",
+  "runAt": "2026-07-23T02:51:49.649Z",
+  "kind": "hier-v9-tree",
+  "variant": "v9",
+  "model": "gpt-4o-mini",
+  "note": "hier-v9-batch 스냅샷에서 변환 — 재실행 없음. 목차 없는 폴백 모드 결과다.",
+  "memoN": 37,
+  "stability": {
+    "agree": 1,
+    "jac": 1
+  },
+  "counts": {
+    "keywords": 36,
+    "promoted": 5,
+    "thick": 1
+  },
+  "tree": {
+    "rootId": "root",
+    "nodes": [
+      {
+        "id": "root",
+        "title": "호모 루덴스",
+        "parentId": null,
+        "level": 0,
+        "kind": "root",
+        "sources": []
+      },
+      {
+        "id": "n1",
+        "title": "놀이의 의미 (p.32)",
+        "parentId": "n38",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          32,
+          34
+        ],
+        "gloss": "놀이는 생활의 즉각적인 필요를 초월하는 의미를 가진다.\n\n근거 p.32, p.34"
+      },
+      {
+        "id": "n3",
+        "title": "놀이의 비합리적 특성 (p.36)",
+        "parentId": "n38",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          36
+        ],
+        "gloss": "놀이의 존재는 인간이 합리적 존재 이상의 존재가 됨을 확인시켜 준다.\n\n근거 p.36"
+      },
+      {
+        "id": "n4",
+        "title": "놀이터 (p.47)",
+        "parentId": "n38",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          47
+        ],
+        "gloss": "놀이터는 금지되어 격리된 장소로, 특정한 규칙이 지배하는 공간이다.\n\n근거 p.47"
+      },
+      {
+        "id": "n5",
+        "title": "긴장 (p.48)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          48
+        ],
+        "gloss": "긴장은 불확실성과 우연성을 의미하며 문제를 파악하고 해결하는 노력을 가져온다.\n\n근거 p.48"
+      },
+      {
+        "id": "n6",
+        "title": "게임의 속임수 (p.50)",
+        "parentId": "n39",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          50
+        ],
+        "gloss": "사회는 게임을 망치는 자보다는 게임을 속이는 자에게 훨씬 관대하다.\n\n근거 p.50"
+      },
+      {
+        "id": "n7",
+        "title": "상상력 (p.54)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          54
+        ],
+        "gloss": "어린아이는 상상력을 통해 현실과 다른 이미지를 만들어낸다.\n\n근거 p.54"
+      },
+      {
+        "id": "n8",
+        "title": "성스러운 공간 (p.64)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          64
+        ],
+        "gloss": "성스러운 공간은 주술, 법률, 예식 등에서 중요한 역할을 하며, 인위적으로 구획된 폐쇄 공간에서 진행된다.\n\n근거 p.64"
+      },
+      {
+        "id": "n9",
+        "title": "원시인의 심리 (p.74)",
+        "parentId": "n42",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          74
+        ],
+        "gloss": "원시인의 심리 상태는 현대인의 논리 체계와 다르며, 그들은 존재와 놀이를 구분하지 않았다.\n\n근거 p.74"
+      },
+      {
+        "id": "n10",
+        "title": "아곤 (p.83)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          83
+        ],
+        "gloss": "아곤은 고대 그리스 생활에서 중요한 경기 혹은 경연의 영역을 나타낸다.\n\n근거 p.83"
+      },
+      {
+        "id": "n11",
+        "title": "놀이와 진지함 (p.109)",
+        "parentId": "n38",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          109
+        ],
+        "gloss": "놀이와 진지함의 가치는 동일하지 않으며, 놀이는 독립적인 개념이다.\n\n근거 p.109"
+      },
+      {
+        "id": "n12",
+        "title": "놀이와 문화 (p.111)",
+        "parentId": "n38",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          111
+        ],
+        "gloss": "문화는 태초의 단계에서 놀이의 특성을 갖고 발전했으며, 놀이가 먼저 존재한다.\n\n근거 p.111"
+      },
+      {
+        "id": "n13",
+        "title": "명예의 갈망 (p.141)",
+        "parentId": "n40",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          141
+        ],
+        "gloss": "인간은 자신의 가치와 미덕을 확신하기 위해 명예를 갈망한다.\n\n근거 p.141"
+      },
+      {
+        "id": "n14",
+        "title": "영웅적 시대 (p.161)",
+        "parentId": "n41",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          161
+        ],
+        "gloss": "영웅적 시대는 인간의 생래적 요구가 놀이-의식으로 표출되었던 시기로, 문화의 생산에 기여했다.\n\n근거 p.161"
+      },
+      {
+        "id": "n15",
+        "title": "소송의 원시적 형태 (p.167)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          167
+        ],
+        "gloss": "소송은 각 당사자의 강력한 욕망에 의해 지배되며, 이기고자 하는 욕망이 아곤적 요소를 배제하지 않는다.\n\n근거 p.167"
+      },
+      {
+        "id": "n16",
+        "title": "정의의 게임 규칙 (p.168)",
+        "parentId": "n39",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          168
+        ],
+        "gloss": "정의는 상당 부분 게임의 규칙에 복종하게 된다.\n\n근거 p.168"
+      },
+      {
+        "id": "n17",
+        "title": "갈등의 성스러움 (p.174)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          174
+        ],
+        "gloss": "갈등은 정의와 불의의 개념으로 활성화되며, 법률과 신앙의 영역으로 승화된다.\n\n근거 p.174"
+      },
+      {
+        "id": "n18",
+        "title": "전쟁의 문화적 기능 (p.188)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          188
+        ],
+        "gloss": "전쟁은 동등한 자들 간의 전투일 때 문화적 기능을 수행한다.\n\n근거 p.188"
+      },
+      {
+        "id": "n19",
+        "title": "명예의 회복 (p.196)",
+        "parentId": "n40",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          196
+        ],
+        "gloss": "훼손된 명예는 공개적인 행동을 통해 주장하고 회복해야 한다.\n\n근거 p.196"
+      },
+      {
+        "id": "n20",
+        "title": "전쟁관 (p.199)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          199
+        ],
+        "gloss": "전쟁을 명예와 미덕의 고상한 게임으로 보는 관점은 문명을 발전시키는 데 중요한 역할을 했다.\n\n근거 p.199"
+      },
+      {
+        "id": "n21",
+        "title": "영웅적 생활 (p.210)",
+        "parentId": "n41",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          210
+        ],
+        "gloss": "영웅적 생활은 명예, 미덕, 아름다움이 지배하는 이상적 영역에서 재연되며, 문명을 진전시키는 강력한 유인책이다.\n\n근거 p.210"
+      },
+      {
+        "id": "n22",
+        "title": "수수께끼의 본질 (p.227)",
+        "parentId": "n42",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          227
+        ],
+        "gloss": "수수께끼는 놀이와 진지함의 경계를 허물며, 문명 발달에 따라 신비 철학과 레크리에이션으로 나뉘었다.\n\n근거 p.227"
+      },
+      {
+        "id": "n23",
+        "title": "신화와 시 (p.259)",
+        "parentId": "n42",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          259
+        ],
+        "gloss": "신화와 시는 논리적 판단의 경계를 초월하는 놀이의 영역에서 움직인다.\n\n근거 p.259"
+      },
+      {
+        "id": "n24",
+        "title": "창조적 글쓰기 (p.266)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          266
+        ],
+        "gloss": "모든 창조적 글쓰기의 밑바탕에는 인간적, 감정적 상황이 깃들어 있다.\n\n근거 p.266"
+      },
+      {
+        "id": "n25",
+        "title": "상상과 언어 (p.267)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          267
+        ],
+        "gloss": "구체적 실체와 추상적 생각은 상상이라는 매개체를 통해 연결된다.\n\n근거 p.267"
+      },
+      {
+        "id": "n26",
+        "title": "심리적 게임 (p.271)",
+        "parentId": "n39",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          271
+        ],
+        "gloss": "생각은 상상과 동시에 태어나며, 이는 마음의 놀이로 표현된다.\n\n근거 p.271"
+      },
+      {
+        "id": "n27",
+        "title": "비극과 희극의 혼합 (p.288)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          288
+        ],
+        "gloss": "인간의 삶 전체는 비극과 희극의 혼합으로 체험되어야 한다.\n\n근거 p.288"
+      },
+      {
+        "id": "n28",
+        "title": "철학의 한계 (p.301)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          301
+        ],
+        "gloss": "철학은 젊은 시절에 적당히 추구해야 하며, 지나치게 몰두하면 해로울 수 있다.\n\n근거 p.301"
+      },
+      {
+        "id": "n29",
+        "title": "조형 예술의 놀이 요소 (p.332)",
+        "parentId": "n38",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          332
+        ],
+        "gloss": "조형 예술 작품은 놀이 요소가 결여되어 있지만, 그 속에서 놀이 요소의 자취를 찾는 것은 가능하다.\n\n근거 p.332"
+      },
+      {
+        "id": "n30",
+        "title": "경제적 요소의 과대평가 (p.377)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          377
+        ],
+        "gloss": "경제적인 요소를 과대평가하는 태도는 기술적 진보를 숭배하는 심리와 관련이 있다.\n\n근거 p.377"
+      },
+      {
+        "id": "n31",
+        "title": "남성 패션의 변화 (p.378)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          378
+        ],
+        "gloss": "남성복은 색채나 형태가 없게 되고 변화를 거부하게 되었다.\n\n근거 p.378"
+      },
+      {
+        "id": "n32",
+        "title": "역사 인식 (p.381)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          381
+        ],
+        "gloss": "역사인식이 뚜렷한 사람은 과거의 상당 부분을 현대로 인식한다.\n\n근거 p.381"
+      },
+      {
+        "id": "n33",
+        "title": "놀이 정신 (p.388)",
+        "parentId": "n38",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          388
+        ],
+        "gloss": "진정한 놀이가 되려면 어른이 동심으로 돌아가 놀이해야 한다.\n\n근거 p.388"
+      },
+      {
+        "id": "n34",
+        "title": "예술의 순진성 (p.393)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          393
+        ],
+        "gloss": "예술은 자신의 목적과 아름다움을 의식하지 않을 때 가장 축복받은 상태이다.\n\n근거 p.393"
+      },
+      {
+        "id": "n35",
+        "title": "진정한 문명 (p.407)",
+        "parentId": "n42",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          407
+        ],
+        "gloss": "진정한 문명은 특정 놀이 요소가 없는 곳에서는 존재할 수 없다.\n\n근거 p.407"
+      },
+      {
+        "id": "n36",
+        "title": "도덕적 양심 (p.411)",
+        "parentId": "n42",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          411
+        ],
+        "gloss": "도덕적 양심은 진지한 의무와 합당한 놀이를 구분하는 데 중요한 역할을 한다.\n\n근거 p.411"
+      },
+      {
+        "id": "n37",
+        "title": "3충동 (p.420)",
+        "parentId": "n42",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          420
+        ],
+        "gloss": "실러는 원칙충동과 감각충동, 놀이 충동이 인간을 움직이는 두 가지 힘이며, 이들 간의 절충이 인간의 온전함으로 나아가는 길이라고 주장한다.\n\n근거 p.420"
+      },
+      {
+        "id": "n38",
+        "title": "놀이",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n39",
+        "title": "게임",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n40",
+        "title": "명예",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n41",
+        "title": "영웅적",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n42",
+        "title": "놀이",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      }
+    ]
+  }
+}

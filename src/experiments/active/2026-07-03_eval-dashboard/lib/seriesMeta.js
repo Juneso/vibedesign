@@ -1,5 +1,5 @@
 export const SERIES_META = {
-  'round':                { title: '인제스트 품질 라운드', purpose: '위계·개념 추출을 반복 평가', pipelineId: 'hier-ingest-v5' },
+  'round':                { title: '인제스트 품질 라운드', purpose: '위계·키워드 추출을 반복 평가', pipelineId: 'hier-ingest-v5' },
   'connections-qf':       { title: '책 간 연결 — 공유질문 우선', purpose: 'question-first 방식으로 두 책을 잇는 후보', pipelineId: 'connections-qf' },
   'connection-candidates':{ title: '책 간 연결 — 초기 후보', purpose: '연결 후보 초안 추출(초기 트랙)', pipelineId: null },
   'nudge-v7':             { title: '넛지 V7 — co-reader 톤', purpose: 'AI가 먼저 생각을 말하고 넘기는 질문', pipelineId: null },
@@ -25,6 +25,7 @@ export const SERIES_META = {
   'hier-v9-justice':      { title: 'V9 · 정의란 무엇인가', purpose: '정의란 무엇인가 — 순서 3종 수렴 검증', pipelineId: 'hier-ingest-v9' },
   'hier-v9-zorba':        { title: 'V9 · 조르바', purpose: '목차 없는 소설 — 평면 폴백 + 상향 승격 테스트베드', pipelineId: 'hier-ingest-v9' },
   'hier-v9-toc':          { title: 'V9 목차 A/B', purpose: '알라딘 목차를 뼈대로 넣었을 때의 효과 — 메모 고정, 목차만 변경', pipelineId: 'hier-ingest-v9' },
+  'hier-v9-tree':         { title: 'V9 위계 트리 · 9권', purpose: 'V8 과 같은 책·같은 형식으로 그린 트리 — 나란히 비교용', pipelineId: 'hier-ingest-v9' },
   'predict-v9':           { title: '전이 채점 · V9 산출', purpose: 'V9 위키로 새 상황을 설명할 수 있는지', pipelineId: null },
   'predict-v9-v2':        { title: '전이 채점 v2 · V9 산출', purpose: '전이 채점 2차 — 오라클 갭 재측정', pipelineId: null },
   'predict-oracle':       { title: '전이 채점 · 오라클', purpose: '사람이 만든 정답 트리 기준선', pipelineId: null },

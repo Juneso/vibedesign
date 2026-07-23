@@ -1,0 +1,302 @@
+{
+  "label": "피로사회",
+  "runAt": "2026-07-23T02:51:49.648Z",
+  "kind": "hier-v9-tree",
+  "variant": "v9",
+  "model": "gpt-4o-mini",
+  "note": "hier-v9-batch 스냅샷에서 변환 — 재실행 없음. 목차 없는 폴백 모드 결과다.",
+  "memoN": 24,
+  "stability": {
+    "agree": 1,
+    "jac": 1
+  },
+  "counts": {
+    "keywords": 22,
+    "promoted": 3,
+    "thick": 2
+  },
+  "tree": {
+    "rootId": "root",
+    "nodes": [
+      {
+        "id": "root",
+        "title": "피로사회",
+        "parentId": null,
+        "level": 0,
+        "kind": "root",
+        "sources": []
+      },
+      {
+        "id": "n1",
+        "title": "신경성 질환 (p.11)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          11
+        ],
+        "gloss": "신경성 질환들은 21세기 초의 병리학적 상황을 지배하고 있다.\n\n근거 p.11"
+      },
+      {
+        "id": "n2",
+        "title": "면역학적 차이 (p.13)",
+        "parentId": "n24",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          13
+        ],
+        "gloss": "오늘날 이질성은 아무런 면역 반응도 일으키지 않는 차이로 대체되었다.\n\n근거 p.13"
+      },
+      {
+        "id": "n3",
+        "title": "면역학적 패러다임 (p.15)",
+        "parentId": "n24",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          15
+        ],
+        "gloss": "면역학적 패러다임은 세계화 과정과 양립하기 어렵다.\n\n근거 p.15"
+      },
+      {
+        "id": "n4",
+        "title": "긍정성의 폭력 (p.20)",
+        "parentId": "n26",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          20
+        ],
+        "gloss": "긍정성의 폭력은 적대성을 전제하지 않으며 관용적이고 평화로운 사회에서 확산된다.\n\n근거 p.20"
+      },
+      {
+        "id": "n5",
+        "title": "성과사회 (p.23)",
+        "parentId": "n26",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          23,
+          24
+        ],
+        "gloss": "21세기 사회는 규율사회에서 성과사회로 변모하였다.\n\n근거 p.23, p.24"
+      },
+      {
+        "id": "n6",
+        "title": "성과주체 (p.26)",
+        "parentId": "n26",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          26,
+          28
+        ],
+        "gloss": "우울증은 규율사회에서 성과사회로의 이행기에 나타나는 현상이다.\n\n근거 p.26, p.28"
+      },
+      {
+        "id": "n8",
+        "title": "탈서사화 (p.41)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          41
+        ],
+        "gloss": "후기근대의 인간은 탈서사화로 인해 초조하고 부산한 상태에 빠진다.\n\n근거 p.41"
+      },
+      {
+        "id": "n9",
+        "title": "노동사회 (p.43)",
+        "parentId": "n26",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          43
+        ],
+        "gloss": "노동사회는 자유로운 사회가 아니며 새로운 강제를 만들어낸다.\n\n근거 p.43"
+      },
+      {
+        "id": "n10",
+        "title": "중단의 필요성 (p.49)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          49
+        ],
+        "gloss": "진정한 전환을 위해서는 중단의 부정성이 필요하다.\n\n근거 p.49"
+      },
+      {
+        "id": "n11",
+        "title": "분노의 특성 (p.50)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          50
+        ],
+        "gloss": "분노는 현재에 대한 총체적인 의문을 제기하며, 상황을 중단시키고 새로운 상황을 시작할 수 있는 능력을 가진다.\n\n근거 p.50"
+      },
+      {
+        "id": "n12",
+        "title": "부정성 (p.52)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          52
+        ],
+        "gloss": "부정성이 인간 존재를 생동하는 상태로 지탱해준다.\n\n근거 p.52"
+      },
+      {
+        "id": "n13",
+        "title": "활동과잉 (p.54)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          54
+        ],
+        "gloss": "활동과잉은 극단적으로 수동적인 형태의 행위로서 자유로운 행동의 여지를 남기지 않는다.\n\n근거 p.54"
+      },
+      {
+        "id": "n14",
+        "title": "분열적인 피로 (p.66)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          66
+        ],
+        "gloss": "분열적인 피로는 인간을 고립시키고 공동체의 친밀함을 파괴하는 폭력적 상태이다.\n\n근거 p.66"
+      },
+      {
+        "id": "n15",
+        "title": "보상의 위기 (p.86)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          86
+        ],
+        "gloss": "타자와의 관계가 사라지면 보상의 위기가 발생한다.\n\n근거 p.86"
+      },
+      {
+        "id": "n16",
+        "title": "후기근대적 자아 (p.91)",
+        "parentId": "n25",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          91
+        ],
+        "gloss": "후기근대적 자아는 성격이 없고 무형적이며, 유연한 인간으로 나타날 수 있다.\n\n근거 p.91"
+      },
+      {
+        "id": "n17",
+        "title": "자기 소모 (p.94)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          94
+        ],
+        "gloss": "우울증은 과도한 긴장과 과부하로 인해 자기 자신에 의해 소모되는 상태이다.\n\n근거 p.94"
+      },
+      {
+        "id": "n18",
+        "title": "우울증과 슬픔 (p.95)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          95
+        ],
+        "gloss": "우울증은 대상이 없고 지향점이 없으며, 슬픔은 강력한 리비도적 유대관계에서 발생한다.\n\n근거 p.95"
+      },
+      {
+        "id": "n19",
+        "title": "유연한 개인 (p.99)",
+        "parentId": "n26",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          99
+        ],
+        "gloss": "산업적 규율사회는 변함없는 정체성에 의존하지만, 성과주의적 후산업사회는 생산의 증대를 위해 유연한 개인을 필요로 한다.\n\n근거 p.99"
+      },
+      {
+        "id": "n20",
+        "title": "합의적 폭력 (p.101)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          101
+        ],
+        "gloss": "모든 것을 흡수하는 자본의 전일적 지배는 폭력의 원천이 될 수 있다.\n\n근거 p.101"
+      },
+      {
+        "id": "n21",
+        "title": "이상 자아 (p.102)",
+        "parentId": "n25",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          102
+        ],
+        "gloss": "이상 자아는 긍정적 강제력을 발휘하며, 자아의 자유를 향한 기투의 대상으로 작용한다.\n\n근거 p.102"
+      },
+      {
+        "id": "n22",
+        "title": "자기 착취 (p.103)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          103
+        ],
+        "gloss": "자기 착취는 타자에 의한 착취보다 더 효과적이고 능률적이다.\n\n근거 p.103"
+      },
+      {
+        "id": "n23",
+        "title": "호모 사케르 (p.114)",
+        "parentId": "n26",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          114
+        ],
+        "gloss": "성과사회의 호모 사케르는 주권 사회의 호모 사케르와 구별되는 특징을 지닌다.\n\n근거 p.114"
+      },
+      {
+        "id": "n24",
+        "title": "면역학적",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n25",
+        "title": "자아",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n26",
+        "title": "사회",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      }
+    ]
+  }
+}

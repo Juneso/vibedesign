@@ -1,0 +1,395 @@
+{
+  "label": "기술적복제시대의 예술작품",
+  "runAt": "2026-07-23T02:51:49.643Z",
+  "kind": "hier-v9-tree",
+  "variant": "v9",
+  "model": "gpt-4o-mini",
+  "note": "hier-v9-batch 스냅샷에서 변환 — 재실행 없음. 목차 없는 폴백 모드 결과다.",
+  "memoN": 30,
+  "stability": {
+    "agree": 1,
+    "jac": 1
+  },
+  "counts": {
+    "keywords": 28,
+    "promoted": 6,
+    "thick": 2
+  },
+  "tree": {
+    "rootId": "root",
+    "nodes": [
+      {
+        "id": "root",
+        "title": "기술적복제시대의 예술작품",
+        "parentId": null,
+        "level": 0,
+        "kind": "root",
+        "sources": []
+      },
+      {
+        "id": "n1",
+        "title": "예술작품의 복제 (p.13)",
+        "parentId": "n31",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          13,
+          36
+        ],
+        "gloss": "예술작품은 원칙적으로 항상 복제 가능하다.\n\n근거 p.13, p.36"
+      },
+      {
+        "id": "n2",
+        "title": "사진술의 가능성 (p.17)",
+        "parentId": "n34",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          17
+        ],
+        "gloss": "사진술은 유성영화의 가능성을 간직하고 있다.\n\n근거 p.17"
+      },
+      {
+        "id": "n4",
+        "title": "진본성 (p.20)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          20
+        ],
+        "gloss": "진본성은 복제가능성을 배제하며, 복제품의 진본성에 차이와 등급을 만든다.\n\n근거 p.20"
+      },
+      {
+        "id": "n5",
+        "title": "기술적 복제 (p.1)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          1,
+          19
+        ],
+        "gloss": "기술적 복제는 원작에 대한 자립성이 크다.\n\n근거 p.1, p.19"
+      },
+      {
+        "id": "n6",
+        "title": "시간과 공간의 극복 (p.2)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          2
+        ],
+        "gloss": "원작의 모상을 원작 자체로서는 도달될 수 없는 상황 속으로 옮겨갈 수 있다.\n\n근거 p.2"
+      },
+      {
+        "id": "n7",
+        "title": "예술작품의 진본성 (p.23)",
+        "parentId": "n31",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          23
+        ],
+        "gloss": "예술작품의 진본성은 그 물질적 존속과 역사적 증언력을 포함하는 개념이다.\n\n근거 p.23"
+      },
+      {
+        "id": "n8",
+        "title": "지각의 조직화 (p.26)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          26
+        ],
+        "gloss": "인간의 지각은 자연적 및 역사적 조건에 의해 제약받는다.\n\n근거 p.26"
+      },
+      {
+        "id": "n9",
+        "title": "아우라의 파괴 (p.30)",
+        "parentId": "n35",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          30
+        ],
+        "gloss": "현대의 대중은 대상들을 더 가까이 접근시키고, 복제를 통해 유일무이성을 극복하려는 경향이 있다.\n\n근거 p.30"
+      },
+      {
+        "id": "n10",
+        "title": "진본 예술작품 (p.33)",
+        "parentId": "n31",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          33
+        ],
+        "gloss": "진본 예술작품의 고유한 가치는 제의적 사용가치에 기초하고 있다.\n\n근거 p.33"
+      },
+      {
+        "id": "n12",
+        "title": "예술의 사회적 기능 (p.38)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          38
+        ],
+        "gloss": "예술의 생산에서 진본성의 척도가 무효가 될 때, 예술의 사회적 기능은 큰 변혁을 겪는다.\n\n근거 p.38"
+      },
+      {
+        "id": "n13",
+        "title": "제의적 가치 (p.41)",
+        "parentId": "n32",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          41
+        ],
+        "gloss": "제의적 가치는 예술작품을 사람들 눈에 띄지 않는 곳에 두게끔 하는 경향이 있다.\n\n근거 p.41"
+      },
+      {
+        "id": "n14",
+        "title": "예술작품의 가치 (p.43)",
+        "parentId": "n31",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          43
+        ],
+        "gloss": "예술작품의 제의적 가치는 양적 이행에 따라 전시적 가치로 대체되었다.\n\n근거 p.43"
+      },
+      {
+        "id": "n15",
+        "title": "초상사진의 가치 (p.45)",
+        "parentId": "n32",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          45
+        ],
+        "gloss": "초상사진은 제의적 가치에서 전시적 가치로의 변화를 겪었다.\n\n근거 p.45"
+      },
+      {
+        "id": "n16",
+        "title": "사진의 정치적 의의 (p.45)",
+        "parentId": "n34",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          45
+        ],
+        "gloss": "사진은 역사적 증거물이 되며, 현실의 재현을 넘어 메시지를 전달하기 시작한다.\n\n근거 p.45"
+      },
+      {
+        "id": "n17",
+        "title": "사진의 발명 (p.47)",
+        "parentId": "n34",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          47
+        ],
+        "gloss": "사진의 발명은 예술의 성격 전체를 변화시켰다.\n\n근거 p.47"
+      },
+      {
+        "id": "n18",
+        "title": "관객과 배우의 관계 (p.2)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          2
+        ],
+        "gloss": "배우와 관객의 1대1 관계가 파괴되면 아우라 형성이 막힌다.\n\n근거 p.2"
+      },
+      {
+        "id": "n19",
+        "title": "인격의 아우라 (p.56)",
+        "parentId": "n35",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          56
+        ],
+        "gloss": "인간은 자신의 인격의 아우라를 포기하고 활동해야 하는 상태에 놓인다.\n\n근거 p.56"
+      },
+      {
+        "id": "n20",
+        "title": "영화의 참여적 성격 (p.59)",
+        "parentId": "n33",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          59
+        ],
+        "gloss": "영화는 물질이 인간과 함께 작용하고 있음을 나타낼 수 있는 최초의 예술수단이다.\n\n근거 p.59"
+      },
+      {
+        "id": "n21",
+        "title": "유명인 (p.62)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          62
+        ],
+        "gloss": "영화배우는 관객을 의식하며 자신을 유명인으로 만들어 시장을 형성한다.\n\n근거 p.62"
+      },
+      {
+        "id": "n22",
+        "title": "자기 표현 (p.67)",
+        "parentId": "n36",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          67
+        ],
+        "gloss": "러시아 영화에서는 배우들이 자기 자신을 표현하는 경향이 있다.\n\n근거 p.67"
+      },
+      {
+        "id": "n23",
+        "title": "영화의 환영적 성격 (p.69)",
+        "parentId": "n33",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          69
+        ],
+        "gloss": "영화의 환영적 성격은 촬영 현장에서가 아니라 몽타주 과정에서 생긴다.\n\n근거 p.69"
+      },
+      {
+        "id": "n24",
+        "title": "리얼리티의 표현 (p.72)",
+        "parentId": "n36",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          72
+        ],
+        "gloss": "영화의 리얼리티 표현은 현대 인간에게 회화와 비교할 수 없을 정도로 중요하다.\n\n근거 p.72"
+      },
+      {
+        "id": "n25",
+        "title": "예술작품의 복제가능성 (p.73)",
+        "parentId": "n31",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          73
+        ],
+        "gloss": "예술작품의 기술적 복제가능성은 예술에 대한 대중의 관계를 변화시킨다.\n\n근거 p.73"
+      },
+      {
+        "id": "n26",
+        "title": "집단적 수용 (p.74)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          74
+        ],
+        "gloss": "회화는 집단적 수용을 동시에 행하는 대상으로는 적합하지 않다.\n\n근거 p.74"
+      },
+      {
+        "id": "n27",
+        "title": "영화의 촉각적 지각 (p.80)",
+        "parentId": "n33",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          80
+        ],
+        "gloss": "영화는 보이지 않는 것을 보이게 하여 무의식적인 시각의 세계를 알게 해준다.\n\n근거 p.80"
+      },
+      {
+        "id": "n28",
+        "title": "쇼크효과 (p.89)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          89
+        ],
+        "gloss": "영화는 다다이즘의 충격 효과를 기술적으로 실현하여 현대인의 삶의 위험에 적합한 예술 형식이다.\n\n근거 p.89"
+      },
+      {
+        "id": "n29",
+        "title": "정신의 집중과 분산 (p.92)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          92
+        ],
+        "gloss": "정신의 집중은 예술작품에 몰입하는 것이고, 정신의 분산은 대중이 예술작품을 자신들 속으로 침잠시키는 것이다.\n\n근거 p.92"
+      },
+      {
+        "id": "n30",
+        "title": "건축물 수용 (p.93)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          93
+        ],
+        "gloss": "건축물에 대한 수용방식은 사용됨과 지각됨의 이중적 측면을 가진다.\n\n근거 p.93"
+      },
+      {
+        "id": "n31",
+        "title": "예술작품",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n32",
+        "title": "가치",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n33",
+        "title": "영화",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n34",
+        "title": "사진",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n35",
+        "title": "아우라",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n36",
+        "title": "표현",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      }
+    ]
+  }
+}

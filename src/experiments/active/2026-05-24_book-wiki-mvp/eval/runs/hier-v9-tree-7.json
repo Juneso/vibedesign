@@ -1,0 +1,593 @@
+{
+  "label": "짓기와 거주하기",
+  "runAt": "2026-07-23T02:51:49.648Z",
+  "kind": "hier-v9-tree",
+  "variant": "v9",
+  "model": "gpt-4o-mini",
+  "note": "hier-v9-batch 스냅샷에서 변환 — 재실행 없음. 목차 없는 폴백 모드 결과다.",
+  "memoN": 47,
+  "stability": {
+    "agree": 1,
+    "jac": 1
+  },
+  "counts": {
+    "keywords": 47,
+    "promoted": 5,
+    "thick": 0
+  },
+  "tree": {
+    "rootId": "root",
+    "nodes": [
+      {
+        "id": "root",
+        "title": "짓기와 거주하기",
+        "parentId": null,
+        "level": 0,
+        "kind": "root",
+        "sources": []
+      },
+      {
+        "id": "n1",
+        "title": "건설환경과 거주 (p.9)",
+        "parentId": "n50",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          9
+        ],
+        "gloss": "건설환경과 사람들이 거주하는 방식은 별개의 문제라는 기본적인 차이를 설명할 가치가 있다.\n\n근거 p.9"
+      },
+      {
+        "id": "n2",
+        "title": "도시의 복잡성 (p.10)",
+        "parentId": "n48",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          10
+        ],
+        "gloss": "도시는 다양한 이주자와 불평등성으로 인해 복잡하고 비틀린 경험을 제공한다.\n\n근거 p.10"
+      },
+      {
+        "id": "n3",
+        "title": "도시계획의 윤리 (p.12)",
+        "parentId": "n48",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          12
+        ],
+        "gloss": "도시계획은 사회를 있는 그대로 나타내야 하는지, 아니면 변화를 추구해야 하는지에 대한 윤리적 문제를 제기한다.\n\n근거 p.12"
+      },
+      {
+        "id": "n4",
+        "title": "실험적인 사고방식 (p.21)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          21
+        ],
+        "gloss": "실험적인 사고방식은 약속에 대한 두려움을 드러낼 수 있다.\n\n근거 p.21"
+      },
+      {
+        "id": "n5",
+        "title": "경제적 독점 (p.22)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          22
+        ],
+        "gloss": "경제적 독점은 개인의 자유를 제한하고 억압적인 권력 체계로 이어질 수 있다.\n\n근거 p.22"
+      },
+      {
+        "id": "n6",
+        "title": "장소 만들기 (p.27)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          27
+        ],
+        "gloss": "거주함으로써 장소 만들기가 유발된다는 것이다.\n\n근거 p.27"
+      },
+      {
+        "id": "n7",
+        "title": "혁신의 어려움 (p.28)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          28
+        ],
+        "gloss": "모든 혁신은 사람들이 현재 일을 하는 방식과 할 수 있는 방식 사이의 어긋남으로 인해 어려움을 겪는다.\n\n근거 p.28"
+      },
+      {
+        "id": "n8",
+        "title": "도시계획가의 역할 (p.30)",
+        "parentId": "n48",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          30
+        ],
+        "gloss": "도시계획가는 도시인의 하인이 아니라 동반자가 되어야 한다.\n\n근거 p.30"
+      },
+      {
+        "id": "n9",
+        "title": "변화와 안정성 (p.48)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          48
+        ],
+        "gloss": "일상생활에서 변화와 안정성 사이의 균형을 맞추고 싶어한다.\n\n근거 p.48"
+      },
+      {
+        "id": "n10",
+        "title": "작은 카페 테이블 (p.54)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          54
+        ],
+        "gloss": "작은 카페 테이블은 현대 도시의 공공장소에서 개인을 보호하는 역할을 한다.\n\n근거 p.54"
+      },
+      {
+        "id": "n11",
+        "title": "현대성의 정의 (p.58)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          58
+        ],
+        "gloss": "빠른 이동이 현대성을 정의하며, 느린 이동은 부자유로 인식된다.\n\n근거 p.58"
+      },
+      {
+        "id": "n12",
+        "title": "노동자의 권리 (p.65)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          65
+        ],
+        "gloss": "세르다는 공기와 빛과 공간에 대한 노동자의 권리를 선언하려고 했다.\n\n근거 p.65"
+      },
+      {
+        "id": "n13",
+        "title": "비극의 치유법 (p.67)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          67
+        ],
+        "gloss": "비극의 치유법은 서로 다른 건물들과 사람들과 활동들을 같은 환경에 심는 것이다.\n\n근거 p.67"
+      },
+      {
+        "id": "n14",
+        "title": "사회적 포용 (p.74)",
+        "parentId": "n51",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          74
+        ],
+        "gloss": "사회적 포용은 물리적으로 설계될 수 있다는 믿음에서 비롯된 옴스테드의 제안이다.\n\n근거 p.74"
+      },
+      {
+        "id": "n15",
+        "title": "기능적 도시 (p.113)",
+        "parentId": "n48",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          113
+        ],
+        "gloss": "기능적 도시를 찬양하는 것은 경험의 형태를 단순화하는 결과를 초래한다.\n\n근거 p.113"
+      },
+      {
+        "id": "n16",
+        "title": "거주 방식 (p.125)",
+        "parentId": "n50",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          125
+        ],
+        "gloss": "거주하는 방식에 따라 형태가 출현할 것이라는 생각은 '형태는 기능을 따른다'는 명제의 또 다른 버전이다.\n\n근거 p.125"
+      },
+      {
+        "id": "n17",
+        "title": "전원도시 (p.129)",
+        "parentId": "n48",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          129
+        ],
+        "gloss": "전원도시는 도시 농업을 구상한 최초의 사람들에 의해 자연과 건설 환경의 조화를 이루는 계획의 일환으로 발전했다.\n\n근거 p.129"
+      },
+      {
+        "id": "n18",
+        "title": "가족의 자부심 (p.145)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          145
+        ],
+        "gloss": "가족의 노력은 자부심과 자존감의 원천이 된다.\n\n근거 p.145"
+      },
+      {
+        "id": "n19",
+        "title": "불확실한 운세 (p.157)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          157
+        ],
+        "gloss": "미스터 수디르의 운세는 불확실하며, 그는 자신의 운명에 무관심한 부유한 세력 속에서도 살아남기 위해 노력한다.\n\n근거 p.157"
+      },
+      {
+        "id": "n20",
+        "title": "복구 (p.168)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          168
+        ],
+        "gloss": "복구는 기능적인 것을 순수하게 상징적인 것으로 바꾸어놓는다.\n\n근거 p.168"
+      },
+      {
+        "id": "n21",
+        "title": "도시계획의 딜레마 (p.172)",
+        "parentId": "n48",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          172
+        ],
+        "gloss": "도시를 박물관으로 바꾸지 않으면서 과거와 연결하는 방법이 필요하다.\n\n근거 p.172"
+      },
+      {
+        "id": "n22",
+        "title": "진보의 폭풍 (p.176)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          176
+        ],
+        "gloss": "진보는 과거의 재앙을 쌓아 올리는 과정이다.\n\n근거 p.176"
+      },
+      {
+        "id": "n23",
+        "title": "주변적 인간 (p.179)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          179
+        ],
+        "gloss": "주변적 인간들은 권력의 반대편에 서 있지만 그들의 주변성을 이용하여 뭔가를 얻어낸다.\n\n근거 p.179"
+      },
+      {
+        "id": "n24",
+        "title": "거리의 죽음 (p.207)",
+        "parentId": "n49",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          207
+        ],
+        "gloss": "오늘날 도시에서의 계급 경험은 신체적 경험과 개인적인 불평등의 경험이 결합된 것이다.\n\n근거 p.207"
+      },
+      {
+        "id": "n25",
+        "title": "정중함의 가면 (p.212)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          212
+        ],
+        "gloss": "현대의 혼성 지역사회에서 정중함은 피상성, 기만, 비개인성을 의미하며, 이는 타자에 대한 의식이 전면에 나서지 않는 한 지역사회의 원활한 운영을 가능하게 한다.\n\n근거 p.212"
+      },
+      {
+        "id": "n26",
+        "title": "조건의 평등성 (p.218)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          218
+        ],
+        "gloss": "조건의 평등성은 개인들 간의 출발점이 불평등하더라도 같은 소비재, 교육, 주택 표준을 원하게 만든다.\n\n근거 p.218"
+      },
+      {
+        "id": "n27",
+        "title": "귀추법 (p.232)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          232
+        ],
+        "gloss": "귀추법은 '만약 ~한다면 어떨까?'의 지식으로, 반사실적 영역에 속한다.\n\n근거 p.232"
+      },
+      {
+        "id": "n28",
+        "title": "현실과 씨름 (p.235)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          235
+        ],
+        "gloss": "우리는 자신이 이해하려고 애써 노력했던 것들을 가장 귀중하게 여긴다.\n\n근거 p.235"
+      },
+      {
+        "id": "n29",
+        "title": "거리의 코드 (p.235)",
+        "parentId": "n49",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          235
+        ],
+        "gloss": "거리의 삶은 표면적으로 유동적이며, 사회학자 일라이저 앤더슨은 유동성에서 질서를 추론하려는 노력을 '거리의 코드'라 부른다.\n\n근거 p.235"
+      },
+      {
+        "id": "n30",
+        "title": "스마트 시티의 윤리적 문제 (p.244)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          244
+        ],
+        "gloss": "스마트 시티는 여행자에게 최단거리만을 제공함으로써 장소 경험을 제한하고, 윤리적 차원의 문제를 야기한다.\n\n근거 p.244"
+      },
+      {
+        "id": "n31",
+        "title": "열린 도시 설계 (p.248)",
+        "parentId": "n48",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          248
+        ],
+        "gloss": "보다 열린 도시 설계는 사용자들이 스스로 대안들을 보고 결정할 수 있는 데이터를 준비한다.\n\n근거 p.248"
+      },
+      {
+        "id": "n32",
+        "title": "지식의 지역성 (p.269)",
+        "parentId": "n52",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          269
+        ],
+        "gloss": "지식의 지역성을 초월하는 방법을 배우는 것이 중요하다.\n\n근거 p.269"
+      },
+      {
+        "id": "n33",
+        "title": "걷기의 지식 (p.275)",
+        "parentId": "n52",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          275
+        ],
+        "gloss": "걷기가 도시에 대한 인식을 만든다.\n\n근거 p.275"
+      },
+      {
+        "id": "n34",
+        "title": "휴먼스케일 (p.278)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          278
+        ],
+        "gloss": "휴먼스케일은 우리가 서 있는 공간에 자신을 투사하여 상상 속에서 그곳을 우리의 움직임으로 채우는 사고방식이다.\n\n근거 p.278"
+      },
+      {
+        "id": "n35",
+        "title": "정신분석 (p.299)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          299
+        ],
+        "gloss": "바슐라르는 성인 생활로 나아가는 방향을 강조하며, 현재에 참여하고 인식론적 단절을 처리하는 것이 중요하다고 주장한다.\n\n근거 p.299"
+      },
+      {
+        "id": "n36",
+        "title": "거주에 숙달 (p.302)",
+        "parentId": "n50",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          302
+        ],
+        "gloss": "거주에 숙달될 수 있는 잠재력은 대부분의 사람이 가지고 있다.\n\n근거 p.302"
+      },
+      {
+        "id": "n37",
+        "title": "공간의 구두점 (p.313)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          313
+        ],
+        "gloss": "공간에도 구두점을 찍어 성격을 부여할 수 있다.\n\n근거 p.313"
+      },
+      {
+        "id": "n38",
+        "title": "가치의 부과 (p.319)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          319
+        ],
+        "gloss": "가치는 자의적으로 부과되며, 그 맥락에 원래 존재하지 않는다.\n\n근거 p.319"
+      },
+      {
+        "id": "n39",
+        "title": "사회적 차이 (p.331)",
+        "parentId": "n51",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          331
+        ],
+        "gloss": "계획가는 차이를 평범한 일상에 개입시킨다.\n\n근거 p.331"
+      },
+      {
+        "id": "n40",
+        "title": "씨앗 계획 (p.356)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          356
+        ],
+        "gloss": "씨앗 계획은 열린 시스템을 기준으로 하여 질서의 포켓을 만드는 것을 목표로 한다.\n\n근거 p.356"
+      },
+      {
+        "id": "n41",
+        "title": "정체성 이미지 (p.359)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          359
+        ],
+        "gloss": "한 지역사회의 정체성 이미지를 명확히 하려다가 소수 그룹의 존재를 지워버릴 위험이 있다.\n\n근거 p.359"
+      },
+      {
+        "id": "n42",
+        "title": "사회성 (p.386)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          386
+        ],
+        "gloss": "사회성은 비개인적인 과제의 공유를 통해 타인에게 느끼는 제한적 우애의 감정이다.\n\n근거 p.386"
+      },
+      {
+        "id": "n43",
+        "title": "정신적 노예 상태 (p.388)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          388
+        ],
+        "gloss": "정신적 노예 상태에서 벗어나기 위해서는 고통받는 자의 감정이 억압의 궤도에 구애받지 않아야 한다.\n\n근거 p.388"
+      },
+      {
+        "id": "n44",
+        "title": "국제적 자금 (p.417)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          417
+        ],
+        "gloss": "프로젝트의 파열은 장소보다 공간을 구매하는 투자자들의 국제적 자금으로 인해 예정되어 있었다.\n\n근거 p.417"
+      },
+      {
+        "id": "n45",
+        "title": "도시 설계 (p.420)",
+        "parentId": "n48",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          420
+        ],
+        "gloss": "도시 설계는 향수와 진실을 중재해야 한다.\n\n근거 p.420"
+      },
+      {
+        "id": "n46",
+        "title": "형태의 주체성 (p.443)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          443
+        ],
+        "gloss": "형태는 그것을 만든 사람의 의도에 한정되지 않고 시간이 흐르면서 자체의 주체성을 획득한다.\n\n근거 p.443"
+      },
+      {
+        "id": "n47",
+        "title": "열린 도시의 윤리 (p.444)",
+        "parentId": "n48",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          444
+        ],
+        "gloss": "도시계획가와 도시 주민의 윤리적 연결은 겸손함을 실천하는 데 달려 있다.\n\n근거 p.444"
+      },
+      {
+        "id": "n48",
+        "title": "도시",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n49",
+        "title": "거리",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n50",
+        "title": "거주",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n51",
+        "title": "사회적",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n52",
+        "title": "지식",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      }
+    ]
+  }
+}

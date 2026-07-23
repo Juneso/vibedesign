@@ -1,0 +1,379 @@
+{
+  "label": "서양미술사",
+  "runAt": "2026-07-23T02:51:49.645Z",
+  "kind": "hier-v9-tree",
+  "variant": "v9",
+  "model": "gpt-4o-mini",
+  "note": "hier-v9-batch 스냅샷에서 변환 — 재실행 없음. 목차 없는 폴백 모드 결과다.",
+  "memoN": 30,
+  "stability": {
+    "agree": 1,
+    "jac": 1
+  },
+  "counts": {
+    "keywords": 30,
+    "promoted": 2,
+    "thick": 0
+  },
+  "tree": {
+    "rootId": "root",
+    "nodes": [
+      {
+        "id": "root",
+        "title": "서양미술사",
+        "parentId": null,
+        "level": 0,
+        "kind": "root",
+        "sources": []
+      },
+      {
+        "id": "n1",
+        "title": "조화에 대한 감각 (p.32)",
+        "parentId": "n32",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          32
+        ],
+        "gloss": "각 시대의 미술가들이 이룩하려고 고심해온 조화에 대한 감각을 발전시켜야 한다.\n\n근거 p.32"
+      },
+      {
+        "id": "n2",
+        "title": "변화하는 생각 (p.43)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          43
+        ],
+        "gloss": "미술의 모든 역사는 기술적인 숙련의 진보가 아니라 변화하는 생각과 요구들에 대한 것이다.\n\n근거 p.43"
+      },
+      {
+        "id": "n3",
+        "title": "초기 문명 (p.47)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          47
+        ],
+        "gloss": "초기 문명에서 형상을 만든 것은 마술과 종교뿐만 아니라 문자의 최초 형태와도 관련이 있다.\n\n근거 p.47"
+      },
+      {
+        "id": "n4",
+        "title": "개념적 완전함 (p.51)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          51
+        ],
+        "gloss": "미술가의 과업은 아름다움이 아니라 완전함을 추구하는 것이다.\n\n근거 p.51"
+      },
+      {
+        "id": "n5",
+        "title": "그리스 미술 (p.72)",
+        "parentId": "n31",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          72
+        ],
+        "gloss": "그리스 미술은 규칙의 준수와 규칙 안에서의 자유가 완벽한 균형을 이루고 있기 때문에 찬양받았다.\n\n근거 p.72"
+      },
+      {
+        "id": "n6",
+        "title": "운동감의 표현 (p.74)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          74
+        ],
+        "gloss": "미론은 운동감의 표현을 정복했다.\n\n근거 p.74"
+      },
+      {
+        "id": "n7",
+        "title": "인체 재현 (p.76)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          76
+        ],
+        "gloss": "그리스 인들은 인체를 재현할 때 내적인 삶을 반영하는 새로 발견된 자유를 중요시했다.\n\n근거 p.76"
+      },
+      {
+        "id": "n8",
+        "title": "미술가의 표현 (p.124)",
+        "parentId": "n31",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          124
+        ],
+        "gloss": "중세의 미술가들은 그들이 '느낀' 것을 그림 속에 표현하는 방법을 배웠다.\n\n근거 p.124"
+      },
+      {
+        "id": "n9",
+        "title": "초자연적인 세계 (p.135)",
+        "parentId": "n32",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          135
+        ],
+        "gloss": "중세 미술가들은 단순화된 표현 방법으로 복귀함으로써 초자연적인 세계의 관념을 전달할 수 있는 자유를 얻었다.\n\n근거 p.135"
+      },
+      {
+        "id": "n10",
+        "title": "스푸마토 (p.227)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          227
+        ],
+        "gloss": "화가는 보는 사람에게 상상할 여지를 남겨두어야 한다.\n\n근거 p.227"
+      },
+      {
+        "id": "n11",
+        "title": "거장다운 절제 (p.286)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          286
+        ],
+        "gloss": "그림을 높이 사는 이유는 거장다운 절제 때문이다.\n\n근거 p.286"
+      },
+      {
+        "id": "n12",
+        "title": "인생에 대한 환희 (p.309)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          309
+        ],
+        "gloss": "루벤스의 작품은 그의 활기찬 삶의 태도가 반영되어 있으며, 이는 그의 작품을 단순한 장식으로 타락시키지 않고 생명력 있는 걸작으로 남게 만든다.\n\n근거 p.309"
+      },
+      {
+        "id": "n13",
+        "title": "주제의 부차성 (p.327)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          327
+        ],
+        "gloss": "미술에 반영된 자연은 미술가의 마음을 반영하며, 주제가 부차적일 수 있음을 보여준다.\n\n근거 p.327"
+      },
+      {
+        "id": "n14",
+        "title": "아름다움의 덧없음 (p.343)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          343
+        ],
+        "gloss": "바토의 예술은 아름다움의 환상 속 슬픈 분위기를 담고 있으며, 이는 그의 병과 요절이 영향을 미쳤다.\n\n근거 p.343"
+      },
+      {
+        "id": "n15",
+        "title": "예술의 목적 (p.350)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          350
+        ],
+        "gloss": "예술은 분명한 목적을 가져야 한다.\n\n근거 p.350"
+      },
+      {
+        "id": "n16",
+        "title": "프랑스 대혁명 (p.366)",
+        "parentId": "n32",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          366
+        ],
+        "gloss": "프랑스 대혁명 시대에 미술가들은 전통적인 주제를 무시하고 자유롭게 주제를 선택할 수 있게 되었다.\n\n근거 p.366"
+      },
+      {
+        "id": "n17",
+        "title": "개인적 환상 (p.370)",
+        "parentId": "n32",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          370
+        ],
+        "gloss": "미술가들은 전통의 단절로 인해 개인적 환상의 세계를 종이 위에 펼칠 자유를 얻게 되었다.\n\n근거 p.370"
+      },
+      {
+        "id": "n18",
+        "title": "19세기 미술가 (p.382)",
+        "parentId": "n31",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          382
+        ],
+        "gloss": "19세기 미술가들은 관례를 따르는 부류와 고립을 자랑스러워하는 부류로 나뉘었다.\n\n근거 p.382"
+      },
+      {
+        "id": "n19",
+        "title": "양식 (p.383)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          383
+        ],
+        "gloss": "양식은 개인의 표현을 제한하는 제복과 같은 역할을 한다.\n\n근거 p.383"
+      },
+      {
+        "id": "n20",
+        "title": "지식의 대가 (p.407)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          407
+        ],
+        "gloss": "휘슬러는 자신의 작품에 대한 대가를 일생 동안 쌓은 지식의 결과로 요구했다고 주장했다.\n\n근거 p.407"
+      },
+      {
+        "id": "n21",
+        "title": "자연의 정복 (p.413)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          413
+        ],
+        "gloss": "인상주의는 화가가 자연을 완전히 정복하게 만든 시기이다.\n\n근거 p.413"
+      },
+      {
+        "id": "n22",
+        "title": "현대미술의 기원 (p.427)",
+        "parentId": "n31",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          427
+        ],
+        "gloss": "현대미술은 불만의 감정에서 자라난 것이다.\n\n근거 p.427"
+      },
+      {
+        "id": "n23",
+        "title": "바이올린의 형태 (p.444)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          444
+        ],
+        "gloss": "바이올린의 형태는 다양한 각도에서 인식될 수 있으며, 이는 실재를 더 잘 재현할 수 있다.\n\n근거 p.444"
+      },
+      {
+        "id": "n24",
+        "title": "미술의 전통 (p.461)",
+        "parentId": "n31",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          461
+        ],
+        "gloss": "미술의 역사는 끊임없이 새로 짜여지고 변화하는 전통의 역사이다.\n\n근거 p.461"
+      },
+      {
+        "id": "n25",
+        "title": "미술의 본질 (p.462)",
+        "parentId": "n31",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          462
+        ],
+        "gloss": "현대 미술가들이 미술의 본질을 다룬 다양한 이론에 관심을 돌리는 이유는 그 이론들이 추구할 만한 가치가 없기 때문이다.\n\n근거 p.462"
+      },
+      {
+        "id": "n26",
+        "title": "미술의 새로움 (p.482)",
+        "parentId": "n31",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          482
+        ],
+        "gloss": "미술은 새로움의 추구이자 자유로운 표현이 되었다.\n\n근거 p.482"
+      },
+      {
+        "id": "n27",
+        "title": "폭넓은 관용 (p.6)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          6
+        ],
+        "gloss": "대중은 폭넓은 관용의 자세를 배우게 된다.\n\n근거 p.6"
+      },
+      {
+        "id": "n28",
+        "title": "유행의 변화 (p.484)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          484
+        ],
+        "gloss": "비평가들과 공장 주인들이 새로운 아이디어와 색채 배합에 관대해짐에 따라 우리의 주위가 풍요로워지고 유행의 변화가 즐거운 일이 되었다.\n\n근거 p.484"
+      },
+      {
+        "id": "n29",
+        "title": "미술의 역사 (p.485)",
+        "parentId": "n31",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          485
+        ],
+        "gloss": "미술의 역사는 문제점들을 해결해 나가는 과정이지만, '진보'를 이야기할 수 없다는 것을 밝힌다.\n\n근거 p.485"
+      },
+      {
+        "id": "n30",
+        "title": "작품 감상 (p.493)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          493
+        ],
+        "gloss": "작품 감상은 개인적인 취향과는 거의 상관없이 객관적인 장점을 찾는 과정이다.\n\n근거 p.493"
+      },
+      {
+        "id": "n31",
+        "title": "미술",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n32",
+        "title": "미술가들",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      }
+    ]
+  }
+}
