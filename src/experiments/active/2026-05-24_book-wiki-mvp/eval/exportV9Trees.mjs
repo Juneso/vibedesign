@@ -60,9 +60,9 @@ function snapToTree(snap, bookTitle) {
     const parent = n.parentId && byId.has(n.parentId)
       ? n.parentId
       : (n.chapter && chapterId.has(n.chapter) ? chapterId.get(n.chapter) : 'root');
-    // 논지가 곧 설명이다. 승격된 가상 노드는 논지가 비어 있어 페이지만 붙는다.
-    const gloss = [n.claim || '', pages.length ? `근거 p.${pages.join(', p.')}` : '']
-      .filter(Boolean).join('\n\n');
+    // 논지가 곧 설명이다. 출처는 노드 제목의 (p.N)과 sources 에 이미 있으므로
+    // gloss 에 넣지 않는다 — 넣으면 문장 분리기가 "근거 p.31" 을 별도 노드로 만든다.
+    const gloss = n.claim || '';
     nodes.push({
       id: n.id,
       title: N(n.title) + (pages.length ? ` (p.${Math.min(...pages)})` : ''),

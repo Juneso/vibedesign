@@ -63,8 +63,10 @@ function withSentenceNodes(nodes) {
   const out = [...nodes];
   for (const n of nodes) {
     if (hadChild.has(n.id)) continue;          // 말단(자식 없음)만 대상
+    // 한 문장짜리 설명도 노드로 낸다. V9 의 논지는 대개 한 문장이라
+    // "2문장 이상"을 요구하면 말단 키워드의 설명이 통째로 사라진다.
     const sents = splitSentences(n.gloss);
-    if (sents.length < 2) continue;            // 한 문장뿐이면 쪼갤 이유가 없다
+    if (sents.length < 1) continue;
     sents.forEach((s, i) => out.push({
       id: `${n.id}__s${i}`, title: s, parentId: n.id,
       level: (n.level ?? 0) + 1, kind: 'sentence', sources: [],
