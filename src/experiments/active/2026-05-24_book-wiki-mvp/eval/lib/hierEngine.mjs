@@ -486,21 +486,44 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
         const leftovers = kws.filter((k) => !used.has(k.id) && nodes.get(k.id)?.parentId === root.id);
         if (stageNodes.length >= 2 && leftovers.length && embedFn) {
           onProgress?.(`phase 2.7 — 미편입 ${leftovers.length}개 근접 단계 배정`);
-          const ASSIGN_MIN = 0.35;
+          const ASSIGN_MIN = 0.35;   // 코사인 단독 배정의 문턱
+          const COS_FLOOR = 0.2;     // 페이지 적합 배정의 의미 바닥(엉뚱 배정 방지)
+          const SPREAD_MAX = 60;     // 이보다 페이지 산포가 크면 책 전반 관통 개념 → 구간 신호 없음
           const sEmbs = [];
           for (const s of stageNodes) sEmbs.push(await embedFn(`${s.title.replace(/^\d+ · /, '')} — ${(s.gloss || '').slice(0, 200)}`));
-          let moved = 0;
+          // 순서형에서 "단계 순서 = 책 순서"는 페이지 단조성으로 이미 검증한 불변식이다.
+          // 그 불변식을 배정에 재사용: 산포가 좁은 키워드는 중앙 페이지가 속하는(가까운) 단계로.
+          // 코사인은 의미가 완전히 어긋난 배정을 막는 바닥 검사로만 쓴다("중세 미술→근대" 오배치 방지).
+          const ranges = ordered ? stageNodes.map((s) => (s.sources.length ? [Math.min(...s.sources), Math.max(...s.sources)] : null)) : null;
+          let moved = 0, byPage = 0;
           for (const k of leftovers) {
             const kn = nodes.get(k.id);
             const e = await embedFn(`${kn.title} — ${(kn.gloss || '').slice(0, 200)}`);
-            let best = -1, bi = -1;
-            sEmbs.forEach((se, idx) => { const s = cos(e, se); if (s > best) { best = s; bi = idx; } });
-            if (best >= ASSIGN_MIN && safeReparent(k.id, stageNodes[bi].id)) {
+            const ps = [...new Set(kn.sources)].sort((a, b) => a - b);
+            const med = ps.length ? ps[Math.floor(ps.length / 2)] : null;
+            const spread = ps.length ? ps[ps.length - 1] - ps[0] : Infinity;
+            let bi = -1;
+            if (ordered && med != null && spread <= SPREAD_MAX) {
+              let bd = Infinity;
+              ranges.forEach((r, idx) => {
+                if (!r) return;
+                const d = med < r[0] ? r[0] - med : med > r[1] ? med - r[1] : 0;
+                if (d < bd) { bd = d; bi = idx; }
+              });
+              if (bi >= 0 && cos(e, sEmbs[bi]) < COS_FLOOR) bi = -1; // 페이지는 맞지만 의미가 엉뚱하면 포기
+              if (bi >= 0) byPage++;
+            }
+            if (bi < 0) {
+              let best = -1;
+              sEmbs.forEach((se, idx) => { const s = cos(e, se); if (s > best) { best = s; bi = idx; } });
+              if (best < ASSIGN_MIN) bi = -1;
+            }
+            if (bi >= 0 && safeReparent(k.id, stageNodes[bi].id)) {
               for (const p of kn.sources) if (!stageNodes[bi].sources.includes(p)) stageNodes[bi].sources.push(p);
               moved++;
             }
           }
-          log.push(`[v10] 미편입 2차 배정: ${moved}/${leftovers.length}개 이동(코사인 ≥ ${ASSIGN_MIN})`);
+          log.push(`[v10] 미편입 2차 배정: ${moved}/${leftovers.length}개 이동(페이지 적합 ${byPage} · 코사인 ${moved - byPage})`);
         }
         await runSubgrouping(); // 2층 위계는 단계가 채워진 뒤에야 의미가 있다
       }
