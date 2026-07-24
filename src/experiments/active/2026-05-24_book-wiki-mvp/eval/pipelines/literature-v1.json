@@ -1,0 +1,62 @@
+{
+  "id": "literature-v1",
+  "title": "문학(소설) 전용 인제스트 — 모티프 축 (literature-v1)",
+  "shortTitle": "문학 인제스트 V1",
+  "order": 150,
+  "script": "lib/litEngine.mjs · 실행: runLitV1.mjs",
+  "goal": "소설 메모는 논지가 아니라 울림 있는 문장이다. 개념 포함관계 대신, 반복되는 모티프를 1차 축으로 세우고 문장을 페이지순(=서사 진행순)으로 놓아 변화 아크가 드러나게 한다.",
+  "designIntent": "비문학 엔진(v8~v11)의 뼈대는 '상위=넓은 개념 ⊃ 하위=좁은 개념'인데 소설 메모엔 그런 포함관계가 없다 — 조르바의 대사, 라스콜니코프의 독백엔 주장이 없다. 소설 메모의 자연스러운 조직 단위는 인물(누구의 목소리), 서사 위치(이야기의 어디), 모티프(무엇이 반복되는가), 정서(어떤 톤)다. 모티프만 위계로 세우고 인물·정서·아크는 문장의 속성으로 남긴다 — 메모 8~22개 규모에서 인물×모티프 2층을 만들면 1문장짜리 노드가 쏟아진다는 걸 비문학 분할 실험에서 이미 확인했기 때문. 단, 한 인물에 문장이 몰리면(조르바처럼 인물이 곧 책인 경우) 그 인물을 모티프와 나란히 승격한다. 환각 방지 원칙 유지: 줄거리 추론 금지, 근거는 메모 문면 + 알라딘 리치데이터뿐.",
+  "diagram": {
+    "flowchart": "flowchart TD\n  subgraph G1[\"① 문학 분석 (gpt-4o · 캐시)\"]\n    memo[\"독서 메모 전량<br/>(대부분 인용·밑줄)\"]:::data\n    rich[\"알라딘 리치데이터<br/>줄거리 · 책소개\"]:::data\n    plan(\"<b>1 · planIngestLit</b><br/>메모별 speaker · emotion ·<br/>resonance · motifs + 모티프 후보\"):::proc\n  end\n  subgraph G2[\"② 모티프 확정 (gpt-4o-mini + 코드)\"]\n    consol(\"<b>2 · 모티프 병합·확정</b><br/>동의어 병합 · 약한 모티프 탈락\"):::proc\n    verify{\"메모 2개 이상<br/>걸리는가\"}:::human\n    motif[\"모티프 노드<br/>문장은 페이지순 = 서사 진행순\"]:::data\n    orphan(\"<b>3 · 미배정 구제</b><br/>임베딩 근접(≥0.3)만 편입,<br/>미달은 root 잔류\"):::proc\n  end\n  subgraph G3[\"③ 코드 처리 (LLM 없음)\"]\n    arc(\"<b>4 · 아크 계산</b><br/>페이지 위치 → 초반·중반·종반\"):::proc\n    char(\"<b>5 · 인물 조건부 승격</b><br/>한 인물에 문장 4개+ 몰리면<br/>모티프와 나란히 상위로\"):::proc\n    final[\"최종 트리<br/>모티프·인물 → 문장(speaker·emotion·arc)\"]:::data\n  end\n  memo --> plan\n  rich --> plan\n  plan --> consol\n  consol --> verify\n  verify -->|\"예\"| motif\n  verify -->|\"아니오\"| orphan\n  motif --> arc\n  orphan --> arc\n  arc --> char\n  char --> final",
+    "stageOf": {
+      "plan": "plan_lit",
+      "consol": "consolidate_motifs",
+      "orphan": "rescue_orphans",
+      "char": "promote_characters"
+    }
+  },
+  "stages": [
+    {
+      "id": "plan_lit",
+      "name": "문학 분석 (planIngestLit)",
+      "why": "비문학 planIngest 의 thesis(핵심 주장)는 소설 문장에 없다. 대신 누구의 목소리인지, 어떤 정서인지, 독자가 왜 밑줄 그었을지를 뽑아야 한다.",
+      "how": "gpt-4o 1회 호출(디스크 캐시). 메모마다 speaker·emotion·resonance(밑줄 이유 가설)·motifs 를, 책 단위로 모티프 후보 3~6개를 받는다. 줄거리 추론 금지 — 근거는 메모 문면과 리치데이터뿐.",
+      "params": [
+        { "name": "모티프 후보 수", "value": "3~6", "meaning": "책을 관통하는 반복 심상·주제", "effect": "메모 1개짜리 모티프는 후보 단계에서 금지" },
+        { "name": "캐시 태그", "value": "gpt-4o#lit(+rich)", "meaning": "비문학 캐시와 분리 + 리치데이터 유무 반영", "effect": "리치데이터가 나중에 채워지면 자동 재분석" }
+      ],
+      "output": "메모별 분석 + 모티프 후보"
+    },
+    {
+      "id": "consolidate_motifs",
+      "name": "모티프 병합·확정",
+      "why": "후보엔 같은 것을 가리키는 모티프가 섞인다. 메모가 2개 미만 걸리는 모티프는 축이 아니다.",
+      "how": "gpt-4o-mini 1회로 병합·이름·설명만 결정한다. 멤버십은 LLM 회신을 믿지 않고 코드가 분석 결과에서 직접 도출한다 — 파일럿에서 mini 가 실제 id 와 안 맞는 memoIds 를 돌려줘 모티프가 전멸했던 실측 방어.",
+      "params": [
+        { "name": "모티프 최소 크기", "value": "메모 2", "meaning": "이보다 작으면 탈락", "effect": "1문장 모티프가 쏟아지는 것 방지" }
+      ],
+      "output": "확정 모티프 + 페이지순 문장"
+    },
+    {
+      "id": "rescue_orphans",
+      "name": "미배정 구제",
+      "why": "억지 편입이 미편입보다 나쁘다 — 비문학에서 확립된 원칙 유지.",
+      "how": "모티프에 안 걸린 메모는 임베딩 근접 모티프(코사인 ≥ 0.3)에만 편입하고, 미달이면 root 직속에 남긴다.",
+      "params": [
+        { "name": "편입 문턱", "value": "0.3", "meaning": "코사인 유사도 하한", "effect": "낮추면 무관한 문장이 모티프에 흡수된다" }
+      ],
+      "output": "전 메모 커버(모티프 소속 또는 root 잔류)"
+    },
+    {
+      "id": "promote_characters",
+      "name": "아크 계산 + 인물 조건부 승격",
+      "why": "소설에선 페이지 순서가 곧 서사 진행이라 공짜 신호다. 인물이 곧 책인 경우(조르바)는 인물이 축이 된다.",
+      "how": "LLM 없이 코드로: 메모 페이지 구간 내 상대 위치로 초반·중반·종반 아크를 붙인다. 한 인물(speaker≠서술자)에 문장 4개+ 몰리면 인물 노드로 승격하되, 호스트 모티프를 비우면서까지 옮기지 않는다(문장 3개+ 호스트에서만).",
+      "params": [
+        { "name": "승격 문턱", "value": "문장 4", "meaning": "인물 노드를 만들 최소 문장 수", "effect": "낮추면 단역까지 상위로 올라온다" },
+        { "name": "아크 경계", "value": "0.33 · 0.67", "meaning": "메모 span 내 상대 위치", "effect": "책 총 페이지 없이도 서사 위치를 근사" }
+      ],
+      "output": "모티프·인물 → 문장(speaker·emotion·arc) 트리"
+    }
+  ]
+}

@@ -30,7 +30,7 @@ export const SERIES_META = {
   'hier-v10':             { title: 'V10 · 전개 방식 기반', purpose: '책이 이야기를 풀어가는 방식을 판정해 그 축으로 위계 구성', pipelineId: 'hier-ingest-v10' },
   'hier-v11':             { title: 'V11 · 관계 축 기반', purpose: '핵심 개념 아래를 "개념(분석)·기원(통시)" 같은 관계 축으로 편성 — 혼재 전개 대응', pipelineId: 'hier-ingest-auto' },
   'hier-auto':            { title: '자동 디스패치 · 최종안', purpose: '목차 시간순(high)이면 v10 시대 편성, 아니면 v11 관계 축 — BKT-380 확정 구조', pipelineId: 'hier-ingest-auto' },
-  'literature-v1':        { title: '문학 V1 · 모티프 축', purpose: '소설 전용 파이프라인 — 모티프 1차 축 + 인물 조건부 승격, 문장은 페이지순(서사 진행)', pipelineId: null },
+  'literature-v1':        { title: '문학 V1 · 모티프 축', purpose: '소설 전용 파이프라인 — 모티프 1차 축 + 인물 조건부 승격, 문장은 페이지순(서사 진행)', pipelineId: 'literature-v1' },
   'predict-v9':           { title: '전이 채점 · V9 산출', purpose: 'V9 위키로 새 상황을 설명할 수 있는지', pipelineId: null },
   'predict-v9-v2':        { title: '전이 채점 v2 · V9 산출', purpose: '전이 채점 2차 — 오라클 갭 재측정', pipelineId: null },
   'predict-oracle':       { title: '전이 채점 · 오라클', purpose: '사람이 만든 정답 트리 기준선', pipelineId: null },
