@@ -648,6 +648,70 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
         if (safeReparent(k.id, target.id)) { moved++; for (const p of k.sources) if (!target.sources.includes(p)) target.sources.push(p); }
       }
       log.push(`[v11] 축 ${facetNodes.length}개 편성 · 배정 ${usedIds.size} + 2차 ${moved}`);
+
+      // 5) 순서형 축 내부 시대 편성 — v10 의 "책 전체 통시"는 사실 "통시 축 하나가 큰 경우"의
+      //    특수형이다. 라우팅(책 유형별 엔진 분기) 대신, 통시·과정·인과 축에 키워드가 몰리면
+      //    그 축 안에서만 v10 의 시대 단계 + 페이지 단조성 검증을 재사용한다.
+      //    (서양미술사: "각 시대 미술의 특징" 축 안에 1·고대 → … → 5·근대가 선다)
+      // ⚠ 시대 편성 허가는 결과 검증만으론 안 된다 — [p] 힌트를 주고 "순서대로 묶어라"
+      //   하면 모델은 페이지순 정렬로 항상 단조성을 통과시킨다(run 8·9 실측: 피로사회
+      //   분석 축에 "1·신경성 질환→2·사회 구조" 가짜 시대). 독립 신호가 필요하다.
+      //   목차 형태 판정은 5회 실행 전부 안정적이었다(서양미술사=통시, 나머지=분석) —
+      //   책 자체가 시간 순으로 흐를 때만 축 내부 시대 편성을 허가한다.
+      let allowStaging = false;
+      if (toc.length && facetNodes.some((f) => conceptChildrenOf(f.id).length >= 4)) {
+        const tRaw = await llm({
+          system: '비문학 책의 목차 장 제목 구조만 보고 책이 시간 순(시대·연대·인물 계보·발전 과정)으로 전개되는지 판정한다. tocEvidence 에 근거 장 제목을 그대로 옮겨 적어라. JSON만 출력.',
+          user: `책: ${book.title}\n\n[목차]\n${toc.map((t, i) => `${i + 1}. ${t}`).join('\n')}\n\n출력 JSON: {"chronological":true|false,"confidence":"high|med|low","tocEvidence":["장 제목"]}`,
+          temperature: 0,
+        });
+        let tj = {}; try { tj = JSON.parse(tRaw); } catch { /* 판정 실패 */ }
+        const ev = (Array.isArray(tj.tocEvidence) ? tj.tocEvidence : []).filter((x) => toc.some((t) => nrm(t).includes(nrm(x)) || nrm(x).includes(nrm(t))));
+        allowStaging = tj.chronological === true && tj.confidence !== 'low' && ev.length > 0;
+        log.push(`[v11] 목차 시간순 판정: ${tj.chronological} (${tj.confidence}) → 시대 편성 ${allowStaging ? '허가' : '차단'}`);
+      }
+      for (const fn of (allowStaging ? facetNodes : [])) {
+        const members = conceptChildrenOf(fn.id);
+        if (members.length < 4) continue;
+        onProgress?.(`phase 2.5 — "${fn.title}" 시대 편성(${members.length}개)`);
+        const mLine = members.map((n) => `${n.id} | ${n.title} [p${[...new Set(n.sources)].sort((a, b) => a - b).join(',')}]`).join('\n');
+        const wantS = Math.min(5, Math.max(2, Math.round(members.length / 3)));
+        const stRaw = await llm({
+          system: '키워드를 책이 전개되는 순서대로 시기·국면 단계로 묶는다. 키워드 옆 [p숫자]가 책 속 위치다. 억지로 다 묶지 말고 안 맞으면 빼라. JSON만 출력.',
+          user: `책: ${book.title}\n축: ${fn.title}\n\n[키워드]\n${mLine}\n\n단계는 정확히 ${wantS}개, 각 단계 키워드 최소 2개, 순서대로 배열(배열 순서=책의 전개 순서). 단계 이름은 시기·국면을 가리키는 짧은 명사구.\n출력 JSON: {"stages":[{"name":"...","memberIds":["n?"]}]}`,
+          temperature: 0.1,
+        });
+        let sts = []; try { sts = (JSON.parse(stRaw).stages || []); } catch { /* 파싱 실패 */ }
+        const su = new Set();
+        const sv = [];
+        for (const st of sts) {
+          const ids = (st.memberIds || []).filter((id) => members.some((mn) => mn.id === id) && !su.has(id));
+          if (ids.length < 2 || !st.name) continue;
+          ids.forEach((id) => su.add(id));
+          sv.push({ ...st, ids });
+          if (sv.length >= wantS) break;
+        }
+        // 페이지 단조성 검증 — 가짜 순서면 편성하지 않는다 (v10 과 동일 원칙)
+        const median = (arr) => { const s = [...arr].sort((a, b) => a - b); return s[Math.floor(s.length / 2)]; };
+        const meds = sv.map((st) => median(st.ids.flatMap((id) => nodes.get(id).sources)));
+        const inv = meds.filter((v, i) => i > 0 && v < meds[i - 1] - 15).length;
+        if (sv.length < 2 || inv > 0) {
+          log.push(`[v11] "${fn.title}" 시대 편성 포기(유효 ${sv.length} · 역전 ${inv})`);
+          continue;
+        }
+        sv.forEach((st, i) => {
+          // MAX_LEVEL(3)을 한 층 넘는 구조라 safeReparent 대신 reparent — 문장 제외 실깊이 4는 의도된 예외
+          const sn = addConcept(`${i + 1} · ${String(st.name).trim()}`, fn.id, null, '');
+          sn.stageIndex = i + 1;
+          for (const id of st.ids) { reparent(id, sn.id); for (const p of nodes.get(id).sources) if (!sn.sources.includes(p)) sn.sources.push(p); }
+        });
+        // 검증을 통과했다면 이 축의 실제 성격은 통시다 — 라벨을 결과에 맞춘다
+        if (fn.relation !== '통시' && fn.relation !== '과정' && fn.relation !== '인과') {
+          fn.title = fn.title.replace(/ · [^·]+$/, ' · 통시');
+          fn.relation = '통시';
+        }
+        log.push(`[v11] "${fn.title}" 시대 ${sv.length}단계 편성(페이지 ${meds.join('→')})`);
+      }
       v10Mode = { mode: `관계축:${fj.core}`, confidence: fj.coreConfidence, reason: facets.map((f) => `${f.name}(${f.relation})`).join(' · ') };
     }
   }
