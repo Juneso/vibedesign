@@ -591,41 +591,54 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
     const kwList = () => concepts().filter((n) => n.parentId === root.id);
     const kwLine = () => kwList().map((n) => `${n.id} | ${n.title} — ${(n.gloss || '').slice(0, 60)} [p${[...new Set(n.sources)].sort((a, b) => a - b).join(',')}]`).join('\n');
     const thesisLine = planAnalyses.map((a) => `- ${a.thesis}${a.bookContextLink ? ` (맥락: ${String(a.bookContextLink).slice(0, 80)})` : ''}`).join('\n').slice(0, 4500);
+    // 핵심 개념은 1개 고정이 아니다 — 책이 정말로 여러 기둥 위에 서 있으면(예: 사피엔스의
+    // 인지혁명·농업혁명·과학혁명) 1~5개까지 허용한다. 단 "정말 핵심일 때만"을 명시하고,
+    // 확신 낮은 core 와 축 2개 미만 core 는 코드에서 걸러 남발을 막는다.
     const facetRaw = await llm({
-      system: `책의 전개 방식을 책 전체 라벨이 아니라 "핵심 개념에 대한 관계"로 파악한다. 이 책이 가장 중요하게 다루는 핵심 개념 1개를 세우고, 수집된 문장들이 그 개념에 대해 맡는 역할을 관계 축으로 나눈다 — 예: "X의 개념"(분석), "X의 기원"(통시), "X의 구성 요소"(분석), "X와 Y의 대립"(대조), "X의 현대적 양상"(예시). 축 이름은 이 책의 실제 내용을 가리키는 구체적 명사구여야 하고, relation 은 후보 중 하나다. 핵심 개념이 하나로 안 모이는 책(백과사전식·통시 일변)이면 coreConfidence 를 low 로 내라. JSON만 출력.`,
-      user: `책: ${book.title}\n\n[목차]\n${toc.join(' · ') || '(없음)'}\n\n[책 소개·서평]\n${rich || '(없음)'}\n\n[수집된 문장(메모별 핵심 주장)]\n${thesisLine || '(없음)'}\n\nrelation 후보는 아래 어휘 중 하나다.\n[관계 어휘 — 정의와 오용 주의]\n${relationGuide()}\n출력 JSON: {"core":"핵심 개념","coreConfidence":"high|med|low","facets":[{"name":"구체적 축 이름","relation":"후보 중 하나","description":"1~2문장"}]} (축 2~5개)`,
+      system: `책의 전개 방식을 책 전체 라벨이 아니라 "핵심 개념에 대한 관계"로 파악한다. 이 책을 떠받치는 핵심 개념을 세우고(보통 1개 — 책이 정말로 여러 기둥 위에 서 있을 때만 최대 5개), 각 핵심 개념마다 수집된 문장들이 그 개념에 대해 맡는 역할을 관계 축으로 나눈다 — 예: "X의 개념"(분석), "X의 기원"(통시), "X의 구성 요소"(분석), "X와 Y의 대립"(대조), "X의 현대적 양상"(예시). 축 이름은 이 책의 실제 내용을 가리키는 구체적 명사구여야 하고, relation 은 후보 중 하나다. 핵심 개념이라 부를 만한 것이 없는 책(백과사전식·통시 일변)이면 cores 를 빈 배열로 내라. JSON만 출력.`,
+      user: `책: ${book.title}\n\n[목차]\n${toc.join(' · ') || '(없음)'}\n\n[책 소개·서평]\n${rich || '(없음)'}\n\n[수집된 문장(메모별 핵심 주장)]\n${thesisLine || '(없음)'}\n\nrelation 후보는 아래 어휘 중 하나다.\n[관계 어휘 — 정의와 오용 주의]\n${relationGuide()}\n출력 JSON: {"cores":[{"name":"핵심 개념","confidence":"high|med|low","facets":[{"name":"구체적 축 이름","relation":"후보 중 하나","description":"1~2문장"}]}]} (core 1~5개 · core당 축 2~5개)`,
       temperature: 0,
     });
     let fj = {}; try { fj = JSON.parse(facetRaw); } catch { /* 판정 실패 */ }
-    const facets = (fj.facets || []).filter((f) => f.name && MODES.includes(f.relation)).slice(0, 5);
-    if (!fj.core || fj.coreConfidence === 'low' || facets.length < 2) {
-      log.push(`[v11] 핵심 개념 불성립(core=${fj.core || '없음'} · ${fj.coreConfidence || '?'} · 축 ${facets.length}개) — 평면 유지`);
-      v10Mode = { mode: '관계축 불성립', confidence: 'low', reason: fj.core ? `core=${fj.core}` : '판정 실패' };
+    // 하위 호환: 구형 {core, coreConfidence, facets} 응답도 cores 배열로 정규화
+    let cores = Array.isArray(fj.cores) ? fj.cores : (fj.core ? [{ name: fj.core, confidence: fj.coreConfidence, facets: fj.facets }] : []);
+    cores = cores
+      .map((c) => ({ name: String(c.name || '').trim(), confidence: c.confidence || 'low', facets: (c.facets || []).filter((f) => f.name && MODES.includes(f.relation)).slice(0, 5) }))
+      .filter((c) => c.name && c.confidence !== 'low' && c.facets.length >= 2)
+      .slice(0, 5);
+    if (!cores.length) {
+      log.push(`[v11] 핵심 개념 불성립(유효 core 0개) — 평면 유지`);
+      v10Mode = { mode: '관계축 불성립', confidence: 'low', reason: '핵심 개념 없음 또는 전부 low' };
     } else {
-      log.push(`[v11] 핵심 개념 "${fj.core}" (${fj.coreConfidence}) · 축: ${facets.map((f) => `${f.name}(${f.relation})`).join(' · ')}`);
+      for (const c of cores) log.push(`[v11] 핵심 개념 "${c.name}" (${c.confidence}) · 축: ${c.facets.map((f) => `${f.name}(${f.relation})`).join(' · ')}`);
 
-      // 2) 배정 — 각 키워드가 어느 축의 역할을 하는지. 키워드의 문장 역할 요약을 근거로 준다.
+      // 2) 배정 — 각 키워드가 어느 core 의 어느 축 역할인지. 전체 축을 f0..fN 으로 펼쳐 1회 호출.
       onProgress?.('phase 2 — 관계 축 배정');
+      const flatFacets = cores.flatMap((c, ci) => c.facets.map((f) => ({ ...f, core: c.name, ci })));
       const roleLine = kwList().map((n) => {
         const roles = sentOf(n.id).map((s) => String(s.gloss || s.title).slice(0, 70)).slice(0, 3).join(' / ');
         return `${n.id} | ${n.title}${roles ? ` — 문장 역할: ${roles}` : ''}`;
       }).join('\n');
       const assignRaw = await llm({
         system: '키워드를 핵심 개념의 관계 축에 배정한다. 키워드에 딸린 문장들이 책 전체에서 맡는 역할(개념 설명인지, 역사적 설명인지, 사례인지)을 근거로 판단하라. 억지로 다 넣지 말고 안 맞으면 빼라. JSON만 출력.',
-        user: `핵심 개념: ${fj.core}\n\n[관계 축]\n${facets.map((f, i) => `f${i} | ${f.name} (${f.relation}) — ${f.description || ''}`).join('\n')}\n\n[키워드와 문장 역할]\n${roleLine}\n\n각 축에 키워드 최소 1개. 출력 JSON: {"assign":[{"facet":"f0","memberIds":["n?"]}]}`,
+        user: `핵심 개념: ${cores.map((c) => c.name).join(' · ')}\n\n[관계 축]\n${flatFacets.map((f, i) => `f${i} | [${f.core}] ${f.name} (${f.relation}) — ${f.description || ''}`).join('\n')}\n\n[키워드와 문장 역할]\n${roleLine}\n\n각 축에 키워드 최소 1개. 출력 JSON: {"assign":[{"facet":"f0","memberIds":["n?"]}]}`,
         temperature: 0.1,
       });
       let asn = []; try { asn = (JSON.parse(assignRaw).assign || []); } catch { /* 파싱 실패 */ }
 
-      // 3) 트리 구성: root → 핵심 개념 → 축(관계 라벨) → 키워드 → 문장
-      const dupCore = kwList().find((k) => nrm(k.title) === nrm(fj.core));
-      const coreNode = dupCore || addConcept(String(fj.core).trim(), root.id, await embedFn(String(fj.core)), '');
+      // 3) 트리 구성: root → 핵심 개념(들) → 축(관계 라벨) → 키워드 → 문장
+      const coreNodes = [];
+      for (const c of cores) {
+        const dup = kwList().find((k) => nrm(k.title) === nrm(c.name));
+        coreNodes.push(dup || addConcept(c.name, root.id, await embedFn(c.name), ''));
+      }
       const usedIds = new Set();
       const facetNodes = [];
       for (const a of asn) {
         const fi = Number(String(a.facet).replace(/^f/, ''));
-        const f = facets[fi]; if (!f) continue;
-        const ids = (a.memberIds || []).filter((id) => id !== coreNode.id && kwList().some((k) => k.id === id) && !usedIds.has(id));
+        const f = flatFacets[fi]; if (!f) continue;
+        const coreNode = coreNodes[f.ci];
+        const ids = (a.memberIds || []).filter((id) => !coreNodes.some((cn) => cn.id === id) && kwList().some((k) => k.id === id) && !usedIds.has(id));
         if (!ids.length) continue;
         const fn = addConcept(`${String(f.name).trim()} · ${f.relation}`, coreNode.id, await embedFn(`${f.name} ${f.description || ''}`), String(f.description || '').trim());
         fn.relation = f.relation;
@@ -638,18 +651,19 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
         facetNodes.push(fn);
       }
 
-      // 4) 미편입 — 코사인 근접 축(≥0.3), 미달이면 핵심 개념 직속으로 남긴다
+      // 4) 미편입 — 코사인 근접 축(≥0.3), 미달이면 가장 가까운 핵심 개념 직속으로
       let moved = 0;
-      for (const k of kwList().filter((k) => k.id !== coreNode.id)) {
+      for (const k of kwList().filter((k) => !coreNodes.some((cn) => cn.id === k.id))) {
         if (!facetNodes.length) break;
         if (usedIds.has(k.id)) continue;
         const e = k.emb || await embedFn(`${k.title} ${(k.gloss || '').slice(0, 100)}`);
         let best = -1, bf = null;
         for (const fn of facetNodes) { const s = cos(e, fn.emb); if (s > best) { best = s; bf = fn; } }
-        const target = best >= 0.3 ? bf : coreNode;
+        const target = best >= 0.3 ? bf : nodes.get(bf ? bf.parentId : coreNodes[0].id);
         if (safeReparent(k.id, target.id)) { moved++; for (const p of k.sources) if (!target.sources.includes(p)) target.sources.push(p); }
       }
-      log.push(`[v11] 축 ${facetNodes.length}개 편성 · 배정 ${usedIds.size} + 2차 ${moved}`);
+      log.push(`[v11] core ${coreNodes.length}개 · 축 ${facetNodes.length}개 편성 · 배정 ${usedIds.size} + 2차 ${moved}`);
+      const fjCoreNames = cores.map((c) => c.name).join('+');
 
       // 5) 순서형 축 내부 시대 편성 — v10 의 "책 전체 통시"는 사실 "통시 축 하나가 큰 경우"의
       //    특수형이다. 라우팅(책 유형별 엔진 분기) 대신, 통시·과정·인과 축에 키워드가 몰리면
@@ -714,7 +728,7 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
         }
         log.push(`[v11] "${fn.title}" 시대 ${sv.length}단계 편성(페이지 ${meds.join('→')})`);
       }
-      v10Mode = { mode: `관계축:${fj.core}`, confidence: fj.coreConfidence, reason: facets.map((f) => `${f.name}(${f.relation})`).join(' · ') };
+      v10Mode = { mode: `관계축:${fjCoreNames}`, confidence: cores[0].confidence, reason: cores.flatMap((c) => c.facets.map((f) => `${f.name}(${f.relation})`)).join(' · ') };
     }
   }
 

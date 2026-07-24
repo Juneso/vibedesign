@@ -14,6 +14,7 @@ import { dirname, resolve } from 'node:path';
 import { runHierIngest, serializeTree } from './lib/hierEngine.mjs';
 import { openaiNodeTransport, loadDotEnvLocal } from './lib/transport.mjs';
 import { cachedPlanIngest } from './lib/planCache.mjs';
+import { buildNarrative } from './lib/logNarrative.mjs';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 await loadDotEnvLocal(__dir);
@@ -110,7 +111,9 @@ for (const t of titles) {
     let md = `# ${N(b.title)} — 자동 디스패치 (${d.variant})\n\n`;
     md += `- 디스패치: **${d.variant}** — ${d.why}\n`;
     md += `- 결과: ${r.mode ? `${r.mode.mode} (${r.mode.confidence})` : '평면'}\n`;
-    md += `- 메모 ${memos.length}개 · 커버 ${covered}/${memos.length} · ${sec}초\n`;
+    md += `- 메모 ${memos.length}개 · 커버 ${covered}/${memos.length} · ${sec}초\n\n`;
+    // 단계별 서사 — LLM 호출 없이 로그를 사람 말로 번역(lib/logNarrative.mjs)
+    md += buildNarrative({ log: r.log, dispatch: d.why, variant: d.variant, counts: { concepts: C.length, sentences, coveredMemos: covered }, nMemos: memos.length });
     await writeFile(`${base}.md`, md, 'utf-8');
 
     console.log(`      → ${d.variant} · 개념 ${C.length} · 문장 ${sentences} · 커버 ${covered}/${memos.length} (${sec}초)`);
