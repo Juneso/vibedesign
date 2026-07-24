@@ -17,6 +17,8 @@
 //   eval/pipelines/hier-ingest-v7.json (eval 대시보드 왼쪽 구조도)도 같이 갱신할 것.
 //   v8은 eval/pipelines/hier-ingest-v8.json 참조.
 
+import { RELATION_NAMES, relationGuide } from './relationVocab.mjs';
+
 const MAX_LEVEL = 3;
 
 const cos = (a, b) => { let s = 0, na = 0, nb = 0; for (let i = 0; i < a.length; i++) { s += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; } return s / (Math.sqrt(na) * Math.sqrt(nb)); };
@@ -358,7 +360,7 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
   let v10Mode = null;
   if (variant === 'v10') {
     const ORDERED = new Set(['통시', '과정', '인과']); // 순서가 의미를 갖는 방식 → 번호를 붙인다
-    const MODES = ['정의', '분석', '분류', '비교', '대조', '유추', '예시', '묘사', '통시', '과정', '인과', '인용', '문답', '통념 반박'];
+    const MODES = RELATION_NAMES; // 단일 소스: lib/relationVocab.mjs
     const rich = [book.summary, book.aladin?.intro, book.aladin?.publisherIntro, book.aladin?.excerpts]
       .filter(Boolean).join('\n').slice(0, 3000);
     const kws = concepts().filter((n) => n.parentId === root.id);
@@ -375,7 +377,7 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
     const toc = (book.toc || []).map(String).filter(Boolean);
     const modeRaw = forceMode ? JSON.stringify({ mode: forceMode, confidence: 'high', reason: '수동 지정(A/B)' }) : await llm({
       system: '비문학 책이 내용을 풀어가는 방식을 목차와 책 소개에서 판정한다. 가장 강한 신호는 목차 장 제목의 구조다: 시대·연도·인물 계보가 이어지면 통시, 병렬 범주 나열이면 분류, "~란 무엇인가"·구성 요소 해부면 분석, 두 대상이 오가면 비교. 통시·과정·인과처럼 순서가 성립하면 그것을 우선하라 — 순서는 다른 방식이 흉내낼 수 없는 정보다. tocEvidence 에는 판단 근거가 된 목차 장 제목을 그대로 옮겨 적어라(목차가 없으면 빈 배열). 부차적으로 섞인 방식이 있으면 secondaryMode 로 표시하라. JSON만 출력.',
-      user: `책: ${book.title}\n\n[목차]\n${toc.map((t, i) => `${i + 1}. ${t}`).join('\n') || '(없음)'}\n\n[책 소개·서평]\n${rich || '(없음)'}\n\n후보: ${MODES.join(' / ')}\n출력 JSON: {"mode":"후보 중 하나","secondaryMode":"후보 중 하나 또는 null","confidence":"high|med|low","tocEvidence":["근거가 된 목차 장 제목"],"reason":"한 줄"}`,
+      user: `책: ${book.title}\n\n[목차]\n${toc.map((t, i) => `${i + 1}. ${t}`).join('\n') || '(없음)'}\n\n[책 소개·서평]\n${rich || '(없음)'}\n\n[관계 어휘 — 정의와 오용 주의]\n${relationGuide()}\n출력 JSON: {"mode":"후보 중 하나","secondaryMode":"후보 중 하나 또는 null","confidence":"high|med|low","tocEvidence":["근거가 된 목차 장 제목"],"reason":"한 줄"}`,
       temperature: 0,
     });
     let m = {}; try { m = JSON.parse(modeRaw); } catch { /* 판정 실패 */ }
@@ -552,7 +554,7 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
   // 각 문장이 책 전체에서 맡는 역할은 planIngest 의 analyses(thesis·keyConcepts·bookContextLink)가
   // 이미 담고 있다 — 지금까지 문장 텍스트로만 쓰이고 축 신호로는 버려지던 정보다.
   if (variant === 'v11') {
-    const MODES = ['정의', '분석', '분류', '비교', '대조', '유추', '예시', '묘사', '통시', '과정', '인과', '인용', '문답', '통념 반박'];
+    const MODES = RELATION_NAMES; // 단일 소스: lib/relationVocab.mjs
     const nrm = (s) => String(s || '').normalize('NFC').replace(/\s+/g, '').toLowerCase();
     const rich = [book.summary, book.aladin?.intro, book.aladin?.publisherIntro, book.aladin?.excerpts]
       .filter(Boolean).join('\n').slice(0, 3000);
@@ -591,7 +593,7 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
     const thesisLine = planAnalyses.map((a) => `- ${a.thesis}${a.bookContextLink ? ` (맥락: ${String(a.bookContextLink).slice(0, 80)})` : ''}`).join('\n').slice(0, 4500);
     const facetRaw = await llm({
       system: `책의 전개 방식을 책 전체 라벨이 아니라 "핵심 개념에 대한 관계"로 파악한다. 이 책이 가장 중요하게 다루는 핵심 개념 1개를 세우고, 수집된 문장들이 그 개념에 대해 맡는 역할을 관계 축으로 나눈다 — 예: "X의 개념"(분석), "X의 기원"(통시), "X의 구성 요소"(분석), "X와 Y의 대립"(대조), "X의 현대적 양상"(예시). 축 이름은 이 책의 실제 내용을 가리키는 구체적 명사구여야 하고, relation 은 후보 중 하나다. 핵심 개념이 하나로 안 모이는 책(백과사전식·통시 일변)이면 coreConfidence 를 low 로 내라. JSON만 출력.`,
-      user: `책: ${book.title}\n\n[목차]\n${toc.join(' · ') || '(없음)'}\n\n[책 소개·서평]\n${rich || '(없음)'}\n\n[수집된 문장(메모별 핵심 주장)]\n${thesisLine || '(없음)'}\n\nrelation 후보: ${MODES.join(' / ')}\n출력 JSON: {"core":"핵심 개념","coreConfidence":"high|med|low","facets":[{"name":"구체적 축 이름","relation":"후보 중 하나","description":"1~2문장"}]} (축 2~5개)`,
+      user: `책: ${book.title}\n\n[목차]\n${toc.join(' · ') || '(없음)'}\n\n[책 소개·서평]\n${rich || '(없음)'}\n\n[수집된 문장(메모별 핵심 주장)]\n${thesisLine || '(없음)'}\n\nrelation 후보는 아래 어휘 중 하나다.\n[관계 어휘 — 정의와 오용 주의]\n${relationGuide()}\n출력 JSON: {"core":"핵심 개념","coreConfidence":"high|med|low","facets":[{"name":"구체적 축 이름","relation":"후보 중 하나","description":"1~2문장"}]} (축 2~5개)`,
       temperature: 0,
     });
     let fj = {}; try { fj = JSON.parse(facetRaw); } catch { /* 판정 실패 */ }
