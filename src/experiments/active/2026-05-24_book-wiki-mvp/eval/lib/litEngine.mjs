@@ -18,10 +18,18 @@ const nrm = (s) => String(s || '').normalize('NFC').replace(/\s+/g, '').toLowerC
 
 // ─── Phase 1: 문학 분석 (gpt-4o, 러너에서 cachedPlanIngest 로 감싼다) ──────
 // 비문학 planIngest 의 thesis(핵심 주장) 대신 speaker·emotion·resonance·motifs 를 뽑는다.
-export async function planIngestLit({ memos, book, llm }) {
+export async function planIngestLit({ memos, book, llm, canon }) {
   const rich = [book.summary, book.aladin?.intro, book.aladin?.publisherIntro, book.aladin?.excerpts]
     .filter(Boolean).join('\n').slice(0, 3000);
   const memoLine = memos.map((m) => `- id:${m.id} p${m.p}: ${m.text}${m.myThought ? `\n  (내 생각: ${m.myThought})` : ''}`).join('\n');
+  // 정본 모티프 앵커(사이클 3, golden/lit-canon-motifs.json) — 이름 일반화·과병합 완충.
+  // ⚠ 억지 편입 금지 게이트: 메모에 실제 근거가 있을 때만 채택하게 프롬프트로 강제한다.
+  //   정본을 그대로 베끼면 모든 유저의 위키가 똑같아진다 — 앵커는 어휘·경계 참고용이다.
+  const canonBlock = canon ? `
+[참고 — 이 책에 대한 일반적 해석의 축 (앵커)]
+${(canon.themes || []).map((t) => `- ${t.name}: ${t.desc || ''}`).join('\n')}
+${(canon.symbols || []).length ? `반복 심상: ${canon.symbols.join(' · ')}` : ''}
+⚠ 위 축은 참고일 뿐이다. **메모에 실제 근거가 있는 축만** 후보로 삼고, 메모가 다루지 않는 축은 무시하라. 메모가 위 축과 다른 고유한 축을 이루면 그쪽을 우선하라. 이름은 위 축의 어휘를 참고하되 메모의 표현이 더 구체적이면 메모 쪽을 쓴다.` : '';
   const raw = await llm({
     system: '너는 소설 독서 메모를 분석하는 문학 편집자다. 책의 줄거리를 아는 척 추론하지 마라 — 판단 근거는 오직 메모 문면과 제공된 책 소개뿐이다. JSON만 출력.',
     user: `책: ${book.title}${book.author ? ` (${book.author})` : ''}
@@ -31,6 +39,7 @@ ${rich || '(없음)'}
 
 [독자가 밑줄 그은 메모]
 ${memoLine}
+${canonBlock}
 
 두 가지를 산출하라.
 
@@ -46,7 +55,7 @@ ${memoLine}
    - speaker: 이 문장을 말하거나 서술하는 목소리. 문면에서 인물이 확실할 때만 인물 이름, 아니면 "서술자".
    - emotion: 정서 톤 한 단어 (예: 불안, 해방감, 그리움, 냉소)
    - resonance: 독자가 왜 이 문장에 밑줄 그었을지 한 줄 가설 — 반드시 문면에서 읽히는 것만.
-   - motifs: 위 motifCandidates 의 name 중 1~2개. 정말 안 맞으면 빈 배열.
+   - motifs: 위 motifCandidates 의 name 중 **이 메모가 관련되는 모든 축**(최대 3개). 하나만 고르려고 아끼지 마라 — 표가 갈리면 축이 성립하지 못한다. 정말 안 맞으면 빈 배열.
 
 출력 JSON: {"motifCandidates":[{"name":"...","description":"..."}],"analyses":[{"memoId":"...","speaker":"...","emotion":"...","resonance":"...","motifs":["..."]}]}`,
     temperature: 0.1,
@@ -54,7 +63,7 @@ ${memoLine}
   try { return JSON.parse(raw); } catch { return { motifCandidates: [], analyses: [] }; }
 }
 
-export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, onProgress }) {
+export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, canon, onProgress }) {
   let SEQ = 0; const id = () => `n${++SEQ}`;
   const nodes = new Map(); const log = [];
   const root = { id: id(), title: book.title, parentId: null, level: 0, kind: 'root', sources: [], emb: null };
@@ -114,7 +123,7 @@ export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, onPro
     `c${i} | ${c.name} — ${c.description || ''}\n${memberOf(c.name).map((x) => `    · p${x.p} ${String(x.text).slice(0, 60)}`).join('\n') || '    (배정 메모 없음)'}`).join('\n');
   const raw = await llm({
     system: '소설 독서 메모의 모티프 목록을 확정한다. 같은 것을 가리키는 모티프는 병합하고, 메모가 2개 미만 걸리는 모티프는 버린다. 메모를 억지로 채워 넣지 마라. JSON만 출력.',
-    user: `책: ${book.title}\n\n[모티프 후보와 배정된 메모]\n${candLine}\n\n최종 모티프를 확정하라. 각 모티프: name(후보 이름을 다듬어도 됨) · description(1~2문장) · mergedFrom(합친 후보 c번호들) · memoIds(위에 배정된 메모의 memoId — 병합 시 합치기).\n규칙:\n- **메모 1개짜리 후보를 그냥 버리지 마라.** 서로 합치거나 이웃 후보에 합쳐 메모 2개 이상이 되는지 먼저 검토하고, 정말 어디에도 못 합칠 때만 버린다(예: "이루어질 수 없는 사랑"+"사회적 제약"이 실은 한 축인 경우).\n- 이름 자기검증: 각 이름이 문장들의 **정서 톤**(무의미·고독·슬픔 따위)이 아니라 **반복되는 심상·주제**를 가리키는지 확인하라. 정서 단어가 이름의 중심이면 심상·주제로 바꿔라.\n출력 JSON: {"motifs":[{"name":"...","description":"...","mergedFrom":["c0"],"memoIds":["m27"]}]}`,
+    user: `책: ${book.title}\n\n[모티프 후보와 배정된 메모]\n${candLine}\n\n최종 모티프를 확정하라. 각 모티프: name(후보 이름을 다듬어도 됨) · description(1~2문장) · mergedFrom(합친 후보 c번호들) · memoIds(위에 배정된 메모의 memoId — 병합 시 합치기).\n규칙:\n- **메모 1개짜리 후보를 그냥 버리지 마라.** 서로 합치거나 이웃 후보에 합쳐 메모 2개 이상이 되는지 먼저 검토하고, 정말 어디에도 못 합칠 때만 버린다(예: "이루어질 수 없는 사랑"+"사회적 제약"이 실은 한 축인 경우).\n- **과병합 금지**: 병합은 두 후보가 **같은 심상·주제**를 가리킬 때만이다. 서로 다른 주제를 개수 채우기 편의로 합치지 마라 — 책의 핵심 축이 다른 축에 삼켜져 사라지는 것이 최악의 실패다.\n- 이름 자기검증: 각 이름이 문장들의 **정서 톤**(무의미·고독·슬픔 따위)이 아니라 **반복되는 심상·주제**를 가리키는지 확인하라. 정서 단어가 이름의 중심이면 심상·주제로 바꿔라.${canon ? `\n- 참고 — 이 책의 일반적 해석 축: ${(canon.themes || []).map((t) => t.name).join(' · ')}. 후보가 이 중 하나와 같은 것을 가리키면 그 어휘를 참고해 이름을 다듬어라. 단, 배정된 메모가 실제로 다루는 범위를 넘어서 이름을 부풀리지 마라.` : ''}\n출력 JSON: {"motifs":[{"name":"...","description":"...","mergedFrom":["c0"],"memoIds":["m27"]}]}`,
     temperature: 0.1,
   });
   let finals = []; try { finals = (JSON.parse(raw).motifs || []); } catch { /* 파싱 실패 → 후보 그대로 */ }

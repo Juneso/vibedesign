@@ -46,6 +46,11 @@ const meta = JSON.parse(await readFile(resolve(__dir, 'golden/obsidian-books-met
 // 문학 리치데이터 폴백 — eval/fetchLitMeta.mjs 가 만든다 (없으면 리치데이터 없이 진행)
 let litMeta = {};
 try { litMeta = JSON.parse(await readFile(resolve(__dir, 'golden/aladin-lit-meta.json'), 'utf-8')); } catch { /* 아직 미수집 */ }
+// 정본 모티프 앵커 (사이클 3) — 없으면 앵커 없이 동작. CANON=0 으로 끌 수 있다(A/B용).
+let canonDb = {};
+if (process.env.CANON !== '0') {
+  try { canonDb = JSON.parse(await readFile(resolve(__dir, 'golden/lit-canon-motifs.json'), 'utf-8')).books || {}; } catch { /* 미적재 */ }
+}
 
 console.log(`[literature-v1] 보조 ${MODEL} · planIngestLit ${INGEST_MODEL} · ${titles.length}권`);
 
@@ -73,14 +78,15 @@ for (const t of titles) {
   const t0 = Date.now();
   try {
     console.log(`  [${done + 1}/${titles.length}] ${N(b.title)} — 메모 ${memos.length}개`);
+    const canon = Object.entries(canonDb).find(([k]) => N(k) === N(t))?.[1] || null;
     const planFn = cachedPlanIngest(
-      (args) => planIngestLit({ ...args, llm: llm4o }),
+      (args) => planIngestLit({ ...args, llm: llm4o, canon }),
       // 캐시 키에 프롬프트가 안 들어가므로 태그로 구분: 비문학 캐시와 충돌 방지(#lit)
-      // + 리치데이터 유무(+rich) — 나중에 리치데이터가 채워지면 새로 분석하게 한다
-      { book, memos, model: `${INGEST_MODEL}#lit${(book.summary || book.aladin?.intro) ? '+rich' : ''}` },
+      // + 리치데이터 유무(+rich) + 정본 앵커 유무(+canon) — 입력이 바뀌면 새로 분석하게 한다
+      { book, memos, model: `${INGEST_MODEL}#lit${(book.summary || book.aladin?.intro) ? '+rich' : ''}${canon ? '+canon' : ''}` },
     );
     const r = await runLitIngest({
-      book, memos, llm, embedFn, planLitFn: planFn,
+      book, memos, llm, embedFn, planLitFn: planFn, canon,
       onProgress: (msg) => process.stdout.write(`      ${msg}\r`),
     });
     const tree = serializeTree(r.nodes, r.rootId);
