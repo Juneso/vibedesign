@@ -128,12 +128,14 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
 
   // v8: planIngest 1회 호출 → 개념 페이지(## 개요 포함) → 노드화
   let v8PageCount = 0;
-  if (variant === 'v8' || variant === 'v10') {
+  let planAnalyses = []; // v11 이 메모별 역할(thesis·keyConcepts·bookContextLink)을 위계 축으로 재사용한다
+  if (variant === 'v8' || variant === 'v10' || variant === 'v11') {
     if (!planIngestFn) throw new Error(`${variant} requires planIngestFn`);
     // memos에 id 부여 (planIngest가 소비하는 형식: id='m'+p)
     const memosWithId = memos.map((m) => ({ ...m, id: `m${m.p}`, chapter: m.chapter || '', myThought: m.my || '' }));
     onProgress?.('phase 1 — planIngest 호출(gpt-4o)...');
     const out = await planIngestFn({ memos: memosWithId, book, existingPages: [], contexts: [], profile: {} });
+    planAnalyses = out.analyses || [];
     log.push(`[plan] planIngest 완료 · patches=${out.patches?.length ?? 0} analyses=${out.analyses?.length ?? 0}`);
 
     // ## 개요 파서 (protoRealMeta 와 동일)
@@ -316,7 +318,7 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
     for (let i = 0; i < cs.length; i++) for (let j = i + 1; j < cs.length; j++) {
       const sim = cos(cs[i].emb, cs[j].emb);
       // v7/v8: 같은 메모에서 나온 개념쌍은 extract 자기중복 가능성이 높다 — sim 문턱 무시하고 검사
-      const sameMemo = (variant === 'v7' || variant === 'v8' || variant === 'v10') && cs[i].sources.some((p) => cs[j].sources.includes(p));
+      const sameMemo = (variant === 'v7' || variant === 'v8' || variant === 'v10' || variant === 'v11') && cs[i].sources.some((p) => cs[j].sources.includes(p));
       if (sim > 0.55 || sameMemo) pairs.push({ a: cs[i], b: cs[j], sim });
     }
     pairs.sort((x, y) => y.sim - x.sim);
@@ -530,6 +532,113 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
     }
   }
 
+  // ─── Phase 2 (v11): 관계 축 위계 — 전개 방식을 "핵심 개념에 대한 관계"로 (BKT-380) ──
+  // v10 은 책 전체에 방식 하나를 골랐지만 전개 방식은 원래 대목 단위 속성이다.
+  // 존중정치학: 어떤 대목은 정체성 정치의 기원을(통시), 어떤 대목은 개념 구조를(분석) 말한다.
+  // → 핵심 개념 1개를 세우고, 그 아래를 "X의 개념(분석) · X의 기원(통시) …" 관계 축으로 편성.
+  // 각 문장이 책 전체에서 맡는 역할은 planIngest 의 analyses(thesis·keyConcepts·bookContextLink)가
+  // 이미 담고 있다 — 지금까지 문장 텍스트로만 쓰이고 축 신호로는 버려지던 정보다.
+  if (variant === 'v11') {
+    const MODES = ['정의', '분석', '분류', '비교', '대조', '유추', '예시', '묘사', '통시', '과정', '인과', '인용', '문답', '통념 반박'];
+    const nrm = (s) => String(s || '').normalize('NFC').replace(/\s+/g, '').toLowerCase();
+    const rich = [book.summary, book.aladin?.intro, book.aladin?.publisherIntro, book.aladin?.excerpts]
+      .filter(Boolean).join('\n').slice(0, 3000);
+    const toc = (book.toc || []).map(String).filter(Boolean);
+    const sentOf = (nid) => childrenOf(nid).filter((k) => k.kind === 'sentence');
+
+    // 0) keyConcepts 승격 — planIngest 가 메모마다 뽑았지만 키워드가 되지 못한 개념을 발굴한다.
+    //    (존중정치학에서 키워드가 5개↔18개로 출렁이는 문제의 완충: 루소·칸트·투모스류가 여기서 살아난다)
+    let promoted = 0;
+    const kcCount = new Map();
+    for (const a of planAnalyses) for (const k of (a.keyConcepts || [])) {
+      const key = nrm(k); if (!key) continue;
+      if (!kcCount.has(key)) kcCount.set(key, { n: 0, name: k, memoIds: [] });
+      const e = kcCount.get(key); e.n++; e.memoIds.push(a.memoId);
+    }
+    for (const e of [...kcCount.values()].sort((a, b) => b.n - a.n)) {
+      if (e.n < 2) continue;
+      if (concepts().some((c) => nrm(c.title) === nrm(e.name))) continue;
+      const sentNodes = [...nodes.values()].filter((n) => n.kind === 'sentence' && e.memoIds.includes(n.memoId));
+      // 호스트에 문장이 3개 이상 몰려 있을 때만 빼온다 — 호스트를 비우면서까지 옮기지 않는다
+      const movable = sentNodes.filter((s) => sentOf(s.parentId).length >= 3);
+      if (movable.length < 2) continue;
+      const kw = addConcept(e.name, root.id, await embedFn(e.name), '');
+      for (const s of movable) {
+        s.parentId = kw.id; s.level = kw.level + 1;
+        const p = s.sources?.[0]; if (p != null && !kw.sources.includes(p)) kw.sources.push(p);
+      }
+      promoted++;
+    }
+    if (promoted) log.push(`[v11] keyConcepts 승격: 키워드 ${promoted}개 신설`);
+
+    // 1) 핵심 개념 + 관계 축 판정 — 메모들의 thesis 가 "무엇에 대해 어떤 역할을 하는지"를 근거로
+    onProgress?.('phase 2 — 핵심 개념·관계 축 판정');
+    const kwList = () => concepts().filter((n) => n.parentId === root.id);
+    const kwLine = () => kwList().map((n) => `${n.id} | ${n.title} — ${(n.gloss || '').slice(0, 60)} [p${[...new Set(n.sources)].sort((a, b) => a - b).join(',')}]`).join('\n');
+    const thesisLine = planAnalyses.map((a) => `- ${a.thesis}${a.bookContextLink ? ` (맥락: ${String(a.bookContextLink).slice(0, 80)})` : ''}`).join('\n').slice(0, 4500);
+    const facetRaw = await llm({
+      system: `책의 전개 방식을 책 전체 라벨이 아니라 "핵심 개념에 대한 관계"로 파악한다. 이 책이 가장 중요하게 다루는 핵심 개념 1개를 세우고, 수집된 문장들이 그 개념에 대해 맡는 역할을 관계 축으로 나눈다 — 예: "X의 개념"(분석), "X의 기원"(통시), "X의 구성 요소"(분석), "X와 Y의 대립"(대조), "X의 현대적 양상"(예시). 축 이름은 이 책의 실제 내용을 가리키는 구체적 명사구여야 하고, relation 은 후보 중 하나다. 핵심 개념이 하나로 안 모이는 책(백과사전식·통시 일변)이면 coreConfidence 를 low 로 내라. JSON만 출력.`,
+      user: `책: ${book.title}\n\n[목차]\n${toc.join(' · ') || '(없음)'}\n\n[책 소개·서평]\n${rich || '(없음)'}\n\n[수집된 문장(메모별 핵심 주장)]\n${thesisLine || '(없음)'}\n\nrelation 후보: ${MODES.join(' / ')}\n출력 JSON: {"core":"핵심 개념","coreConfidence":"high|med|low","facets":[{"name":"구체적 축 이름","relation":"후보 중 하나","description":"1~2문장"}]} (축 2~5개)`,
+      temperature: 0,
+    });
+    let fj = {}; try { fj = JSON.parse(facetRaw); } catch { /* 판정 실패 */ }
+    const facets = (fj.facets || []).filter((f) => f.name && MODES.includes(f.relation)).slice(0, 5);
+    if (!fj.core || fj.coreConfidence === 'low' || facets.length < 2) {
+      log.push(`[v11] 핵심 개념 불성립(core=${fj.core || '없음'} · ${fj.coreConfidence || '?'} · 축 ${facets.length}개) — 평면 유지`);
+      v10Mode = { mode: '관계축 불성립', confidence: 'low', reason: fj.core ? `core=${fj.core}` : '판정 실패' };
+    } else {
+      log.push(`[v11] 핵심 개념 "${fj.core}" (${fj.coreConfidence}) · 축: ${facets.map((f) => `${f.name}(${f.relation})`).join(' · ')}`);
+
+      // 2) 배정 — 각 키워드가 어느 축의 역할을 하는지. 키워드의 문장 역할 요약을 근거로 준다.
+      onProgress?.('phase 2 — 관계 축 배정');
+      const roleLine = kwList().map((n) => {
+        const roles = sentOf(n.id).map((s) => String(s.gloss || s.title).slice(0, 70)).slice(0, 3).join(' / ');
+        return `${n.id} | ${n.title}${roles ? ` — 문장 역할: ${roles}` : ''}`;
+      }).join('\n');
+      const assignRaw = await llm({
+        system: '키워드를 핵심 개념의 관계 축에 배정한다. 키워드에 딸린 문장들이 책 전체에서 맡는 역할(개념 설명인지, 역사적 설명인지, 사례인지)을 근거로 판단하라. 억지로 다 넣지 말고 안 맞으면 빼라. JSON만 출력.',
+        user: `핵심 개념: ${fj.core}\n\n[관계 축]\n${facets.map((f, i) => `f${i} | ${f.name} (${f.relation}) — ${f.description || ''}`).join('\n')}\n\n[키워드와 문장 역할]\n${roleLine}\n\n각 축에 키워드 최소 1개. 출력 JSON: {"assign":[{"facet":"f0","memberIds":["n?"]}]}`,
+        temperature: 0.1,
+      });
+      let asn = []; try { asn = (JSON.parse(assignRaw).assign || []); } catch { /* 파싱 실패 */ }
+
+      // 3) 트리 구성: root → 핵심 개념 → 축(관계 라벨) → 키워드 → 문장
+      const dupCore = kwList().find((k) => nrm(k.title) === nrm(fj.core));
+      const coreNode = dupCore || addConcept(String(fj.core).trim(), root.id, await embedFn(String(fj.core)), '');
+      const usedIds = new Set();
+      const facetNodes = [];
+      for (const a of asn) {
+        const fi = Number(String(a.facet).replace(/^f/, ''));
+        const f = facets[fi]; if (!f) continue;
+        const ids = (a.memberIds || []).filter((id) => id !== coreNode.id && kwList().some((k) => k.id === id) && !usedIds.has(id));
+        if (!ids.length) continue;
+        const fn = addConcept(`${String(f.name).trim()} · ${f.relation}`, coreNode.id, await embedFn(`${f.name} ${f.description || ''}`), String(f.description || '').trim());
+        fn.relation = f.relation;
+        for (const id of ids) if (safeReparent(id, fn.id)) {
+          usedIds.add(id);
+          for (const p of nodes.get(id).sources) if (!fn.sources.includes(p)) fn.sources.push(p);
+        }
+        if (!conceptChildrenOf(fn.id).length) { nodes.delete(fn.id); continue; }
+        for (const p of fn.sources) if (!coreNode.sources.includes(p)) coreNode.sources.push(p);
+        facetNodes.push(fn);
+      }
+
+      // 4) 미편입 — 코사인 근접 축(≥0.3), 미달이면 핵심 개념 직속으로 남긴다
+      let moved = 0;
+      for (const k of kwList().filter((k) => k.id !== coreNode.id)) {
+        if (!facetNodes.length) break;
+        if (usedIds.has(k.id)) continue;
+        const e = k.emb || await embedFn(`${k.title} ${(k.gloss || '').slice(0, 100)}`);
+        let best = -1, bf = null;
+        for (const fn of facetNodes) { const s = cos(e, fn.emb); if (s > best) { best = s; bf = fn; } }
+        const target = best >= 0.3 ? bf : coreNode;
+        if (safeReparent(k.id, target.id)) { moved++; for (const p of k.sources) if (!target.sources.includes(p)) target.sources.push(p); }
+      }
+      log.push(`[v11] 축 ${facetNodes.length}개 편성 · 배정 ${usedIds.size} + 2차 ${moved}`);
+      v10Mode = { mode: `관계축:${fj.core}`, confidence: fj.coreConfidence, reason: facets.map((f) => `${f.name}(${f.relation})`).join(' · ') };
+    }
+  }
+
   // ─── Phase 2 (v7/v8): 테마 주역화 — Description 필수 + 책 논지 앵커링 + critic 반증 ──
   if (variant === 'v7' || variant === 'v8') {
     onProgress?.('phase 2 — 테마 생성(v7)');
@@ -682,7 +791,7 @@ ${orphans.map((k) => `${k.id}: ${k.title} — ${k.gloss || ''}`).join('\n')}
     merge: cnt('merge'), mergeGlobal: cnt('merge*'), child: cnt('child'),
     parent: cnt('parent'), attach: cnt('attach'), cluster: cnt('cluster'), flip: cnt('flip'),
     theme: cnt('theme'), themeRejected: cnt('theme✗'),
-    ...(variant === 'v8' || variant === 'v10' ? { pages: v8PageCount } : {}),
+    ...(variant === 'v8' || variant === 'v10' || variant === 'v11' ? { pages: v8PageCount } : {}),
   };
   return { nodes, rootId: root.id, stats, log, mode: v10Mode };
 }
