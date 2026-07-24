@@ -35,7 +35,9 @@ ${memoLine}
 두 가지를 산출하라.
 
 1) motifCandidates — 이 메모들을 관통하며 **반복되는** 심상·주제 3~6개.
-   - name: 짧은 명사구 (목차·줄거리 복붙 금지, 메모들에 실제로 나타나는 것만)
+   - name: 짧은 명사구. **메모에 실제로 등장하는 책 고유의 심상·표현을 이름에 우선 사용하라**
+     (예: "내면의 갈등"(백과사전식) 대신 "두 세계", "변화와 성장" 대신 "알을 깨고 나오는 새").
+     어느 책에나 붙일 수 있는 일반명사 이름은 실패다. 목차·줄거리 복붙도 금지.
    - description: 1~2문장. 이 모티프가 메모들 속에서 어떻게 나타나는지.
    - 메모 1개에만 걸리는 모티프는 만들지 마라.
 
@@ -112,7 +114,7 @@ export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, onPro
     `c${i} | ${c.name} — ${c.description || ''}\n${memberOf(c.name).map((x) => `    · p${x.p} ${String(x.text).slice(0, 60)}`).join('\n') || '    (배정 메모 없음)'}`).join('\n');
   const raw = await llm({
     system: '소설 독서 메모의 모티프 목록을 확정한다. 같은 것을 가리키는 모티프는 병합하고, 메모가 2개 미만 걸리는 모티프는 버린다. 메모를 억지로 채워 넣지 마라. JSON만 출력.',
-    user: `책: ${book.title}\n\n[모티프 후보와 배정된 메모]\n${candLine}\n\n최종 모티프를 확정하라. 각 모티프: name(후보 이름을 다듬어도 됨) · description(1~2문장) · memoIds(위에 배정된 메모의 memoId — 병합 시 합치기).\n출력 JSON: {"motifs":[{"name":"...","description":"...","mergedFrom":["c0"],"memoIds":["m27"]}]}`,
+    user: `책: ${book.title}\n\n[모티프 후보와 배정된 메모]\n${candLine}\n\n최종 모티프를 확정하라. 각 모티프: name(후보 이름을 다듬어도 됨) · description(1~2문장) · mergedFrom(합친 후보 c번호들) · memoIds(위에 배정된 메모의 memoId — 병합 시 합치기).\n규칙:\n- **메모 1개짜리 후보를 그냥 버리지 마라.** 서로 합치거나 이웃 후보에 합쳐 메모 2개 이상이 되는지 먼저 검토하고, 정말 어디에도 못 합칠 때만 버린다(예: "이루어질 수 없는 사랑"+"사회적 제약"이 실은 한 축인 경우).\n- 이름 자기검증: 각 이름이 문장들의 **정서 톤**(무의미·고독·슬픔 따위)이 아니라 **반복되는 심상·주제**를 가리키는지 확인하라. 정서 단어가 이름의 중심이면 심상·주제로 바꿔라.\n출력 JSON: {"motifs":[{"name":"...","description":"...","mergedFrom":["c0"],"memoIds":["m27"]}]}`,
     temperature: 0.1,
   });
   let finals = []; try { finals = (JSON.parse(raw).motifs || []); } catch { /* 파싱 실패 → 후보 그대로 */ }
