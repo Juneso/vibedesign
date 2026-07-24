@@ -171,15 +171,28 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
       const text = String(a.thesis || '').trim();
       if (!text) continue;
 
-      // 붙일 키워드 찾기: ① 이 메모를 소스로 가진 개념 ② keyConcepts 이름 일치 ③ 의미상 최근접
-      let host = pageHost.get(p)
-        || concepts().find((c) => (a.keyConcepts || []).some((k) => c.title === k));
-      if (!host) {
-        const pool = concepts().filter((c) => c.emb);
-        if (pool.length) {
-          const e = await embedFn(text);
-          host = pool.reduce((best, c) => (!best || cos(e, c.emb) > cos(e, best.emb) ? c : best), null);
-        }
+      // 붙일 키워드 찾기: ① keyConcepts 이름 일치 ② 페이지 일치 ③ 의미상 최근접.
+      // ⚠ 페이지 일치를 1순위로 두면 내용 검증 없이 무관한 메모를 흡수한다 —
+      //   "대등 욕망"에 68혁명·기초소득 문장이 붙은 실측 사례. planIngest 가 키워드 소스
+      //   페이지를 느슨하게 주장할 수 있으므로, 페이지 호스트가 의미상 크게 밀리면 최근접으로 교체.
+      const e = await embedFn(text);
+      const pool = concepts().filter((c) => c.emb);
+      const semHost = pool.length ? pool.reduce((best, c) => (!best || cos(e, c.emb) > cos(e, best.emb) ? c : best), null) : null;
+      let host = concepts().find((c) => (a.keyConcepts || []).some((k) => c.title === k))
+        || pageHost.get(p);
+      if (host && semHost && host.emb && cos(e, semHost.emb) - cos(e, host.emb) > 0.05) host = semHost;
+      if (!host) host = semHost;
+      // 최근접이라도 유사도가 낮으면 억지로 붙이지 않는다 — "대등 욕망"에 기초소득·68혁명
+      // 문장이 흡수된 실측 원인. 그 메모의 keyConcept 로 새 키워드를 세우는 쪽이 맞다.
+      const ATTACH_MIN = 0.3;
+      if (host && host.emb && cos(e, host.emb) < ATTACH_MIN && (a.keyConcepts || []).length) {
+        const title = a.keyConcepts[0];
+        const kw = addConcept(title, root.id, await embedFn(`${title}: ${text}`), '');
+        kw.sources.push(p);
+        pageHost.set(p, kw);
+        log.push(`[plan] 유사도 미달(${cos(e, host.emb).toFixed(2)} < ${ATTACH_MIN}) → 키워드 신설 "${title}"`);
+        host = kw;
+        madeConcept++;
       }
 
       // 개념이 하나도 없을 때만(패치 전멸) 최소한의 키워드를 만든다
