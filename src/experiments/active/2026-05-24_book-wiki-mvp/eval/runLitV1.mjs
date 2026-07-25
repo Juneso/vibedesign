@@ -42,6 +42,11 @@ const titles = (process.argv.slice(2).length ? process.argv.slice(2) : (process.
 if (!titles.length) { console.error('책 제목을 인자로 주세요'); process.exit(1); }
 
 const ds = JSON.parse(await readFile(resolve(__dir, 'golden/books50-memos.json'), 'utf-8'));
+// 골든셋 밖의 문학 책(하루키 잡문집 등) — 옵시디언에서 파싱해 둔 폴백 소스
+try {
+  const extra = JSON.parse(await readFile(resolve(__dir, 'golden/extra-lit-memos.json'), 'utf-8'));
+  ds.books.push(...(extra.books || []));
+} catch { /* 없으면 골든셋만 */ }
 const meta = JSON.parse(await readFile(resolve(__dir, 'golden/obsidian-books-meta.json'), 'utf-8'));
 // 문학 리치데이터 폴백 — eval/fetchLitMeta.mjs 가 만든다 (없으면 리치데이터 없이 진행)
 let litMeta = {};
@@ -71,7 +76,7 @@ for (const t of titles) {
     return { id: n ? `m${mm.p}dup${n}` : `m${mm.p}`, p: mm.p, text: mm.text, myThought: '' };
   });
   const book = {
-    title: N(b.title), author: m.author || '', category: m.category || '',
+    title: N(b.title), author: m.author || b.author || '', category: m.category || b.category || '',
     toc: m.toc || [], summary: m.summary || '', aladin: m.aladin || {},
   };
 
@@ -83,7 +88,8 @@ for (const t of titles) {
       (args) => planIngestLit({ ...args, llm: llm4o, canon }),
       // 캐시 키에 프롬프트가 안 들어가므로 태그로 구분: 비문학 캐시와 충돌 방지(#lit)
       // + 리치데이터 유무(+rich) + 정본 앵커 유무(+canon) — 입력이 바뀌면 새로 분석하게 한다
-      { book, memos, model: `${INGEST_MODEL}#lit${(book.summary || book.aladin?.intro) ? '+rich' : ''}${canon ? '+canon' : ''}` },
+      // #lit2: speaker 3분류(인물|서술자|미상) 프롬프트부터 — 이전 캐시와 분리
+      { book, memos, model: `${INGEST_MODEL}#lit2${(book.summary || book.aladin?.intro) ? '+rich' : ''}${canon ? '+canon' : ''}` },
     );
     const r = await runLitIngest({
       book, memos, llm, embedFn, planLitFn: planFn, canon,
@@ -104,15 +110,15 @@ for (const t of titles) {
       tree, log: r.log,
     }, null, 2) + '\n', 'utf-8');
 
-    // 최상위(루트 직속)만 상단 목록에 — 인물 하위로 분기된 모티프 노드가 중복 출력되지 않게
-    const motifs = tree.nodes.filter((n) => n.kind === 'concept' && n.role !== 'character' && n.parentId === r.rootId);
-    const chars = tree.nodes.filter((n) => n.role === 'character');
+    // 최상위(루트 직속) 모티프만 상단 목록에 — 목소리(voice) 노드는 모티프 아래 중첩으로만
+    const motifs = tree.nodes.filter((n) => n.kind === 'concept' && n.parentId === r.rootId);
+    const voices = tree.nodes.filter((n) => n.role === 'voice');
     let md = `# ${N(b.title)} — literature-v1 (모티프 축)\n\n`;
     md += `- 모티프: ${motifs.map((n) => `**${n.title}**`).join(' · ') || '(불성립)'}\n`;
-    if (chars.length) md += `- 승격 인물: ${chars.map((n) => n.title).join(' · ')}\n`;
+    if (voices.length) md += `- 목소리 분기: ${[...new Set(voices.map((n) => n.title))].join(' · ')}\n`;
     md += `- 메모 ${memos.length}개 · 보조 ${MODEL} · planIngestLit ${INGEST_MODEL} · ${sec}초\n\n`;
     md += `## 구조\n\n| 지표 | 값 |\n|---|---|\n`;
-    md += `| 모티프 | ${r.stats.motifs} |\n| 승격 인물 | ${r.stats.characters} |\n| 문장 노드 | ${r.stats.sentences} |\n| root 잔류 문장 | ${r.stats.rootSentences} |\n| 메모 커버리지 | ${covered} / ${memos.length} |\n\n`;
+    md += `| 모티프 | ${r.stats.motifs} |\n| 목소리 분기 | ${r.stats.voices} |\n| 문장 노드 | ${r.stats.sentences} |\n| root 잔류 문장 | ${r.stats.rootSentences} |\n| 메모 커버리지 | ${covered} / ${memos.length} |\n\n`;
     md += `## 트리\n\n모티프 아래 문장은 페이지순 = 서사 진행순. 각 문장에 speaker/emotion/arc 속성.\n\n`;
     // 중첩 렌더링: 책 → (모티프|인물) → [인물의 모티프] → 문장
     const sentLine = (s, indent) => `${indent}- p${s.sources[0] || '?'} [${[s.arc, s.speaker, s.emotion].filter(Boolean).join('·')}] ${String(s.title).slice(0, 80)}\n`;
@@ -122,7 +128,7 @@ for (const t of titles) {
       for (const sub of tree.nodes.filter((n) => n.parentId === c.id && n.kind === 'concept')) renderNode(sub, depth + 1);
       for (const s of tree.nodes.filter((n) => n.parentId === c.id && n.kind === 'sentence').sort((a, b) => (a.sources[0] || 0) - (b.sources[0] || 0))) md += sentLine(s, indent + '  ');
     };
-    for (const c of [...motifs, ...chars]) renderNode(c, 0);
+    for (const c of motifs) renderNode(c, 0);
     const rootSents = tree.nodes.filter((n) => n.parentId === r.rootId && n.kind === 'sentence');
     if (rootSents.length) {
       md += `- *(미분류 — root 직속)*\n`;
@@ -130,7 +136,7 @@ for (const t of titles) {
     }
     await writeFile(`${base}.md`, md, 'utf-8');
 
-    console.log(`      → 모티프 ${r.stats.motifs} · 인물 ${r.stats.characters} · 문장 ${r.stats.sentences} · root 잔류 ${r.stats.rootSentences} · 커버 ${covered}/${memos.length} (${sec}초)`);
+    console.log(`      → 모티프 ${r.stats.motifs} · 목소리 ${r.stats.voices} · 문장 ${r.stats.sentences} · root 잔류 ${r.stats.rootSentences} · 커버 ${covered}/${memos.length} (${sec}초)`);
     done++;
   } catch (e) {
     console.log(`      ✗ 실패: ${e.message}`);

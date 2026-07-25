@@ -162,7 +162,13 @@ export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, canon
     const extra = returned.filter((mid) => !derived.includes(mid));
     if (extra.length) log.push(`[consol] "${f.name}" 확정 단계 추가 배정: ${extra.join(',')}`);
     const mids = [...new Set([...derived, ...returned])].filter((mid) => !usedMemo.has(mid));
-    if (mids.length < MIN_MOTIF || !f.name) { log.push(`[motif✗] "${f.name || '?'}" 탈락(유효 메모 ${mids.length})`); continue; }
+    // 확정 단계에서 "새로 세워진" 축(강한 후보 출신이 아닌 것)은 1메모여도 씨앗으로 허용 —
+    // LLM 이 미배정 문장을 하나씩 판단해 세운 축이고, 유저는 메모를 하나씩 쌓으므로
+    // 이 씨앗이 다음 메모의 자리가 된다. (조르바 m164 영혼·관능, m165 배움 실측)
+    const isSeed = !srcNames.some((nm) => strong.has(nrm(nm)));
+    const minHere = isSeed ? 1 : MIN_MOTIF;
+    if (mids.length < minHere || !f.name) { log.push(`[motif✗] "${f.name || '?'}" 탈락(유효 메모 ${mids.length})`); continue; }
+    if (isSeed && mids.length < MIN_MOTIF) log.push(`[motif~] "${f.name}" 씨앗 모티프(메모 ${mids.length})`);
     const gloss = String(f.description || '').trim();
     const node = addConcept(String(f.name).trim(), gloss, await embedFn(`${f.name}: ${gloss}`));
     for (const mid of mids.sort((a, b) => (byId.get(a)?.p || 0) - (byId.get(b)?.p || 0))) {
