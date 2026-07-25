@@ -113,7 +113,7 @@ for (const t of titles) {
     md += `- 결과: ${r.mode ? `${r.mode.mode} (${r.mode.confidence})` : '평면'}\n`;
     md += `- 메모 ${memos.length}개 · 커버 ${covered}/${memos.length} · ${sec}초\n\n`;
     // 단계별 서사 — LLM 호출 없이 로그를 사람 말로 번역(lib/logNarrative.mjs)
-    md += buildNarrative({ log: r.log, dispatch: d.why, variant: d.variant, counts: { concepts: C.length, sentences, coveredMemos: covered }, nMemos: memos.length });
+    md += buildNarrative({ log: r.log, dispatch: d.why, variant: d.variant, tree, counts: { concepts: C.length, sentences, coveredMemos: covered }, nMemos: memos.length });
     await writeFile(`${base}.md`, md, 'utf-8');
 
     console.log(`      → ${d.variant} · 개념 ${C.length} · 문장 ${sentences} · 커버 ${covered}/${memos.length} (${sec}초)`);

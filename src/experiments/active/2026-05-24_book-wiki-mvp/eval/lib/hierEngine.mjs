@@ -564,6 +564,7 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
     // 0) keyConcepts 승격 — planIngest 가 메모마다 뽑았지만 키워드가 되지 못한 개념을 발굴한다.
     //    (존중정치학에서 키워드가 5개↔18개로 출렁이는 문제의 완충: 루소·칸트·투모스류가 여기서 살아난다)
     let promoted = 0;
+    const promotedNames = [];
     const kcCount = new Map();
     for (const a of planAnalyses) for (const k of (a.keyConcepts || [])) {
       const key = nrm(k); if (!key) continue;
@@ -583,8 +584,9 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
         const p = s.sources?.[0]; if (p != null && !kw.sources.includes(p)) kw.sources.push(p);
       }
       promoted++;
+      promotedNames.push(`${e.name}(${e.n}회·문장 ${movable.length})`);
     }
-    if (promoted) log.push(`[v11] keyConcepts 승격: 키워드 ${promoted}개 신설`);
+    if (promoted) log.push(`[v11] keyConcepts 승격 ${promoted}개: ${promotedNames.join(' · ')}`);
 
     // 1) 핵심 개념 + 관계 축 판정 — 메모들의 thesis 가 "무엇에 대해 어떤 역할을 하는지"를 근거로
     onProgress?.('phase 2 — 핵심 개념·관계 축 판정');
@@ -595,22 +597,50 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
     // 인지혁명·농업혁명·과학혁명) 1~5개까지 허용한다. 단 "정말 핵심일 때만"을 명시하고,
     // 확신 낮은 core 와 축 2개 미만 core 는 코드에서 걸러 남발을 막는다.
     const facetRaw = await llm({
-      system: `책의 전개 방식을 책 전체 라벨이 아니라 "핵심 개념에 대한 관계"로 파악한다. 이 책을 떠받치는 핵심 개념을 세우고(보통 1개 — 책이 정말로 여러 기둥 위에 서 있을 때만 최대 5개), 각 핵심 개념마다 수집된 문장들이 그 개념에 대해 맡는 역할을 관계 축으로 나눈다 — 예: "X의 개념"(분석), "X의 기원"(통시), "X의 구성 요소"(분석), "X와 Y의 대립"(대조), "X의 현대적 양상"(예시). 축 이름은 이 책의 실제 내용을 가리키는 구체적 명사구여야 하고, relation 은 후보 중 하나다. 핵심 개념이라 부를 만한 것이 없는 책(백과사전식·통시 일변)이면 cores 를 빈 배열로 내라. JSON만 출력.`,
-      user: `책: ${book.title}\n\n[목차]\n${toc.join(' · ') || '(없음)'}\n\n[책 소개·서평]\n${rich || '(없음)'}\n\n[수집된 문장(메모별 핵심 주장)]\n${thesisLine || '(없음)'}\n\nrelation 후보는 아래 어휘 중 하나다.\n[관계 어휘 — 정의와 오용 주의]\n${relationGuide()}\n출력 JSON: {"cores":[{"name":"핵심 개념","confidence":"high|med|low","facets":[{"name":"구체적 축 이름","relation":"후보 중 하나","description":"1~2문장"}]}]} (core 1~5개 · core당 축 2~5개)`,
+      system: `책의 전개 방식을 책 전체 라벨이 아니라 "핵심 개념에 대한 관계"로 파악한다. 이 책을 떠받치는 핵심 개념을 세우고(보통 1개 — 책이 정말로 여러 기둥 위에 서 있을 때만 최대 5개), 각 핵심 개념마다 수집된 문장들이 그 개념에 대해 맡는 역할을 관계 축으로 나눈다 — 예: "X의 개념"(분석), "X의 기원"(통시), "X의 구성 요소"(분석), "X와 Y의 대립"(대조), "X의 현대적 양상"(예시). 축 이름은 이 책의 실제 내용을 가리키는 구체적 명사구여야 하고, relation 은 후보 중 하나다.
+⚠ core 를 2개 이상 세울 때는 **서로 다른 기둥일 때만**이다. 같은 것을 다른 말로 부르는 개념(예: 인정 / 정체성 / 존엄 처럼 그 책 안에서 사실상 한 덩어리로 쓰이는 말들)은 **하나의 core 로 합치고** 나머지는 그 core 의 축으로 내려라. core 마다 why 에 "이 개념이 왜 기둥인지"를 수집된 문장을 근거로 한 줄 적어라.
+핵심 개념이라 부를 만한 것이 없는 책(백과사전식·통시 일변)이면 cores 를 빈 배열로 내라. JSON만 출력.`,
+      user: `책: ${book.title}\n\n[목차]\n${toc.join(' · ') || '(없음)'}\n\n[책 소개·서평]\n${rich || '(없음)'}\n\n[수집된 문장(메모별 핵심 주장)]\n${thesisLine || '(없음)'}\n\nrelation 후보는 아래 어휘 중 하나다.\n[관계 어휘 — 정의와 오용 주의]\n${relationGuide()}\n출력 JSON: {"cores":[{"name":"핵심 개념","confidence":"high|med|low","why":"이 개념이 이 책의 기둥인 이유 한 줄(수집된 문장 근거)","facets":[{"name":"구체적 축 이름","relation":"후보 중 하나","description":"1~2문장"}]}]} (core 1~5개 · core당 축 2~5개)`,
       temperature: 0,
     });
     let fj = {}; try { fj = JSON.parse(facetRaw); } catch { /* 판정 실패 */ }
     // 하위 호환: 구형 {core, coreConfidence, facets} 응답도 cores 배열로 정규화
     let cores = Array.isArray(fj.cores) ? fj.cores : (fj.core ? [{ name: fj.core, confidence: fj.coreConfidence, facets: fj.facets }] : []);
-    cores = cores
-      .map((c) => ({ name: String(c.name || '').trim(), confidence: c.confidence || 'low', facets: (c.facets || []).filter((f) => f.name && MODES.includes(f.relation)).slice(0, 5) }))
-      .filter((c) => c.name && c.confidence !== 'low' && c.facets.length >= 2)
-      .slice(0, 5);
+    const rawCores = cores.map((c) => ({
+      name: String(c.name || '').trim(), confidence: c.confidence || 'low', why: String(c.why || '').trim(),
+      facets: (c.facets || []).filter((f) => f.name && MODES.includes(f.relation)).slice(0, 5),
+    }));
+    // 탈락 사유를 남긴다 — 왜 이 core 가 살고 저 core 가 죽었는지 로그만 보고 알 수 있어야 한다.
+    for (const c of rawCores) {
+      const bad = !c.name ? '이름 없음' : c.confidence === 'low' ? '확신 low' : c.facets.length < 2 ? `축 ${c.facets.length}개(2개 미만)` : null;
+      if (bad) log.push(`[v11✗] core 후보 "${c.name || '?'}" 탈락 — ${bad}`);
+    }
+    cores = rawCores.filter((c) => c.name && c.confidence !== 'low' && c.facets.length >= 2).slice(0, 5);
+
+    // core 끼리 사실상 같은 말이면 합친다 — 존중정치학에서 "정체성의 정치"와 "인정의 정치"가
+    // 따로 서 버렸다(그 책에서 인정·정체성·존엄은 한 덩어리). 뒤에 온 core 의 축을 앞 core 로 넘긴다.
+    if (cores.length > 1) {
+      const cEmb = [];
+      for (const c of cores) cEmb.push(await embedFn(`${c.name} ${c.why || ''}`));
+      const merged = [];
+      for (let i = 0; i < cores.length; i++) {
+        const dupTo = merged.findIndex((_, j) => cos(cEmb[i], cEmb[cores.indexOf(merged[j])]) >= 0.72);
+        if (dupTo >= 0) {
+          merged[dupTo].facets = [...merged[dupTo].facets, ...cores[i].facets].slice(0, 5);
+          log.push(`[v11] core 병합: "${cores[i].name}" → "${merged[dupTo].name}" (사실상 같은 개념 · 축은 흡수)`);
+        } else merged.push(cores[i]);
+      }
+      cores = merged;
+    }
+
     if (!cores.length) {
       log.push(`[v11] 핵심 개념 불성립(유효 core 0개) — 평면 유지`);
       v10Mode = { mode: '관계축 불성립', confidence: 'low', reason: '핵심 개념 없음 또는 전부 low' };
     } else {
-      for (const c of cores) log.push(`[v11] 핵심 개념 "${c.name}" (${c.confidence}) · 축: ${c.facets.map((f) => `${f.name}(${f.relation})`).join(' · ')}`);
+      for (const c of cores) {
+        log.push(`[v11] 핵심 개념 "${c.name}" (${c.confidence})${c.why ? ` — 근거: ${c.why}` : ''}`);
+        log.push(`[v11] └ "${c.name}" 제안 축 ${c.facets.length}개: ${c.facets.map((f) => `${f.name}(${f.relation})`).join(' · ')}`);
+      }
 
       // 2) 배정 — 각 키워드가 어느 core 의 어느 축 역할인지. 전체 축을 f0..fN 으로 펼쳐 1회 호출.
       onProgress?.('phase 2 — 관계 축 배정');
@@ -639,20 +669,28 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
         const f = flatFacets[fi]; if (!f) continue;
         const coreNode = coreNodes[f.ci];
         const ids = (a.memberIds || []).filter((id) => !coreNodes.some((cn) => cn.id === id) && kwList().some((k) => k.id === id) && !usedIds.has(id));
-        if (!ids.length) continue;
+        if (!ids.length) { log.push(`[v11✗] 축 "${f.name}" 무산 — 배정할 키워드 없음`); continue; }
         const fn = addConcept(`${String(f.name).trim()} · ${f.relation}`, coreNode.id, await embedFn(`${f.name} ${f.description || ''}`), String(f.description || '').trim());
         fn.relation = f.relation;
+        const took = [];
         for (const id of ids) if (safeReparent(id, fn.id)) {
-          usedIds.add(id);
+          usedIds.add(id); took.push(nodes.get(id).title);
           for (const p of nodes.get(id).sources) if (!fn.sources.includes(p)) fn.sources.push(p);
         }
-        if (!conceptChildrenOf(fn.id).length) { nodes.delete(fn.id); continue; }
+        if (!conceptChildrenOf(fn.id).length) { nodes.delete(fn.id); log.push(`[v11✗] 축 "${f.name}" 무산 — 키워드 이동 실패`); continue; }
         for (const p of fn.sources) if (!coreNode.sources.includes(p)) coreNode.sources.push(p);
         facetNodes.push(fn);
+        log.push(`[v11] 축 "${f.name}·${f.relation}" [${f.core}] ← 키워드 ${took.length}개: ${took.join(', ')}`);
+      }
+      // 제안됐으나 배정에서 아예 언급조차 안 된 축도 조용히 사라지면 안 된다
+      for (let fi = 0; fi < flatFacets.length; fi++) {
+        if (asn.some((a) => Number(String(a.facet).replace(/^f/, '')) === fi)) continue;
+        log.push(`[v11✗] 축 "${flatFacets[fi].name}" 무산 — 배정 단계에서 미언급`);
       }
 
       // 4) 미편입 — 코사인 근접 축(≥0.3), 미달이면 가장 가까운 핵심 개념 직속으로
       let moved = 0;
+      const movedDetail = [];
       for (const k of kwList().filter((k) => !coreNodes.some((cn) => cn.id === k.id))) {
         if (!facetNodes.length) break;
         if (usedIds.has(k.id)) continue;
@@ -660,9 +698,35 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
         let best = -1, bf = null;
         for (const fn of facetNodes) { const s = cos(e, fn.emb); if (s > best) { best = s; bf = fn; } }
         const target = best >= 0.3 ? bf : nodes.get(bf ? bf.parentId : coreNodes[0].id);
-        if (safeReparent(k.id, target.id)) { moved++; for (const p of k.sources) if (!target.sources.includes(p)) target.sources.push(p); }
+        if (safeReparent(k.id, target.id)) {
+          moved++;
+          movedDetail.push(`${k.title}→${target.title}(${best.toFixed(2)})`);
+          for (const p of k.sources) if (!target.sources.includes(p)) target.sources.push(p);
+        }
       }
-      log.push(`[v11] core ${coreNodes.length}개 · 축 ${facetNodes.length}개 편성 · 배정 ${usedIds.size} + 2차 ${moved}`);
+      if (movedDetail.length) log.push(`[v11] 2차 배정 ${moved}개(뜻 유사도): ${movedDetail.join(' · ')}`);
+
+      // 5) core 실속 검증 — 배정 전 검증(확신도·제안 축 수)만으로는 부족하다. 제안은 그럴듯한데
+      //    실제로는 축 1개·키워드 2개만 받은 core 가 기둥 행세를 했다(존중정치학 "인정의 정치" 실측).
+      //    알맹이를 못 받은 core 는 해체해 그 내용물을 가장 가까운 core 밑으로 옮긴다.
+      const MIN_FACETS = 2, MIN_KWS = 3;
+      if (coreNodes.length > 1) {
+        for (const cn of [...coreNodes]) {
+          const fs = conceptChildrenOf(cn.id);
+          const kws = fs.reduce((s, f) => s + conceptChildrenOf(f.id).length, 0) + fs.filter((f) => !f.relation).length;
+          if (fs.length >= MIN_FACETS && kws >= MIN_KWS) continue;
+          const others = coreNodes.filter((o) => o.id !== cn.id && nodes.has(o.id));
+          if (!others.length) continue;
+          let best = -1, to = null;
+          for (const o of others) { const s = cos(cn.emb, o.emb); if (s > best) { best = s; to = o; } }
+          for (const child of childrenOf(cn.id)) safeReparent(child.id, to.id);
+          for (const p of cn.sources) if (!to.sources.includes(p)) to.sources.push(p);
+          nodes.delete(cn.id);
+          coreNodes.splice(coreNodes.indexOf(cn), 1);
+          log.push(`[v11] core 해체: "${cn.title}" (축 ${fs.length}개·키워드 ${kws}개로 기둥 미달) → "${to.title}" 밑으로 이동`);
+        }
+      }
+      log.push(`[v11] core ${coreNodes.length}개 · 축 ${facetNodes.filter((f) => nodes.has(f.id)).length}개 편성 · 배정 ${usedIds.size} + 2차 ${moved}`);
       const fjCoreNames = cores.map((c) => c.name).join('+');
 
       // 5) 순서형 축 내부 시대 편성 — v10 의 "책 전체 통시"는 사실 "통시 축 하나가 큰 경우"의
