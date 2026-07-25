@@ -114,11 +114,40 @@ export function MdBlock({ block }) {
   return <p className="eval-md-p">{mdInline(block.text)}</p>;
 }
 
+// "이 실행에서 단계별로 일어난 일" — 굵은 글씨 한 줄이 단계 제목, 그 뒤 블록이 그 단계 내용.
+// 단계 경계를 보더로 나누기 위해 블록 배열을 단계 단위로 묶는다.
+function groupStages(blocks) {
+  const groups = [];
+  for (const b of blocks) {
+    const head = b.type === 'p' && /^\*\*(.+)\*\*$/.test(b.text.trim());
+    if (head || !groups.length) groups.push({ head: head ? b : null, blocks: head ? [] : [b] });
+    else groups[groups.length - 1].blocks.push(b);
+  }
+  return groups;
+}
+
 export function MdSection({ section }) {
   const t = section.title || '';
   const isCheckpoint = /체크포인트|요약|판정/.test(t);
   const isLog = /로그/.test(t);
+  const isNarrative = /단계별로 일어난 일/.test(t);
   const body = section.blocks.map((b, i) => <MdBlock key={i} block={b} />);
+
+  if (isNarrative) {
+    return (
+      <section className="eval-md-section">
+        {t && <h4 className="eval-md-h">{t}</h4>}
+        <div className="eval-md-narr">
+          {groupStages(section.blocks).map((g, i) => (
+            <div className="eval-md-narr-step" key={i}>
+              {g.head && <div className="eval-md-narr-head">{mdInline(g.head.text)}</div>}
+              {g.blocks.map((b, j) => <MdBlock key={j} block={b} />)}
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   if (isLog) {
     return (

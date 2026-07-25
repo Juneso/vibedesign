@@ -54,8 +54,11 @@ export function buildNarrative(run) {
     if (!hit && /^\[(plan|v10|v11)\]/.test(line)) misc.push(line);
   }
 
+  // 원본 로그는 싣지 않는다 — 대시보드 md 렌더러가 <details> 를 모르는데다,
+  // 서사가 로그를 이미 대체하므로 원본은 runs/*.json 의 log 필드로만 남긴다.
   let md = `## 이 실행에서 단계별로 일어난 일\n\n`;
-  if (run.dispatch) md += `**⓪ 디스패치** — ${run.dispatch} → **${run.variant}** 경로로 보냈다.\n\n`;
+  // 단계 제목은 굵은 글씨 한 줄로만 둔다 — 대시보드가 그 줄을 기준으로 단계를 나눈다.
+  if (run.dispatch) md += `**⓪ 디스패치**\n\n- ${run.dispatch} → **${run.variant}** 경로로 보냈다.\n\n`;
 
   for (const [stage, items] of sections) {
     md += `**${stage}**\n\n`;
@@ -63,13 +66,18 @@ export function buildNarrative(run) {
     const quiet = items.filter((i) => i.quiet);
     for (const i of loud) md += `- ${i.tell}\n`;
     if (quiet.length) md += `- 만들어진 키워드 ${quiet.length}개: ${quiet.map((i) => i.raw.match(/"(.+?)"/)?.[1]).filter(Boolean).join(', ')}\n`;
-    md += `\n<details><summary>원본 로그</summary>\n\n\`\`\`\n${items.map((i) => i.raw).join('\n')}\n\`\`\`\n</details>\n\n`;
+    md += `\n`;
   }
-  if (misc.length) md += `**기타 로그**\n\n\`\`\`\n${misc.join('\n')}\n\`\`\`\n\n`;
+  // 번역 규칙이 없는 로그도 조용히 버리지 않는다 — 규칙 보강이 필요하다는 신호다.
+  if (misc.length) {
+    md += `**그 밖의 기록**\n\n`;
+    for (const l of misc) md += `- ${l.replace(/^\[[^\]]+\]\s*/, '')}\n`;
+    md += `\n`;
+  }
 
   if (run.counts) {
     const c = run.counts;
-    md += `**마무리 숫자** — 개념 ${c.concepts ?? (c.stages + c.keywords)}개 · 문장 ${c.sentences}개 · 메모 커버 ${c.coveredMemos}/${run.nMemos}\n`;
+    md += `**마무리 숫자**\n\n- 개념 ${c.concepts ?? (c.stages + c.keywords)}개 · 문장 ${c.sentences}개 · 메모 커버 ${c.coveredMemos}/${run.nMemos}\n`;
   }
   return md;
 }
