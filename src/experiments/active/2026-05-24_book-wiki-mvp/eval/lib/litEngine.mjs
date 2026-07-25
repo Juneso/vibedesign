@@ -138,12 +138,16 @@ export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, canon
   const unassignedLine = unassigned.map((x) => `- ${x.memoId} p${x.p}: ${String(x.text).slice(0, 70)}`).join('\n');
   const raw = await llm({
     system: '소설 독서 메모의 모티프 목록을 확정한다. 같은 것을 가리키는 모티프는 병합하고, 메모가 2개 미만 걸리는 모티프는 버린다. 메모를 억지로 채워 넣지 마라. JSON만 출력.',
-    user: `책: ${book.title}\n\n[모티프 후보와 배정된 메모]\n${candLine}\n${unassigned.length ? `\n[모티프가 없는 문장 — 하나씩 반드시 판단하라]\n${unassignedLine}\n각 문장에 대해 셋 중 하나를 골라라: ① 기존 모티프가 실제로 다루는 내용이면 그 모티프의 memoIds 에 포함 ② 이 문장들끼리 2개 이상 모이는 새 축이 보이면 **새 모티프를 motifs 에 추가**(이 문장들의 memoIds 로) ③ 정말 어디에도 안 맞으면 제외. 판단 없이 통째로 무시하는 것은 실패다. 단, 억지 배정도 금지.\n` : ''}\n최종 모티프를 확정하라. 각 모티프: name(후보 이름을 다듬어도 됨) · description(1~2문장) · mergedFrom(합친 후보 c번호들) · memoIds(위에 배정된 메모의 memoId — 병합 시 합치기).\n규칙:\n- [모티프가 없는 문장] 섹션이 있으면 그 문장들을 하나씩 판단한 결과가 motifs 에 반영돼야 한다 — 입력 후보를 그대로 복사한 출력은 실패다.\n- **메모 1개짜리 후보를 그냥 버리지 마라.** 서로 합치거나 이웃 후보에 합쳐 메모 2개 이상이 되는지 먼저 검토하고, 정말 어디에도 못 합칠 때만 버린다(예: "이루어질 수 없는 사랑"+"사회적 제약"이 실은 한 축인 경우).\n- **과병합 금지**: 병합은 두 후보가 **같은 심상·주제**를 가리킬 때만이다. 서로 다른 주제를 개수 채우기 편의로 합치지 마라 — 책의 핵심 축이 다른 축에 삼켜져 사라지는 것이 최악의 실패다.\n- 이름 자기검증: 각 이름이 문장들의 **정서 톤**(무의미·고독·슬픔 따위)이 아니라 **반복되는 심상·주제**를 가리키는지 확인하라. 정서 단어가 이름의 중심이면 심상·주제로 바꿔라.${canon ? `\n- 참고 — 이 책의 일반적 해석 축: ${(canon.themes || []).map((t) => t.name).join(' · ')}. 후보가 이 중 하나와 같은 것을 가리키면 그 어휘를 참고해 이름을 다듬어라. 단, 배정된 메모가 실제로 다루는 범위를 넘어서 이름을 부풀리지 마라.` : ''}\n출력 JSON: {"motifs":[{"name":"...","description":"...","mergedFrom":["c0"],"memoIds":["m27"]}]}`,
+    user: `책: ${book.title}\n\n[모티프 후보와 배정된 메모]\n${candLine}\n${unassigned.length ? `\n[모티프가 없는 문장 — 하나씩 반드시 판단하라]\n${unassignedLine}\n이 문장들은 motifs 의 memoIds 에 넣지 말고, **placements 배열에 문장마다 정확히 한 건씩** 판정하라:
+- action="attach": 기존 모티프가 그 설명대로 이미 다루는 주제일 때. motif=그 모티프 이름. **①이 성립하면 new 로 가지 마라** (예: "위대한 사상은 속이 빈 인형" → '체험과 관념의 대립' attach).
+- action="new": 기존 어느 모티프도 다루지 않는 새 축일 때만. motif=새 축 이름(짧은 명사구). 문장 1개짜리 축도 된다 — 앞으로 쌓일 메모의 씨앗. 단 문장마다 신설하면 잡동사니다.
+- action="drop": 문맥 없는 파편일 때만. 격언·핵심 사유 문장을 drop 하는 것은 실패다.\n` : ''}\n최종 모티프를 확정하라. 각 모티프: name(후보 이름을 다듬어도 됨) · description(1~2문장) · mergedFrom(합친 후보 c번호들) · memoIds(위에 배정된 메모의 memoId — 병합 시 합치기).\n규칙:\n- [모티프가 없는 문장] 섹션이 있으면 그 문장들을 하나씩 판단한 결과가 motifs 에 반영돼야 한다 — 입력 후보를 그대로 복사한 출력은 실패다.\n- **메모 1개짜리 후보를 그냥 버리지 마라.** 서로 합치거나 이웃 후보에 합쳐 메모 2개 이상이 되는지 먼저 검토하고, 정말 어디에도 못 합칠 때만 버린다(예: "이루어질 수 없는 사랑"+"사회적 제약"이 실은 한 축인 경우).\n- **과병합 금지**: 병합은 두 후보가 **같은 심상·주제**를 가리킬 때만이다. 서로 다른 주제를 개수 채우기 편의로 합치지 마라 — 책의 핵심 축이 다른 축에 삼켜져 사라지는 것이 최악의 실패다.\n- 이름 자기검증: 각 이름이 문장들의 **정서 톤**(무의미·고독·슬픔 따위)이 아니라 **반복되는 심상·주제**를 가리키는지 확인하라. 정서 단어가 이름의 중심이면 심상·주제로 바꿔라.${canon ? `\n- 참고 — 이 책의 일반적 해석 축: ${(canon.themes || []).map((t) => t.name).join(' · ')}. 후보가 이 중 하나와 같은 것을 가리키면 그 어휘를 참고해 이름을 다듬어라. 단, 배정된 메모가 실제로 다루는 범위를 넘어서 이름을 부풀리지 마라.` : ''}\n출력 JSON: {"motifs":[{"name":"...","description":"...","mergedFrom":["c0"],"memoIds":["m27"]}],"placements":[{"memoId":"m70","action":"attach|new|drop","motif":"모티프 이름"}]}`,
     temperature: 0.1,
     // mini 는 미배정 문장 판단을 반복적으로 무시하고 후보를 에코만 했다(조르바 3회 실측) — 이 콜만 4o.
     model: 'gpt-4o',
   });
-  let finals = []; try { finals = (JSON.parse(raw).motifs || []); } catch { /* 파싱 실패 → 후보 그대로 */ }
+  let finals = [], placements = [];
+  try { const pj = JSON.parse(raw); finals = pj.motifs || []; placements = pj.placements || []; } catch { /* 파싱 실패 → 후보 그대로 */ }
   if (!finals.length) finals = candidates.map((c) => ({ name: c.name, description: c.description, mergedFrom: [] }));
 
   // ⚠ 멤버십은 LLM 이 돌려준 memoIds 를 믿지 않고 코드가 analyses 에서 직접 도출한다 —
@@ -179,6 +183,44 @@ export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, canon
     log.push(`[motif] "${node.title}" ← 메모 ${mids.length}개 (p${node.sources.sort((a, b) => a - b).join(',p')})`);
   }
 
+  // ─── Phase 2.3: placements 집행 — 미배정 문장의 문장별 판정(attach|new|drop)을 코드가 적용 ──
+  // "목록을 알아서 고쳐라"는 편집 지시는 샘플마다 준수율이 출렁였다(43 균형→45 전부 신설→46 전부 편입 실측).
+  // 문장별 폐쇄형 분류로 좁히고 집행·검증은 코드가 한다 — 비문학의 "제약은 코드로 강제" 원칙.
+  {
+    const findMotif = (name) => motifNodes.find((n) => nodes.has(n.id) && nrm(n.title) === nrm(name));
+    const newGroups = new Map(); // 신설 이름 → memoIds (같은 이름은 한 노드로)
+    let attached = 0, dropped = 0;
+    for (const pl of placements) {
+      const mid = normId(pl.memoId);
+      const x = items.find((i) => i.memoId === mid);
+      if (!x || usedMemo.has(mid)) continue;
+      const action = String(pl.action || '').toLowerCase();
+      if (action === 'attach' && pl.motif && findMotif(pl.motif)) {
+        const node = findMotif(pl.motif);
+        usedMemo.add(mid);
+        addSentence({ ...x, motifName: node.title }, node.id);
+        attached++;
+      } else if (action === 'new' && pl.motif) {
+        const key = nrm(pl.motif);
+        if (!newGroups.has(key)) newGroups.set(key, { name: String(pl.motif).trim(), mids: [] });
+        newGroups.get(key).mids.push(mid);
+      } else if (action === 'drop') {
+        dropped++; // 백스톱(2.5)으로 넘어간다 — 코사인이 잡으면 살고, 아니면 root 잔류
+      }
+    }
+    for (const g of newGroups.values()) {
+      const node = addConcept(g.name, '', await embedFn(g.name));
+      for (const mid of g.mids.sort((a, b) => (byId.get(a)?.p || 0) - (byId.get(b)?.p || 0))) {
+        if (usedMemo.has(mid)) continue;
+        usedMemo.add(mid);
+        addSentence({ ...items.find((i) => i.memoId === mid), motifName: node.title }, node.id);
+      }
+      motifNodes.push(node);
+      log.push(`[motif~] "${g.name}" 씨앗 신설(placements · 메모 ${g.mids.length})`);
+    }
+    if (placements.length) log.push(`[placements] 판정 ${placements.length}건 — attach ${attached} · new ${newGroups.size}축 · drop ${dropped}`);
+  }
+
   // ─── Phase 2.5: 미배정 메모 — 임베딩 근접 모티프(≥0.3), 미달이면 root 직속 ──
   const orphans = items.filter((x) => !usedMemo.has(x.memoId));
   let adopted = 0;
@@ -195,6 +237,25 @@ export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, canon
         let best = -1;
         for (const n of motifNodes) { if (!nodes.has(n.id)) continue; const s = cos(e, n.emb); if (s > best) { best = s; host = n; } }
         if (best < 0.3) host = null;
+      }
+    }
+    // ③ 그래도 못 찾으면 root 에 버리지 않고 그 문장의 씨앗 모티프를 세운다 —
+    //    독자가 밑줄 그은 문장은 전부 위키에 자리가 있어야 한다(증분 수집 원칙).
+    //    이름은 planIngestLit 이 이미 부여한 후보명 우선, 없으면 mini 이름짓기(단순 생성이라 mini 로 충분).
+    if (!host) {
+      let name = (x.motifs || [])[0];
+      if (!name) {
+        const nameRaw = await llm({
+          system: '문학 문장 하나의 핵심 심상·주제를 짧은 명사구 하나로 짓는다. JSON만 출력.',
+          user: `책: ${book.title}\n문장: ${String(x.text).slice(0, 300)}\n출력 JSON: {"name":"짧은 명사구"}`,
+          temperature: 0.1,
+        });
+        try { name = String(JSON.parse(nameRaw).name || '').trim(); } catch { /* 실패 시 root */ }
+      }
+      if (name) {
+        host = addConcept(name, '', await embedFn(name));
+        motifNodes.push(host);
+        log.push(`[motif~] "${name}" 씨앗 신설(잔류 방지 · p${x.p})`);
       }
     }
     addSentence({ ...x, motifName: host?.title || '' }, host ? host.id : root.id);
