@@ -617,6 +617,22 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
     }
     cores = rawCores.filter((c) => c.name && c.confidence !== 'low' && c.facets.length >= 2).slice(0, 5);
 
+    // 축은 자식 2개쯤을 받아야 성립하므로, 쓸 수 있는 축 수는 키워드 수에 묶여 있다.
+    // 상한이 없으면 키워드 8개짜리 책에 축 5개가 제안돼 남는 축에 아무거나 채워진다
+    // (공정하다는 착각 실측: 3개 축 전부 이름과 무관한 키워드를 받았다).
+    {
+      const kwCount = concepts().filter((n) => n.parentId === root.id).length;
+      const capTotal = Math.max(2, Math.floor(kwCount / 2));
+      let total = cores.reduce((s, c) => s + c.facets.length, 0);
+      if (total > capTotal) {
+        // core 마다 최소 2개는 남기고, 뒤쪽 축부터 잘라 낸다
+        for (let i = cores.length - 1; i >= 0 && total > capTotal; i--) {
+          while (cores[i].facets.length > 2 && total > capTotal) { cores[i].facets.pop(); total--; }
+        }
+        log.push(`[v11] 축 상한 적용: 키워드 ${kwCount}개 → 축 최대 ${capTotal}개 (제안 초과분 잘라냄)`);
+      }
+    }
+
     // core 끼리 사실상 같은 말이면 합친다 — 존중정치학에서 "정체성의 정치"와 "인정의 정치"가
     // 따로 서 버렸다(그 책에서 인정·정체성·존엄은 한 덩어리). 뒤에 온 core 의 축을 앞 core 로 넘긴다.
     if (cores.length > 1) {
@@ -694,8 +710,18 @@ ${roleLine}
           if (PAIRED_RELATIONS.has(f.relation) && ids.length === 1) {
             const src = nodes.get(ids[0]);
             const sents = sentOf(src.id);
+            // ⚠ 전환 직전에 의미 검증을 한다. 배정이 애초에 틀렸을 때("능력주의와 패배자의 반응"
+            //   축에 '정보 부족' 키워드가 배정된 실측) 전환이 그 오류를 구조로 굳혀 버린다.
+            //   축 이름과 실제 문장이 겉돌면 전환하지 않고 무산시킨다.
+            const axisEmb = await embedFn(`${f.name} ${f.description || ''}`);
+            const fit = sents.length ? cos(axisEmb, await embedFn(sents.map((s) => s.title).join(' ').slice(0, 500))) : 0;
+            const FIT_MIN = 0.3;
+            if (sents.length && fit < FIT_MIN) {
+              log.push(`[v11✗] 축 "${f.name}·${f.relation}" 무산 — 관계 키워드 전환을 시도했으나 문장이 축 이름과 겉돈다(적합도 ${fit.toFixed(2)} < ${FIT_MIN} · 배정된 키워드 "${src.title}")`);
+              continue;
+            }
             if (sents.length && !conceptChildrenOf(src.id).length) {
-              const rn = addConcept(`${String(f.name).trim()} · ${f.relation}`, coreNode.id, await embedFn(`${f.name} ${f.description || ''}`), String(f.description || '').trim());
+              const rn = addConcept(`${String(f.name).trim()} · ${f.relation}`, coreNode.id, axisEmb, String(f.description || '').trim());
               rn.relation = f.relation; rn.relationLeaf = true;
               for (const s of sents) { s.parentId = rn.id; s.level = rn.level + 1; }
               for (const p of src.sources) { if (!rn.sources.includes(p)) rn.sources.push(p); if (!coreNode.sources.includes(p)) coreNode.sources.push(p); }

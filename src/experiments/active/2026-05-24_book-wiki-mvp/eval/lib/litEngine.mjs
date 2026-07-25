@@ -48,7 +48,7 @@ ${canonBlock}
      (예: "내면의 갈등"(백과사전식) 대신 "두 세계", "변화와 성장" 대신 "알을 깨고 나오는 새").
      어느 책에나 붙일 수 있는 일반명사 이름은 실패다. 목차·줄거리 복붙도 금지.
    - description: 1~2문장. 이 모티프가 메모들 속에서 어떻게 나타나는지.
-   - 메모 1개에만 걸리는 모티프는 만들지 마라.
+   - ${memos.length >= 6 ? '메모 1개에만 걸리는 모티프는 만들지 마라.' : '메모가 아직 적으니 1개짜리 모티프도 허용된다 — 앞으로 쌓일 메모의 씨앗이 될 축을 세워라.'}
 
 2) analyses — 메모마다:
    - memoId: 위 id 그대로
@@ -104,8 +104,10 @@ export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, canon
   const byId = new Map(memosWithId.map((m) => [m.id, m]));
   const pages = memosWithId.map((m) => m.p).filter((p) => p != null);
   const [minP, maxP] = [Math.min(...pages), Math.max(...pages)];
+  // 수필·에세이는 독립된 글 모음이라 페이지 순서 ≠ 서사 진행 — 아크 라벨이 오해를 만든다
+  const isEssay = /수필|에세이/.test(book.category || '');
   const arcOf = (p) => {
-    if (p == null || maxP === minP) return '';
+    if (isEssay || p == null || maxP === minP) return '';
     const r = (p - minP) / (maxP - minP);
     return r < 0.33 ? '초반' : r < 0.67 ? '중반' : '종반';
   };
@@ -126,10 +128,20 @@ export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, canon
   const memberOf = (name) => items.filter((x) => x.motifs.some((mm) => nrm(mm) === nrm(name)));
   const candLine = candidates.map((c, i) =>
     `c${i} | ${c.name} — ${c.description || ''}\n${memberOf(c.name).map((x) => `    · p${x.p} ${String(x.text).slice(0, 60)}`).join('\n') || '    (배정 메모 없음)'}`).join('\n');
+  // 어느 후보에도 안 걸린 문장을 확정 단계에 함께 보여준다 — 사후 임베딩 "구제"보다
+  // 초기 형성에서 LLM 판단으로 배정되는 쪽이 정확하다 (조르바 잔류 5~7 실측의 처방).
+  // "강한 후보"(2메모+) 기준으로 판단 — 탈락 예정인 약한 후보만 가리킨 메모도 미배정으로 취급해야
+  // 확정 단계에서 살아남을 모티프에 실릴 기회를 얻는다 (전체 후보 기준으로 하면 그 메모들이 누락된다).
+  const strong = new Set(candidates.filter((c) => memberOf(c.name).length >= 2).map((c) => nrm(c.name)));
+  const unassigned = items.filter((x) => !x.motifs.some((mm) => strong.has(nrm(mm))));
+  log.push(`[consol] 강한 후보 ${strong.size}/${candidates.length} · 확정 콜에 미배정 ${unassigned.length}건 제시(${unassigned.map((x) => x.memoId).join(',')})`);
+  const unassignedLine = unassigned.map((x) => `- ${x.memoId} p${x.p}: ${String(x.text).slice(0, 70)}`).join('\n');
   const raw = await llm({
     system: '소설 독서 메모의 모티프 목록을 확정한다. 같은 것을 가리키는 모티프는 병합하고, 메모가 2개 미만 걸리는 모티프는 버린다. 메모를 억지로 채워 넣지 마라. JSON만 출력.',
-    user: `책: ${book.title}\n\n[모티프 후보와 배정된 메모]\n${candLine}\n\n최종 모티프를 확정하라. 각 모티프: name(후보 이름을 다듬어도 됨) · description(1~2문장) · mergedFrom(합친 후보 c번호들) · memoIds(위에 배정된 메모의 memoId — 병합 시 합치기).\n규칙:\n- **메모 1개짜리 후보를 그냥 버리지 마라.** 서로 합치거나 이웃 후보에 합쳐 메모 2개 이상이 되는지 먼저 검토하고, 정말 어디에도 못 합칠 때만 버린다(예: "이루어질 수 없는 사랑"+"사회적 제약"이 실은 한 축인 경우).\n- **과병합 금지**: 병합은 두 후보가 **같은 심상·주제**를 가리킬 때만이다. 서로 다른 주제를 개수 채우기 편의로 합치지 마라 — 책의 핵심 축이 다른 축에 삼켜져 사라지는 것이 최악의 실패다.\n- 이름 자기검증: 각 이름이 문장들의 **정서 톤**(무의미·고독·슬픔 따위)이 아니라 **반복되는 심상·주제**를 가리키는지 확인하라. 정서 단어가 이름의 중심이면 심상·주제로 바꿔라.${canon ? `\n- 참고 — 이 책의 일반적 해석 축: ${(canon.themes || []).map((t) => t.name).join(' · ')}. 후보가 이 중 하나와 같은 것을 가리키면 그 어휘를 참고해 이름을 다듬어라. 단, 배정된 메모가 실제로 다루는 범위를 넘어서 이름을 부풀리지 마라.` : ''}\n출력 JSON: {"motifs":[{"name":"...","description":"...","mergedFrom":["c0"],"memoIds":["m27"]}]}`,
+    user: `책: ${book.title}\n\n[모티프 후보와 배정된 메모]\n${candLine}\n${unassigned.length ? `\n[모티프가 없는 문장 — 하나씩 반드시 판단하라]\n${unassignedLine}\n각 문장에 대해 셋 중 하나를 골라라: ① 기존 모티프가 실제로 다루는 내용이면 그 모티프의 memoIds 에 포함 ② 이 문장들끼리 2개 이상 모이는 새 축이 보이면 **새 모티프를 motifs 에 추가**(이 문장들의 memoIds 로) ③ 정말 어디에도 안 맞으면 제외. 판단 없이 통째로 무시하는 것은 실패다. 단, 억지 배정도 금지.\n` : ''}\n최종 모티프를 확정하라. 각 모티프: name(후보 이름을 다듬어도 됨) · description(1~2문장) · mergedFrom(합친 후보 c번호들) · memoIds(위에 배정된 메모의 memoId — 병합 시 합치기).\n규칙:\n- [모티프가 없는 문장] 섹션이 있으면 그 문장들을 하나씩 판단한 결과가 motifs 에 반영돼야 한다 — 입력 후보를 그대로 복사한 출력은 실패다.\n- **메모 1개짜리 후보를 그냥 버리지 마라.** 서로 합치거나 이웃 후보에 합쳐 메모 2개 이상이 되는지 먼저 검토하고, 정말 어디에도 못 합칠 때만 버린다(예: "이루어질 수 없는 사랑"+"사회적 제약"이 실은 한 축인 경우).\n- **과병합 금지**: 병합은 두 후보가 **같은 심상·주제**를 가리킬 때만이다. 서로 다른 주제를 개수 채우기 편의로 합치지 마라 — 책의 핵심 축이 다른 축에 삼켜져 사라지는 것이 최악의 실패다.\n- 이름 자기검증: 각 이름이 문장들의 **정서 톤**(무의미·고독·슬픔 따위)이 아니라 **반복되는 심상·주제**를 가리키는지 확인하라. 정서 단어가 이름의 중심이면 심상·주제로 바꿔라.${canon ? `\n- 참고 — 이 책의 일반적 해석 축: ${(canon.themes || []).map((t) => t.name).join(' · ')}. 후보가 이 중 하나와 같은 것을 가리키면 그 어휘를 참고해 이름을 다듬어라. 단, 배정된 메모가 실제로 다루는 범위를 넘어서 이름을 부풀리지 마라.` : ''}\n출력 JSON: {"motifs":[{"name":"...","description":"...","mergedFrom":["c0"],"memoIds":["m27"]}]}`,
     temperature: 0.1,
+    // mini 는 미배정 문장 판단을 반복적으로 무시하고 후보를 에코만 했다(조르바 3회 실측) — 이 콜만 4o.
+    model: 'gpt-4o',
   });
   let finals = []; try { finals = (JSON.parse(raw).motifs || []); } catch { /* 파싱 실패 → 후보 그대로 */ }
   if (!finals.length) finals = candidates.map((c) => ({ name: c.name, description: c.description, mergedFrom: [] }));
@@ -138,14 +150,19 @@ export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, canon
   //   파일럿에서 mini 가 실제 id 와 안 맞는 memoIds 를 돌려줘 모티프가 전멸했다.
   //   mini 의 역할은 병합(mergedFrom)·이름·설명 결정까지만.
   const normId = (v) => { const s = String(v ?? '').trim(); return /^m\d+$/.test(s) ? s : /^\d+$/.test(s) ? `m${s}` : s; };
+  // 메모가 적을 땐(증분 수집 초기) 1메모 모티프도 씨앗으로 세운다 —
+  // 유저는 문장을 하나씩 쌓으므로 2문장짜리 노트에서도 결과가 나와야 한다.
+  const MIN_MOTIF = memos.length >= 6 ? 2 : 1;
   const usedMemo = new Set();
   const motifNodes = [];
   for (const f of finals) {
     const srcNames = [f.name, ...(f.mergedFrom || []).map((ci) => candidates[Number(String(ci).replace(/^c/, ''))]?.name)].filter(Boolean);
     const derived = [...new Set(srcNames.flatMap((nm) => memberOf(nm).map((x) => x.memoId)))];
     const returned = [...new Set((f.memoIds || []).map(normId))].filter((mid) => items.some((x) => x.memoId === mid));
+    const extra = returned.filter((mid) => !derived.includes(mid));
+    if (extra.length) log.push(`[consol] "${f.name}" 확정 단계 추가 배정: ${extra.join(',')}`);
     const mids = [...new Set([...derived, ...returned])].filter((mid) => !usedMemo.has(mid));
-    if (mids.length < 2 || !f.name) { log.push(`[motif✗] "${f.name || '?'}" 탈락(유효 메모 ${mids.length})`); continue; }
+    if (mids.length < MIN_MOTIF || !f.name) { log.push(`[motif✗] "${f.name || '?'}" 탈락(유효 메모 ${mids.length})`); continue; }
     const gloss = String(f.description || '').trim();
     const node = addConcept(String(f.name).trim(), gloss, await embedFn(`${f.name}: ${gloss}`));
     for (const mid of mids.sort((a, b) => (byId.get(a)?.p || 0) - (byId.get(b)?.p || 0))) {
@@ -167,11 +184,11 @@ export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, canon
       host = motifNodes.find((n) => nodes.has(n.id) && x.motifs.some((mm) => nrm(mm) === nrm(n.title))) || null;
       if (!host) {
         // ② 임베딩 근접 — 문장 원문에 resonance(밑줄 이유)를 붙이면 모티프 설명과 어휘가 겹쳐 매칭이 잘 된다.
-        //    문턱 0.3은 실측상 과엄격(구제 0~3건) → 0.22. 그래도 미달이면 root 잔류(억지 편입 금지).
+        //    코사인은 보수적으로(0.3) — 억지 편입은 초기 모티프를 잘 세우는 것보다 못하다.
         const e = await embedFn([x.text, x.resonance].filter(Boolean).join(' '));
         let best = -1;
         for (const n of motifNodes) { if (!nodes.has(n.id)) continue; const s = cos(e, n.emb); if (s > best) { best = s; host = n; } }
-        if (best < 0.22) host = null;
+        if (best < 0.3) host = null;
       }
     }
     addSentence({ ...x, motifName: host?.title || '' }, host ? host.id : root.id);
