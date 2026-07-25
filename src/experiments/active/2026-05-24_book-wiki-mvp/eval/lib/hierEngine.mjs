@@ -17,7 +17,7 @@
 //   eval/pipelines/hier-ingest-v7.json (eval 대시보드 왼쪽 구조도)도 같이 갱신할 것.
 //   v8은 eval/pipelines/hier-ingest-v8.json 참조.
 
-import { RELATION_NAMES, relationGuide } from './relationVocab.mjs';
+import { RELATION_NAMES, relationGuide, memberSpec, MEMBER_SPEC, PAIRED_RELATIONS } from './relationVocab.mjs';
 
 const MAX_LEVEL = 3;
 
@@ -649,9 +649,23 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
         const roles = sentOf(n.id).map((s) => String(s.gloss || s.title).slice(0, 70)).slice(0, 3).join(' / ');
         return `${n.id} | ${n.title}${roles ? ` — 문장 역할: ${roles}` : ''}`;
       }).join('\n');
+      // ⚠ 축은 관계를 선언하는데 멤버는 아무거나 들어오던 문제(실측: "~의 대조" 축에 견주는
+      //   대상이 아니라 인접 개념이 배정). 축마다 "이 관계의 자식은 무엇이어야 하는가"를
+      //   명세로 붙여 준다 — 대조면 맞세워지는 양쪽, 인과면 원인과 결과, 분석이면 구성 요소.
       const assignRaw = await llm({
-        system: '키워드를 핵심 개념의 관계 축에 배정한다. 키워드에 딸린 문장들이 책 전체에서 맡는 역할(개념 설명인지, 역사적 설명인지, 사례인지)을 근거로 판단하라. 억지로 다 넣지 말고 안 맞으면 빼라. JSON만 출력.',
-        user: `핵심 개념: ${cores.map((c) => c.name).join(' · ')}\n\n[관계 축]\n${flatFacets.map((f, i) => `f${i} | [${f.core}] ${f.name} (${f.relation}) — ${f.description || ''}`).join('\n')}\n\n[키워드와 문장 역할]\n${roleLine}\n\n각 축에 키워드 최소 1개. 출력 JSON: {"assign":[{"facet":"f0","memberIds":["n?"]}]}`,
+        system: `키워드를 핵심 개념의 관계 축에 배정한다. **축의 관계가 요구하는 역할에 맞는 키워드만** 넣어라 — 주제가 비슷하다고 넣는 것이 아니다. 대조·비교 축에는 실제로 맞세워지는 양쪽이, 인과 축에는 원인 쪽과 결과 쪽이, 분석 축에는 구성 요소가 들어와야 한다. 판단 근거는 키워드에 딸린 문장이 책에서 맡는 역할이다.
+동시에, **역할이 맞는 키워드는 하나도 빠뜨리지 마라** — 목록의 키워드를 전부 훑고 어느 축의 역할에 해당하는지 판단하라. 축당 1개만 넣고 나머지를 남기는 식은 잘못이다. 정말 어느 역할에도 안 맞는 것만 남긴다.
+역할이 맞는 키워드가 최소 개수만큼 없으면 그 축은 비워 두어라(빈 축은 코드가 없앤다) — 억지로 채우지도 마라. JSON만 출력.`,
+        user: `핵심 개념: ${cores.map((c) => c.name).join(' · ')}
+
+[관계 축 — 각 축에 들어와야 하는 것]
+${flatFacets.map((f, i) => `f${i} | [${f.core}] ${f.name} (${f.relation}) — ${f.description || ''}\n     └ 이 축의 자식: ${memberSpec(f.relation)}`).join('\n')}
+
+[키워드와 문장 역할]
+${roleLine}
+
+각 키워드는 한 축에만. 역할이 안 맞으면 어느 축에도 넣지 마라.
+출력 JSON: {"assign":[{"facet":"f0","memberIds":["n?"],"why":"이들이 이 관계의 자식인 이유 한 줄"}]}`,
         temperature: 0.1,
       });
       let asn = []; try { asn = (JSON.parse(assignRaw).assign || []); } catch { /* 파싱 실패 */ }
@@ -670,6 +684,12 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
         const coreNode = coreNodes[f.ci];
         const ids = (a.memberIds || []).filter((id) => !coreNodes.some((cn) => cn.id === id) && kwList().some((k) => k.id === id) && !usedIds.has(id));
         if (!ids.length) { log.push(`[v11✗] 축 "${f.name}" 무산 — 배정할 키워드 없음`); continue; }
+        // 관계가 요구하는 최소 자식 수를 코드로 강제한다 — 대조 축에 한쪽만 있으면 대조가 아니다.
+        const need = MEMBER_SPEC[f.relation]?.min || 1;
+        if (ids.length < need) {
+          log.push(`[v11✗] 축 "${f.name}·${f.relation}" 무산 — ${f.relation} 관계는 자식 ${need}개가 필요한데 ${ids.length}개(${ids.map((id) => nodes.get(id).title).join(', ')})`);
+          continue;
+        }
         const fn = addConcept(`${String(f.name).trim()} · ${f.relation}`, coreNode.id, await embedFn(`${f.name} ${f.description || ''}`), String(f.description || '').trim());
         fn.relation = f.relation;
         const took = [];
@@ -688,23 +708,107 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
         log.push(`[v11✗] 축 "${flatFacets[fi].name}" 무산 — 배정 단계에서 미언급`);
       }
 
-      // 4) 미편입 — 코사인 근접 축(≥0.3), 미달이면 가장 가까운 핵심 개념 직속으로
+      // 4) 미편입 2차 배정 — 축의 *추상 이름*과의 코사인으로 넣던 것을 걷어낸다.
+      //    "자유" vs "정체성과 민주주의 · 대조" 같은 비교는 주제 근접도일 뿐 "이게 대조 대상인가"를
+      //    재지 못한다(실측 0.35~0.41 은 사실상 잡음). 대신 ① 관계 역할을 아는 LLM 이 판단하고,
+      //    ② 실패 시에는 축의 *실제 멤버 무게중심*과 비교한다(추상 라벨보다 훨씬 나은 신호).
       let moved = 0;
       const movedDetail = [];
-      for (const k of kwList().filter((k) => !coreNodes.some((cn) => cn.id === k.id))) {
-        if (!facetNodes.length) break;
-        if (usedIds.has(k.id)) continue;
-        const e = k.emb || await embedFn(`${k.title} ${(k.gloss || '').slice(0, 100)}`);
-        let best = -1, bf = null;
-        for (const fn of facetNodes) { const s = cos(e, fn.emb); if (s > best) { best = s; bf = fn; } }
-        const target = best >= 0.3 ? bf : nodes.get(bf ? bf.parentId : coreNodes[0].id);
-        if (safeReparent(k.id, target.id)) {
-          moved++;
-          movedDetail.push(`${k.title}→${target.title}(${best.toFixed(2)})`);
-          for (const p of k.sources) if (!target.sources.includes(p)) target.sources.push(p);
+      const leftovers = kwList().filter((k) => !coreNodes.some((cn) => cn.id === k.id) && !usedIds.has(k.id));
+      // 쌍으로 의미가 정해지는 축(대조·비교·인과…)은 2차 편입 대상에서 제외한다.
+      // 그 축의 자식은 서로를 규정하므로 나중에 하나 더 끼워 넣으면 관계가 깨진다
+      // (실측: "진본성과의 대조" 축에 대조 대상이 아닌 '영화'·'정신의 분산'이 2차로 들어감).
+      const openFacets = facetNodes.filter((fn) => !PAIRED_RELATIONS.has(fn.relation));
+      const closedCount = facetNodes.length - openFacets.length;
+      if (closedCount) log.push(`[v11] 2차 배정 제외 축 ${closedCount}개 — ${facetNodes.filter((f) => PAIRED_RELATIONS.has(f.relation)).map((f) => f.title).join(', ')} (쌍으로 뜻이 정해지는 관계라 뒤에 끼워 넣지 않는다)`);
+      if (leftovers.length && openFacets.length) {
+        onProgress?.('phase 2 — 미편입 키워드 역할 판단');
+        const axisLine = openFacets.map((fn, i) => {
+          const mem = conceptChildrenOf(fn.id).map((c) => c.title).join(', ');
+          return `f${i} | ${fn.title} — 지금 자식: ${mem || '(없음)'}\n     └ 이 축의 자식이어야 할 것: ${memberSpec(fn.relation)}`;
+        }).join('\n');
+        const leftLine = leftovers.map((k) => {
+          const roles = sentOf(k.id).map((s) => String(s.gloss || s.title).slice(0, 70)).slice(0, 2).join(' / ');
+          return `${k.id} | ${k.title}${roles ? ` — 문장 역할: ${roles}` : ''}`;
+        }).join('\n');
+        const leftRaw = await llm({
+          system: '아직 자리를 못 찾은 키워드를 관계 축에 넣을지 판단한다. **그 축의 관계가 요구하는 역할에 맞을 때만** 넣어라 — 주제가 비슷하다는 이유로 넣지 마라. 맞는 축이 없으면 facet 을 null 로 두어 핵심 개념 직속에 남긴다. 그게 억지로 넣는 것보다 낫다. JSON만 출력.',
+          user: `[관계 축과 현재 자식]\n${axisLine}\n\n[자리를 못 찾은 키워드]\n${leftLine}\n\n출력 JSON: {"place":[{"id":"n?","facet":"f0 또는 null","why":"역할이 맞는 이유 한 줄"}]}`,
+          temperature: 0.1,
+        });
+        let place = []; try { place = (JSON.parse(leftRaw).place || []); } catch { /* 파싱 실패 → 폴백 */ }
+        const decided = new Set();
+        for (const p of place) {
+          const k = leftovers.find((x) => x.id === p.id); if (!k) continue;
+          decided.add(k.id);
+          const fi = p.facet == null || p.facet === 'null' ? -1 : Number(String(p.facet).replace(/^f/, ''));
+          const fn = openFacets[fi];
+          const target = fn && nodes.has(fn.id) ? fn : nodes.get(coreNodes[0].id);
+          if (safeReparent(k.id, target.id)) {
+            moved++;
+            movedDetail.push(`${k.title}→${target.title}${fn ? ` (${String(p.why || '역할 판단').slice(0, 40)})` : ' (맞는 축 없음 · 핵심 직속)'}`);
+            for (const pg of k.sources) if (!target.sources.includes(pg)) target.sources.push(pg);
+          }
+        }
+        // LLM 이 언급조차 안 한 키워드는 멤버 무게중심 코사인으로 처리(문턱 0.45), 미달이면 핵심 직속
+        for (const k of leftovers) {
+          if (decided.has(k.id)) continue;
+          const e = k.emb || await embedFn(`${k.title} ${(k.gloss || '').slice(0, 100)}`);
+          let best = -1, bf = null;
+          for (const fn of openFacets) {
+            const mem = conceptChildrenOf(fn.id).filter((c) => c.emb);
+            if (!mem.length) continue;
+            const s = mem.reduce((acc, c) => acc + cos(e, c.emb), 0) / mem.length; // 멤버 평균
+            if (s > best) { best = s; bf = fn; }
+          }
+          const target = best >= 0.45 && bf ? bf : nodes.get(coreNodes[0].id);
+          if (safeReparent(k.id, target.id)) {
+            moved++;
+            movedDetail.push(`${k.title}→${target.title}(멤버 유사도 ${best > 0 ? best.toFixed(2) : '—'})`);
+            for (const pg of k.sources) if (!target.sources.includes(pg)) target.sources.push(pg);
+          }
         }
       }
-      if (movedDetail.length) log.push(`[v11] 2차 배정 ${moved}개(뜻 유사도): ${movedDetail.join(' · ')}`);
+      if (movedDetail.length) log.push(`[v11] 2차 배정 ${moved}개: ${movedDetail.join(' · ')}`);
+
+      // 4.5) 남은 키워드로 축 2라운드 — 관계 축은 소수만 정확히 담는 그릇이라, 엄격하게 만들수록
+      //      자리를 못 찾는 키워드가 쌓인다(피로사회 14개가 core 직속에 실측). 이들은 관계로
+      //      설명되는 게 아니라 묶어 줄 주제 축이 없었을 뿐이다 — 남은 것만 보고 축을 더 제안받는다.
+      for (const cn of coreNodes.filter((c) => nodes.has(c.id))) {
+        const orphans = conceptChildrenOf(cn.id).filter((k) => !conceptChildrenOf(k.id).length && !k.relation);
+        if (orphans.length < 4) continue;
+        onProgress?.(`phase 2 — "${cn.title}" 남은 키워드 ${orphans.length}개 축 2라운드`);
+        const oLine = orphans.map((k) => {
+          const roles = sentOf(k.id).map((s) => String(s.gloss || s.title).slice(0, 60)).slice(0, 2).join(' / ');
+          return `${k.id} | ${k.title}${roles ? ` — ${roles}` : ''}`;
+        }).join('\n');
+        const existing = conceptChildrenOf(cn.id).filter((f) => f.relation).map((f) => f.title).join(' · ') || '(없음)';
+        const r2Raw = await llm({
+          system: '핵심 개념 아래에서 아직 자리를 못 찾은 키워드들만 보고, 이들을 담을 관계 축을 추가로 제안한다. 이미 있는 축과 겹치지 않아야 하고, 각 축은 그 관계가 요구하는 자식을 실제로 갖춰야 한다. 남은 키워드가 정말 한 덩어리로 안 묶이면 빈 배열을 내라. JSON만 출력.',
+          user: `핵심 개념: ${cn.title}\n이미 선 축: ${existing}\n\n[아직 자리를 못 찾은 키워드]\n${oLine}\n\nrelation 후보와 각 관계가 요구하는 자식:\n${RELATION_NAMES.map((r) => `- ${r}: ${memberSpec(r)}`).join('\n')}\n\n축 1~3개. 출력 JSON: {"facets":[{"name":"구체적 축 이름","relation":"후보 중 하나","description":"1~2문장","memberIds":["n?"]}]}`,
+          temperature: 0.1,
+        });
+        let r2 = []; try { r2 = (JSON.parse(r2Raw).facets || []); } catch { /* 파싱 실패 */ }
+        const r2Used = new Set();
+        for (const f of r2.slice(0, 3)) {
+          if (!f.name || !MODES.includes(f.relation)) continue;
+          const ids = (f.memberIds || []).filter((id) => orphans.some((o) => o.id === id) && !r2Used.has(id));
+          const need = MEMBER_SPEC[f.relation]?.min || 1;
+          if (ids.length < need) { log.push(`[v11✗] 2라운드 축 "${f.name}·${f.relation}" 무산 — 자식 ${need}개 필요, ${ids.length}개`); continue; }
+          const fn = addConcept(`${String(f.name).trim()} · ${f.relation}`, cn.id, await embedFn(`${f.name} ${f.description || ''}`), String(f.description || '').trim());
+          fn.relation = f.relation;
+          const took = [];
+          for (const id of ids) if (safeReparent(id, fn.id)) {
+            r2Used.add(id); took.push(nodes.get(id).title);
+            for (const p of nodes.get(id).sources) if (!fn.sources.includes(p)) fn.sources.push(p);
+          }
+          if (!conceptChildrenOf(fn.id).length) { nodes.delete(fn.id); continue; }
+          facetNodes.push(fn);
+          log.push(`[v11] 2라운드 축 "${f.name}·${f.relation}" ← 키워드 ${took.length}개: ${took.join(', ')}`);
+        }
+        const still = conceptChildrenOf(cn.id).filter((k) => !conceptChildrenOf(k.id).length && !k.relation).length;
+        if (still) log.push(`[v11] "${cn.title}" 직속 잔류 ${still}개 — 어느 축에도 묶이지 않았다`);
+      }
 
       // 5) core 실속 검증 — 배정 전 검증(확신도·제안 축 수)만으로는 부족하다. 제안은 그럴듯한데
       //    실제로는 축 1개·키워드 2개만 받은 core 가 기둥 행세를 했다(존중정치학 "인정의 정치" 실측).

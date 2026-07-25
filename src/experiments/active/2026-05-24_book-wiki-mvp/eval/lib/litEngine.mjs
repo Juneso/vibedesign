@@ -169,61 +169,41 @@ export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, canon
   // 편입 후에도 페이지순 유지 — 문장 노드 자체엔 순서가 없으므로 직렬화 순서로 보장하지 않고
   // 대시보드가 sources/p 로 정렬한다. (노드 배열 순서 의존 방지)
 
-  // ─── Phase 3: 인물 승격 — 한 인물에 문장 4개+ 몰리면 모티프와 나란히 상위로 ──
-  const bySpeaker = new Map();
-  for (const n of [...nodes.values()].filter((n) => n.kind === 'sentence' && n.speaker && n.speaker !== '서술자')) {
-    if (!bySpeaker.has(n.speaker)) bySpeaker.set(n.speaker, []);
-    bySpeaker.get(n.speaker).push(n);
-  }
-  for (const [speaker, sents] of bySpeaker) {
-    if (sents.length < 4) continue;
-    // 호스트 모티프를 비우면서까지 옮기지 않는다(문장 3개 이상인 호스트에서만) — v11 승격과 같은 원칙
-    const movable = sents.filter((s) => s.parentId === root.id || sentOf(s.parentId).length >= 3);
-    if (movable.length < 2) continue;
-    const ch = addConcept(speaker, `${speaker}의 목소리로 수집된 문장들`, await embedFn(speaker), { role: 'character' });
-    for (const s of movable.sort((a, b) => (a.sources[0] || 0) - (b.sources[0] || 0))) {
-      s.parentId = ch.id; s.level = ch.level + 1;
-      const p = s.sources[0]; if (p != null && !ch.sources.includes(p)) ch.sources.push(p);
+  // ─── Phase 3: 모티프 내부 목소리 분기 — 인물은 축이 아니라 "모티프에 대한 대응·견해" ──
+  // 인물을 상위로 승격하면 같은 모티프가 1차 축과 인물 아래에 중복으로 서고(자유와 해방 ×2 실측),
+  // 한 인물 중심 소설(죄와 벌)에선 인물 키워드가 정보가 없다. 구조를 뒤집는다:
+  // 책 → 모티프 → [목소리(인물별 견해) — 서로 다른 목소리가 2개 이상일 때만] → 문장.
+  // 누군가에게 책을 설명하듯: 모티프를 나열하고, 인물의 실제 발언·행동으로 구체화한다.
+  let voiceBranches = 0;
+  for (const motifNode of motifNodes.filter((n) => nodes.has(n.id))) {
+    const sents = sentOf(motifNode.id);
+    const bySp = new Map();
+    for (const s of sents) {
+      const key = nrm(s.speaker || '서술자');
+      if (!bySp.has(key)) bySp.set(key, { name: s.speaker || '서술자', sents: [] });
+      bySp.get(key).sents.push(s);
     }
-    log.push(`[character] "${speaker}" 승격 — 문장 ${movable.length}/${sents.length}개 이동`);
-
-    // 인물 내부 모티프 분기 (책 → 인물 → 모티프 → 문장) — 인물 하나로 평면 묶으면
-    // 그 인물이 가진 서로 다른 모티프(급진 사상·자기 파멸·거짓말…)가 위계에서 사라진다.
-    // 문장 노드가 이미 motif 필드를 들고 있으므로 LLM 호출 없이 코드로 분기한다.
-    // 2문장 이상 모이는 모티프만 하위 노드로, 1문장짜리는 인물 직속에 남긴다(1문장 노드 금지 원칙).
-    const byMotif = new Map();
-    for (const s of sentOf(ch.id)) {
-      const key = nrm(s.motif); if (!key) continue;
-      if (!byMotif.has(key)) byMotif.set(key, { name: s.motif, sents: [] });
-      byMotif.get(key).sents.push(s);
-    }
-    let branched = 0;
-    for (const g of byMotif.values()) {
-      if (g.sents.length < 2) continue;
-      // 인물 문장 전부가 한 모티프면 층만 늘어난다 — 분기하지 않는다
-      if (g.sents.length >= sentOf(ch.id).length) continue;
-      const srcMotif = [...nodes.values()].find((c) => c.kind === 'concept' && nrm(c.title) === nrm(g.name));
-      const sub = addConcept(g.name, srcMotif?.gloss || '', null);
-      sub.parentId = ch.id; sub.level = ch.level + 1;
+    // 2문장 이상인 목소리가 2개 이상일 때만 분기 — 목소리가 하나뿐이면(단일 주인공 소설) 층을 늘리지 않는다
+    const groups = [...bySp.values()].filter((g) => g.sents.length >= 2);
+    if (bySp.size < 2 || groups.length < 2) continue;
+    for (const g of groups) {
+      const v = addConcept(g.name, `${g.name}의 발언·시선으로 본 '${motifNode.title}'`, null, { role: 'voice' });
+      v.parentId = motifNode.id; v.level = motifNode.level + 1;
       for (const s of g.sents.sort((a, b) => (a.sources[0] || 0) - (b.sources[0] || 0))) {
-        s.parentId = sub.id; s.level = sub.level + 1;
-        const p = s.sources[0]; if (p != null && !sub.sources.includes(p)) sub.sources.push(p);
+        s.parentId = v.id; s.level = v.level + 1;
+        const p = s.sources[0]; if (p != null && !v.sources.includes(p)) v.sources.push(p);
       }
-      branched++;
+      voiceBranches++;
     }
-    if (branched) log.push(`[character] "${speaker}" 내부 모티프 분기 ${branched}개`);
-  }
-
-  // 인물 승격으로 문장을 다 내준 빈 모티프 노드는 지운다 — 이름만 남은 껍데기 방지
-  for (const c of [...nodes.values()].filter((n) => n.kind === 'concept' && n.role !== 'character' && n.parentId === root.id)) {
-    if (!childrenOf(c.id).length) { nodes.delete(c.id); log.push(`[cleanup] 빈 모티프 "${c.title}" 제거`); }
+    log.push(`[voice] "${motifNode.title}" 목소리 분기: ${groups.map((g) => `${g.name}(${g.sents.length})`).join(' · ')}`);
+    // 1문장짜리 목소리는 모티프 직속에 남는다 (1문장 노드 금지 원칙)
   }
 
   const sentences = [...nodes.values()].filter((n) => n.kind === 'sentence');
   const stats = {
     variant: 'literature-v1',
     motifs: motifNodes.filter((n) => nodes.has(n.id)).length,
-    characters: [...nodes.values()].filter((n) => n.role === 'character').length,
+    voices: voiceBranches,
     sentences: sentences.length,
     rootSentences: sentences.filter((n) => n.parentId === root.id).length,
   };
