@@ -186,6 +186,37 @@ export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, canon
       const p = s.sources[0]; if (p != null && !ch.sources.includes(p)) ch.sources.push(p);
     }
     log.push(`[character] "${speaker}" 승격 — 문장 ${movable.length}/${sents.length}개 이동`);
+
+    // 인물 내부 모티프 분기 (책 → 인물 → 모티프 → 문장) — 인물 하나로 평면 묶으면
+    // 그 인물이 가진 서로 다른 모티프(급진 사상·자기 파멸·거짓말…)가 위계에서 사라진다.
+    // 문장 노드가 이미 motif 필드를 들고 있으므로 LLM 호출 없이 코드로 분기한다.
+    // 2문장 이상 모이는 모티프만 하위 노드로, 1문장짜리는 인물 직속에 남긴다(1문장 노드 금지 원칙).
+    const byMotif = new Map();
+    for (const s of sentOf(ch.id)) {
+      const key = nrm(s.motif); if (!key) continue;
+      if (!byMotif.has(key)) byMotif.set(key, { name: s.motif, sents: [] });
+      byMotif.get(key).sents.push(s);
+    }
+    let branched = 0;
+    for (const g of byMotif.values()) {
+      if (g.sents.length < 2) continue;
+      // 인물 문장 전부가 한 모티프면 층만 늘어난다 — 분기하지 않는다
+      if (g.sents.length >= sentOf(ch.id).length) continue;
+      const srcMotif = [...nodes.values()].find((c) => c.kind === 'concept' && nrm(c.title) === nrm(g.name));
+      const sub = addConcept(g.name, srcMotif?.gloss || '', null);
+      sub.parentId = ch.id; sub.level = ch.level + 1;
+      for (const s of g.sents.sort((a, b) => (a.sources[0] || 0) - (b.sources[0] || 0))) {
+        s.parentId = sub.id; s.level = sub.level + 1;
+        const p = s.sources[0]; if (p != null && !sub.sources.includes(p)) sub.sources.push(p);
+      }
+      branched++;
+    }
+    if (branched) log.push(`[character] "${speaker}" 내부 모티프 분기 ${branched}개`);
+  }
+
+  // 인물 승격으로 문장을 다 내준 빈 모티프 노드는 지운다 — 이름만 남은 껍데기 방지
+  for (const c of [...nodes.values()].filter((n) => n.kind === 'concept' && n.role !== 'character' && n.parentId === root.id)) {
+    if (!childrenOf(c.id).length) { nodes.delete(c.id); log.push(`[cleanup] 빈 모티프 "${c.title}" 제거`); }
   }
 
   const sentences = [...nodes.values()].filter((n) => n.kind === 'sentence');

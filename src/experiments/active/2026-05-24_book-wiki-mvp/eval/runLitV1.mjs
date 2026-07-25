@@ -104,7 +104,8 @@ for (const t of titles) {
       tree, log: r.log,
     }, null, 2) + '\n', 'utf-8');
 
-    const motifs = tree.nodes.filter((n) => n.kind === 'concept' && n.role !== 'character');
+    // 최상위(루트 직속)만 상단 목록에 — 인물 하위로 분기된 모티프 노드가 중복 출력되지 않게
+    const motifs = tree.nodes.filter((n) => n.kind === 'concept' && n.role !== 'character' && n.parentId === r.rootId);
     const chars = tree.nodes.filter((n) => n.role === 'character');
     let md = `# ${N(b.title)} — literature-v1 (모티프 축)\n\n`;
     md += `- 모티프: ${motifs.map((n) => `**${n.title}**`).join(' · ') || '(불성립)'}\n`;
@@ -113,12 +114,15 @@ for (const t of titles) {
     md += `## 구조\n\n| 지표 | 값 |\n|---|---|\n`;
     md += `| 모티프 | ${r.stats.motifs} |\n| 승격 인물 | ${r.stats.characters} |\n| 문장 노드 | ${r.stats.sentences} |\n| root 잔류 문장 | ${r.stats.rootSentences} |\n| 메모 커버리지 | ${covered} / ${memos.length} |\n\n`;
     md += `## 트리\n\n모티프 아래 문장은 페이지순 = 서사 진행순. 각 문장에 speaker/emotion/arc 속성.\n\n`;
-    for (const c of [...motifs, ...chars]) {
-      md += `- **${c.title}**${c.gloss ? ` — ${c.gloss}` : ''}\n`;
-      for (const s of tree.nodes.filter((n) => n.parentId === c.id && n.kind === 'sentence').sort((a, b) => (a.sources[0] || 0) - (b.sources[0] || 0))) {
-        md += `  - p${s.sources[0] || '?'} [${[s.arc, s.speaker, s.emotion].filter(Boolean).join('·')}] ${String(s.title).slice(0, 80)}\n`;
-      }
-    }
+    // 중첩 렌더링: 책 → (모티프|인물) → [인물의 모티프] → 문장
+    const sentLine = (s, indent) => `${indent}- p${s.sources[0] || '?'} [${[s.arc, s.speaker, s.emotion].filter(Boolean).join('·')}] ${String(s.title).slice(0, 80)}\n`;
+    const renderNode = (c, depth) => {
+      const indent = '  '.repeat(depth);
+      md += `${indent}- **${c.title}**${c.gloss ? ` — ${c.gloss}` : ''}\n`;
+      for (const sub of tree.nodes.filter((n) => n.parentId === c.id && n.kind === 'concept')) renderNode(sub, depth + 1);
+      for (const s of tree.nodes.filter((n) => n.parentId === c.id && n.kind === 'sentence').sort((a, b) => (a.sources[0] || 0) - (b.sources[0] || 0))) md += sentLine(s, indent + '  ');
+    };
+    for (const c of [...motifs, ...chars]) renderNode(c, 0);
     const rootSents = tree.nodes.filter((n) => n.parentId === r.rootId && n.kind === 'sentence');
     if (rootSents.length) {
       md += `- *(미분류 — root 직속)*\n`;
