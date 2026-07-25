@@ -655,6 +655,7 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
       const assignRaw = await llm({
         system: `키워드를 핵심 개념의 관계 축에 배정한다. **축의 관계가 요구하는 역할에 맞는 키워드만** 넣어라 — 주제가 비슷하다고 넣는 것이 아니다. 대조·비교 축에는 실제로 맞세워지는 양쪽이, 인과 축에는 원인 쪽과 결과 쪽이, 분석 축에는 구성 요소가 들어와야 한다. 판단 근거는 키워드에 딸린 문장이 책에서 맡는 역할이다.
 동시에, **역할이 맞는 키워드는 하나도 빠뜨리지 마라** — 목록의 키워드를 전부 훑고 어느 축의 역할에 해당하는지 판단하라. 축당 1개만 넣고 나머지를 남기는 식은 잘못이다. 정말 어느 역할에도 안 맞는 것만 남긴다.
+⚠ 대조·비교·인과 축에서 **짝이 되는 양쪽이 실제로 각각 키워드로 존재할 때만** 둘을 넣어라. 그 관계가 한 문장 안에서 완결되는 경우(예: "시장 규범이 비시장 규범을 밀어낸다" 한 문장에 양쪽이 다 있는 경우)에는 **짝을 억지로 맞추지 말고 해당 키워드 하나만** 넣어라 — 그러면 그 축은 문장을 직접 거느리는 키워드가 된다. 짝이 아닌 것을 짝으로 묶는 것이 가장 나쁘다.
 역할이 맞는 키워드가 최소 개수만큼 없으면 그 축은 비워 두어라(빈 축은 코드가 없앤다) — 억지로 채우지도 마라. JSON만 출력.`,
         user: `핵심 개념: ${cores.map((c) => c.name).join(' · ')}
 
@@ -687,6 +688,23 @@ ${roleLine}
         // 관계가 요구하는 최소 자식 수를 코드로 강제한다 — 대조 축에 한쪽만 있으면 대조가 아니다.
         const need = MEMBER_SPEC[f.relation]?.min || 1;
         if (ids.length < need) {
+          // 다만 대조·인과·비교는 한 문장 안에서 완결되는 일이 흔하다("A가 B를 밀어낸다").
+          // 그럴 때 자식 키워드 둘을 억지로 채우면 짝이 아닌 것이 짝으로 묶인다 —
+          // 축 자체를 "관계 키워드"로 세우고 그 문장들을 바로 밑에 다는 편이 정직하다.
+          if (PAIRED_RELATIONS.has(f.relation) && ids.length === 1) {
+            const src = nodes.get(ids[0]);
+            const sents = sentOf(src.id);
+            if (sents.length && !conceptChildrenOf(src.id).length) {
+              const rn = addConcept(`${String(f.name).trim()} · ${f.relation}`, coreNode.id, await embedFn(`${f.name} ${f.description || ''}`), String(f.description || '').trim());
+              rn.relation = f.relation; rn.relationLeaf = true;
+              for (const s of sents) { s.parentId = rn.id; s.level = rn.level + 1; }
+              for (const p of src.sources) { if (!rn.sources.includes(p)) rn.sources.push(p); if (!coreNode.sources.includes(p)) coreNode.sources.push(p); }
+              nodes.delete(src.id); usedIds.add(src.id);
+              facetNodes.push(rn);
+              log.push(`[v11] 관계 키워드 "${f.name}·${f.relation}" ← 문장 ${sents.length}개 직접 부착 (짝이 될 키워드가 "${src.title}" 하나뿐 — 관계가 문장 안에서 완결된 경우)`);
+              continue;
+            }
+          }
           log.push(`[v11✗] 축 "${f.name}·${f.relation}" 무산 — ${f.relation} 관계는 자식 ${need}개가 필요한데 ${ids.length}개(${ids.map((id) => nodes.get(id).title).join(', ')})`);
           continue;
         }
@@ -808,6 +826,25 @@ ${roleLine}
         }
         const still = conceptChildrenOf(cn.id).filter((k) => !conceptChildrenOf(k.id).length && !k.relation).length;
         if (still) log.push(`[v11] "${cn.title}" 직속 잔류 ${still}개 — 어느 축에도 묶이지 않았다`);
+      }
+
+      // 4.9) 헛도는 축 정리 — 자식이 하나뿐이고 그 이름이 축 이름과 사실상 같으면
+      //      ("능력주의의 개념 · 정의" ← 능력주의) 층만 하나 낀 것이다. 축을 없애고
+      //      키워드를 핵심 개념 직속으로 올린다.
+      for (const fn of [...facetNodes]) {
+        if (!nodes.has(fn.id)) continue;
+        const ch = conceptChildrenOf(fn.id);
+        if (ch.length !== 1) continue;
+        const axisName = fn.title.replace(/ · [^·]+$/, '');
+        const a = nrm(axisName), b = nrm(ch[0].title);
+        if (!(a.includes(b) || b.includes(a))) continue;
+        const parent = nodes.get(fn.parentId);
+        if (safeReparent(ch[0].id, parent.id)) {
+          for (const s of sentOf(fn.id)) { s.parentId = ch[0].id; s.level = ch[0].level + 1; }
+          nodes.delete(fn.id);
+          facetNodes.splice(facetNodes.indexOf(fn), 1);
+          log.push(`[v11] 축 해체: "${fn.title}" — 자식이 "${ch[0].title}" 하나이고 이름이 겹쳐 층만 늘리고 있었다 → "${parent.title}" 직속으로`);
+        }
       }
 
       // 5) core 실속 검증 — 배정 전 검증(확신도·제안 축 수)만으로는 부족하다. 제안은 그럴듯한데

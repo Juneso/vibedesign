@@ -52,7 +52,12 @@ ${canonBlock}
 
 2) analyses — 메모마다:
    - memoId: 위 id 그대로
-   - speaker: 이 문장을 말하거나 서술하는 목소리. 문면에서 인물이 확실할 때만 인물 이름, 아니면 "서술자".
+   - speaker: 이 문장을 말하거나 서술하는 목소리. 셋 중 하나다:
+     · 인물 이름 — 메모 문면의 단서로 화자를 특정할 수 있을 때. 단서에는 이름 부름·호칭·대화 구조가 포함된다
+       (예: "조르바, 인간이 똥이고…"라고 부르는 말에 답하는 대사 → 화자는 조르바). 이런 단서가 있으면 자신 있게 인물 이름을 써라.
+     · "서술자" — 지문, 내면 서술, 1인칭 화자의 사유. 따옴표 없는 문장은 대부분 여기다.
+     · "미상" — 따옴표 대사인데 위 단서가 전혀 없을 때만. **미상은 최후 수단이다** — 단서가 있는데 미상으로 도망치지 마라.
+       단, 문면 단서 없이 책 줄거리 지식만으로 주인공에게 귀속시키는 것도 금지.
    - emotion: 정서 톤 한 단어 (예: 불안, 해방감, 그리움, 냉소)
    - resonance: 독자가 왜 이 문장에 밑줄 그었을지 한 줄 가설 — 반드시 문면에서 읽히는 것만.
    - motifs: 위 motifCandidates 의 name 중 **이 메모가 관련되는 모든 축**(최대 3개). 하나만 고르려고 아끼지 마라 — 표가 갈리면 축이 성립하지 못한다. 정말 안 맞으면 빈 배열.
@@ -157,10 +162,17 @@ export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, canon
   for (const x of orphans) {
     let host = null;
     if (motifNodes.length) {
-      const e = await embedFn(x.text);
-      let best = -1;
-      for (const n of motifNodes) { const s = cos(e, n.emb); if (s > best) { best = s; host = n; } }
-      if (best < 0.3) host = null;
+      // ① 이 메모가 planIngestLit 에서 가리킨 후보가 최종 모티프에 병합돼 살아남았으면 그쪽으로
+      //    (다중 배정 도입 후에도 후보 일부가 탈락하면 고아가 된다 — 조르바 잔류 7 실측)
+      host = motifNodes.find((n) => nodes.has(n.id) && x.motifs.some((mm) => nrm(mm) === nrm(n.title))) || null;
+      if (!host) {
+        // ② 임베딩 근접 — 문장 원문에 resonance(밑줄 이유)를 붙이면 모티프 설명과 어휘가 겹쳐 매칭이 잘 된다.
+        //    문턱 0.3은 실측상 과엄격(구제 0~3건) → 0.22. 그래도 미달이면 root 잔류(억지 편입 금지).
+        const e = await embedFn([x.text, x.resonance].filter(Boolean).join(' '));
+        let best = -1;
+        for (const n of motifNodes) { if (!nodes.has(n.id)) continue; const s = cos(e, n.emb); if (s > best) { best = s; host = n; } }
+        if (best < 0.22) host = null;
+      }
     }
     addSentence({ ...x, motifName: host?.title || '' }, host ? host.id : root.id);
     if (host) adopted++;
@@ -183,8 +195,9 @@ export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, canon
       if (!bySp.has(key)) bySp.set(key, { name: s.speaker || '서술자', sents: [] });
       bySp.get(key).sents.push(s);
     }
-    // 2문장 이상인 목소리가 2개 이상일 때만 분기 — 목소리가 하나뿐이면(단일 주인공 소설) 층을 늘리지 않는다
-    const groups = [...bySp.values()].filter((g) => g.sents.length >= 2);
+    // 2문장 이상인 목소리가 2개 이상일 때만 분기 — 목소리가 하나뿐이면(단일 주인공 소설) 층을 늘리지 않는다.
+    // "미상"(화자 특정 불가)은 분기 대상이 아니다 — 모티프 직속에 남긴다. 억지 귀속이 오인보다 낫지 않다.
+    const groups = [...bySp.values()].filter((g) => g.sents.length >= 2 && nrm(g.name) !== nrm('미상'));
     if (bySp.size < 2 || groups.length < 2) continue;
     for (const g of groups) {
       const v = addConcept(g.name, `${g.name}의 발언·시선으로 본 '${motifNode.title}'`, null, { role: 'voice' });
