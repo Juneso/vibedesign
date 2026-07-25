@@ -599,12 +599,16 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
     // 정의 · 정의 ← 기후변화와 정치" 같은 이름-자식 불일치 발생).
     // 키워드 수에 따라 만들 수 있는 구조의 크기를 단계적으로 제한한다 —
     // 메모가 쌓이면 구조도 함께 자란다.
+    // ⚠ 축 개수 상한은 최소한으로만 둔다. "축이 아무거나 받는다"는 문제는 개수가 아니라
+    //   관계별 자식 명세·쌍 검증·적합도 검증이 정확하게 막는다. 개수로 한 번 더 조였더니
+    //   그 장치들이 살려 놓은 구조까지 깎였다(공정하다는 착각 62%→25%). core 상한은
+    //   억지 기둥을 막는 효과가 분명해 유지하고, 축은 새싹 단계에서만 느슨하게 제한한다.
     const kwNow = kwList().length;
     const stage = kwNow < 5 ? { name: '씨앗', cores: 0, facets: 0 }
-      : kwNow < 10 ? { name: '새싹', cores: 1, facets: 2 }
-      : kwNow < 16 ? { name: '자람', cores: 2, facets: Math.floor(kwNow / 2) }
-      : { name: '무성', cores: 5, facets: Math.floor(kwNow / 2) };
-    log.push(`[v11] 구조 단계 "${stage.name}" — 키워드 ${kwNow}개 → 핵심 개념 최대 ${stage.cores}개 · 축 최대 ${stage.facets}개`);
+      : kwNow < 10 ? { name: '새싹', cores: 1, facets: 4 }
+      : kwNow < 16 ? { name: '자람', cores: 2, facets: Infinity }
+      : { name: '무성', cores: 5, facets: Infinity };
+    log.push(`[v11] 구조 단계 "${stage.name}" — 키워드 ${kwNow}개 → 핵심 개념 최대 ${stage.cores}개 · 축 ${Number.isFinite(stage.facets) ? `최대 ${stage.facets}개` : '개수 제한 없음'}`);
     if (!stage.cores) {
       log.push('[v11] 아직 구조를 세우지 않는다 — 키워드가 적어 위계를 만들면 억지가 된다. 메모가 쌓이면 자동으로 세워진다.');
       v10Mode = { mode: '평면(재료 부족)', confidence: 'high', reason: `키워드 ${kwNow}개` };
