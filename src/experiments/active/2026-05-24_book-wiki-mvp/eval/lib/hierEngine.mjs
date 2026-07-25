@@ -593,6 +593,23 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
     const kwList = () => concepts().filter((n) => n.parentId === root.id);
     const kwLine = () => kwList().map((n) => `${n.id} | ${n.title} — ${(n.gloss || '').slice(0, 60)} [p${[...new Set(n.sources)].sort((a, b) => a - b).join(',')}]`).join('\n');
     const thesisLine = planAnalyses.map((a) => `- ${a.thesis}${a.bookContextLink ? ` (맥락: ${String(a.bookContextLink).slice(0, 80)})` : ''}`).join('\n').slice(0, 4500);
+    // ── 재료에 맞는 구조 단계 ─────────────────────────────────
+    // 유저는 메모 3개일 때도, 30개일 때도 이 위키를 본다. 재료가 없는데 구조를 세우면
+    // 억지가 생긴다(공정하다는 착각 8메모: core 2개 × 축 2개를 채우려다 "정치적 담론의
+    // 정의 · 정의 ← 기후변화와 정치" 같은 이름-자식 불일치 발생).
+    // 키워드 수에 따라 만들 수 있는 구조의 크기를 단계적으로 제한한다 —
+    // 메모가 쌓이면 구조도 함께 자란다.
+    const kwNow = kwList().length;
+    const stage = kwNow < 5 ? { name: '씨앗', cores: 0, facets: 0 }
+      : kwNow < 10 ? { name: '새싹', cores: 1, facets: 2 }
+      : kwNow < 16 ? { name: '자람', cores: 2, facets: Math.floor(kwNow / 2) }
+      : { name: '무성', cores: 5, facets: Math.floor(kwNow / 2) };
+    log.push(`[v11] 구조 단계 "${stage.name}" — 키워드 ${kwNow}개 → 핵심 개념 최대 ${stage.cores}개 · 축 최대 ${stage.facets}개`);
+    if (!stage.cores) {
+      log.push('[v11] 아직 구조를 세우지 않는다 — 키워드가 적어 위계를 만들면 억지가 된다. 메모가 쌓이면 자동으로 세워진다.');
+      v10Mode = { mode: '평면(재료 부족)', confidence: 'high', reason: `키워드 ${kwNow}개` };
+    } else {
+
     // 핵심 개념은 1개 고정이 아니다 — 책이 정말로 여러 기둥 위에 서 있으면(예: 사피엔스의
     // 인지혁명·농업혁명·과학혁명) 1~5개까지 허용한다. 단 "정말 핵심일 때만"을 명시하고,
     // 확신 낮은 core 와 축 2개 미만 core 는 코드에서 걸러 남발을 막는다.
@@ -615,21 +632,25 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
       const bad = !c.name ? '이름 없음' : c.confidence === 'low' ? '확신 low' : c.facets.length < 2 ? `축 ${c.facets.length}개(2개 미만)` : null;
       if (bad) log.push(`[v11✗] core 후보 "${c.name || '?'}" 탈락 — ${bad}`);
     }
-    cores = rawCores.filter((c) => c.name && c.confidence !== 'low' && c.facets.length >= 2).slice(0, 5);
+    cores = rawCores.filter((c) => c.name && c.confidence !== 'low' && c.facets.length >= 2);
+    if (cores.length > stage.cores) {
+      log.push(`[v11] 구조 단계 "${stage.name}" 상한 적용: 핵심 개념 ${cores.length}개 제안 → ${stage.cores}개만 채택(${cores.slice(stage.cores).map((c) => c.name).join(', ')} 제외)`);
+      cores = cores.slice(0, stage.cores);
+    }
 
-    // 축은 자식 2개쯤을 받아야 성립하므로, 쓸 수 있는 축 수는 키워드 수에 묶여 있다.
-    // 상한이 없으면 키워드 8개짜리 책에 축 5개가 제안돼 남는 축에 아무거나 채워진다
-    // (공정하다는 착각 실측: 3개 축 전부 이름과 무관한 키워드를 받았다).
+    // 축도 단계 상한을 넘지 않게 자른다 — 자식 2개쯤을 받아야 성립하므로 축 수는 재료에 묶인다.
     {
-      const kwCount = concepts().filter((n) => n.parentId === root.id).length;
-      const capTotal = Math.max(2, Math.floor(kwCount / 2));
+      const capTotal = Math.max(2, stage.facets);
       let total = cores.reduce((s, c) => s + c.facets.length, 0);
       if (total > capTotal) {
-        // core 마다 최소 2개는 남기고, 뒤쪽 축부터 잘라 낸다
         for (let i = cores.length - 1; i >= 0 && total > capTotal; i--) {
           while (cores[i].facets.length > 2 && total > capTotal) { cores[i].facets.pop(); total--; }
         }
-        log.push(`[v11] 축 상한 적용: 키워드 ${kwCount}개 → 축 최대 ${capTotal}개 (제안 초과분 잘라냄)`);
+        // core 가 1개뿐이면 2개 하한도 단계 상한까지 낮춘다
+        if (total > capTotal && cores.length === 1) {
+          while (cores[0].facets.length > capTotal) { cores[0].facets.pop(); total--; }
+        }
+        log.push(`[v11] 축 상한 적용: 축 최대 ${capTotal}개 (제안 초과분 잘라냄)`);
       }
     }
 
@@ -834,7 +855,10 @@ ${roleLine}
         });
         let r2 = []; try { r2 = (JSON.parse(r2Raw).facets || []); } catch { /* 파싱 실패 */ }
         const r2Used = new Set();
-        for (const f of r2.slice(0, 3)) {
+        // 2라운드도 구조 단계 상한을 지켜야 한다 — 안 그러면 새싹 단계 책에 축이 계속 늘어난다
+        const roomLeft = Math.max(0, stage.facets - facetNodes.filter((f) => nodes.has(f.id)).length);
+        if (!roomLeft) { log.push(`[v11] 2라운드 생략 — "${stage.name}" 단계의 축 상한 ${stage.facets}개를 이미 채웠다`); continue; }
+        for (const f of r2.slice(0, Math.min(3, roomLeft))) {
           if (!f.name || !MODES.includes(f.relation)) continue;
           const ids = (f.memberIds || []).filter((id) => orphans.some((o) => o.id === id) && !r2Used.has(id));
           const need = MEMBER_SPEC[f.relation]?.min || 1;
@@ -852,6 +876,47 @@ ${roleLine}
         }
         const still = conceptChildrenOf(cn.id).filter((k) => !conceptChildrenOf(k.id).length && !k.relation).length;
         if (still) log.push(`[v11] "${cn.title}" 직속 잔류 ${still}개 — 어느 축에도 묶이지 않았다`);
+      }
+
+      // 4.8) 쌍 검증 — 대조·비교·인과 축의 자식이 *실제로 그 관계의 양쪽인지* 확인한다.
+      //      개수만 강제하면 짝이 아닌 둘이 짝으로 묶인다("성과사회와 타자성의 상실 · 대조"
+      //      ← 타자성, 자본주의 — 자본주의는 타자성의 대조쌍이 아니다). 한 번의 호출로 전부 검사.
+      const pairedNodes = facetNodes.filter((fn) => nodes.has(fn.id) && PAIRED_RELATIONS.has(fn.relation) && conceptChildrenOf(fn.id).length >= 2);
+      if (pairedNodes.length) {
+        onProgress?.('phase 2 — 관계 쌍 검증');
+        const pLine = pairedNodes.map((fn, i) => `p${i} | ${fn.title} — 자식: ${conceptChildrenOf(fn.id).map((c) => c.title).join(', ')}`).join('\n');
+        const vRaw = await llm({
+          system: '관계 축의 자식들이 그 관계의 양쪽으로 실제로 성립하는지 검증한다. 대조·비교면 정말 맞세워지는 두 대상인지, 인과면 한쪽이 원인이고 다른 쪽이 결과인지 본다. 주제가 같은 영역이라는 이유로 통과시키지 마라. 성립하지 않으면 남길 자식(keep)만 고르고 나머지는 빼라. JSON만 출력.',
+          user: `[검증할 축과 자식]\n${pLine}\n\n각 축에 대해: ok(양쪽이 성립하면 true) · keep(성립하지 않을 때 남길 자식 이름들 — 보통 관계의 주인공 1개) · why(한 줄)\n출력 JSON: {"checks":[{"id":"p0","ok":true,"keep":[],"why":"..."}]}`,
+          temperature: 0,
+        });
+        let checks = []; try { checks = (JSON.parse(vRaw).checks || []); } catch { /* 파싱 실패 → 검증 생략 */ }
+        for (const ck of checks) {
+          const pi = Number(String(ck.id).replace(/^p/, ''));
+          const fn = pairedNodes[pi];
+          if (!fn || !nodes.has(fn.id) || ck.ok !== false) continue;
+          const keepSet = new Set((ck.keep || []).map(nrm));
+          const kids = conceptChildrenOf(fn.id);
+          const evicted = kids.filter((c) => !keepSet.has(nrm(c.title)));
+          if (!evicted.length || evicted.length === kids.length) continue; // 전부 빼면 축이 빈다 — 그냥 둔다
+          const parent = nodes.get(fn.parentId);
+          for (const c of evicted) safeReparent(c.id, parent.id);
+          log.push(`[v11] 쌍 검증 실패 "${fn.title}" — ${evicted.map((c) => c.title).join(', ')} 를 뺐다(${String(ck.why || '').slice(0, 60)})`);
+          // 한쪽을 빼면 자식이 최소 개수 아래로 떨어진다 — 규칙을 어긴 축을 그대로 두지 않는다.
+          // 남은 하나의 문장을 축으로 흡수해 "관계 키워드"로 만든다(축 이름이 곧 관계 서술).
+          const rest = conceptChildrenOf(fn.id);
+          if (rest.length < (MEMBER_SPEC[fn.relation]?.min || 2) && rest.length === 1) {
+            const only = rest[0];
+            const sents = sentOf(only.id);
+            if (sents.length && !conceptChildrenOf(only.id).length) {
+              for (const s of sents) { s.parentId = fn.id; s.level = fn.level + 1; }
+              for (const p of only.sources) if (!fn.sources.includes(p)) fn.sources.push(p);
+              nodes.delete(only.id);
+              fn.relationLeaf = true;
+              log.push(`[v11] → "${fn.title}" 은 관계 키워드로 전환 — 짝이 없어져 "${only.title}" 의 문장 ${sents.length}개를 직접 거느린다`);
+            }
+          }
+        }
       }
 
       // 4.9) 헛도는 축 정리 — 자식이 하나뿐이고 그 이름이 축 이름과 사실상 같으면
@@ -961,6 +1026,7 @@ ${roleLine}
       }
       v10Mode = { mode: `관계축:${fjCoreNames}`, confidence: cores[0].confidence, reason: cores.flatMap((c) => c.facets.map((f) => `${f.name}(${f.relation})`)).join(' · ') };
     }
+    } // 구조 단계 게이트(stage.cores > 0)
   }
 
   // ─── Phase 2 (v7/v8): 테마 주역화 — Description 필수 + 책 논지 앵커링 + critic 반증 ──
