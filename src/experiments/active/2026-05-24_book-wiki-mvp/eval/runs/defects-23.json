@@ -1,0 +1,41 @@
+{
+  "label": "공정하다는 착각",
+  "runAt": "2026-07-26T03:19:43.257Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-50.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 10,
+  "total": 3,
+  "density": 0.3,
+  "byType": {
+    "loneChild": 1,
+    "relationMiss": 1,
+    "misplaced": 1
+  },
+  "defects": [
+    {
+      "type": "loneChild",
+      "by": "code",
+      "nodeId": "n21",
+      "title": "인센티브와 행동 유도 · 분류",
+      "why": "자식이 \"인센티브제화\" 하나뿐이다"
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n20",
+      "title": "정치적 담론과 능력주의의 관계 · 대조",
+      "why": "자식 '진보 및 자유주의 정치권의 담론'은 능력주의와의 관계가 대조가 아니라 상호작용을 나타내는 것이 더 적합하다."
+    },
+    {
+      "type": "misplaced",
+      "by": "llm",
+      "nodeId": "n21",
+      "otherId": "n20",
+      "title": "인센티브와 행동 유도 · 분류",
+      "why": "인센티브와 행동 유도는 정치적 담론과 능력주의의 관계와는 다른 축에서 다루어져야 한다."
+    }
+  ],
+  "reading": "개념 10개 중 결함 3건 — 자식 1개 축 1 · 관계-멤버 불일치 1 · 오배치 1"
+}

@@ -1,0 +1,24 @@
+{
+  "label": "존중받지 못하는 자들을 위한 정치학",
+  "runAt": "2026-07-26T03:19:41.715Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-49.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 17,
+  "total": 1,
+  "density": 0.059,
+  "byType": {
+    "relationMiss": 1
+  },
+  "defects": [
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n41",
+      "title": "존엄성과 민주주의 · 분류",
+      "why": "자식 '대등 욕망'·'내적 자아'·'자존감'은 민주주의와 직접적인 관계가 아니라, 민주주의의 영향을 받는 개념들이다."
+    }
+  ],
+  "reading": "개념 17개 중 결함 1건 — 관계-멤버 불일치 1"
+}

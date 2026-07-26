@@ -1,0 +1,47 @@
+{
+  "label": "심리 정치",
+  "runAt": "2026-07-26T03:19:50.430Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-53.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 22,
+  "total": 4,
+  "density": 0.182,
+  "byType": {
+    "loneChild": 2,
+    "dumping": 1,
+    "relationMiss": 1
+  },
+  "defects": [
+    {
+      "type": "loneChild",
+      "by": "code",
+      "nodeId": "n53",
+      "title": "심리정치의 기원 · 통시",
+      "why": "자식이 \"자본\" 하나뿐이다"
+    },
+    {
+      "type": "loneChild",
+      "by": "code",
+      "nodeId": "n55",
+      "title": "심리정치와 현대 사회 · 예시",
+      "why": "자식이 \"디지털 파놉티콘\" 하나뿐이다"
+    },
+    {
+      "type": "dumping",
+      "by": "code",
+      "nodeId": "n54",
+      "title": "심리정치의 구성 요소 · 분석",
+      "why": "하위 33개 — 형제 축 평균 11.3개의 2.9배"
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n54",
+      "title": "심리정치의 구성 요소 · 분석",
+      "why": "자식 '권력'·'데이터'·'종교'·'2차 계몽주의'·'다타이즘'·'경험'·'바보'·'침묵'·'자유 의지의 위기'·'자본과 자유의 착취'·'정치적 소비자화'·'자기 착취와 사회 혁명'은 심리정치의 구성 요소가 아니라 심리정치의 결과와 배경이다."
+    }
+  ],
+  "reading": "개념 22개 중 결함 4건 — 자식 1개 축 2 · 덤핑 버킷 1 · 관계-멤버 불일치 1"
+}

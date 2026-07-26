@@ -1,0 +1,31 @@
+{
+  "label": "서양미술사",
+  "runAt": "2026-07-26T03:19:54.816Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-55.json",
+  "sourceVariant": "v10",
+  "model": "gpt-4o-mini",
+  "nConcepts": 38,
+  "total": 2,
+  "density": 0.053,
+  "byType": {
+    "thinPillar": 2
+  },
+  "defects": [
+    {
+      "type": "thinPillar",
+      "by": "code",
+      "nodeId": "n23",
+      "title": "형태와 실재 재현",
+      "why": "축 0개 · 하위 키워드 0개뿐이다"
+    },
+    {
+      "type": "thinPillar",
+      "by": "code",
+      "nodeId": "n61",
+      "title": "1 · 고대 문명",
+      "why": "축 0개 · 하위 키워드 2개뿐이다"
+    }
+  ],
+  "reading": "개념 38개 중 결함 2건 — 실속 없는 기둥 2"
+}

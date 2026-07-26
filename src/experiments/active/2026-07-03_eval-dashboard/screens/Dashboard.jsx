@@ -5,10 +5,13 @@ import { Spinner } from '@astryxdesign/core/Spinner';
 import { listPipelines, listRuns, getRunStatus } from '../lib/api.js';
 import { SERIES_META } from '../lib/seriesMeta.js';
 import { PipelineDetail } from './PipelineView.jsx';
+import EvalAxes from './EvalAxes.jsx';
 import { RunList } from './RunBrowser.jsx';
 
 // "기타 eval" — 파이프라인 미연결(pipelineId=null) 시리즈를 모으는 가상 항목
 const MISC_ID = '__misc__';
+// "평가축" — 파이프라인이 아니라 "무엇을 왜 재는가"를 모아 보는 가상 항목
+const AXES_ID = '__axes__';
 
 // 파이프라인 정의(pipelines[].id) ↔ 시리즈(SERIES_META[series].pipelineId) 매핑.
 // MISC_ID일 때는 pipelineId가 null인 시리즈 전체.
@@ -125,6 +128,13 @@ export default function Dashboard() {
               })}
               <button
                 type="button"
+                className={`eval-pl-chip${activeId === AXES_ID ? ' is-active' : ''}`}
+                onClick={() => setActiveId(AXES_ID)}
+              >
+                평가축
+              </button>
+              <button
+                type="button"
                 className={`eval-pl-chip${isMisc ? ' is-active' : ''}`}
                 onClick={() => setActiveId(MISC_ID)}
               >
@@ -134,6 +144,7 @@ export default function Dashboard() {
           </VStack>}
 
           {!plLoaded && <Spinner />}
+          {activeId === AXES_ID && <EvalAxes />}
           {isMisc && (
             <VStack gap={1}>
               <Text type="supporting">
@@ -153,18 +164,18 @@ export default function Dashboard() {
                 prev.map((q) => (q.file === active.file ? { ...q, shortTitle: name } : q)))}
             />
           )}
-          {!isMisc && plLoaded && !active && !plError && (
+          {!isMisc && activeId !== AXES_ID && plLoaded && !active && !plError && (
             <Text type="supporting">등록된 파이프라인이 없습니다.</Text>
           )}
         </VStack>
       </section>
 
-      {/* 우측: 활성 파이프라인의 Eval 결과 */}
-      <section className="eval-split-col eval-runs-col">
+      {/* 우측: 활성 파이프라인의 Eval 결과. 평가축 화면은 자체 표를 들고 있어 우측을 비운다. */}
+      {activeId !== AXES_ID && <section className="eval-split-col eval-runs-col">
         {runsError
           ? <Text type="supporting" color="accent">{runsError} (dev 서버에서만 동작)</Text>
           : <RunResults key={activeId} runs={filteredRuns} statusMap={statusMap} />}
-      </section>
+      </section>}
     </div>
   );
 }

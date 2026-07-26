@@ -1,0 +1,75 @@
+{
+  "label": "기술적복제시대의 예술작품",
+  "runAt": "2026-07-26T03:19:39.664Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-48.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 18,
+  "total": 8,
+  "density": 0.444,
+  "byType": {
+    "loneChild": 3,
+    "relationMiss": 4,
+    "nameMiss": 1
+  },
+  "defects": [
+    {
+      "type": "loneChild",
+      "by": "code",
+      "nodeId": "n49",
+      "title": "기술적 복제의 역사적 발전 · 통시",
+      "why": "자식이 \"기술적 변화와 사회적 기능\" 하나뿐이다"
+    },
+    {
+      "type": "loneChild",
+      "by": "code",
+      "nodeId": "n52",
+      "title": "기술적 복제와 대중의 관계 · 분석",
+      "why": "자식이 \"영화\" 하나뿐이다"
+    },
+    {
+      "type": "loneChild",
+      "by": "code",
+      "nodeId": "n54",
+      "title": "아우라의 붕괴와 대중문화 · 예시",
+      "why": "자식이 \"사진\" 하나뿐이다"
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n48",
+      "title": "기술적 복제의 개념 · 정의",
+      "why": "자식 '제의적 가치와 전시적 가치'·'예술작품'은 기술적 복제의 개념을 정의하는 요소가 아니라 그 개념의 결과물이다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n49",
+      "title": "기술적 복제의 역사적 발전 · 통시",
+      "why": "자식 '기술적 변화와 사회적 기능'은 시간의 흐름에 따른 순서를 이루지 않으며, 기술적 복제의 역사적 발전과 관련이 없다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n50",
+      "title": "기술적 복제와 진본성 · 대조",
+      "why": "자식 '진본성'·'예술작품의 복제 가능성'은 대조 관계가 아니라 서로 보완적인 관계에 있다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n51",
+      "title": "기술적 복제의 사회적 기능 변화 · 인과",
+      "why": "자식 '가장 오래된 예술작품들은 제의에 사용되기 위해 성립되었으며'·'예술작품의 기술적 복제 가능성은 예술작품을 제의에의 기생상태로부터 해방시킨다'는 인과 관계가 성립하지 않는다."
+    },
+    {
+      "type": "nameMiss",
+      "by": "llm",
+      "nodeId": "n54",
+      "title": "아우라의 붕괴와 대중문화 · 예시",
+      "why": "자식 '사진'은 아우라의 붕괴와 대중문화의 예시가 아니라 그 결과물로서의 역할을 한다."
+    }
+  ],
+  "reading": "개념 18개 중 결함 8건 — 관계-멤버 불일치 4 · 자식 1개 축 3 · 이름-내용 불일치 1"
+}
