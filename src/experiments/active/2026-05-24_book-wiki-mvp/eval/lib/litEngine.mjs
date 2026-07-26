@@ -310,3 +310,222 @@ export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, canon
     mode: { mode: '모티프 축', confidence: motifNodes.length >= 2 ? 'high' : 'low', reason: motifNodes.map((n) => n.title).join(' · ') || '모티프 불성립' },
   };
 }
+
+// ─── 동화 모드 (증분) — 기존 모티프 트리를 고정 컨텍스트로 주고 새 메모 1개만 배정 ──
+// 실서비스 시나리오: 유저는 메모를 하나씩 쌓는다. 전량 재인제스트는 재현성이 35~39%로
+// 출렁이지만(stability-1 실측), 동화는 기존 축이 고정이라 출렁일 여지가 배정 1건뿐이다.
+// 판정은 폐쇄형(attach|new)이라 mini 로 충분한지가 검증 대상 — confidence 낮으면 4o 에스컬레이션.
+// 집행·검증·목소리 재분기는 전부 코드(비문학 v9 동화 우선과 같은 경로).
+
+const nextId = (nodes) => {
+  let mx = 0;
+  for (const k of nodes.keys()) { const n = Number(String(k).replace(/^n/, '')); if (n > mx) mx = n; }
+  return () => `n${++mx}`;
+};
+
+// 목소리 층을 전부 걷어내고 다시 세운다 — 증분 후 분기 조건(2목소리×2문장)이 새로 성립/해소될 수 있다.
+export function rebranchVoices(nodes, rootId) {
+  for (const v of [...nodes.values()].filter((n) => n.role === 'voice')) {
+    for (const s of [...nodes.values()].filter((n) => n.parentId === v.id)) { s.parentId = v.parentId; s.level = v.level; }
+    nodes.delete(v.id);
+  }
+  const id = nextId(nodes);
+  let branches = 0;
+  for (const motifNode of [...nodes.values()].filter((n) => n.kind === 'concept' && n.parentId === rootId && n.role !== 'voice')) {
+    const sents = [...nodes.values()].filter((n) => n.parentId === motifNode.id && n.kind === 'sentence');
+    const bySp = new Map();
+    for (const s of sents) {
+      const key = nrm(s.speaker || '서술자');
+      if (!bySp.has(key)) bySp.set(key, { name: s.speaker || '서술자', sents: [] });
+      bySp.get(key).sents.push(s);
+    }
+    const groups = [...bySp.values()].filter((g) => g.sents.length >= 2 && nrm(g.name) !== nrm('미상'));
+    if (bySp.size < 2 || groups.length < 2) continue;
+    for (const g of groups) {
+      const v = {
+        id: id(), title: g.name, parentId: motifNode.id, level: motifNode.level + 1, kind: 'concept',
+        sources: [], emb: null, gloss: `${g.name}의 발언·시선으로 본 '${motifNode.title}'`, role: 'voice',
+      };
+      nodes.set(v.id, v);
+      for (const s of g.sents) {
+        s.parentId = v.id; s.level = v.level + 1;
+        const p = s.sources[0]; if (p != null && !v.sources.includes(p)) v.sources.push(p);
+      }
+      branches++;
+    }
+  }
+  return branches;
+}
+
+// 아크 라벨 재계산 — 증분으로 페이지 범위(min/max)가 바뀌면 기존 문장의 초반/중반/종반도 달라진다.
+export function recomputeArcs(nodes, isEssay) {
+  const sents = [...nodes.values()].filter((n) => n.kind === 'sentence');
+  const pages = sents.map((s) => s.sources[0]).filter((p) => p != null);
+  if (!pages.length) return;
+  const [minP, maxP] = [Math.min(...pages), Math.max(...pages)];
+  for (const s of sents) {
+    const p = s.sources[0];
+    s.arc = (isEssay || p == null || maxP === minP) ? '' : ((p - minP) / (maxP - minP)) < 0.33 ? '초반' : ((p - minP) / (maxP - minP)) < 0.67 ? '중반' : '종반';
+  }
+}
+
+// ─── 씨앗 통합 — 파편화·재현성의 공통 뿌리(씨앗 남발) 처방 ──────────────
+// 증분 동화가 쌓이면 사실상 같은/포함 관계인 모티프가 나란히 선다(run 74~75 실측 12~14개).
+// 코드가 임베딩 유사도 ≥0.5 쌍만 추려서 mini 에 쌍별 폐쇄 판정을 맡긴다:
+//   same — 같은 심상 → 병합(문장 많은 쪽이 승자)
+//   sub  — 한쪽이 다른 쪽의 하위 측면 → 병합하지 않고 **하위 모티프로 편입**(2층 위계)
+//   distinct — 별개 → 그대로 (judged 셋에 기록해 재판정 방지)
+export async function consolidateSeeds({ nodes, rootId, book, llm, embedFn, judged = new Set(), maxPairs = 4 }) {
+  const rootMotifs = () => [...nodes.values()].filter((n) => n.kind === 'concept' && n.parentId === rootId && n.role !== 'voice');
+  const kidsOf = (nid) => [...nodes.values()].filter((n) => n.parentId === nid);
+  const sentCount = (m) => {
+    let c = 0;
+    const walk = (nid) => { for (const k of kidsOf(nid)) { if (k.kind === 'sentence') c++; else walk(k.id); } };
+    walk(m.id); return c;
+  };
+  const examples = (m) => {
+    const out = [];
+    const walk = (nid) => { for (const k of kidsOf(nid)) { if (k.kind === 'sentence') out.push(k); else walk(k.id); } };
+    walk(m.id);
+    return out.slice(0, 2).map((s) => `「${String(s.title).slice(0, 60)}」`).join(' ');
+  };
+  const relevel = (nid, level) => { const n = nodes.get(nid); n.level = level; for (const k of kidsOf(nid)) relevel(k.id, level + 1); };
+
+  for (const m of rootMotifs()) if (!m.emb && embedFn) m.emb = await embedFn(`${m.title}: ${m.gloss || ''}`);
+  const ms = rootMotifs();
+  const pairs = [];
+  for (let i = 0; i < ms.length; i++) for (let j = i + 1; j < ms.length; j++) {
+    const key = [nrm(ms[i].title), nrm(ms[j].title)].sort().join('|');
+    if (judged.has(key) || !ms[i].emb || !ms[j].emb) continue;
+    const sim = cos(ms[i].emb, ms[j].emb);
+    if (sim >= 0.5) pairs.push({ a: ms[i], b: ms[j], sim, key });
+  }
+  pairs.sort((x, y) => y.sim - x.sim);
+
+  const gone = new Set(); const actions = [];
+  for (const p of pairs.slice(0, maxPairs)) {
+    if (gone.has(p.a.id) || gone.has(p.b.id)) continue;
+    judged.add(p.key);
+    let out = null;
+    try {
+      out = JSON.parse(await llm({
+        system: '한 소설 위키의 모티프 두 개의 관계를 판정한다. JSON만 출력.',
+        user: `책: ${book.title}
+
+A: ${p.a.title}${p.a.gloss ? ` — ${p.a.gloss}` : ''}\n   예시: ${examples(p.a) || '(없음)'}
+B: ${p.b.title}${p.b.gloss ? ` — ${p.b.gloss}` : ''}\n   예시: ${examples(p.b) || '(없음)'}
+
+관계를 하나만 골라라:
+- "same" — 사실상 같은 심상·주제를 다른 말로 부른 것.
+- "sub" — 한쪽이 다른 쪽의 **하위 측면**(더 구체적인 갈래)일 때. parent="A"|"B" (더 넓은 쪽).
+- "distinct" — 서로 다른 축. 애매하면 distinct 다 — 억지 병합이 최악이다.
+
+출력 JSON: {"relation":"same|sub|distinct","parent":"A|B"}`,
+        temperature: 0.1,
+      }));
+    } catch { continue; }
+    const rel = String(out?.relation || '').toLowerCase();
+    if (rel === 'same') {
+      const [win, lose] = sentCount(p.a) >= sentCount(p.b) ? [p.a, p.b] : [p.b, p.a];
+      for (const k of kidsOf(lose.id)) { k.parentId = win.id; relevel(k.id, win.level + 1); }
+      for (const s of lose.sources) if (!win.sources.includes(s)) win.sources.push(s);
+      nodes.delete(lose.id); gone.add(lose.id);
+      actions.push(`[consol] "${lose.title}" → "${win.title}" 병합`);
+    } else if (rel === 'sub' && (out.parent === 'A' || out.parent === 'B')) {
+      const [par, child] = out.parent === 'A' ? [p.a, p.b] : [p.b, p.a];
+      // 2층 위계까지만 — 하위 모티프가 또 하위를 갖는 건 금지(대시보드 가독성)
+      if (kidsOf(child.id).some((k) => k.kind === 'concept' && k.role !== 'voice')) continue;
+      child.parentId = par.id; relevel(child.id, par.level + 1);
+      for (const s of child.sources) if (!par.sources.includes(s)) par.sources.push(s);
+      gone.add(child.id);
+      actions.push(`[consol] "${child.title}" ⊂ "${par.title}" 하위 편입`);
+    }
+  }
+  return actions;
+}
+
+// 새 메모 1개를 기존 트리에 동화한다. nodes 를 직접 변형.
+// llm = 판정 모델(mini 검증 대상), llmEsc = 저신뢰 에스컬레이션(4o), 없으면 에스컬레이션 안 함.
+// 반환: { action:'attach'|'new', motif, escalated, confidence }
+export async function assimilateLitMemo({ nodes, rootId, book, memo, llm, llmEsc, embedFn }) {
+  const motifs = [...nodes.values()].filter((n) => n.kind === 'concept' && n.parentId === rootId && n.role !== 'voice');
+  const sentsOf = (m) => {
+    const direct = [...nodes.values()].filter((n) => n.kind === 'sentence' && n.parentId === m.id);
+    const viaVoice = [...nodes.values()].filter((n) => n.role === 'voice' && n.parentId === m.id)
+      .flatMap((v) => [...nodes.values()].filter((n) => n.kind === 'sentence' && n.parentId === v.id));
+    return [...direct, ...viaVoice];
+  };
+  // ⚠ mini 는 attach|new 경계를 프롬프트 뉘앙스로 못 잡는다 — run 68(16/16 attach) ↔ run 70(16/16 new)
+  //   진자 실측. 추상적 경계 판단 대신: 코드가 임베딩으로 후보를 상위 K개로 좁혀서 주고,
+  //   LLM 은 "이 후보들의 예시 문장 옆에 놓이는가"라는 구체적 비교 선택만 한다.
+  const e = embedFn ? await embedFn(memo.text) : null;
+  const ranked = e
+    ? motifs.map((m) => ({ m, sim: m.emb ? cos(e, m.emb) : -1 })).sort((a, b) => b.sim - a.sim)
+    : motifs.map((m) => ({ m, sim: -1 }));
+  const top = ranked.slice(0, 3).filter((r) => r.sim >= 0.2 || !e);
+  const candLine = top.map((r, k) =>
+    `후보${k + 1} | ${r.m.title}${r.m.gloss ? ` — ${r.m.gloss}` : ''}\n${sentsOf(r.m).slice(0, 3).map((s) => `    · p${s.sources[0] ?? '?'} ${String(s.title).slice(0, 70)}`).join('\n')}`).join('\n');
+  const prompt = {
+    system: '소설 독서 메모 1개를 기존 위키의 모티프 축에 배정하는 문학 편집자다. 책 줄거리를 아는 척 추론하지 마라 — 근거는 메모 문면뿐. JSON만 출력.',
+    user: `책: ${book.title}${book.author ? ` (${book.author})` : ''}
+
+[새 메모] p${memo.p}: ${memo.text}${memo.myThought ? `\n(내 생각: ${memo.myThought})` : ''}
+
+[가까운 기존 모티프 후보 — 예시 문장 포함]
+${candLine || '(없음)'}
+
+판정 기준: 이 메모를 각 후보의 **예시 문장들 옆에 놓았을 때** 같은 심상·주제의 연속으로 읽히는가?
+- 그런 후보가 있으면 choice=그 후보의 이름 그대로.
+- 어느 후보와도 다른 심상이면 choice="NEW", newName=새 축 이름(짧은 명사구 — 정서 단어 말고 심상·주제, 메모 속 책 고유의 표현 우선).
+그리고 speaker(인물 이름|서술자|미상 — 문면 단서 있을 때만 인물, 따옴표 없으면 대부분 서술자), emotion(정서 한 단어), resonance(밑줄 이유 한 줄), confidence(0~1).
+
+출력 JSON: {"choice":"후보 이름 또는 NEW","newName":"...","speaker":"...","emotion":"...","resonance":"...","confidence":0.9}`,
+    temperature: 0.1,
+  };
+  let out = null, escalated = false;
+  const ask = async (fn) => { try { return JSON.parse(await fn(prompt)); } catch { return null; } };
+  out = await ask(llm);
+  const findHost = (o) => o && o.choice && nrm(o.choice) !== nrm('NEW')
+    ? top.find((r) => nrm(r.m.title) === nrm(o.choice))?.m || motifs.find((m) => nrm(m.title) === nrm(o.choice)) || null
+    : null;
+  // 에스컬레이션: 파싱 실패 · 후보 밖 이름 · 저신뢰 · NEW 인데 최근접 축과 임베딩상 매우 가까움(중복 신설 게이트)
+  const bad = (o) => !o || !o.choice
+    || (nrm(o.choice) !== nrm('NEW') && !findHost(o))
+    || (Number(o.confidence ?? 1) < 0.6)
+    || (nrm(o.choice) === nrm('NEW') && top.length && top[0].sim >= 0.5);
+  if (bad(out) && llmEsc) { out = (await ask(llmEsc)) || out; escalated = true; }
+
+  const id = nextId(nodes);
+  let host = findHost(out), action = 'new';
+  if (host) action = 'attach';
+  else {
+    // 씨앗 신설 — 이름이 안 왔으면 문장 조각을 이름으로 쓰지 않고(run 72 "그런데 당신은 이 폐허에서…" 실측)
+    // 이름짓기 콜로 폴백. gloss 는 resonance 로 채운다 — 비면 다음 메모 판정 때 이 씨앗이
+    // 후보로 제시돼도 정보가 없어 다시 붙지 못한다(씨앗이 자라지 못하는 구조).
+    let name = String(out?.newName || '').trim();
+    if (!name || name.length > 25 || /["'“”,.?!]/.test(name)) {
+      const nameRaw = await llm({
+        system: '문학 문장 하나의 핵심 심상·주제를 짧은 명사구 하나로 짓는다. 정서 단어 말고 심상·주제. JSON만 출력.',
+        user: `책: ${book.title}\n문장: ${String(memo.text).slice(0, 300)}\n출력 JSON: {"name":"짧은 명사구"}`,
+        temperature: 0.1,
+      });
+      try { name = String(JSON.parse(nameRaw).name || '').trim() || name; } catch { /* 원래 값 유지 */ }
+      if (!name) name = String(memo.text).slice(0, 20);
+    }
+    const gloss = String(out?.resonance || '').trim();
+    host = {
+      id: id(), title: name, parentId: rootId, level: 1, kind: 'concept', sources: [],
+      emb: embedFn ? await embedFn(`${name}: ${gloss}`) : null, gloss,
+    };
+    nodes.set(host.id, host);
+  }
+  const s = {
+    id: id(), title: memo.text, parentId: host.id, level: host.level + 1, kind: 'sentence',
+    sources: memo.p != null ? [memo.p] : [], emb: null, memoId: memo.id, gloss: out?.resonance || '',
+    speaker: out?.speaker || '서술자', emotion: out?.emotion || '', motif: host.title, arc: '',
+  };
+  nodes.set(s.id, s);
+  if (memo.p != null && !host.sources.includes(memo.p)) host.sources.push(memo.p);
+  return { action, motif: host.title, escalated, confidence: Number(out?.confidence ?? 0) };
+}
+
