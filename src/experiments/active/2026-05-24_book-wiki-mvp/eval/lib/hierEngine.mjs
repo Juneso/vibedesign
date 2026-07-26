@@ -17,7 +17,7 @@
 //   eval/pipelines/hier-ingest-v7.json (eval 대시보드 왼쪽 구조도)도 같이 갱신할 것.
 //   v8은 eval/pipelines/hier-ingest-v8.json 참조.
 
-import { RELATION_NAMES, relationGuide, memberSpec, MEMBER_SPEC, PAIRED_RELATIONS } from './relationVocab.mjs';
+import { RELATION_NAMES, relationGuide, memberSpec, MEMBER_SPEC, PAIRED_RELATIONS, verifyAsk, PAGE_ORDERED } from './relationVocab.mjs';
 
 const MAX_LEVEL = 3;
 
@@ -882,34 +882,55 @@ ${roleLine}
         if (still) log.push(`[v11] "${cn.title}" 직속 잔류 ${still}개 — 어느 축에도 묶이지 않았다`);
       }
 
-      // 4.8) 쌍 검증 — 대조·비교·인과 축의 자식이 *실제로 그 관계의 양쪽인지* 확인한다.
-      //      개수만 강제하면 짝이 아닌 둘이 짝으로 묶인다("성과사회와 타자성의 상실 · 대조"
-      //      ← 타자성, 자본주의 — 자본주의는 타자성의 대조쌍이 아니다). 한 번의 호출로 전부 검사.
-      const pairedNodes = facetNodes.filter((fn) => nodes.has(fn.id) && PAIRED_RELATIONS.has(fn.relation) && conceptChildrenOf(fn.id).length >= 2);
-      if (pairedNodes.length) {
-        onProgress?.('phase 2 — 관계 쌍 검증');
-        const pLine = pairedNodes.map((fn, i) => `p${i} | ${fn.title} — 자식: ${conceptChildrenOf(fn.id).map((c) => c.title).join(', ')}`).join('\n');
+      // 4.8) 전개 방식 검증 — 판정한 관계가 결과에 실제로 지켜졌는지 **14종 전부** 확인한다.
+      //      쌍 관계에만 검증을 두면 정의·통시·분류 축은 무검증으로 남는다.
+      //      정의면 뜻을 규정하는 요소인지, 통시면 시간 순서를 이루는지, 분류면 같은 층위의
+      //      갈래인지 — 관계마다 기준이 다르므로 relationVocab 의 VERIFY_SPEC 을 질문으로 쓴다.
+      //      순서형(통시·과정)은 메모 페이지로 코드가 먼저 교차검증한다(LLM 불필요).
+      const auditNodes = facetNodes.filter((fn) => nodes.has(fn.id) && conceptChildrenOf(fn.id).length >= 2);
+      if (auditNodes.length) {
+        onProgress?.('phase 2 — 전개 방식 검증');
+        // 순서형 축: 자식들의 중앙 페이지가 실제로 앞뒤를 이루는지 먼저 본다
+        for (const fn of auditNodes.filter((f) => PAGE_ORDERED.has(f.relation))) {
+          const kids = conceptChildrenOf(fn.id);
+          const med = (n) => { const ps = [...new Set(n.sources)].sort((a, b) => a - b); return ps.length ? ps[Math.floor(ps.length / 2)] : null; };
+          const seq = kids.map(med).filter((p) => p != null);
+          if (seq.length < 2) continue;
+          const span = Math.max(...seq) - Math.min(...seq);
+          if (span < 20) {
+            log.push(`[v11✗] 전개 방식 검증 "${fn.title}" — ${fn.relation} 인데 자식들이 같은 대목에 몰려 있다(페이지 ${seq.join(',')} · 폭 ${span}p). 시간 흐름이 아니다`);
+            fn.orderSuspect = true;
+          }
+        }
+        const pLine = auditNodes.map((fn, i) => `p${i} | ${fn.title} [${fn.relation}] — 자식: ${conceptChildrenOf(fn.id).map((c) => c.title).join(', ')}\n     └ 검증 질문: ${verifyAsk(fn.relation)}`).join('\n');
         const vRaw = await llm({
-          system: '관계 축의 자식들이 그 관계의 양쪽으로 실제로 성립하는지 검증한다. 대조·비교면 정말 맞세워지는 두 대상인지, 인과면 한쪽이 원인이고 다른 쪽이 결과인지 본다. 주제가 같은 영역이라는 이유로 통과시키지 마라. 성립하지 않으면 남길 자식(keep)만 고르고 나머지는 빼라. JSON만 출력.',
-          user: `[검증할 축과 자식]\n${pLine}\n\n각 축에 대해: ok(양쪽이 성립하면 true) · keep(성립하지 않을 때 남길 자식 이름들 — 보통 관계의 주인공 1개) · why(한 줄)\n출력 JSON: {"checks":[{"id":"p0","ok":true,"keep":[],"why":"..."}]}`,
+          system: '관계 축이 그 관계로서 실제로 성립하는지 검증한다. 축마다 붙은 검증 질문에 답하듯 판단하라 — 정의 축이면 자식이 뜻을 규정하는 요소인지, 통시 축이면 시간 순서를 이루는지, 분류 축이면 같은 층위의 갈래인지, 대조·인과면 양쪽이 맞는지. **주제가 같은 영역이라는 이유로 통과시키지 마라.** 성립하지 않으면 남길 자식(keep)만 고르고 나머지는 뺀다. JSON만 출력.',
+          user: `[검증할 축과 자식]\n${pLine}\n\n각 축에 대해: ok(그 관계로 성립하면 true) · keep(성립하지 않을 때 남길 자식 이름들 — 보통 관계의 주인공) · why(한 줄)\n출력 JSON: {"checks":[{"id":"p0","ok":true,"keep":[],"why":"..."}]}`,
           temperature: 0,
         });
         let checks = []; try { checks = (JSON.parse(vRaw).checks || []); } catch { /* 파싱 실패 → 검증 생략 */ }
+        const okIds = new Set(checks.filter((c) => c.ok !== false).map((c) => String(c.id)));
+        log.push(`[v11] 전개 방식 검증: 축 ${auditNodes.length}개 중 ${okIds.size}개 통과`);
         for (const ck of checks) {
           const pi = Number(String(ck.id).replace(/^p/, ''));
-          const fn = pairedNodes[pi];
+          const fn = auditNodes[pi];
           if (!fn || !nodes.has(fn.id) || ck.ok !== false) continue;
           const keepSet = new Set((ck.keep || []).map(nrm));
           const kids = conceptChildrenOf(fn.id);
           const evicted = kids.filter((c) => !keepSet.has(nrm(c.title)));
-          if (!evicted.length || evicted.length === kids.length) continue; // 전부 빼면 축이 빈다 — 그냥 둔다
+          // 검증에 떨어졌는데 뺄 자식이 특정되지 않으면 조치 없이 넘어간다 — 그 사실을 남긴다.
+          // (실측: 돈으로 5축 중 3축 실패인데 조치 로그는 1건뿐이었다)
+          if (!evicted.length || evicted.length === kids.length) {
+            log.push(`[v11✗] 전개 방식 검증 실패 "${fn.title}"[${fn.relation}] — 조치 없음(뺄 자식이 특정되지 않음): ${String(ck.why || '').slice(0, 70)}`);
+            continue;
+          }
           const parent = nodes.get(fn.parentId);
           for (const c of evicted) safeReparent(c.id, parent.id);
-          log.push(`[v11] 쌍 검증 실패 "${fn.title}" — ${evicted.map((c) => c.title).join(', ')} 를 뺐다(${String(ck.why || '').slice(0, 60)})`);
-          // 한쪽을 빼면 자식이 최소 개수 아래로 떨어진다 — 규칙을 어긴 축을 그대로 두지 않는다.
+          log.push(`[v11] 전개 방식 검증 실패 "${fn.title}"[${fn.relation}] — ${evicted.map((c) => c.title).join(', ')} 를 뺐다(${String(ck.why || '').slice(0, 60)})`);
+          // 쌍 관계에서 한쪽이 빠지면 관계가 성립하지 않는다 — 규칙을 어긴 축을 그대로 두지 않고
           // 남은 하나의 문장을 축으로 흡수해 "관계 키워드"로 만든다(축 이름이 곧 관계 서술).
           const rest = conceptChildrenOf(fn.id);
-          if (rest.length < (MEMBER_SPEC[fn.relation]?.min || 2) && rest.length === 1) {
+          if (PAIRED_RELATIONS.has(fn.relation) && rest.length === 1) {
             const only = rest[0];
             const sents = sentOf(only.id);
             if (sents.length && !conceptChildrenOf(only.id).length) {
