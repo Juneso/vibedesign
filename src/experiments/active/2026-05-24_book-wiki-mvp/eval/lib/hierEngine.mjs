@@ -1199,13 +1199,34 @@ ${orphans.map((k) => `${k.id}: ${k.title} — ${k.gloss || ''}`).join('\n')}
     }
   }
 
+  // ── 최종 정리: 껍데기 키워드 제거 ──────────────────────────────────
+  // 이름만 있고 그 아래 문장도 자식도 없는 키워드가 남는다. 문장은 만들어졌지만
+  // 나중에 의미가 더 맞는 곳으로 옮겨 가거나 관계 키워드에 흡수돼, 이름표만 남는 것이다.
+  // 유저가 눌러도 볼 게 없을 뿐 아니라 **다른 내용까지 잘못 끌어당긴다** — 배치 테스트에서
+  // "자본주의에서 자기 착취는…" 문장이 텅 빈 '자본주의' 키워드로 갔다(실측).
+  // 껍데기는 지운다. 문장은 이미 다른 곳에 살아 있으므로 잃는 내용이 없다.
+  {
+    let swept = 0;
+    // 자식이 지워지면 부모가 새 껍데기가 될 수 있어 더 지울 게 없을 때까지 반복한다.
+    for (let pass = 0; pass < 5; pass++) {
+      const shells = concepts().filter((n) => n.parentId !== null && !childrenOf(n.id).length);
+      if (!shells.length) break;
+      for (const n of shells) {
+        log.push(`[sweep] 껍데기 키워드 제거 "${n.title}"${(n.sources || []).length ? ` — 출처 p.${[...new Set(n.sources)].join(',')} 의 문장은 다른 곳에 배정돼 이름만 남아 있었다` : ' — 문장이 한 번도 붙지 않았다'}`);
+        nodes.delete(n.id);
+        swept++;
+      }
+    }
+    if (swept) log.push(`[sweep] 껍데기 ${swept}개를 지웠다 — 눌러도 볼 게 없는 이름은 내용을 잘못 끌어당긴다`);
+  }
+
   const cnt = (t) => log.filter((l) => l.startsWith(`[${t}]`)).length;
   const maxDepth = Math.max(...[...nodes.values()].map((n) => n.level));
   const stats = {
     variant, conceptCount: concepts().length, maxDepth,
     merge: cnt('merge'), mergeGlobal: cnt('merge*'), child: cnt('child'),
     parent: cnt('parent'), attach: cnt('attach'), cluster: cnt('cluster'), flip: cnt('flip'),
-    theme: cnt('theme'), themeRejected: cnt('theme✗'),
+    theme: cnt('theme'), themeRejected: cnt('theme✗'), sweep: cnt('sweep'),
     ...(variant === 'v8' || variant === 'v10' || variant === 'v11' ? { pages: v8PageCount } : {}),
   };
   return { nodes, rootId: root.id, stats, log, mode: v10Mode };

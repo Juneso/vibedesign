@@ -21,15 +21,21 @@ await loadDotEnvLocal(__dir);
 
 const N = (s) => String(s || '').normalize('NFC');
 const MODEL = process.env.EVAL_MODEL || 'gpt-4o-mini';
-// KIMI=1 이면 비싼 두 콜(planIngestLit·모티프 확정)을 Moonshot Kimi 로 A/B (BKT-381 4o 비용 최소화).
-// 필요 env: MOONSHOT_API_KEY (.env.local). 모델·주소는 KIMI_MODEL / KIMI_BASE_URL 로 오버라이드.
-const KIMI = process.env.KIMI === '1';
-const INGEST_MODEL = process.env.INGEST_MODEL || (KIMI ? (process.env.KIMI_MODEL || 'kimi-k2.5') : 'gpt-4o');
+// PROVIDER=deepseek|kimi 면 비싼 두 콜(planIngestLit·모티프 확정)을 해당 저가 모델로 A/B
+// (BKT-381 4o 비용 최소화). OpenAI 호환 API라면 PROVIDERS 에 한 줄 추가로 확장.
+// KIMI=1 은 하위 호환 별칭. INGEST_MODEL 로 모델명 오버라이드 가능.
+const PROVIDERS = {
+  openai: { model: 'gpt-4o' },
+  kimi: { model: 'kimi-k2.5', baseURL: process.env.KIMI_BASE_URL || 'https://api.moonshot.ai/v1', keyEnv: 'MOONSHOT_API_KEY' },
+  deepseek: { model: 'deepseek-v4-flash', baseURL: 'https://api.deepseek.com', keyEnv: 'DEEPSEEK_API_KEY' },
+};
+const PROVIDER = process.env.PROVIDER || (process.env.KIMI === '1' ? 'kimi' : 'openai');
+const prov = PROVIDERS[PROVIDER];
+if (!prov) { console.error(`알 수 없는 PROVIDER: ${PROVIDER} (${Object.keys(PROVIDERS).join('|')})`); process.exit(1); }
+const INGEST_MODEL = process.env.INGEST_MODEL || prov.model;
 const KEY = process.env.OPENAI_API_KEY;
 const llm = openaiNodeTransport({ model: MODEL });
-const bigOpts = KIMI
-  ? { model: INGEST_MODEL, baseURL: process.env.KIMI_BASE_URL || 'https://api.moonshot.ai/v1', keyEnv: 'MOONSHOT_API_KEY' }
-  : { model: INGEST_MODEL };
+const bigOpts = { ...prov, model: INGEST_MODEL };
 const llm4o = openaiNodeTransport(bigOpts);
 const llmConsol = openaiNodeTransport(bigOpts);
 
