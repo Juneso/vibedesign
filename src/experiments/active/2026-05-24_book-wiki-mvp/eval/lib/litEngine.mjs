@@ -377,6 +377,14 @@ export function recomputeArcs(nodes, isEssay) {
 //   distinct — 별개 → 그대로 (judged 셋에 기록해 재판정 방지)
 export async function consolidateSeeds({ nodes, rootId, book, llm, embedFn, judged = new Set(), maxPairs = 4 }) {
   const rootMotifs = () => [...nodes.values()].filter((n) => n.kind === 'concept' && n.parentId === rootId && n.role !== 'voice');
+  // 적응형 통합 강도 — 통합이 가장 필요한(씨앗이 흩어진) 실행일수록 유사도 게이트에 걸리는
+  // 쌍이 적어지는 악순환(run 78: new 9건 → 통합 1건 → 11축). 트리가 과편화 상태면
+  // 문을 넓힌다: 게이트 0.5→0.4, 판정쌍 상한 4→8. 병합/하위/별개 판단 기준 자체는 그대로
+  // ("애매하면 distinct") — 나쁜 실행만 끌어올리고 좋은 실행은 건드리지 않는다.
+  const sentTotal = [...nodes.values()].filter((n) => n.kind === 'sentence').length;
+  const overFragmented = rootMotifs().length > Math.max(5, Math.ceil(sentTotal / 3));
+  const simGate = overFragmented ? 0.4 : 0.5;
+  if (overFragmented) maxPairs = Math.max(maxPairs, 8);
   const kidsOf = (nid) => [...nodes.values()].filter((n) => n.parentId === nid);
   const sentCount = (m) => {
     let c = 0;
@@ -398,7 +406,7 @@ export async function consolidateSeeds({ nodes, rootId, book, llm, embedFn, judg
     const key = [nrm(ms[i].title), nrm(ms[j].title)].sort().join('|');
     if (judged.has(key) || !ms[i].emb || !ms[j].emb) continue;
     const sim = cos(ms[i].emb, ms[j].emb);
-    if (sim >= 0.5) pairs.push({ a: ms[i], b: ms[j], sim, key });
+    if (sim >= simGate) pairs.push({ a: ms[i], b: ms[j], sim, key });
   }
   pairs.sort((x, y) => y.sim - x.sim);
 
