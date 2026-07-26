@@ -1,0 +1,39 @@
+{
+  "label": "돈으로 살 수 없는 것들",
+  "runAt": "2026-07-26T02:40:08.155Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-42.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 17,
+  "total": 3,
+  "density": 0.176,
+  "byType": {
+    "loneChild": 1,
+    "relationMiss": 2
+  },
+  "defects": [
+    {
+      "type": "loneChild",
+      "by": "code",
+      "nodeId": "n36",
+      "title": "상품화의 한계 · 분석",
+      "why": "자식이 \"라이브콘서트\" 하나뿐이다"
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n36",
+      "title": "상품화의 한계 · 분석",
+      "why": "자식 '라이브콘서트'는 상품화의 한계를 분석하는 것이 아니라 상품화의 결과로서의 사회적 행사에 대한 설명이다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n39",
+      "title": "사회적 규범과 경제적 인센티브의 관계 · 인과",
+      "why": "자식 '벌금과 요금'·'재정적 인센티브'는 사회적 규범과 경제적 인센티브의 관계를 설명하는 것이 아니라 각각의 개별적인 요소로서 다루어져야 한다."
+    }
+  ],
+  "reading": "개념 17개 중 결함 3건 — 관계-멤버 불일치 2 · 자식 1개 축 1"
+}

@@ -1,0 +1,49 @@
+{
+  "label": "돈으로 살 수 없는 것들",
+  "runAt": "2026-07-26T02:40:05.915Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-41.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 17,
+  "total": 4,
+  "density": 0.235,
+  "byType": {
+    "loneChild": 1,
+    "dumping": 1,
+    "relationMiss": 1,
+    "misplaced": 1
+  },
+  "defects": [
+    {
+      "type": "loneChild",
+      "by": "code",
+      "nodeId": "n38",
+      "title": "공공정신과 시장 · 예시",
+      "why": "자식이 \"재정적 인센티브\" 하나뿐이다"
+    },
+    {
+      "type": "dumping",
+      "by": "code",
+      "nodeId": "n35",
+      "title": "시장 규범의 한계 · 대조",
+      "why": "하위 9개 — 형제 축 평균 3.8개의 2.3배"
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n35",
+      "title": "시장 규범의 한계 · 대조",
+      "why": "자식 '시장'·'줄서기 도덕'은 대조 관계가 아니라 서로 다른 규범을 반영하는 관계이다."
+    },
+    {
+      "type": "misplaced",
+      "by": "llm",
+      "nodeId": "n36",
+      "otherId": "n39",
+      "title": "상품화의 영향 · 분석",
+      "why": "자식 '라이브콘서트'·'출산 허가증'은 상품화의 영향이 아니라 사회적 가치의 상품화와 관련된 사례여야 한다."
+    }
+  ],
+  "reading": "개념 17개 중 결함 4건 — 자식 1개 축 1 · 덤핑 버킷 1 · 관계-멤버 불일치 1"
+}

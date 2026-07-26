@@ -31,6 +31,8 @@ export const SERIES_META = {
   'hier-v11':             { title: 'V11 · 관계 축 기반', purpose: '핵심 개념 아래를 "개념(분석)·기원(통시)" 같은 관계 축으로 편성 — 혼재 전개 대응', pipelineId: 'hier-ingest-auto' },
   'hier-auto':            { title: '자동 디스패치 · 최종안', purpose: '목차 시간순(high)이면 v10 시대 편성, 아니면 v11 관계 축 — BKT-380 확정 구조', pipelineId: 'hier-ingest-auto' },
   'literature-v1':        { title: '문학 V1 · 모티프 축', purpose: '소설 전용 파이프라인 — 모티프 1차 축 + 인물 조건부 승격, 문장은 페이지순(서사 진행)', pipelineId: 'literature-v1' },
+  'placement':            { title: '배치 테스트', purpose: '라벨 경로만 보고 메모를 제자리에 놓을 수 있는가 — 임베딩 최근접 기준선과 비교해 관계 라벨의 기여를 잰다', pipelineId: 'hier-ingest-auto' },
+  'defects':              { title: '결함 감사', purpose: '알려진 결함 14종이 트리에 몇 건 있는지 — 점수가 아니라 지목된 노드를 열어 사람이 검증하는 지표', pipelineId: 'hier-ingest-auto' },
   'competency':           { title: '역량 질문 채점', purpose: '트리만 보고 핵심 주장·근거·전개·사례 질문에 답할 수 있는지 — 온톨로지 품질 측정', pipelineId: 'hier-ingest-auto' },
   'predict-v9':{ title: '전이 채점 · V9 산출', purpose: 'V9 위키로 새 상황을 설명할 수 있는지', pipelineId: null },
   'predict-v9-v2':        { title: '전이 채점 v2 · V9 산출', purpose: '전이 채점 2차 — 오라클 갭 재측정', pipelineId: null },
