@@ -3,9 +3,11 @@
 
 const DEFAULT_MODEL = 'gpt-4o-mini';
 
-export function openaiNodeTransport({ apiKey, model } = {}) {
-  const key = apiKey || process.env.OPENAI_API_KEY;
-  if (!key) throw new Error('OPENAI_API_KEY missing (env or apiKey)');
+// baseURL·keyEnv 로 OpenAI 호환 API(Moonshot Kimi 등)도 같은 transport 로 쓴다 (BKT-381 4o 비용 A/B)
+export function openaiNodeTransport({ apiKey, model, baseURL, keyEnv } = {}) {
+  const key = apiKey || process.env[keyEnv || 'OPENAI_API_KEY'];
+  if (!key) throw new Error(`${keyEnv || 'OPENAI_API_KEY'} missing (env or apiKey)`);
+  const endpoint = `${(baseURL || 'https://api.openai.com/v1').replace(/\/$/, '')}/chat/completions`;
   return async ({ system, user, model: m, temperature }) => {
     const useModel = m || model || DEFAULT_MODEL;
     // gpt-5 계열·o-시리즈(reasoning)는 temperature 기본값(1)만 지원 — 파라미터 생략
@@ -23,7 +25,7 @@ export function openaiNodeTransport({ apiKey, model } = {}) {
     });
     // rate limit 자동 재시도 (최대 3회, 지수 백오프)
     for (let attempt = 0; attempt < 3; attempt++) {
-      const r = await fetch('https://api.openai.com/v1/chat/completions', {
+      const r = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
         body,

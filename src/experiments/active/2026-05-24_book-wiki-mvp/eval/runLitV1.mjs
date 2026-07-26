@@ -21,10 +21,17 @@ await loadDotEnvLocal(__dir);
 
 const N = (s) => String(s || '').normalize('NFC');
 const MODEL = process.env.EVAL_MODEL || 'gpt-4o-mini';
-const INGEST_MODEL = process.env.INGEST_MODEL || 'gpt-4o';
+// KIMI=1 이면 비싼 두 콜(planIngestLit·모티프 확정)을 Moonshot Kimi 로 A/B (BKT-381 4o 비용 최소화).
+// 필요 env: MOONSHOT_API_KEY (.env.local). 모델·주소는 KIMI_MODEL / KIMI_BASE_URL 로 오버라이드.
+const KIMI = process.env.KIMI === '1';
+const INGEST_MODEL = process.env.INGEST_MODEL || (KIMI ? (process.env.KIMI_MODEL || 'kimi-k2.5') : 'gpt-4o');
 const KEY = process.env.OPENAI_API_KEY;
 const llm = openaiNodeTransport({ model: MODEL });
-const llm4o = openaiNodeTransport({ model: INGEST_MODEL });
+const bigOpts = KIMI
+  ? { model: INGEST_MODEL, baseURL: process.env.KIMI_BASE_URL || 'https://api.moonshot.ai/v1', keyEnv: 'MOONSHOT_API_KEY' }
+  : { model: INGEST_MODEL };
+const llm4o = openaiNodeTransport(bigOpts);
+const llmConsol = openaiNodeTransport(bigOpts);
 
 async function embedFn(text) {
   const r = await fetch('https://api.openai.com/v1/embeddings', {
@@ -92,7 +99,7 @@ for (const t of titles) {
       { book, memos, model: `${INGEST_MODEL}#lit2${(book.summary || book.aladin?.intro) ? '+rich' : ''}${canon ? '+canon' : ''}` },
     );
     const r = await runLitIngest({
-      book, memos, llm, embedFn, planLitFn: planFn, canon,
+      book, memos, llm, embedFn, planLitFn: planFn, canon, llmConsol,
       onProgress: (msg) => process.stdout.write(`      ${msg}\r`),
     });
     const tree = serializeTree(r.nodes, r.rootId);

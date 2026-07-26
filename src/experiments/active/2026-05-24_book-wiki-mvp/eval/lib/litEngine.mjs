@@ -68,7 +68,10 @@ ${canonBlock}
   try { return JSON.parse(raw); } catch { return { motifCandidates: [], analyses: [] }; }
 }
 
-export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, canon, onProgress }) {
+export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, canon, llmConsol, onProgress }) {
+  // 모티프 확정 콜: 기본 gpt-4o (mini 는 미배정 판단을 에코로 무시 — 실측 3회).
+  // llmConsol 주입 시 그 transport 사용 — Kimi K2.5 등 OpenAI 호환 API A/B 용.
+  const consol = llmConsol || ((args) => llm({ ...args, model: 'gpt-4o' }));
   let SEQ = 0; const id = () => `n${++SEQ}`;
   const nodes = new Map(); const log = [];
   const root = { id: id(), title: book.title, parentId: null, level: 0, kind: 'root', sources: [], emb: null };
@@ -136,15 +139,13 @@ export async function runLitIngest({ book, memos, llm, embedFn, planLitFn, canon
   const unassigned = items.filter((x) => !x.motifs.some((mm) => strong.has(nrm(mm))));
   log.push(`[consol] 강한 후보 ${strong.size}/${candidates.length} · 확정 콜에 미배정 ${unassigned.length}건 제시(${unassigned.map((x) => x.memoId).join(',')})`);
   const unassignedLine = unassigned.map((x) => `- ${x.memoId} p${x.p}: ${String(x.text).slice(0, 70)}`).join('\n');
-  const raw = await llm({
+  const raw = await consol({
     system: '소설 독서 메모의 모티프 목록을 확정한다. 같은 것을 가리키는 모티프는 병합하고, 메모가 2개 미만 걸리는 모티프는 버린다. 메모를 억지로 채워 넣지 마라. JSON만 출력.',
     user: `책: ${book.title}\n\n[모티프 후보와 배정된 메모]\n${candLine}\n${unassigned.length ? `\n[모티프가 없는 문장 — 하나씩 반드시 판단하라]\n${unassignedLine}\n이 문장들은 motifs 의 memoIds 에 넣지 말고, **placements 배열에 문장마다 정확히 한 건씩** 판정하라:
 - action="attach": 기존 모티프가 그 설명대로 이미 다루는 주제일 때. motif=그 모티프 이름. **①이 성립하면 new 로 가지 마라** (예: "위대한 사상은 속이 빈 인형" → '체험과 관념의 대립' attach).
 - action="new": 기존 어느 모티프도 다루지 않는 새 축일 때만. motif=새 축 이름(짧은 명사구). 문장 1개짜리 축도 된다 — 앞으로 쌓일 메모의 씨앗. 단 문장마다 신설하면 잡동사니다.
 - action="drop": 문맥 없는 파편일 때만. 격언·핵심 사유 문장을 drop 하는 것은 실패다.\n` : ''}\n최종 모티프를 확정하라. 각 모티프: name(후보 이름을 다듬어도 됨) · description(1~2문장) · mergedFrom(합친 후보 c번호들) · memoIds(위에 배정된 메모의 memoId — 병합 시 합치기).\n규칙:\n- [모티프가 없는 문장] 섹션이 있으면 그 문장들을 하나씩 판단한 결과가 motifs 에 반영돼야 한다 — 입력 후보를 그대로 복사한 출력은 실패다.\n- **메모 1개짜리 후보를 그냥 버리지 마라.** 서로 합치거나 이웃 후보에 합쳐 메모 2개 이상이 되는지 먼저 검토하고, 정말 어디에도 못 합칠 때만 버린다(예: "이루어질 수 없는 사랑"+"사회적 제약"이 실은 한 축인 경우).\n- **과병합 금지**: 병합은 두 후보가 **같은 심상·주제**를 가리킬 때만이다. 서로 다른 주제를 개수 채우기 편의로 합치지 마라 — 책의 핵심 축이 다른 축에 삼켜져 사라지는 것이 최악의 실패다.\n- 이름 자기검증: 각 이름이 문장들의 **정서 톤**(무의미·고독·슬픔 따위)이 아니라 **반복되는 심상·주제**를 가리키는지 확인하라. 정서 단어가 이름의 중심이면 심상·주제로 바꿔라.${canon ? `\n- 참고 — 이 책의 일반적 해석 축: ${(canon.themes || []).map((t) => t.name).join(' · ')}. 후보가 이 중 하나와 같은 것을 가리키면 그 어휘를 참고해 이름을 다듬어라. 단, 배정된 메모가 실제로 다루는 범위를 넘어서 이름을 부풀리지 마라.` : ''}\n출력 JSON: {"motifs":[{"name":"...","description":"...","mergedFrom":["c0"],"memoIds":["m27"]}],"placements":[{"memoId":"m70","action":"attach|new|drop","motif":"모티프 이름"}]}`,
     temperature: 0.1,
-    // mini 는 미배정 문장 판단을 반복적으로 무시하고 후보를 에코만 했다(조르바 3회 실측) — 이 콜만 4o.
-    model: 'gpt-4o',
   });
   let finals = [], placements = [];
   try { const pj = JSON.parse(raw); finals = pj.motifs || []; placements = pj.placements || []; } catch { /* 파싱 실패 → 후보 그대로 */ }
