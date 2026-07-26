@@ -944,6 +944,48 @@ ${roleLine}
         }
       }
 
+      // 4.85) 분석 축 삼분 판정 — "구성 요소"라는 이름이 나머지 통이 되는 것을 막는다.
+      //
+      // 10권 감사 실측: 관계별 결함률이 분석 150%(축 6·결함 9) · 분류 150% 로 최악인 반면
+      // 대조는 33%, 비교는 0% 였다. 즉 문제는 짝을 못 맞추는 쌍 관계가 아니라 **분석**이다.
+      // 분석은 거의 모든 것에 대해 참이라("X 는 Y 의 한 측면이다") 4.8 의 예/아니오 검증이
+      // 통과시켜 버린다 — 심리 정치의 "심리정치의 구성 요소 · 분석"은 자식 12개를 달고
+      // 검증을 통과했지만, 결함 감사는 그 12개가 전부 "구성 요소가 아니라 결과와 배경"이라
+      // 지적했다. 두 판정이 엇갈린 지점이 여기다.
+      //
+      // 그래서 축 단위 예/아니오 대신 **자식마다 구성 요소·결과·배경 3지선다**를 강제한다.
+      // 선택지를 주면 "결과"라고 말할 자리가 생겨 관대한 통과가 어려워진다.
+      {
+        const DUMP_MIN = 4; // 이보다 작으면 덤핑이라 볼 수 없어 건드리지 않는다
+        const targets = facetNodes.filter((fn) => nodes.has(fn.id) && fn.relation === '분석'
+          && conceptChildrenOf(fn.id).length >= DUMP_MIN);
+        for (const fn of targets) {
+          const kids = conceptChildrenOf(fn.id);
+          const core = nodes.get(fn.parentId);
+          if (!core) continue;
+          const subject = fn.title.replace(/ · [^·]+$/, '');
+          const raw = await llm({
+            system: '개념을 이루는 "구성 요소"로 묶인 목록을 검사한다. 각 항목이 정말 그 개념을 이루는 부분인지, 아니면 그 개념이 낳은 **결과**인지, 그 개념을 둘러싼 **배경**인지 셋 중 하나로 판정하라. 전체와 부분의 관계가 아니면 구성 요소가 아니다. 애매하면 구성 요소가 아닌 쪽으로 판정하라. JSON만 출력.',
+            user: `[개념] ${subject}\n\n[구성 요소로 묶여 있는 항목]\n${kids.map((c, i) => `${i} | ${c.title}${c.gloss ? ` — ${String(c.gloss).slice(0, 80)}` : ''}`).join('\n')}\n\n출력 JSON: {"items":[{"i":0,"kind":"구성요소|결과|배경","why":"한 줄"}]}`,
+            temperature: 0,
+          });
+          let items = []; try { items = JSON.parse(raw).items || []; } catch { continue; }
+          const out = items.filter((x) => x.kind && x.kind !== '구성요소')
+            .map((x) => ({ node: kids[Number(x.i)], kind: x.kind })).filter((x) => x.node);
+          // 전부 아니라고 하면 축 자체가 잘못 선 것이다 — 축을 해체해 핵심 개념 직속으로 올린다.
+          if (out.length >= kids.length) {
+            for (const c of kids) safeReparent(c.id, core.id);
+            for (const s of sentOf(fn.id)) { s.parentId = core.id; s.level = core.level + 1; }
+            nodes.delete(fn.id);
+            log.push(`[v11✗] 분석 축 "${fn.title}" 해체 — 자식 ${kids.length}개가 하나도 구성 요소가 아니었다(${out.slice(0, 3).map((o) => `${o.node.title}=${o.kind}`).join(' · ')}). 이름이 약속한 것과 내용이 달라 층을 없애고 "${core.title}" 직속으로 올렸다`);
+            continue;
+          }
+          if (!out.length) { log.push(`[v11] 분석 축 "${fn.title}" 삼분 판정 통과 — 자식 ${kids.length}개가 모두 구성 요소로 확인됐다`); continue; }
+          for (const o of out) safeReparent(o.node.id, core.id);
+          log.push(`[v11] 분석 축 "${fn.title}" 에서 ${out.length}개를 뺐다 — ${out.map((o) => `${o.node.title}(${o.kind})`).join(' · ')}. 구성 요소가 아니라서 "${core.title}" 직속으로 옮겼다`);
+        }
+      }
+
       // 4.9) 헛도는 축 정리 — 자식이 하나뿐이고 그 이름이 축 이름과 사실상 같으면
       //      ("능력주의의 개념 · 정의" ← 능력주의) 층만 하나 낀 것이다. 축을 없애고
       //      키워드를 핵심 개념 직속으로 올린다.

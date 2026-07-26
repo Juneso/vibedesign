@@ -1,0 +1,60 @@
+{
+  "label": "짓기와 거주하기",
+  "runAt": "2026-07-26T05:33:07.469Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-58.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 31,
+  "total": 6,
+  "density": 0.194,
+  "byType": {
+    "hollowAxis": 2,
+    "relationMiss": 4
+  },
+  "defects": [
+    {
+      "type": "hollowAxis",
+      "by": "code",
+      "nodeId": "n79",
+      "title": "도시계획의 윤리적 딜레마 · 문답",
+      "why": "유일한 자식 \"윤리적 문제\" 과 이름이 겹친다"
+    },
+    {
+      "type": "hollowAxis",
+      "by": "code",
+      "nodeId": "n81",
+      "title": "경제적 구조와 도시 · 분류",
+      "why": "유일한 자식 \"경제적 독점\" 과 이름이 겹친다"
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n78",
+      "title": "열린 도시의 필요성 · 예시",
+      "why": "자식 '사회적 포용과 물리적 설계'·'공공장소'는 열린 도시의 필요성과 관련된 구체적 사례가 아니라 일반적인 개념을 다루고 있다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n79",
+      "title": "도시계획의 윤리적 딜레마 · 문답",
+      "why": "자식 '윤리적 문제'는 도시계획의 윤리적 딜레마를 다루고 있지만, 그 내용이 던져진 물음과 직접적인 답을 이루지 않는다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n81",
+      "title": "경제적 구조와 도시 · 분류",
+      "why": "자식 '경제적 독점'은 경제적 구조와 도시의 분류에 적합하지 않으며, 서로 겹치는 개념이 있다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n82",
+      "title": "정신적 경험과 도시 · 묘사",
+      "why": "자식 '휴먼스케일'·'바슐라르'는 정신적 경험과 도시의 묘사로서 그 상태를 그리는 것이 아니라 개념적 설명에 그치고 있다."
+    }
+  ],
+  "reading": "개념 31개 중 결함 6건 — 관계-멤버 불일치 4 · 헛도는 층 2"
+}

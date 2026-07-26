@@ -1,0 +1,39 @@
+{
+  "label": "심리 정치",
+  "runAt": "2026-07-26T05:33:01.502Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-56.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 20,
+  "total": 3,
+  "density": 0.15,
+  "byType": {
+    "loneChild": 1,
+    "relationMiss": 2
+  },
+  "defects": [
+    {
+      "type": "loneChild",
+      "by": "code",
+      "nodeId": "n51",
+      "title": "심리정치의 기원 · 통시",
+      "why": "자식이 \"신자유주의\" 하나뿐이다"
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n52",
+      "title": "심리정치의 구성 요소 · 분석",
+      "why": "자식 '디지털 파놉티콘'·'자유의 위기'는 심리정치의 구성 요소가 아니라 그 결과와 배경이다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n53",
+      "title": "심리정치의 결과 · 인과",
+      "why": "자식 '자본의 착취'·'착취'는 심리정치의 결과가 아니라 자본과 권력의 관계에 대한 설명이다."
+    }
+  ],
+  "reading": "개념 20개 중 결함 3건 — 관계-멤버 불일치 2 · 자식 1개 축 1"
+}

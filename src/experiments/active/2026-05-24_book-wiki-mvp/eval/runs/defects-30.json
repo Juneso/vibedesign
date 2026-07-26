@@ -1,0 +1,63 @@
+{
+  "label": "피로사회",
+  "runAt": "2026-07-26T05:33:04.103Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-57.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 23,
+  "total": 6,
+  "density": 0.261,
+  "byType": {
+    "loneChild": 2,
+    "hollowAxis": 1,
+    "underMin": 1,
+    "dumping": 1,
+    "relationMiss": 1
+  },
+  "defects": [
+    {
+      "type": "loneChild",
+      "by": "code",
+      "nodeId": "n47",
+      "title": "성과사회의 기원 · 통시",
+      "why": "자식이 \"규율사회\" 하나뿐이다"
+    },
+    {
+      "type": "loneChild",
+      "by": "code",
+      "nodeId": "n49",
+      "title": "성과사회의 현대적 양상 · 예시",
+      "why": "자식이 \"후기근대\" 하나뿐이다"
+    },
+    {
+      "type": "hollowAxis",
+      "by": "code",
+      "nodeId": "n50",
+      "title": "면역학적 패러다임과 세계화의 충돌 · 대조",
+      "why": "유일한 자식 \"면역학적 조직\" 과 이름이 겹친다"
+    },
+    {
+      "type": "underMin",
+      "by": "code",
+      "nodeId": "n50",
+      "title": "면역학적 패러다임과 세계화의 충돌 · 대조",
+      "why": "대조 는 최소 2개가 필요한데 1개다"
+    },
+    {
+      "type": "dumping",
+      "by": "code",
+      "nodeId": "n48",
+      "title": "성과사회의 구성 요소 · 분석",
+      "why": "하위 10개 — 형제 축 평균 4.3개의 2.3배"
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n48",
+      "title": "성과사회의 구성 요소 · 분석",
+      "why": "자식 '긍정성의 과잉'·'자기 착취'·'타자성'은 성과사회의 구성 요소가 아니라 그 결과와 배경이다."
+    }
+  ],
+  "reading": "개념 23개 중 결함 6건 — 자식 1개 축 2 · 헛도는 층 1 · 관계 최소 위반 1"
+}
