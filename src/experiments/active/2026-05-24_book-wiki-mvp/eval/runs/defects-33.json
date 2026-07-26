@@ -1,0 +1,24 @@
+{
+  "label": "돈으로 살 수 없는 것들",
+  "runAt": "2026-07-26T06:03:05.459Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-60.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 18,
+  "total": 1,
+  "density": 0.056,
+  "byType": {
+    "relationMiss": 1
+  },
+  "defects": [
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n35",
+      "title": "시장 규범과 비시장 규범의 충돌 · 대조",
+      "why": "자식 '줄서기 도덕'·'비시장 규범'은 대조 관계가 아니라 서로 다른 규범을 설명하는 것이므로 관계가 어긋난다."
+    }
+  ],
+  "reading": "개념 18개 중 결함 1건 — 관계-멤버 불일치 1"
+}

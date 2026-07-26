@@ -1,0 +1,63 @@
+{
+  "label": "서양미술사",
+  "runAt": "2026-07-26T06:03:27.767Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-68.json",
+  "sourceVariant": "v10",
+  "model": "gpt-4o-mini",
+  "nConcepts": 35,
+  "total": 6,
+  "density": 0.171,
+  "byType": {
+    "thinPillar": 4,
+    "dupPillar": 1,
+    "misplaced": 1
+  },
+  "defects": [
+    {
+      "type": "thinPillar",
+      "by": "code",
+      "nodeId": "n23",
+      "title": "형태와 실재 재현",
+      "why": "축 0개 · 하위 키워드 0개뿐이다"
+    },
+    {
+      "type": "thinPillar",
+      "by": "code",
+      "nodeId": "n62",
+      "title": "2 · 그리스의 미학",
+      "why": "축 0개 · 하위 키워드 2개뿐이다"
+    },
+    {
+      "type": "thinPillar",
+      "by": "code",
+      "nodeId": "n63",
+      "title": "3 · 중세의 초자연",
+      "why": "축 0개 · 하위 키워드 2개뿐이다"
+    },
+    {
+      "type": "thinPillar",
+      "by": "code",
+      "nodeId": "n64",
+      "title": "4 · 르네상스와 혁신",
+      "why": "축 0개 · 하위 키워드 2개뿐이다"
+    },
+    {
+      "type": "dupPillar",
+      "by": "llm",
+      "nodeId": "n65",
+      "otherId": "n18",
+      "title": "5 · 근대 미술의 분열",
+      "why": "자식 '미술가의 마음과 취향'·'19세기 미술의 분열'은 모두 근대 미술의 분열을 다루고 있어 중복된다."
+    },
+    {
+      "type": "misplaced",
+      "by": "llm",
+      "nodeId": "n66",
+      "otherId": "n65",
+      "title": "미술의 역사와 전통",
+      "why": "'미술의 역사와 전통'은 근대 미술의 분열 아래가 아니라 독립된 주제로 다루어져야 한다."
+    }
+  ],
+  "reading": "개념 35개 중 결함 6건 — 실속 없는 기둥 4 · 중복 기둥 1 · 오배치 1"
+}

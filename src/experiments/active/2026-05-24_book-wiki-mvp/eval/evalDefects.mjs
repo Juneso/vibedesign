@@ -26,10 +26,14 @@ const llm = openaiNodeTransport({ model: MODEL });
 
 // 결함 분류 — code 는 코드가 확정적으로 잡고, llm 은 의미 판단이 필요해 모델이 지목한다.
 export const DEFECTS = {
-  hollowAxis:   { by: 'code', label: '헛도는 층', desc: '축 이름과 유일한 자식 이름이 사실상 같다 — 층이 하나 늘었을 뿐 아무것도 나누지 않는다' },
-  loneChild:    { by: 'code', label: '자식 1개 축', desc: '축인데 자식이 하나 — 묶을 게 없는데 묶었다' },
+  // 다음 둘은 결함 목록에서 뺐다(Junseo 판정).
+  // - 자식 1개 축: "성과사회의 기원 · 통시 → 규율사회" 처럼 멀쩡한 경우가 많다.
+  //   축이 하나만 거느린 것 자체는 잘못이 아니다. 37건 중 11건이 이것이었고,
+  //   전부 오탐으로 관계별 순위를 통째로 왜곡하고 있었다.
+  // - 헛도는 층: 결함으로 셀 게 아니라 파이프라인이 고칠 일이다. hierEngine 4.9 의
+  //   축 해체 규칙을 낱말 겹침까지 넓혀(조사 차이로 놓치던 것) 코드가 직접 없앤다.
   underMin:     { by: 'code', label: '관계 최소 위반', desc: '대조·인과처럼 짝이 있어야 성립하는 관계인데 한쪽만 있다' },
-  dumping:      { by: 'code', label: '덤핑 버킷', desc: '한 축이 형제 축들보다 압도적으로 많이 삼켰다 — 분류가 아니라 나머지 통이다' },
+  dumping:      { by: 'code', label: '덤핑 버킷', desc: '한 축이 지나치게 많이 삼켰다 — 분류가 아니라 나머지 통이다' },
   orphan:       { by: 'code', label: '고아', desc: '어느 개념에도 안 묶이고 뿌리에 매달린 문장' },
   emptyLeaf:    { by: 'code', label: '빈 키워드', desc: '이름만 있고 문장도 자식도 없다' },
   thinPillar:   { by: 'code', label: '실속 없는 기둥', desc: '핵심 개념인데 거느린 게 거의 없다 — 기둥이라 부를 근거가 없다' },
@@ -57,14 +61,6 @@ function idx(tree) {
   const deep = (id) => { let n = 0; const w = (i) => { for (const c of ch(i)) { n++; w(c.id); } }; w(id); return n; };
   return { byId, root, ch, concepts, sents, deep };
 }
-// 축 이름은 "빌의 물리적 특성 · 묘사" 꼴 — 관계 꼬리를 뗀 몸통만 비교한다.
-const bare = (t) => N(t).replace(/\s*·\s*[^·]+$/, '').trim();
-const overlap = (a, b) => {
-  const A = new Set(bare(a).split(/[\s·]+/).filter((w) => w.length > 1));
-  const B = new Set(bare(b).split(/[\s·]+/).filter((w) => w.length > 1));
-  if (!A.size || !B.size) return 0;
-  return [...A].filter((w) => B.has(w)).length / Math.min(A.size, B.size);
-};
 
 // ── 코드 감사 ──────────────────────────────────────────────────────────
 function auditCode(tree) {
@@ -83,11 +79,6 @@ function auditCode(tree) {
     }
     // 축(relation 보유) 전용 검사
     if (n.relation) {
-      if (kidC.length === 1) {
-        const c = kidC[0];
-        if (overlap(n.title, c.title) >= 0.5) add('hollowAxis', n, `유일한 자식 "${N(c.title)}" 과 이름이 겹친다`);
-        else add('loneChild', n, `자식이 "${N(c.title)}" 하나뿐이다`);
-      }
       const min = MEMBER_SPEC[n.relation]?.min || 1;
       if (kidC.length && kidC.length < min) add('underMin', n, `${n.relation} 는 최소 ${min}개가 필요한데 ${kidC.length}개다`);
       if (PAGE_ORDERED.has(n.relation) && kidC.length >= 2) {
@@ -114,17 +105,15 @@ function auditCode(tree) {
     }
   }
 
-  // 덤핑 버킷 — 형제 축끼리 비교
-  for (const p of tree.nodes) {
-    const axes = T.concepts(p.id).filter((c) => c.relation);
-    if (axes.length < 2) continue;
-    const sizes = axes.map((a) => T.deep(a.id));
-    const avg = sizes.reduce((a, b) => a + b, 0) / sizes.length;
-    axes.forEach((a, i) => {
-      if (sizes[i] >= 5 && sizes[i] >= avg * 2.2) {
-        add('dumping', a, `하위 ${sizes[i]}개 — 형제 축 평균 ${avg.toFixed(1)}개의 ${(sizes[i] / avg).toFixed(1)}배`);
-      }
-    });
+  // 덤핑 버킷 — 절대 기준으로 센다.
+  // 형제 축 대비 배수로 재던 규칙은 **개선을 벌줬다**: 피로사회의 분석 축에서 결과 2개를
+  // 걷어내 자식이 4개로 줄었는데, 형제 축이 더 작아서 오히려 덤핑 판정에 새로 걸렸다.
+  // 축이 커진 게 아니라 형제가 작아진 것이므로 결함이 아니다. 키워드 절대 수로 본다.
+  const DUMP_KIDS = 8;
+  for (const n of tree.nodes) {
+    if (!n.relation) continue;
+    const k = T.concepts(n.id).length;
+    if (k >= DUMP_KIDS) add('dumping', n, `키워드 ${k}개를 거느린다 — 하나의 관계로 묶였다고 보기 어렵다`);
   }
   return out;
 }
@@ -180,6 +169,10 @@ async function auditLLM(tree, label) {
     const bad = !ids.has(d.nodeId) || !keys.has(d.type) ? '없는 노드/종류'
       // 관계 없는 노드(v10 트리 등)에 관계 결함을 붙일 수 없다
       : (d.type === 'relationMiss' && !n.relation) ? '관계 없는 노드'
+      // 관계 키워드 — 짝이 한 문장 안에서 완결될 때 축을 키워드로 전환한 **의도된 구조**다.
+      // 자식 키워드가 없으니 "자식들이 그 관계인가"라는 질문 자체가 성립하지 않는다.
+      // (실측: 대조 결함 4건 중 2건이 이 오탐이었다)
+      : (d.type === 'relationMiss' && !tree.nodes.some((x) => x.parentId === n.id && x.kind === 'concept')) ? '관계 키워드(자식 없음)'
       // 상대가 있어야 성립하는 결함은 상대를 대야 한다
       : (['dupPillar', 'misplaced'].includes(d.type) && !ids.has(d.otherId)) ? '상대 노드 미지정'
       // 기둥은 뿌리 직속 핵심 개념만 — 축을 기둥이라 부른 지목은 종류를 잘못 고른 것이다

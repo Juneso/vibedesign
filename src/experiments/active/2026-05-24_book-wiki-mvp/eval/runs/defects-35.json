@@ -1,0 +1,48 @@
+{
+  "label": "존중받지 못하는 자들을 위한 정치학",
+  "runAt": "2026-07-26T06:03:11.085Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-62.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 18,
+  "total": 4,
+  "density": 0.222,
+  "byType": {
+    "relationMiss": 2,
+    "misplaced": 2
+  },
+  "defects": [
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n40",
+      "title": "존엄의 개념 · 정의",
+      "why": "자식 '대등 욕망'·'칸트'·'정체성 정치'는 정의의 요소가 아니라 각각의 개념을 설명하는 내용이다."
+    },
+    {
+      "type": "misplaced",
+      "by": "llm",
+      "nodeId": "n41",
+      "otherId": "n40",
+      "title": "정체성의 기원 · 통시",
+      "why": "정체성의 기원은 정의와 관련된 것이 아니라 역사적 맥락에 속해야 한다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n42",
+      "title": "정체성과 민주주의의 관계 · 인과",
+      "why": "자식 '내적 자아'·'인정의 정치'는 인과 관계를 설명하는 것이 아니라 각각의 개념을 다루고 있다."
+    },
+    {
+      "type": "misplaced",
+      "by": "llm",
+      "nodeId": "n43",
+      "otherId": "n42",
+      "title": "정체성 정치의 현대적 양상 · 예시",
+      "why": "정체성 정치의 현대적 양상은 인과 관계와 관련된 것이 아니라 예시로 다루어져야 한다."
+    }
+  ],
+  "reading": "개념 18개 중 결함 4건 — 관계-멤버 불일치 2 · 오배치 2"
+}

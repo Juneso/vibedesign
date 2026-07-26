@@ -989,13 +989,24 @@ ${roleLine}
       // 4.9) 헛도는 축 정리 — 자식이 하나뿐이고 그 이름이 축 이름과 사실상 같으면
       //      ("능력주의의 개념 · 정의" ← 능력주의) 층만 하나 낀 것이다. 축을 없애고
       //      키워드를 핵심 개념 직속으로 올린다.
+      //
+      //      부분 문자열만 보던 규칙은 조사 하나가 달라도 놓쳤다 —
+      //      "사회적 포용의 물리적 설계 · 분석" ← "사회적 포용과 물리적 설계" 는
+      //      '의/과' 때문에 빠져나가 결함 감사에서 잡혔다. 낱말 겹침으로 넓힌다.
+      const wordSet = (s) => new Set(nrm(s).split(/[\s·]+/).filter((w) => w.length > 1));
+      const sameName = (x, y) => {
+        const a = nrm(x), b = nrm(y);
+        if (a.includes(b) || b.includes(a)) return true;
+        const A = wordSet(x), B = wordSet(y);
+        if (!A.size || !B.size) return false;
+        return [...A].filter((w) => B.has(w)).length / Math.min(A.size, B.size) >= 0.5;
+      };
       for (const fn of [...facetNodes]) {
         if (!nodes.has(fn.id)) continue;
         const ch = conceptChildrenOf(fn.id);
         if (ch.length !== 1) continue;
         const axisName = fn.title.replace(/ · [^·]+$/, '');
-        const a = nrm(axisName), b = nrm(ch[0].title);
-        if (!(a.includes(b) || b.includes(a))) continue;
+        if (!sameName(axisName, ch[0].title)) continue;
         const parent = nodes.get(fn.parentId);
         if (safeReparent(ch[0].id, parent.id)) {
           for (const s of sentOf(fn.id)) { s.parentId = ch[0].id; s.level = ch[0].level + 1; }

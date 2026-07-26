@@ -1,0 +1,59 @@
+{
+  "label": "욕망의 사물, 디자인의 사회사",
+  "runAt": "2026-07-26T06:03:24.299Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-67.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 25,
+  "total": 6,
+  "density": 0.24,
+  "byType": {
+    "relationMiss": 6
+  },
+  "defects": [
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n52",
+      "title": "디자인의 정의 · 정의",
+      "why": "자식 '디자인과 신화'·'디자인의 결정 요인'은 디자인의 정의를 규정하는 요소가 아니라 디자인의 특성과 관련된 개념이다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n53",
+      "title": "디자인의 기원 · 통시",
+      "why": "자식 '디자인과 기계화'는 시간의 흐름에 따른 순서를 이루는 것이 아니라 디자인의 기원과 관련된 개념이다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n54",
+      "title": "디자인의 구성 요소 · 분석",
+      "why": "자식 '디자인의 다양성'은 디자인의 구성 요소가 아니라 디자인의 특성과 관련된 개념이다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n55",
+      "title": "디자인과 자본주의 · 인과",
+      "why": "자식 '디자인과 자본주의'·'자본주의'는 인과 관계를 설명하는 것이 아니라 디자인과 자본주의의 상호작용을 설명하는 개념이다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n56",
+      "title": "디자인의 현대적 양상 · 예시",
+      "why": "자식 '1950년대'는 디자인의 현대적 양상의 구체적 사례가 아니라 특정 시대의 디자인 경향을 설명하는 개념이다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n58",
+      "title": "위생과 청결의 사회적 맥락 · 비교",
+      "why": "자식 '위생과 청결'·'디자인 이미지'는 서로 견줄 수 있는 대상이 아니라 각각의 개념을 설명하는 요소이다."
+    }
+  ],
+  "reading": "개념 25개 중 결함 6건 — 관계-멤버 불일치 6"
+}
