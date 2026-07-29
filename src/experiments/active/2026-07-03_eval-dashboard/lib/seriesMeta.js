@@ -30,6 +30,7 @@ export const SERIES_META = {
   'hier-v10':             { title: 'V10 · 전개 방식 기반', purpose: '책이 이야기를 풀어가는 방식을 판정해 그 축으로 위계 구성', pipelineId: 'hier-ingest-v10' },
   'hier-v11':             { title: 'V11 · 관계 축 기반', purpose: '핵심 개념 아래를 "개념(분석)·기원(통시)" 같은 관계 축으로 편성 — 혼재 전개 대응', pipelineId: 'hier-ingest-auto' },
   'hier-auto':            { title: '자동 디스패치 · 최종안', purpose: '목차 시간순(high)이면 v10 시대 편성, 아니면 v11 관계 축 — BKT-380 확정 구조', pipelineId: 'hier-ingest-auto' },
+  'hier-incr':            { title: '증분 동화 · 비문학', purpose: '메모 1건씩 동화 — 부트 일괄 + 폐쇄형 배정 + 성장 단계 승격 시 재정리 (BKT-382)', pipelineId: 'hier-ingest-auto' },
   'literature-v1':        { title: '문학 V1 · 모티프 축', purpose: '소설 전용 파이프라인 — 모티프 1차 축 + 인물 조건부 승격, 문장은 페이지순(서사 진행)', pipelineId: 'literature-v1' },
   'placement':            { title: '배치 테스트', purpose: '라벨 경로만 보고 메모를 제자리에 놓을 수 있는가 — 임베딩 최근접 기준선과 비교해 관계 라벨의 기여를 잰다', pipelineId: 'hier-ingest-auto' },
   'defects':              { title: '결함 감사', purpose: '알려진 결함 14종이 트리에 몇 건 있는지 — 점수가 아니라 지목된 노드를 열어 사람이 검증하는 지표', pipelineId: 'hier-ingest-auto' },

@@ -578,7 +578,9 @@ ${variant === 'v5' ? hierRuleV5 : hierRuleV6}
       // 호스트에 문장이 3개 이상 몰려 있을 때만 빼온다 — 호스트를 비우면서까지 옮기지 않는다
       const movable = sentNodes.filter((s) => sentOf(s.parentId).length >= 3);
       if (movable.length < 2) continue;
-      const kw = addConcept(e.name, root.id, await embedFn(e.name), '');
+      // gloss 를 비워 두면 이 키워드는 이후 배정·동화에서 후보로 제시돼도 정보가 없어
+      // 문장이 다시 붙지 못한다(문학의 "씨앗이 자라지 못하는 구조" 실측). 대표 문장으로 채운다.
+      const kw = addConcept(e.name, root.id, await embedFn(e.name), String(sentNodes[0]?.gloss || sentNodes[0]?.title || '').slice(0, 160));
       for (const s of movable) {
         s.parentId = kw.id; s.level = kw.level + 1;
         const p = s.sources?.[0]; if (p != null && !kw.sources.includes(p)) kw.sources.push(p);
@@ -716,7 +718,11 @@ ${roleLine}
       const coreNodes = [];
       for (const c of cores) {
         const dup = kwList().find((k) => nrm(k.title) === nrm(c.name));
-        coreNodes.push(dup || addConcept(c.name, root.id, await embedFn(c.name), ''));
+        // core 의 why("이 개념이 이 책의 기둥인 이유")를 gloss 로 싣는다 — 판정에만 쓰고
+        // 버리면 유저가 위키를 열었을 때 기둥이 왜 기둥인지 아무 데도 안 남는다.
+        const cn = dup || addConcept(c.name, root.id, await embedFn(c.name), String(c.why || '').trim());
+        if (dup && !dup.gloss) dup.gloss = String(c.why || '').trim();
+        coreNodes.push(cn);
       }
       const usedIds = new Set();
       const facetNodes = [];
@@ -1250,6 +1256,25 @@ ${orphans.map((k) => `${k.id}: ${k.title} — ${k.gloss || ''}`).join('\n')}
         for (const m of meaningful) safeReparent(m.id, t.id);
       }
     }
+  }
+
+  // ── 뿌리 테제 — 트리가 "분류"는 해주는데 책의 "주장"을 어디에도 말해주지 않았다 ──
+  // (존중정치학 실측: root gloss 없음 · core gloss 없음 → 위키를 열면 라벨만 보인다.)
+  // 인제스트의 존재 이유는 유저 대신 구조화해 주는 것이고, 그 첫 줄은 "이 책이 무엇을
+  // 주장하는가"다. 상위 2층 골격 + 대표 문장으로 mini 1콜 요약을 뿌리에 싣는다.
+  if ((variant === 'v10' || variant === 'v11') && !root.gloss) {
+    try {
+      const tops = conceptChildrenOf(root.id);
+      const outline = tops.map((c) => `- ${c.title}${c.gloss ? ` — ${String(c.gloss).slice(0, 80)}` : ''}\n${conceptChildrenOf(c.id).map((x) => `  - ${x.title}`).join('\n')}`).join('\n');
+      const sample = [...nodes.values()].filter((n) => n.kind === 'sentence').slice(0, 10).map((s) => `· ${String(s.title).slice(0, 90)}`).join('\n');
+      const tj = JSON.parse(await llm({
+        system: '비문학 책의 위키 골격과 수집 문장을 보고 이 책의 핵심 주장을 요약한다. 수집된 문장에 근거한 것만 말하라 — 책에 대한 배경지식으로 채우지 마라. JSON만 출력.',
+        user: `책: ${book.title}\n\n[위키 골격]\n${outline}\n\n[수집 문장 일부]\n${sample}\n\n출력 JSON: {"thesis":"이 책의 주장 1~2문장"}`,
+        temperature: 0.1,
+      }));
+      const th = String(tj.thesis || '').trim();
+      if (th) { root.gloss = th; log.push(`[thesis] 뿌리에 책의 주장 요약을 실었다: ${th.slice(0, 80)}`); }
+    } catch { /* 테제 실패는 치명적이지 않다 — 뿌리만 비워 둔다 */ }
   }
 
   // ── 최종 정리: 껍데기 키워드 제거 ──────────────────────────────────
