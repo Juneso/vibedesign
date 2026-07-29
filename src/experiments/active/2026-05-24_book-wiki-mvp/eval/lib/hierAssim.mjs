@@ -114,8 +114,21 @@ ${candLine || '(없음)'}
   let host = findHost(out), action = 'new';
   if (host) action = 'attach';
   else {
+    // 이름이 안 왔으면 문장 조각을 이름으로 쓰지 않는다 — 존중정치학 run 6 실측:
+    // "현재 미국의 숙명은 신조에 기반을 둔" 이라는 키워드가 생겼다(문학 run 72의 재현).
+    // 문학과 같은 이름짓기 콜 폴백을 승계한다.
     let name = String(out?.newName || '').trim();
-    if (!name || name.length > 25 || /["'“”,.?!]/.test(name)) name = String(memo.text).slice(0, 20);
+    if (!name || name.length > 25 || /["'“”,.?!]/.test(name)) {
+      try {
+        const nj = JSON.parse(await llm({
+          system: '비문학 문장 하나의 핵심 개념을 짧은 명사구 하나로 짓는다. 책 고유의 용어 우선. JSON만 출력.',
+          user: `책: ${book.title}\n문장: ${String(memo.text).slice(0, 300)}\n출력 JSON: {"name":"짧은 명사구"}`,
+          temperature: 0.1,
+        }));
+        name = String(nj.name || '').trim() || name;
+      } catch { /* 원래 값 유지 */ }
+      if (!name) name = String(memo.text).slice(0, 20);
+    }
     const gloss = String(out?.summary || '').trim();
     host = {
       id: id(), title: name, parentId: rootId, level: 1, kind: 'concept', sources: [],
