@@ -16,6 +16,23 @@
 const cos = (a, b) => { let s = 0, na = 0, nb = 0; for (let i = 0; i < a.length; i++) { s += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; } return s / (Math.sqrt(na) * Math.sqrt(nb)); };
 const nrm = (s) => String(s || '').normalize('NFC').replace(/\s+/g, '').toLowerCase();
 
+// ─── 지연 재임베딩 ───────────────────────────────────────────
+// serializeTree 는 용량 때문에 emb 를 빼고 저장한다. 그래서 **저장된 트리를 불러오면
+// 모든 노드에 emb 가 없다.** 없는 채로 유사도를 재면 전부 -1 이 되어 후보 하한(0.2)에
+// 걸리고, 후보 목록이 비면 모델은 NEW 밖에 못 고른다 — 넣는 문장마다 새 축이 생겨
+// 위계가 평평해진다. eval 은 부트→증분이 한 프로세스라 안 드러나지만, 앱은 문장 추가가
+// 세션을 넘나들어 반드시 드러난다 (BKT-383).
+//
+// ⚠️ **임베딩 문자열은 한 곳에서만 만든다.** consolidateSeeds 와 assimilateLitMemo 가
+//    서로 다른 문자열을 쓰면 같은 노드가 실행 시점마다 다른 벡터를 갖게 되고,
+//    유사도가 조용히 틀어진다 — 에러 없이 판정만 나빠지므로 알아채기 어렵다.
+const motifEmbText = (m) => `${m.title}: ${m.gloss || ''}`;
+
+async function ensureMotifEmbs(motifs, embedFn) {
+  if (!embedFn) return;
+  for (const m of motifs) if (!m.emb) m.emb = await embedFn(motifEmbText(m));
+}
+
 // ─── Phase 1: 문학 분석 (gpt-4o, 러너에서 cachedPlanIngest 로 감싼다) ──────
 // 비문학 planIngest 의 thesis(핵심 주장) 대신 speaker·emotion·resonance·motifs 를 뽑는다.
 export async function planIngestLit({ memos, book, llm, canon }) {
@@ -399,7 +416,7 @@ export async function consolidateSeeds({ nodes, rootId, book, llm, embedFn, judg
   };
   const relevel = (nid, level) => { const n = nodes.get(nid); n.level = level; for (const k of kidsOf(nid)) relevel(k.id, level + 1); };
 
-  for (const m of rootMotifs()) if (!m.emb && embedFn) m.emb = await embedFn(`${m.title}: ${m.gloss || ''}`);
+  await ensureMotifEmbs(rootMotifs(), embedFn);
   const ms = rootMotifs();
   const pairs = [];
   for (let i = 0; i < ms.length; i++) for (let j = i + 1; j < ms.length; j++) {
@@ -467,6 +484,9 @@ export async function assimilateLitMemo({ nodes, rootId, book, memo, llm, llmEsc
   //   진자 실측. 추상적 경계 판단 대신: 코드가 임베딩으로 후보를 상위 K개로 좁혀서 주고,
   //   LLM 은 "이 후보들의 예시 문장 옆에 놓이는가"라는 구체적 비교 선택만 한다.
   const e = embedFn ? await embedFn(memo.text) : null;
+  // 저장된 트리를 불러온 직후엔 emb 가 없다. 여기서 되살리지 않으면 후보가 0개가 되어
+  // 매 문장이 NEW 가 된다 — ensureMotifEmbs 주석 참조 (BKT-383).
+  await ensureMotifEmbs(motifs, embedFn);
   const ranked = e
     ? motifs.map((m) => ({ m, sim: m.emb ? cos(e, m.emb) : -1 })).sort((a, b) => b.sim - a.sim)
     : motifs.map((m) => ({ m, sim: -1 }));
