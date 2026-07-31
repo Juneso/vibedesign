@@ -387,7 +387,9 @@ export function GenericDetail({ json, md }) {
 
   // '트리' 섹션 인덱스 찾기 (ASCII 코드블록 포함 섹션)
   const treeSecIdx = hasTree
-    ? sections.findIndex((s) => s.title === '트리')
+    // '트리' 외에 '최종 트리'(hier-incr) 같은 변형도 SVG 로 치환한다 — 안 그러면
+    // ASCII 목록이 먼저 나오고 SVG 는 맨 아래 중복으로 붙어 그래프가 안 보이는 것처럼 읽힌다
+    ? sections.findIndex((s) => /트리$/.test(String(s.title || '').trim()))
     : -1;
 
   return (
