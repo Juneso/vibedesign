@@ -1,0 +1,6 @@
+{
+  "id": "2026-08-01_login-auth",
+  "title": "0801 로그인 구조 — Anonymous Auth + SIWA",
+  "summary": "BKT-277/BKT-312 구조 프로토타입. Firebase Anonymous Auth로 uid 발급 후 즉시 시작, 첫 기록 저장(T1) 시점에 Apple/Google 연결 넛지. linkWithCredential로 uid 유지한 채 연결되어 데이터 마이그레이션이 필요 없는 구조를 mock으로 시연.",
+  "created": "2026-08-01"
+}

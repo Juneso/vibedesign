@@ -49,4 +49,13 @@ export const experiments = [
     folder: 'src/experiments/active/2026-06-21_book-wiki-mvp',
     files: ['index.html', 'main.jsx', 'App.jsx', 'style.css', 'meta.json', 'screens/MindMapScreen.jsx', 'lib/mindmaps.json']
   },
+  {
+    id: '2026-08-01_login-auth',
+    title: '0801 로그인 구조 — Anonymous Auth + SIWA',
+    chip: 'BKT-277/312',
+    status: 'active',
+    path: 'src/experiments/active/2026-08-01_login-auth/index.html',
+    folder: 'src/experiments/active/2026-08-01_login-auth',
+    files: ['index.html', 'main.jsx', 'App.jsx', 'style.css', 'meta.json', 'lib/mockAuth.js', 'lib/records.js', 'screens/MainScreen.jsx', 'screens/AuthNudgeSheet.jsx']
+  },
 ];
