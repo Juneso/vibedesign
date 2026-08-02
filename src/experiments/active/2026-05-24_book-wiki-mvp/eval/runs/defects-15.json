@@ -1,0 +1,78 @@
+{
+  "label": "피로사회",
+  "runAt": "2026-07-26T02:40:13.749Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-44.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 25,
+  "total": 8,
+  "density": 0.32,
+  "byType": {
+    "emptyLeaf": 4,
+    "loneChild": 1,
+    "dumping": 1,
+    "relationMiss": 1,
+    "misplaced": 1
+  },
+  "defects": [
+    {
+      "type": "emptyLeaf",
+      "by": "code",
+      "nodeId": "n5",
+      "title": "이질성",
+      "why": "출처 p.13 는 있으나 문장이 딸려 있지 않다"
+    },
+    {
+      "type": "emptyLeaf",
+      "by": "code",
+      "nodeId": "n7",
+      "title": "세계화",
+      "why": "출처 p.15 는 있으나 문장이 딸려 있지 않다"
+    },
+    {
+      "type": "emptyLeaf",
+      "by": "code",
+      "nodeId": "n15",
+      "title": "중단",
+      "why": "출처 p.49 는 있으나 문장이 딸려 있지 않다"
+    },
+    {
+      "type": "emptyLeaf",
+      "by": "code",
+      "nodeId": "n20",
+      "title": "자본주의",
+      "why": "출처 p.103 는 있으나 문장이 딸려 있지 않다"
+    },
+    {
+      "type": "loneChild",
+      "by": "code",
+      "nodeId": "n49",
+      "title": "성과사회의 현대적 양상 · 예시",
+      "why": "자식이 \"타자성\" 하나뿐이다"
+    },
+    {
+      "type": "dumping",
+      "by": "code",
+      "nodeId": "n48",
+      "title": "성과사회의 구성 요소 · 분석",
+      "why": "하위 18개 — 형제 축 평균 6.4개의 2.8배"
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n48",
+      "title": "성과사회의 구성 요소 · 분석",
+      "why": "자식 '신경성 질환', '긍정성의 과잉', '긍정성의 폭력', '자기 착취', '활동성', '사회 긍정화'는 성과사회의 구성 요소가 아니라 그 결과와 배경이다."
+    },
+    {
+      "type": "misplaced",
+      "by": "llm",
+      "nodeId": "n50",
+      "otherId": "n49",
+      "title": "사회적 변화와 갈등 · 비교",
+      "why": "'사회적 변화와 갈등'은 '성과사회의 현대적 양상' 아래 있어야 맞다."
+    }
+  ],
+  "reading": "개념 25개 중 결함 8건 — 빈 키워드 4 · 자식 1개 축 1 · 덤핑 버킷 1"
+}

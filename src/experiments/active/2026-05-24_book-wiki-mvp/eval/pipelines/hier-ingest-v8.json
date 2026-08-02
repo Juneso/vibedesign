@@ -1,0 +1,101 @@
+{
+  "id": "hier-ingest-v8",
+  "title": "책별 키워드 위계 인제스트 — planIngest 개요 로직 + V7 테마 통합 (V8)",
+  "shortTitle": "위계 인제스트 V8",
+  "order": 100,
+  "script": "lib/hierEngine.mjs (variant=v8) · 실행: runHierStability.mjs v8",
+  "goal": "Phase 1을 한 문장씩 도는 키워드 추출 대신 **planIngest 한 번 호출**로 바꾼다. 키워드 설명은 알라딘 리치데이터로 쓴 개요 전문이 되고, 그 위에 V7 테마를 그대로 얹는다.",
+  "designIntent": "- 검증된 두 계보를 합친다.\n  - **M2의 개요 로직** — 알라딘 리치데이터를 넣어 키워드 페이지의 개요를 만든다.\n  - **V7의 테마 로직** — 인용 필수 + gpt-4o critic 반증.\n- V5~V7의 키워드 추출은 이름과 한 줄 설명만 뽑아서, 키워드 페이지에 본문이 없었다.\n- V8은 planIngest 의 개요(책 맥락·관점·긴장을 3~5문장으로 쓴 글)를 키워드 설명으로 그대로 이어받는다. 이 글이 대시보드 트리 클릭 상세에 자동으로 뜬다.\n- 동의어 병합과 테마 생성·critic 은 **v7 코드를 고치지 않고 그대로 재사용**한다.",
+  "diagram": {
+    "flowchart": "flowchart TD\n  subgraph G1[\"① 키워드 뽑기\"]\n    memo[\"독서 메모 문장<br/>책별 · 전체 일괄 투입\"]:::data\n    rich[\"알라딘 리치데이터<br/>책소개 · 출판사서평 · 책속에서 · 추천사\"]:::data\n    plan(\"<b>1 · planIngest · gpt-4o</b> <span class='pl-llm'>LLM</span><br/>리치데이터 → 키워드 페이지 + 개요\"):::proc\n    pages[\"키워드 페이지 초안<br/>제목 · 본문(개요 포함) · 출처\"]:::data\n    nodes(\"<b>2 · 키워드 노드 빌드</b><br/>개요 파싱 + 누락 메모 보강\"):::proc\n  end\n  subgraph G2[\"② 중복 정리\"]\n    dedup(\"<b>3 · 동의어 사후 병합</b> <span class='pl-llm'>LLM</span><br/>같은 메모 출신은 무조건 검사\"):::proc\n  end\n  subgraph G3[\"③ 테마 만들기\"]\n    themegen(\"<b>4 · 테마 생성</b> <span class='pl-llm'>LLM</span><br/>V7 인용 방식 그대로\"):::proc\n    themes[\"테마 후보<br/>이름 · 인용 · 설명 · 멤버 2개 이상\"]:::data\n  end\n  subgraph G4[\"④ 테마 검증\"]\n    critic(\"<b>5 · 테마 critic 반증</b> <span class='pl-llm'>LLM</span><br/>gpt-4o · 인용해야만 기각\"):::proc\n    final[\"최종 키워드 트리<br/>책 → 검증된 테마 → 키워드(개요 포함)\"]:::data\n  end\n  memo -->|\"메모 전체\"| plan\n  rich -->|\"리치데이터 주입\"| plan\n  plan --> pages\n  pages -->|\"개요 파싱 + 임베딩\"| nodes\n  nodes -->|\"전체 키워드 쌍\"| dedup\n  dedup -->|\"root 직속 키워드들\"| themegen\n  themegen -->|\"인용 가능한 축만\"| themes\n  themes -->|\"테마별 독립 검증\"| critic\n  critic -->|\"승인 편성 · 기각 해체\"| final",
+    "stageOf": {
+      "plan": "plan_ingest",
+      "nodes": "node_build",
+      "dedup": "dedup_merge",
+      "themegen": "theme_gen",
+      "critic": "theme_critic"
+    }
+  },
+  "stages": [
+    {
+      "id": "plan_ingest",
+      "name": "planIngest — 리치데이터 → 키워드 페이지 + ## 개요",
+      "why": "- V5~V7의 키워드 추출은 한 줄 설명만 뽑아서 키워드 페이지에 본문이 없었다.\n- planIngest 는 알라딘 책소개·출판사서평·책속에서를 넣어, 키워드마다 3~5문장 개요를 만든다.\n- 개요에는 정의 · 이 책의 각도 · 긴장/질문이 들어간다.\n- M2 인제스트에서 이미 검증된 로직을 eval 파이프라인에 그대로 재사용한다.",
+      "how": "- 메모 전체를 책(알라딘 리치데이터 포함)과 함께 planIngest 로 **한 번** 호출한다(gpt-4o).\n- 결과 중 `create` 패치를 키워드 노드로 바꾼다.\n  - 제목 = 페이지 초안 제목\n  - 설명 = 본문의 개요 섹션\n  - 출처 = 메모 id → 페이지 번호\n- 임베딩은 `title: gloss` 로 만든다.",
+      "params": [
+        {
+          "name": "INGEST_MODEL",
+          "value": "gpt-4o",
+          "meaning": "planIngest 전용 모델",
+          "effect": "mini는 patches 과소생성 + sources 누락으로 키워드 커버리지 하락. gpt-4o 필수"
+        }
+      ],
+      "output": "키워드 노드 배열 (root 직속 leaf). gloss = ## 개요 전문.",
+      "llm": true
+    },
+    {
+      "id": "node_build",
+      "name": "키워드 노드 빌드 + analyses 보강",
+      "why": "- planIngest 가 미처 다루지 못한 메모가 남을 수 있다.\n- 그런 메모를 분석 결과로 메워 커버리지를 높인다.",
+      "how": "- `create` 패치를 노드로 만들면서 어떤 메모가 덮였는지 추적한다.\n- 빠진 메모는 분석 결과에서 대표 키워드·논지를 제목으로, 논지와 책 맥락 연결을 설명으로 삼아 노드를 보충한다.",
+      "params": [],
+      "output": "전체 키워드 노드 (patch 기반 + analyses 보강).",
+      "llm": false
+    },
+    {
+      "id": "dedup_merge",
+      "name": "동의어 사후 병합 (Phase 1.5 — v7 동일)",
+      "why": "- planIngest 가 같은 키워드를 다른 이름으로 두 번 만들 수 있다.\n- 유사도 0.55 이상이거나 같은 메모 출신인 쌍을 검사해 합친다.",
+      "how": "- v7의 동의어 병합 코드를 그대로 쓴다. 같은 메모 출신 쌍은 문턱과 무관하게 검사한다.",
+      "params": [
+        {
+          "name": "sim_dedup_threshold",
+          "value": 0.55
+        },
+        {
+          "name": "same_memo_force_check",
+          "value": true
+        }
+      ],
+      "output": "동의어 합쳐진 트리.",
+      "llm": true
+    },
+    {
+      "id": "theme_gen",
+      "name": "테마 생성 — V7 하이브리드 anchor (재사용)",
+      "why": "- V7에서 검증된 로직이라 고치지 않고 쓴다. 책 논지를 인용하거나 독자가 3개 이상 메모로 반복한 축이면 유효하다.",
+      "how": "- v7의 테마 생성 코드를 그대로 쓴다. 알라딘 리치데이터를 인용 근거로 삼는다.",
+      "params": [
+        {
+          "name": "min_root_kids",
+          "value": 3
+        },
+        {
+          "name": "min_members",
+          "value": 2
+        }
+      ],
+      "output": "anchor·description을 갖춘 테마 후보.",
+      "llm": true
+    },
+    {
+      "id": "theme_critic",
+      "name": "테마 critic 반증 — V7 gpt-4o (재사용)",
+      "why": "- V7에서 검증된 로직이라 고치지 않고 쓴다. 인용해야만 기각할 수 있다.",
+      "how": "- v7의 critic 코드를 그대로 쓴다(gpt-4o, 온도 0).",
+      "params": [
+        {
+          "name": "critic_model",
+          "value": "gpt-4o"
+        }
+      ],
+      "output": "승인된 테마만 트리에 편성.",
+      "llm": true
+    }
+  ],
+  "knownIssues": [
+    "planIngest 가 gpt-4o 필수라 런당 비용이 v7보다 높다 — 메모 17개 기준 약 2배로 본다",
+    "planIngest 응답 파싱이 실패하면 키워드 노드가 0이 될 수 있다 — 분석 결과로 메우는 경로가 있지만 개요는 없다",
+    "테마 이름 표현이 실행마다 다를 수 있다 — v7과 같은 문제다"
+  ]
+}

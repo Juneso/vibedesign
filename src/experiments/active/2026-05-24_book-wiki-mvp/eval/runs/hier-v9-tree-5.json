@@ -1,0 +1,437 @@
+{
+  "label": "욕망의 사물, 디자인의 사회사",
+  "runAt": "2026-07-23T05:02:21.997Z",
+  "kind": "hier-v9-tree",
+  "variant": "v9",
+  "model": "gpt-4o-mini",
+  "note": "hier-v9-batch 스냅샷에서 변환 — 재실행 없음. 목차 없는 폴백 모드 결과다.",
+  "memoN": 32,
+  "stability": {
+    "agree": 1,
+    "jac": 1
+  },
+  "counts": {
+    "keywords": 32,
+    "promoted": 6,
+    "thick": 0
+  },
+  "tree": {
+    "rootId": "root",
+    "nodes": [
+      {
+        "id": "root",
+        "title": "욕망의 사물, 디자인의 사회사",
+        "parentId": null,
+        "level": 0,
+        "kind": "root",
+        "sources": []
+      },
+      {
+        "id": "n1",
+        "title": "디자인의 영향력 (p.9)",
+        "parentId": "n33",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          9
+        ],
+        "gloss": "디자인은 우리의 사고 방식에 지속적인 영향을 미친다."
+      },
+      {
+        "id": "n2",
+        "title": "신화의 창안 (p.13)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          13
+        ],
+        "gloss": "구조주의자들은 사람들의 생각과 일상 경험 사이의 차이에서 발생하는 모순들이 모든 사회에서 신화의 창안으로 해결된다고 주장한다."
+      },
+      {
+        "id": "n3",
+        "title": "디자인의 본질 (p.18)",
+        "parentId": "n33",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          18
+        ],
+        "gloss": "디자인은 사물의 본질을 감추거나 바꾸는 역할을 한다."
+      },
+      {
+        "id": "n4",
+        "title": "신고전주의 (p.23)",
+        "parentId": "n36",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          23
+        ],
+        "gloss": "신고전주의는 18세기 변화의 혼란을 억누르려는 욕망에서 비롯된 사조이다."
+      },
+      {
+        "id": "n5",
+        "title": "고전적 분위기 (p.31)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          31
+        ],
+        "gloss": "존 플랙스만은 고전주의 정신을 이해하여 제품에 고전적 분위기를 부여하는 능력이 있었다."
+      },
+      {
+        "id": "n6",
+        "title": "진보에 대한 거부 (p.36)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          36
+        ],
+        "gloss": "소비자들이 느끼고 있는 신기술에 대한 우려는 고대 유물의 가치를 통해 해소될 수 있다."
+      },
+      {
+        "id": "n7",
+        "title": "디자인의 역량 (p.49)",
+        "parentId": "n33",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          49
+        ],
+        "gloss": "디자인은 공장의 장인들이 보유한 기술과 도구를 활용하여 균일하고 정확한 제품 생산을 가능하게 한다."
+      },
+      {
+        "id": "n8",
+        "title": "신고전주의 스타일 (p.53)",
+        "parentId": "n36",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          53
+        ],
+        "gloss": "신고전주의 스타일은 단순하면서도 넓고 매끄러운 표면을 가진 형태로, 로코코 스타일보다 생산 방식과 판매 시장의 유행에 더 적합하다."
+      },
+      {
+        "id": "n9",
+        "title": "생산 과정의 분업화 (p.57)",
+        "parentId": "n35",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          57
+        ],
+        "gloss": "기계 생산이 시작되기 이전에 이미 존재했던 생산 과정의 분업화는 기계 때문이 아니다."
+      },
+      {
+        "id": "n10",
+        "title": "디자인의 필요성 (p.58)",
+        "parentId": "n33",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          58
+        ],
+        "gloss": "18세기 영국에서 분업화가 시작되면서 디자인의 필요성이 새롭게 대두되었다."
+      },
+      {
+        "id": "n11",
+        "title": "자본주의 생산 시스템 (p.70)",
+        "parentId": "n35",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          70
+        ],
+        "gloss": "지나친 덧주름 장식의 원인은 재봉틀이 자본주의 생산 시스템 안에서 사용된 데 있다."
+      },
+      {
+        "id": "n12",
+        "title": "기계의 영향 (p.74)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          74
+        ],
+        "gloss": "기계가 품질 저하의 원인이 아니라 특정한 사회적 경제적 상황이 문제이다."
+      },
+      {
+        "id": "n13",
+        "title": "분업된 직공 (p.2)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          2
+        ],
+        "gloss": "분업된 직공들은 창의성이 요구되지 않고 단순히 제작 능력만 있으면 된다."
+      },
+      {
+        "id": "n14",
+        "title": "디자인의 가치 (p.78)",
+        "parentId": "n33",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          78
+        ],
+        "gloss": "디자인은 기술적, 예술적 관점뿐만 아니라 사회적 관계와 시스템의 산물로 이해해야 한다."
+      },
+      {
+        "id": "n15",
+        "title": "제품 디자인의 차이 (p.81)",
+        "parentId": "n33",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          81
+        ],
+        "gloss": "제품 디자인간의 차이는 당시의 사회적 차이에 대한 관념이 구체화된 것이다."
+      },
+      {
+        "id": "n16",
+        "title": "성별 구분 (p.82)",
+        "parentId": "n38",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          82
+        ],
+        "gloss": "개인용품 디자인은 생물학적 차이가 아닌 사회적 관념에 따라 남성과 여성에 맞춰 다르게 이루어진다."
+      },
+      {
+        "id": "n17",
+        "title": "남성성 여성성 (p.85)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          85
+        ],
+        "gloss": "19세기를 거치면서 남성성과 여성성이 뚜렷이 특화되었다."
+      },
+      {
+        "id": "n18",
+        "title": "유니폼 (p.103)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          103
+        ],
+        "gloss": "주인과 하인을 구분짓는 장치가 날염 면직물의 보급으로 사라지면서 새로운 장치가 필요하다."
+      },
+      {
+        "id": "n19",
+        "title": "디자인과 자본주의 (p.114)",
+        "parentId": "n33",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          114
+        ],
+        "gloss": "디자인 행위는 자본주의의 발달에 기여하며, 자본주의 또한 디자인에 이로운 영향을 미친다."
+      },
+      {
+        "id": "n20",
+        "title": "형태와 기능 (p.1)",
+        "parentId": "n38",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          1
+        ],
+        "gloss": "새로운 필요가 생겨남에 따라 필요를 충족하는 다양한 디자인이 출현하며, 형태는 기능을 따른다."
+      },
+      {
+        "id": "n21",
+        "title": "디자이너의 자율성 (p.2)",
+        "parentId": "n38",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          2
+        ],
+        "gloss": "디자이너는 디자인을 제공하는 것 외에 생산과정에 대한 결정권이 없다."
+      },
+      {
+        "id": "n22",
+        "title": "가정의 역할 (p.127)",
+        "parentId": "n34",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          127
+        ],
+        "gloss": "가정은 도덕과 미학의 성역으로, 노동으로부터 배제된 여성의 개성을 표현하는 장소이다."
+      },
+      {
+        "id": "n23",
+        "title": "가정의 기능 (p.144)",
+        "parentId": "n34",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          144
+        ],
+        "gloss": "19세기적 관점에서 집은 아름다움과 정신적 미덕을 지키는 요새였으나, 20세기 초에는 신체적 복리와 건강 증진을 주요 기능으로 보는 시각으로 대치되었다."
+      },
+      {
+        "id": "n24",
+        "title": "가정의 실내 장식 (p.151)",
+        "parentId": "n34",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          151
+        ],
+        "gloss": "가정의 실내 장식은 개성의 상징과 경제활동에서 벗어난 삶을 누릴 수 있는 공간을 의미한다."
+      },
+      {
+        "id": "n25",
+        "title": "기계의 무관심 (p.172)",
+        "parentId": "n38",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          172
+        ],
+        "gloss": "1950년대 디자인의 성공은 기기 조작자가 기계의 작동 방식을 인식하지 않기를 바라는 데 있었다."
+      },
+      {
+        "id": "n26",
+        "title": "사무실 환경 디자인 (p.179)",
+        "parentId": "n33",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          179
+        ],
+        "gloss": "1950년대부터 이어진 서비스 산업의 성장과 사무직 노동자의 수요 증가로 인해 새로운 사무실 환경 디자인이 필요하게 되었다."
+      },
+      {
+        "id": "n27",
+        "title": "평등정신 (p.186)",
+        "parentId": "n38",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          186
+        ],
+        "gloss": "사무실의 평등정신을 보여주는 디자인은 겉모습에 그쳐야 한다."
+      },
+      {
+        "id": "n28",
+        "title": "위생과 청결 (p.207)",
+        "parentId": "n37",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          207
+        ],
+        "gloss": "위생과 청결에 관한 '과학적' 논리는 사회적 차별 앞에서 타협하게 된다."
+      },
+      {
+        "id": "n29",
+        "title": "청결의 기회 (p.224)",
+        "parentId": "n37",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          224
+        ],
+        "gloss": "제품은 청결의 기회를 제공하는 사물로서 디자인되고, 개발되고, 마케팅된다."
+      },
+      {
+        "id": "n30",
+        "title": "소비자지향 디자인 (p.273)",
+        "parentId": "n33",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          273
+        ],
+        "gloss": "소비자지향 디자인은 소비자의 관념과 신념을 선택적으로 표현하며, 해결 가능한 소비자 생활문제에만 집중하는 경향이 있다."
+      },
+      {
+        "id": "n31",
+        "title": "디자인의 결정요인 (p.298)",
+        "parentId": "n33",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          298
+        ],
+        "gloss": "디자인은 디자이너의 자율성과 관여할 수 없는 조건들에 의해 결정된다."
+      },
+      {
+        "id": "n32",
+        "title": "디자인의 영향 (p.303)",
+        "parentId": "n33",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          303
+        ],
+        "gloss": "디자인은 청결함과 미국적 관념을 이미지로 구축하여 성공적인 담뱃갑 디자인을 가능하게 했다."
+      },
+      {
+        "id": "n33",
+        "title": "디자인",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n34",
+        "title": "가정",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n35",
+        "title": "생산",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n36",
+        "title": "신고전주",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n37",
+        "title": "청결",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n38",
+        "title": "디자인",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      }
+    ]
+  }
+}

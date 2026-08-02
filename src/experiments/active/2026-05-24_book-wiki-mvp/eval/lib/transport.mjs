@@ -3,9 +3,11 @@
 
 const DEFAULT_MODEL = 'gpt-4o-mini';
 
-export function openaiNodeTransport({ apiKey, model } = {}) {
-  const key = apiKey || process.env.OPENAI_API_KEY;
-  if (!key) throw new Error('OPENAI_API_KEY missing (env or apiKey)');
+// baseURL·keyEnv 로 OpenAI 호환 API(Moonshot Kimi 등)도 같은 transport 로 쓴다 (BKT-381 4o 비용 A/B)
+export function openaiNodeTransport({ apiKey, model, baseURL, keyEnv } = {}) {
+  const key = apiKey || process.env[keyEnv || 'OPENAI_API_KEY'];
+  if (!key) throw new Error(`${keyEnv || 'OPENAI_API_KEY'} missing (env or apiKey)`);
+  const endpoint = `${(baseURL || 'https://api.openai.com/v1').replace(/\/$/, '')}/chat/completions`;
   return async ({ system, user, model: m, temperature }) => {
     const useModel = m || model || DEFAULT_MODEL;
     // gpt-5 계열·o-시리즈(reasoning)는 temperature 기본값(1)만 지원 — 파라미터 생략
@@ -13,6 +15,8 @@ export function openaiNodeTransport({ apiKey, model } = {}) {
     const body = JSON.stringify({
       model: useModel,
       ...(noTemp ? {} : { temperature: temperature ?? 0.3 }),
+      // 미지정 시 4096에서 잘림 — 메모 20개+ planIngest 응답이 중간에 끊겨 JSON 파싱 실패.
+      max_tokens: 16384,
       response_format: { type: 'json_object' },
       messages: [
         ...(system ? [{ role: 'system', content: system }] : []),
@@ -21,13 +25,15 @@ export function openaiNodeTransport({ apiKey, model } = {}) {
     });
     // rate limit 자동 재시도 (최대 3회, 지수 백오프)
     for (let attempt = 0; attempt < 3; attempt++) {
-      const r = await fetch('https://api.openai.com/v1/chat/completions', {
+      const r = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
         body,
       });
       const data = await r.json();
-      if (r.status === 429) {
+      // 429 중 insufficient_quota(크레딧 소진)는 재시도해도 회복 불가 → 즉시 실패.
+      // 진짜 rate limit(요청·토큰 한도 초과)만 백오프 재시도.
+      if (r.status === 429 && data?.error?.code !== 'insufficient_quota') {
         const wait = (attempt + 1) * 15000; // 15s, 30s, 45s
         console.warn(`  ⚠ rate limit, ${wait/1000}s 대기 후 재시도...`);
         await new Promise(res => setTimeout(res, wait));

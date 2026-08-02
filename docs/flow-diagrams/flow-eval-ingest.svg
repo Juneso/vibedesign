@@ -1,0 +1,76 @@
+<svg width="1060" height="470" viewBox="0 0 1060 470" xmlns="http://www.w3.org/2000/svg" font-family="Apple SD Gothic Neo, AppleSDGothicNeo, sans-serif">
+<rect x="0" y="0" width="1060" height="470" fill="#ffffff"/>
+<defs>
+<marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#5F5E5A"/></marker>
+<marker id="arr" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#C2410C"/></marker>
+</defs>
+
+<text x="40" y="26" font-size="15" font-weight="600" fill="#2C2C2A">인제스트 eval 흐름 — 입력 고정 → 인제스트 → 채점 → 검수 → 판정 (BKT-346)</text>
+<line x1="40" y1="36" x2="1020" y2="36" stroke="#B4B2A9"/>
+
+<!-- S1 입력 -->
+<g><rect x="40" y="78" width="178" height="120" rx="7" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="129" y="100" font-size="13" font-weight="600" fill="#085041" text-anchor="middle">① 입력 고정</text>
+<text x="56" y="124" font-size="11" fill="#0F6E56">· 골든셋 seed-v1</text>
+<text x="56" y="143" font-size="11" fill="#0F6E56">· 책 2권(문학·비문학)</text>
+<text x="56" y="162" font-size="11" fill="#0F6E56">· 메모 10~16개</text>
+<text x="56" y="184" font-size="10.5" fill="#5F5E5A">BKT-176</text></g>
+
+<!-- S2 인제스트 -->
+<g><rect x="248" y="78" width="178" height="120" rx="7" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="337" y="100" font-size="13" font-weight="600" fill="#085041" text-anchor="middle">② 인제스트</text>
+<text x="264" y="124" font-size="11" fill="#0F6E56">· planIngest (메타 주입)</text>
+<text x="264" y="143" font-size="11" fill="#0F6E56">· analyses 커버리지 백본</text>
+<text x="264" y="162" font-size="11" fill="#0F6E56">· 위계 군집 레이어</text>
+<text x="264" y="184" font-size="10.5" fill="#5F5E5A">toc = 숨은 척추</text></g>
+
+<!-- S3 채점 -->
+<g><rect x="456" y="78" width="178" height="120" rx="7" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="545" y="100" font-size="13" font-weight="600" fill="#085041" text-anchor="middle">③ 채점</text>
+<text x="472" y="124" font-size="11" fill="#0F6E56">· node runEval.mjs (한 줄)</text>
+<text x="472" y="143" font-size="11" fill="#0F6E56">· A축 5개로 채점</text>
+<text x="472" y="162" font-size="11" fill="#0F6E56">· AI 1차 자기채점</text>
+<text x="472" y="184" font-size="10.5" fill="#5F5E5A">RUBRIC.md · BKT-188</text></g>
+
+<!-- S4 검수 -->
+<g><rect x="664" y="78" width="178" height="120" rx="7" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="753" y="100" font-size="13" font-weight="600" fill="#085041" text-anchor="middle">④ 사람 검수</text>
+<text x="680" y="124" font-size="11" fill="#0F6E56">· 의심 케이스만(5~10분)</text>
+<text x="680" y="143" font-size="11" fill="#0F6E56">· 실데이터 위계 하네스</text>
+<text x="680" y="162" font-size="11" fill="#0F6E56">  (트리·누락 눈검수)</text>
+<text x="680" y="184" font-size="10.5" fill="#5F5E5A">BKT-193 · BKT-349</text></g>
+
+<!-- S5 판정 -->
+<g><rect x="872" y="78" width="148" height="120" rx="7" fill="#EEEDFE" stroke="#534AB7"/>
+<text x="946" y="100" font-size="13" font-weight="600" fill="#3C3489" text-anchor="middle">⑤ 판정</text>
+<text x="888" y="124" font-size="11" fill="#534AB7">· 각 축 ≥ 4점</text>
+<text x="888" y="143" font-size="11" fill="#534AB7">· 골든셋 100%</text>
+<text x="888" y="166" font-size="11" font-weight="600" fill="#3C3489">  = 합격</text></g>
+
+<!-- arrows between stages -->
+<path d="M218 138 L246 138" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M426 138 L454 138" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M634 138 L662 138" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M842 138 L870 138" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- artifacts row -->
+<g><rect x="248" y="238" width="178" height="46" rx="6" fill="#FAEEDA" stroke="#BA7517"/>
+<text x="337" y="259" font-size="11.5" font-weight="500" fill="#854F0B" text-anchor="middle">개념 위계 트리 + 개요</text>
+<text x="337" y="276" font-size="10.5" fill="#BA7517" text-anchor="middle">노드=개념 · 상위=테마(발생)</text></g>
+<path d="M337 198 L337 236" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<g><rect x="456" y="238" width="178" height="46" rx="6" fill="#FAEEDA" stroke="#BA7517"/>
+<text x="545" y="259" font-size="11.5" font-weight="500" fill="#854F0B" text-anchor="middle">round-N.md (채점표)</text>
+<text x="545" y="276" font-size="10.5" fill="#BA7517" text-anchor="middle">축별 점수 · 🚩의심 케이스</text></g>
+<path d="M545 198 L545 236" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- A축 detail -->
+<text x="456" y="312" font-size="11" font-weight="600" fill="#2C2C2A">A축:</text>
+<text x="494" y="312" font-size="11" fill="#5F5E5A">충실도 · 중요도(표면 비유 오인 방지) · 포괄성(누락 0) · 위계 구조 · 균질화 방지</text>
+
+<!-- feedback loop -->
+<path d="M946 198 L946 410 L337 410 L337 200" fill="none" stroke="#C2410C" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arr)"/>
+<text x="641" y="402" font-size="11.5" font-weight="500" fill="#C2410C" text-anchor="middle">불합격 → 프롬프트·실사용 보정(BKT-173) 후 재실행</text>
+
+<text x="40" y="448" font-size="11" fill="#5F5E5A">현재: A축 자기평가 100% 달성 · 위계 구조화 실데이터 검증 완료(디자인의 디자인, 누락 0). 다음: 위계 품질 축 채점 자동화 + 골든셋 50권 확장(BKT-307).</text>
+</svg>

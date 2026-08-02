@@ -45,3 +45,6 @@ yarn-error.log*
 
 # OMC (oh-my-claudecode) session state
 .omc/
+
+# book-wiki-mvp eval: planIngest 응답 디스크 캐시 (재실행 비용 절감용, 커밋 불필요)
+src/experiments/active/2026-05-24_book-wiki-mvp/eval/.plan-cache/

@@ -1,0 +1,14 @@
+{
+  "label": "짓기와 거주하기",
+  "runAt": "2026-07-26T06:03:15.724Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-64.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 32,
+  "total": 0,
+  "density": 0,
+  "byType": {},
+  "defects": [],
+  "reading": "개념 32개 중 결함 0건 — 없음"
+}

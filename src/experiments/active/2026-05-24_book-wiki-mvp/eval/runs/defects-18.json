@@ -1,0 +1,38 @@
+{
+  "label": "돈으로 살 수 없는 것들",
+  "runAt": "2026-07-26T03:09:00.232Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-47.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 17,
+  "total": 3,
+  "density": 0.176,
+  "byType": {
+    "relationMiss": 3
+  },
+  "defects": [
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n35",
+      "title": "시장 규범과 비시장 규범의 충돌 · 대조",
+      "why": "자식 '줄서기 도덕'·'비시장 규범'은 대조 관계가 아니라 서로 다른 규범을 설명하는 것이므로 관계가 잘못 설정되었다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n38",
+      "title": "시장 효율성과 사회적 선 · 대조",
+      "why": "자식 '시장 효율성과 사회적 선'의 내용은 대조 관계가 아니라 시장의 효율성과 사회적 선의 상관관계를 설명하고 있어 관계가 잘못 설정되었다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n39",
+      "title": "경제적 인센티브와 사회적 가치의 충돌 · 대조",
+      "why": "자식 '경제적 인센티브와 사회적 가치의 충돌'의 내용은 대조 관계가 아니라 인센티브가 사회적 가치에 미치는 영향을 설명하고 있어 관계가 잘못 설정되었다."
+    }
+  ],
+  "reading": "개념 17개 중 결함 3건 — 관계-멤버 불일치 3"
+}

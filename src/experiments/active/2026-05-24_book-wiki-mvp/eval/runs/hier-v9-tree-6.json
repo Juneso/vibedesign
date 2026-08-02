@@ -1,0 +1,271 @@
+{
+  "label": "존중받지 못하는 자들을 위한 정치학",
+  "runAt": "2026-07-23T05:02:21.998Z",
+  "kind": "hier-v9-tree",
+  "variant": "v9",
+  "model": "gpt-4o-mini",
+  "note": "hier-v9-batch 스냅샷에서 변환 — 재실행 없음. 목차 없는 폴백 모드 결과다.",
+  "memoN": 23,
+  "stability": {
+    "agree": 1,
+    "jac": 1
+  },
+  "counts": {
+    "keywords": 19,
+    "promoted": 3,
+    "thick": 2
+  },
+  "tree": {
+    "rootId": "root",
+    "nodes": [
+      {
+        "id": "root",
+        "title": "존중받지 못하는 자들을 위한 정치학",
+        "parentId": null,
+        "level": 0,
+        "kind": "root",
+        "sources": []
+      },
+      {
+        "id": "n1",
+        "title": "정체성 정치 (p.31)",
+        "parentId": "n22",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          31,
+          178,
+          199,
+          200
+        ],
+        "gloss": "정체성 정치는 개인들이 자신의 가치를 공적으로 인정받기를 요구하는 현상이다."
+      },
+      {
+        "id": "n2",
+        "title": "대등 욕망 (p.50)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          50
+        ],
+        "gloss": "근대 민주주의의 탄생 과정은 우월 욕망이 밀려나고 대등 욕망으로 대체된 과정이다."
+      },
+      {
+        "id": "n3",
+        "title": "정체성 (p.52)",
+        "parentId": "n22",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          52,
+          214
+        ],
+        "gloss": "정체성이라는 개념은 투모스에 뿌리를 두고 있지만 근대에 와서야 그 모습을 드러냈다."
+      },
+      {
+        "id": "n4",
+        "title": "존재감 (p.65)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          65
+        ],
+        "gloss": "존재감은 개인이 후천적으로 획득한 사회적 감성 아래 숨겨진 진정한 자아를 발견할 때 경험하는 충만함과 행복이라는 감정이다."
+      },
+      {
+        "id": "n5",
+        "title": "내적 자아와 외부 현실 (p.71)",
+        "parentId": "n23",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          71
+        ],
+        "gloss": "새로운 시대적 지평이 열리면서 개인들은 내적 자아와 외부 현실 사이의 간격을 자각하게 되었다."
+      },
+      {
+        "id": "n6",
+        "title": "도덕적 행위자 (p.76)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          76
+        ],
+        "gloss": "인간은 물질적 주변 환경과 관계없이 선택을 할 수 있는 도덕적 행위자이다."
+      },
+      {
+        "id": "n7",
+        "title": "상호 인정 (p.77)",
+        "parentId": "n24",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          77
+        ],
+        "gloss": "유일한 합리적 형태의 인정은 주인과 노예가 자신들이 공유하는 존엄성을 인정하는 것이다."
+      },
+      {
+        "id": "n8",
+        "title": "내적 자아의 자유 (p.79)",
+        "parentId": "n23",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          79
+        ],
+        "gloss": "내적 자아의 자유는 권리와 법률로 구현되어야 하며, 이는 민주주의 발전의 원동력이 되었다."
+      },
+      {
+        "id": "n9",
+        "title": "행위 주체감 (p.88)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          88
+        ],
+        "gloss": "자유란 인간의 주체적 행위 능력과 자치에 적극적으로 참여함으로써 자기 몫의 힘을 행사할 수 있는 능력을 의미한다."
+      },
+      {
+        "id": "n10",
+        "title": "공통된 정체성 (p.102)",
+        "parentId": "n22",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          102
+        ],
+        "gloss": "공통된 정체성이 개인의 사회적 삶을 가능하게 하고, 개인의 불안과 소외감을 해소하는 데 중요한 역할을 한다."
+      },
+      {
+        "id": "n11",
+        "title": "19세기 정치의 분기점 (p.103)",
+        "parentId": "n24",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          103
+        ],
+        "gloss": "19세기 초에 인정과 존엄성의 정치는 개인 권리의 보편적 인정과 집단 정체성의 선언이라는 두 가지 방향으로 나뉘었다."
+      },
+      {
+        "id": "n12",
+        "title": "배송 사고 (p.137)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          137
+        ],
+        "gloss": "오늘날 중동에서는 계급들에게 전달돼야 하는 메시지가 종교에 전달된 배송 사고가 발생했다."
+      },
+      {
+        "id": "n13",
+        "title": "사회적 가치 (p.144)",
+        "parentId": "n24",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          144
+        ],
+        "gloss": "일자리를 갖는 것은 개인이 사회적으로 가치 있는 무언가를 하고 있다는 인정을 얻는 길이다."
+      },
+      {
+        "id": "n14",
+        "title": "현대 자유주의 (p.153)",
+        "parentId": "n24",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          153
+        ],
+        "gloss": "현대 자유주의는 보편적이고 평등한 인정의 원칙이 특정 집단들에 대한 특별한 인정으로 변형되어온 현상이다."
+      },
+      {
+        "id": "n15",
+        "title": "나르시시즘 (p.166)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          166
+        ],
+        "gloss": "자존감 증진은 치명적인 나르시시즘을 야기한다."
+      },
+      {
+        "id": "n16",
+        "title": "서구 헤게모니 (p.187)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          187
+        ],
+        "gloss": "68혁명 이후 좌파의 어젠다는 기존 정치 질서에서 서구 문화 및 가치관으로 옮겨갔다."
+      },
+      {
+        "id": "n17",
+        "title": "정체성 집착 (p.192)",
+        "parentId": "n22",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          192
+        ],
+        "gloss": "정체성에 대한 집착은 이성적 숙고와 담론의 필요성과 충돌한다."
+      },
+      {
+        "id": "n20",
+        "title": "국민 국가 (p.221)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          221
+        ],
+        "gloss": "국민 국가의 차원에서만 존재하는 공통의 규범과 관점, 문화가 민주 제도의 기능을 좌우한다."
+      },
+      {
+        "id": "n21",
+        "title": "민주주의 국가의 국민 정체성 (p.256)",
+        "parentId": "n22",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          256
+        ],
+        "gloss": "민주주의 국가의 국민 정체성은 신조에 대한 소극적 수용 이상의 긍정적인 덕목이 필요하다."
+      },
+      {
+        "id": "n22",
+        "title": "정체성",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n23",
+        "title": "내적",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n24",
+        "title": "인정",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      }
+    ]
+  }
+}

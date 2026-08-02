@@ -1,0 +1,458 @@
+{
+  "name": "run2-seed7",
+  "snap": {
+    "nodes": [
+      {
+        "id": "n1",
+        "chapter": "정보의 건축 그 가능성",
+        "chapterIdx": 2,
+        "title": "정보의 음미",
+        "claim": "정보와 개인의 관계에서 음미하는 능력이 중요하다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 109,
+            "headword": "정보의 음미",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n2",
+        "chapter": "정보의 건축 그 가능성",
+        "chapterIdx": 2,
+        "title": "정보의 건축",
+        "claim": "정보의 건축은 프로그램을 통해 사람들의 머릿속에 구축되는 과정이다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 82,
+            "headword": "정보의 건축",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n3",
+        "chapter": "비주얼커뮤니케이션 디자인",
+        "chapterIdx": 5,
+        "title": "디자이너의 역할",
+        "claim": "디자이너는 커뮤니케이션 문제를 해결하기 위해 진단과 최선의 해결책을 제시해야 한다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 219,
+            "headword": "디자이너의 역할",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n4",
+        "chapter": "비주얼커뮤니케이션 디자인",
+        "chapterIdx": 5,
+        "title": "시각성의 확장",
+        "claim": "컴퓨터와 정보 테크놀로지를 통해 인간의 신체성과 감각을 확장할 수 있는 관점을 다룬다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 234,
+            "headword": "시각성의 확장",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n6",
+        "chapter": "욕망의 에듀케이션",
+        "chapterIdx": 3,
+        "title": "욕망의 반영",
+        "claim": "일본의 자동차는 일본인의 자동차에 대한 욕망의 수준을 반영한다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 148,
+            "headword": "욕망의 반영",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n8",
+        "chapter": "비주얼커뮤니케이션 디자인",
+        "chapterIdx": 5,
+        "title": "미디어의 본질",
+        "claim": "미디어 그 자체에 창조성의 근거를 맡기려는 것은 사물의 본질을 무시하는 발상이다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 220,
+            "headword": "미디어의 본질",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n9",
+        "chapter": "비주얼커뮤니케이션 디자인",
+        "chapterIdx": 5,
+        "title": "그래픽 디자인",
+        "claim": "그래픽 디자인의 의미를 쇄신하는 것이 바람직하다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 236,
+            "headword": "그래픽 디자인",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n10",
+        "chapter": "디자인이라는 것",
+        "chapterIdx": 0,
+        "title": "디자인의 기원",
+        "claim": "디자인의 사상은 무엇인가를 만드는 것과 생활의 관계 속에서 즐거움을 만들어내는 감성과 발상에 뿌리를 두고 있다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 32,
+            "headword": "디자인의 기원",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n11",
+        "chapter": "디자인이라는 것",
+        "chapterIdx": 0,
+        "title": "기묘한 과일",
+        "claim": "현재의 디자인은 기술적 진보에 의해 왜곡된 신기한 과일을 사회에 프레젠테이션하는 역할을 한다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 33,
+            "headword": "기묘한 과일",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n12",
+        "chapter": "디자인이라는 것",
+        "chapterIdx": 0,
+        "title": "디자인의 가능성",
+        "claim": "익숙한 일상생활에도 무수한 디자인의 가능성이 잠들어 있다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 35,
+            "headword": "디자인의 가능성",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n13",
+        "chapter": "디자인이라는 것",
+        "chapterIdx": 0,
+        "title": "디자인의 본질",
+        "claim": "디자인은 미디어의 본질을 탐색하고, 다양한 미디어를 종합적으로 활용하는 기능이다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 36,
+            "headword": "디자인의 본질",
+            "role": "주장",
+            "exampleOf": ""
+          },
+          {
+            "p": 38,
+            "headword": "디자인의 본질",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n15",
+        "chapter": "디자인이라는 것",
+        "chapterIdx": 0,
+        "title": "디자인의 비평성",
+        "claim": "디자인은 생활을 기반으로 한 문명 비평의 일환이다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 48,
+            "headword": "디자인의 비평성",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n16",
+        "chapter": "RE-DESIGN — 21세기의 일상",
+        "chapterIdx": 1,
+        "title": "미지화",
+        "claim": "새로운 시대는 우리가 이미 알고 있는 일상이 끊임없이 미지화되어 새롭게 등장하는 시대다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 70,
+            "headword": "미지화",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n17",
+        "chapter": "욕망의 에듀케이션",
+        "chapterIdx": 3,
+        "title": "종이 미디어",
+        "claim": "디지털 미디어의 등장으로 종이는 본래의 매력적인 소재로서의 역할을 할 수 있게 되었다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 114,
+            "headword": "종이 미디어",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n18",
+        "chapter": "욕망의 에듀케이션",
+        "chapterIdx": 3,
+        "title": "유도 장치",
+        "claim": "한 사람의 행위는 작은 일들의 축적을 통해 원하는 장소에 도달하기 위해 필요하다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 139,
+            "headword": "유도 장치",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n19",
+        "chapter": "비주얼커뮤니케이션 디자인",
+        "chapterIdx": 5,
+        "title": "디자인의 의도",
+        "claim": "디자인은 반대 메시지를 만드는 것이 아니라, 명확한 의도와 의지로 계획을 세우는 과정이다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 216,
+            "headword": "디자인의 의도",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      }
+    ],
+    "shelf": [],
+    "overlay": [],
+    "stats": {
+      "llmCalls": 0,
+      "embCalls": 0
+    }
+  },
+  "relFinal": {
+    "32-33": "sibling",
+    "32-35": "sibling",
+    "32-36": "sibling",
+    "32-38": "sibling",
+    "32-48": "sibling",
+    "32-70": "none",
+    "32-82": "none",
+    "32-109": "none",
+    "32-114": "none",
+    "32-139": "none",
+    "32-148": "none",
+    "32-216": "none",
+    "32-219": "none",
+    "32-220": "none",
+    "32-234": "none",
+    "32-236": "none",
+    "33-35": "sibling",
+    "33-36": "sibling",
+    "33-38": "sibling",
+    "33-48": "sibling",
+    "33-70": "none",
+    "33-82": "none",
+    "33-109": "none",
+    "33-114": "none",
+    "33-139": "none",
+    "33-148": "none",
+    "33-216": "none",
+    "33-219": "none",
+    "33-220": "none",
+    "33-234": "none",
+    "33-236": "none",
+    "35-36": "sibling",
+    "35-38": "sibling",
+    "35-48": "sibling",
+    "35-70": "none",
+    "35-82": "none",
+    "35-109": "none",
+    "35-114": "none",
+    "35-139": "none",
+    "35-148": "none",
+    "35-216": "none",
+    "35-219": "none",
+    "35-220": "none",
+    "35-234": "none",
+    "35-236": "none",
+    "36-38": "merged",
+    "36-48": "sibling",
+    "36-70": "none",
+    "36-82": "none",
+    "36-109": "none",
+    "36-114": "none",
+    "36-139": "none",
+    "36-148": "none",
+    "36-216": "none",
+    "36-219": "none",
+    "36-220": "none",
+    "36-234": "none",
+    "36-236": "none",
+    "38-48": "sibling",
+    "38-70": "none",
+    "38-82": "none",
+    "38-109": "none",
+    "38-114": "none",
+    "38-139": "none",
+    "38-148": "none",
+    "38-216": "none",
+    "38-219": "none",
+    "38-220": "none",
+    "38-234": "none",
+    "38-236": "none",
+    "48-70": "none",
+    "48-82": "none",
+    "48-109": "none",
+    "48-114": "none",
+    "48-139": "none",
+    "48-148": "none",
+    "48-216": "none",
+    "48-219": "none",
+    "48-220": "none",
+    "48-234": "none",
+    "48-236": "none",
+    "70-82": "none",
+    "70-109": "none",
+    "70-114": "none",
+    "70-139": "none",
+    "70-148": "none",
+    "70-216": "none",
+    "70-219": "none",
+    "70-220": "none",
+    "70-234": "none",
+    "70-236": "none",
+    "82-109": "sibling",
+    "82-114": "none",
+    "82-139": "none",
+    "82-148": "none",
+    "82-216": "none",
+    "82-219": "none",
+    "82-220": "none",
+    "82-234": "none",
+    "82-236": "none",
+    "109-114": "none",
+    "109-139": "none",
+    "109-148": "none",
+    "109-216": "none",
+    "109-219": "none",
+    "109-220": "none",
+    "109-234": "none",
+    "109-236": "none",
+    "114-139": "sibling",
+    "114-148": "sibling",
+    "114-216": "none",
+    "114-219": "none",
+    "114-220": "none",
+    "114-234": "none",
+    "114-236": "none",
+    "139-148": "sibling",
+    "139-216": "none",
+    "139-219": "none",
+    "139-220": "none",
+    "139-234": "none",
+    "139-236": "none",
+    "148-216": "none",
+    "148-219": "none",
+    "148-220": "none",
+    "148-234": "none",
+    "148-236": "none",
+    "216-219": "sibling",
+    "216-220": "sibling",
+    "216-234": "sibling",
+    "216-236": "sibling",
+    "219-220": "sibling",
+    "219-234": "sibling",
+    "219-236": "sibling",
+    "220-234": "sibling",
+    "220-236": "sibling",
+    "234-236": "sibling"
+  },
+  "digest": [
+    "p32 \"디자인의 기원\" → 디자인이라는 것로 이동(단조 정렬)",
+    "p33 \"기묘한 과일\" → 디자인이라는 것로 이동(단조 정렬)",
+    "p35 \"디자인의 가능성\" → 디자인이라는 것로 이동(단조 정렬)",
+    "p36 \"디자인의 본질\" → 디자인이라는 것로 이동(단조 정렬)",
+    "p38 \"디자인의 본질\" → 디자인이라는 것로 이동(단조 정렬)",
+    "p48 \"디자인의 비평성\" → 디자인이라는 것로 이동(단조 정렬)",
+    "p70 \"미지화\" → RE-DESIGN — 21세기의 일상로 이동(단조 정렬)",
+    "p114 \"종이 미디어\" → 욕망의 에듀케이션로 이동(단조 정렬)",
+    "p139 \"유도 장치\" → 욕망의 에듀케이션로 이동(단조 정렬)",
+    "p216 \"디자인의 의도\" → 비주얼커뮤니케이션 디자인로 이동(단조 정렬)",
+    "병합: \"디자인의 본질\" → \"디자인의 본질\""
+  ]
+}

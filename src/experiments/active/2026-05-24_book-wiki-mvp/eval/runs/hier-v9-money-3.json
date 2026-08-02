@@ -1,0 +1,542 @@
+{
+  "name": "run3-seed42",
+  "snap": {
+    "nodes": [
+      {
+        "id": "n1",
+        "chapter": "삶과 죽음의 시장",
+        "chapterIdx": 4,
+        "title": "생명보험의 이중성",
+        "claim": "생명보험은 상호 안전 보장과 죽음에 대한 대비책이라는 두 가지 요소가 공존하며 불안정하게 결합되어 있다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 200,
+            "headword": "생명보험의 이중성",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n2",
+        "chapter": "인센티브",
+        "chapterIdx": 2,
+        "title": "부모의 의미",
+        "claim": "아이를 낳을 권리를 사는 것은 부모의 의미를 변질시킨다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 108,
+            "headword": "부모의 의미",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n3",
+        "chapter": "시장은 어떻게 도덕을 밀어내는가",
+        "chapterIdx": 3,
+        "title": "시민의 의무의식",
+        "claim": "시민의 의무의식은 시장 규범에 의해 침해받을 수 있다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 162,
+            "headword": "시민의 의무의식",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n4",
+        "chapter": "명명권",
+        "chapterIdx": 5,
+        "title": "상업적 감수성",
+        "claim": "상업용 광고가 일상적인 삶을 침범하면서 시장가치가 지배하는 세상이 더러워진다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 258,
+            "headword": "상업적 감수성",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n5",
+        "chapter": "서론: 시장과 도덕",
+        "chapterIdx": 0,
+        "title": "시장",
+        "claim": "시장은 재화의 가치를 평가할 때 기준을 두지 않고, 거래 당사자가 스스로 판단하도록 한다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 33,
+            "headword": "시장",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n6",
+        "chapter": "새치기",
+        "chapterIdx": 1,
+        "title": "사회적 효용",
+        "claim": "자유시장이 줄서기보다 믿음직스럽지 않을 수 있다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 55,
+            "headword": "사회적 효용",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n7",
+        "chapter": "인센티브",
+        "chapterIdx": 2,
+        "title": "사회제도의 목적",
+        "claim": "사회제도의 목적을 파악하는 것은 벌금과 요금의 적절성을 결정하는 데 중요하다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 103,
+            "headword": "사회제도의 목적",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n8",
+        "chapter": "명명권",
+        "chapterIdx": 5,
+        "title": "공동체적 생활",
+        "claim": "민주주의는 시민에게 공동체적 생활을 공유할 것을 요구한다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 275,
+            "headword": "공동체적 생활",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n9",
+        "chapter": "명명권",
+        "chapterIdx": 5,
+        "title": "시장 체제",
+        "claim": "시장 체제를 도입하는 것이 경기의 선을 향상시키는지 훼손시키는지는 중요한 문제이다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 246,
+            "headword": "시장 체제",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n10",
+        "chapter": "인센티브",
+        "chapterIdx": 2,
+        "title": "비용 지불의 변화",
+        "claim": "금전적 지불 방법의 도입은 부모들이 아이를 늦게 데리러 오는 것에 대한 인식을 변화시켰다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 99,
+            "headword": "비용 지불의 변화",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n11",
+        "chapter": "인센티브",
+        "chapterIdx": 2,
+        "title": "재정적 인센티브",
+        "claim": "재정적 인센티브는 보호해야 할 태도와 규범을 변질시킬 수 있다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 131,
+            "headword": "재정적 인센티브",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n12",
+        "chapter": "시장은 어떻게 도덕을 밀어내는가",
+        "chapterIdx": 3,
+        "title": "재정적 인센티브",
+        "claim": "재정적 인센티브는 공공정신에서 우러난 활동을 보상받기 위한 노동으로 변질시킨다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 166,
+            "headword": "재정적 인센티브",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n13",
+        "chapter": "새치기",
+        "chapterIdx": 1,
+        "title": "줄서기 도덕",
+        "claim": "줄서기 도덕은 모든 상황을 지배하지 않으며, 집을 파는 것과 버스를 기다리는 것은 서로 다른 행위로 각기 다른 규범의 지배를 받는다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 66,
+            "headword": "줄서기 도덕",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n14",
+        "chapter": "인센티브",
+        "chapterIdx": 2,
+        "title": "시장 규범",
+        "claim": "시장 규범은 거래 재화의 가치를 평가하고 조장한다.",
+        "role": "주장",
+        "parentId": "n20",
+        "virtual": false,
+        "memos": [
+          {
+            "p": 116,
+            "headword": "시장 규범",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n15",
+        "chapter": "새치기",
+        "chapterIdx": 1,
+        "title": "라이브콘서트의 가치",
+        "claim": "라이브콘서트는 단순한 상품이 아닌 사회적 행사로서의 가치를 지닌다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 64,
+            "headword": "라이브콘서트의 가치",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n16",
+        "chapter": "시장은 어떻게 도덕을 밀어내는가",
+        "chapterIdx": 3,
+        "title": "선물의 의미",
+        "claim": "선물은 단순한 효용을 넘어서 정체성과 관계를 표현하는 중요한 요소이다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 146,
+            "headword": "선물의 의미",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n17",
+        "chapter": "삶과 죽음의 시장",
+        "chapterIdx": 4,
+        "title": "말기환금",
+        "claim": "말기환금은 죽음에 대한 도박으로, 피보험자의 동의 없이 이익이 투자자에게 돌아가기 때문에 도덕적 문제가 발생한다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 193,
+            "headword": "말기환금",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n18",
+        "chapter": "인센티브",
+        "chapterIdx": 2,
+        "title": "비시장 규범",
+        "claim": "비시장 규범의 지배를 받는 사회적 관행에 가격 효과 원칙이 적용되면 신뢰성이 떨어진다.",
+        "role": "주장",
+        "parentId": "n20",
+        "virtual": false,
+        "memos": [
+          {
+            "p": 130,
+            "headword": "비시장 규범",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n19",
+        "chapter": "시장은 어떻게 도덕을 밀어내는가",
+        "chapterIdx": 3,
+        "title": "시장 가치의 변질",
+        "claim": "특정 도덕적, 시민적 재화는 사고팔 때 가치가 감소하거나 변질된다.",
+        "role": "주장",
+        "parentId": null,
+        "virtual": false,
+        "memos": [
+          {
+            "p": 157,
+            "headword": "시장 가치의 변질",
+            "role": "주장",
+            "exampleOf": ""
+          }
+        ]
+      },
+      {
+        "id": "n20",
+        "chapter": "인센티브",
+        "chapterIdx": 2,
+        "title": "규범",
+        "claim": "",
+        "role": "주장",
+        "parentId": null,
+        "virtual": true,
+        "memos": []
+      }
+    ],
+    "shelf": [],
+    "overlay": [],
+    "stats": {
+      "llmCalls": 0,
+      "embCalls": 0
+    }
+  },
+  "rel": {
+    "33-55": "none",
+    "33-64": "none",
+    "33-66": "none",
+    "33-99": "none",
+    "33-103": "none",
+    "33-108": "none",
+    "33-116": "none",
+    "33-130": "none",
+    "33-131": "none",
+    "33-146": "none",
+    "33-157": "none",
+    "33-162": "none",
+    "33-166": "none",
+    "33-193": "none",
+    "33-200": "none",
+    "33-246": "none",
+    "33-258": "none",
+    "33-275": "none",
+    "55-64": "sibling",
+    "55-66": "sibling",
+    "55-99": "none",
+    "55-103": "none",
+    "55-108": "none",
+    "55-116": "none",
+    "55-130": "none",
+    "55-131": "none",
+    "55-146": "none",
+    "55-157": "none",
+    "55-162": "none",
+    "55-166": "none",
+    "55-193": "none",
+    "55-200": "none",
+    "55-246": "none",
+    "55-258": "none",
+    "55-275": "none",
+    "64-66": "sibling",
+    "64-99": "none",
+    "64-103": "none",
+    "64-108": "none",
+    "64-116": "none",
+    "64-130": "none",
+    "64-131": "none",
+    "64-146": "none",
+    "64-157": "none",
+    "64-162": "none",
+    "64-166": "none",
+    "64-193": "none",
+    "64-200": "none",
+    "64-246": "none",
+    "64-258": "none",
+    "64-275": "none",
+    "66-99": "none",
+    "66-103": "none",
+    "66-108": "none",
+    "66-116": "none",
+    "66-130": "none",
+    "66-131": "none",
+    "66-146": "none",
+    "66-157": "none",
+    "66-162": "none",
+    "66-166": "none",
+    "66-193": "none",
+    "66-200": "none",
+    "66-246": "none",
+    "66-258": "none",
+    "66-275": "none",
+    "99-103": "sibling",
+    "99-108": "sibling",
+    "99-116": "sibling",
+    "99-130": "sibling",
+    "99-131": "sibling",
+    "99-146": "none",
+    "99-157": "none",
+    "99-162": "none",
+    "99-166": "none",
+    "99-193": "none",
+    "99-200": "none",
+    "99-246": "none",
+    "99-258": "none",
+    "99-275": "none",
+    "103-108": "sibling",
+    "103-116": "sibling",
+    "103-130": "sibling",
+    "103-131": "sibling",
+    "103-146": "none",
+    "103-157": "none",
+    "103-162": "none",
+    "103-166": "none",
+    "103-193": "none",
+    "103-200": "none",
+    "103-246": "none",
+    "103-258": "none",
+    "103-275": "none",
+    "108-116": "sibling",
+    "108-130": "sibling",
+    "108-131": "sibling",
+    "108-146": "none",
+    "108-157": "none",
+    "108-162": "none",
+    "108-166": "none",
+    "108-193": "none",
+    "108-200": "none",
+    "108-246": "none",
+    "108-258": "none",
+    "108-275": "none",
+    "116-130": "sibling",
+    "116-131": "sibling",
+    "116-146": "none",
+    "116-157": "none",
+    "116-162": "none",
+    "116-166": "none",
+    "116-193": "none",
+    "116-200": "none",
+    "116-246": "none",
+    "116-258": "none",
+    "116-275": "none",
+    "130-131": "sibling",
+    "130-146": "none",
+    "130-157": "none",
+    "130-162": "none",
+    "130-166": "none",
+    "130-193": "none",
+    "130-200": "none",
+    "130-246": "none",
+    "130-258": "none",
+    "130-275": "none",
+    "131-146": "none",
+    "131-157": "none",
+    "131-162": "none",
+    "131-166": "none",
+    "131-193": "none",
+    "131-200": "none",
+    "131-246": "none",
+    "131-258": "none",
+    "131-275": "none",
+    "146-157": "sibling",
+    "146-162": "sibling",
+    "146-166": "sibling",
+    "146-193": "none",
+    "146-200": "none",
+    "146-246": "none",
+    "146-258": "none",
+    "146-275": "none",
+    "157-162": "sibling",
+    "157-166": "sibling",
+    "157-193": "none",
+    "157-200": "none",
+    "157-246": "none",
+    "157-258": "none",
+    "157-275": "none",
+    "162-166": "sibling",
+    "162-193": "none",
+    "162-200": "none",
+    "162-246": "none",
+    "162-258": "none",
+    "162-275": "none",
+    "166-193": "none",
+    "166-200": "none",
+    "166-246": "none",
+    "166-258": "none",
+    "166-275": "none",
+    "193-200": "sibling",
+    "193-246": "none",
+    "193-258": "none",
+    "193-275": "none",
+    "200-246": "none",
+    "200-258": "none",
+    "200-275": "none",
+    "246-258": "sibling",
+    "246-275": "sibling",
+    "258-275": "sibling"
+  },
+  "digest": [
+    "승격(표제어 공유): \"규범\" ← 시장 규범, 비시장 규범"
+  ]
+}

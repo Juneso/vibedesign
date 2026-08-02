@@ -27,7 +27,10 @@
     <!-- ---- 왼쪽 사이드바 (데스크톱 전용) ---- -->
     <nav class="lab-sidebar">
       <div class="lab-sidebar-header">
-        <h1 class="lab-title"></h1>
+        <div class="lab-mode-toggle" id="lab-mode-toggle" role="tablist" aria-label="모드 전환">
+          <button type="button" class="lab-mode-btn" data-mode="canvas" role="tab">Canvas</button>
+          <button type="button" class="lab-mode-btn" data-mode="logic" role="tab">Logic</button>
+        </div>
         <button id="mobile-nav-close" class="mobile-nav-close" aria-label="메뉴 닫기">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>

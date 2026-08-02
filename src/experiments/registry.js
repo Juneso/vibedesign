@@ -50,6 +50,15 @@ export const experiments = [
     files: ['index.html', 'main.jsx', 'App.jsx', 'style.css', 'meta.json', 'screens/MindMapScreen.jsx', 'lib/mindmaps.json']
   },
   {
+    id: '2026-07-03_eval-dashboard',
+    title: 'Eval 대시보드',
+    chip: 'eval',
+    status: 'active',
+    path: 'src/experiments/active/2026-07-03_eval-dashboard/index.html',
+    folder: 'src/experiments/active/2026-07-03_eval-dashboard',
+    files: ['index.html', 'main.jsx', 'style.css', 'meta.json', 'lib/api.js', 'screens/RunBrowser.jsx']
+  },
+  {
     id: '2026-08-01_login-auth',
     title: '0801 로그인 구조 — Anonymous Auth + SIWA',
     chip: 'BKT-277/312',

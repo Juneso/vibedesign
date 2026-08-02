@@ -1,0 +1,466 @@
+{
+  "label": "심리 정치",
+  "runAt": "2026-07-23T05:02:21.996Z",
+  "kind": "hier-v9-tree",
+  "variant": "v9",
+  "model": "gpt-4o-mini",
+  "note": "hier-v9-batch 스냅샷에서 변환 — 재실행 없음. 목차 없는 폴백 모드 결과다.",
+  "memoN": 33,
+  "stability": {
+    "agree": 1,
+    "jac": 1
+  },
+  "counts": {
+    "keywords": 33,
+    "promoted": 8,
+    "thick": 0
+  },
+  "tree": {
+    "rootId": "root",
+    "nodes": [
+      {
+        "id": "root",
+        "title": "심리 정치",
+        "parentId": null,
+        "level": 0,
+        "kind": "root",
+        "sources": []
+      },
+      {
+        "id": "n1",
+        "title": "할 수 있음의 자유 (p.10)",
+        "parentId": "n41",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          10
+        ],
+        "gloss": "할 수 있음의 자유는 해야 함의 규율보다 더 큰 강제를 낳는다."
+      },
+      {
+        "id": "n2",
+        "title": "자본의 착취 (p.13)",
+        "parentId": "n39",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          13
+        ],
+        "gloss": "자본은 개인의 자유를 착취하여 자신의 번식을 추구한다."
+      },
+      {
+        "id": "n3",
+        "title": "무계급적 자기 착취 (p.16)",
+        "parentId": "n38",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          16
+        ],
+        "gloss": "신자유주의 질서는 타자에 의한 착취를 자기 착취로 탈바꿈시켜 사회 혁명의 불가능성을 의미한다."
+      },
+      {
+        "id": "n4",
+        "title": "초월적 질서에서의 해방 (p.18)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          18
+        ],
+        "gloss": "근대 정치의 본질적 특징은 초월적 질서에서의 해방이다."
+      },
+      {
+        "id": "n5",
+        "title": "소비자 정치 (p.22)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          22
+        ],
+        "gloss": "신자유주의는 시민의 자유를 소비자의 수동성으로 대체하여 정치에 대한 진정한 관심을 상실하게 만든다."
+      },
+      {
+        "id": "n6",
+        "title": "자기 결정권 (p.23)",
+        "parentId": "n38",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          23
+        ],
+        "gloss": "정보에 대한 자기 결정권은 자유의 본질적 부분이다."
+      },
+      {
+        "id": "n7",
+        "title": "디지털 성물 (p.25)",
+        "parentId": "n35",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          25
+        ],
+        "gloss": "스마트폰은 디지털 성물로서 예속화의 도구로 기능한다."
+      },
+      {
+        "id": "n8",
+        "title": "허용적 권력 (p.28)",
+        "parentId": "n34",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          28
+        ],
+        "gloss": "권력은 반드시 배제하고 금지하는 방식으로 작동하지 않으며, 오늘날 점점 더 허용적 형식을 취하고 있다."
+      },
+      {
+        "id": "n9",
+        "title": "친절한 권력 (p.29)",
+        "parentId": "n34",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          29
+        ],
+        "gloss": "친절한 권력은 억압적 권력보다 더 막강하다."
+      },
+      {
+        "id": "n10",
+        "title": "규율 권력 (p.37)",
+        "parentId": "n34",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          37
+        ],
+        "gloss": "규율 권력은 심리의 심층에 있는 소망과 욕구를 좌지우지하기에는 조악하다."
+      },
+      {
+        "id": "n11",
+        "title": "빅데이터 (p.37)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          37
+        ],
+        "gloss": "빅데이터는 개인과 집단의 심리 지도를 작성할 수 있게 해준다."
+      },
+      {
+        "id": "n12",
+        "title": "생정치 (p.41)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          41
+        ],
+        "gloss": "자본주의 사회에서 생정치는 생물학적이고 신체적인 요소가 중요하다는 것을 의미한다."
+      },
+      {
+        "id": "n13",
+        "title": "신자유주의 권력 기술 (p.45)",
+        "parentId": "n34",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          45
+        ],
+        "gloss": "신자유주의 체제의 권력 기술은 개인이 자발적으로 자기 제어를 통해 지배 관계를 내면화하도록 유도한다."
+      },
+      {
+        "id": "n14",
+        "title": "자아 최적화 (p.46)",
+        "parentId": "n40",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          46
+        ],
+        "gloss": "자아 최적화의 필요성은 시장의 논리에 의해 발생한다."
+      },
+      {
+        "id": "n15",
+        "title": "디지털 파놉티콘 (p.59)",
+        "parentId": "n35",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          59
+        ],
+        "gloss": "디지털 파놉티콘에서는 우리가 자발적으로 정보를 발가벗긴다."
+      },
+      {
+        "id": "n16",
+        "title": "감성 자본주의 (p.67)",
+        "parentId": "n39",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          67
+        ],
+        "gloss": "감성 자본주의는 자유를 이용하여 기분 내키는 대로 할 수 있는 상태를 의미한다."
+      },
+      {
+        "id": "n17",
+        "title": "기분 소비 (p.68)",
+        "parentId": "n36",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          68
+        ],
+        "gloss": "오늘날 우리는 결국 사물이 아니라 기분을 소비한다."
+      },
+      {
+        "id": "n18",
+        "title": "기분의 조종 (p.70)",
+        "parentId": "n36",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          70
+        ],
+        "gloss": "기분은 대뇌변연계에 의해 조종되며, 반성 이전의 반의식적이고 신체적인 층위에 속한다."
+      },
+      {
+        "id": "n19",
+        "title": "자유로운 삶의 형식 (p.74)",
+        "parentId": "n41",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          74
+        ],
+        "gloss": "진정한 자유는 삶이 자본에서 완전히 해방될 때만 성립할 수 있다."
+      },
+      {
+        "id": "n20",
+        "title": "종교의 본질 (p.76)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          76
+        ],
+        "gloss": "종교는 신성한 물건들을 지키고 관리하는 것, 즉 격리하는 것을 본질로 한다."
+      },
+      {
+        "id": "n21",
+        "title": "2차 계몽주의 (p.83)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          83
+        ],
+        "gloss": "2차 계몽주의는 새로운 형태의 폭력을 낳고, 결국 이데올로기로 변질될 위험이 있다."
+      },
+      {
+        "id": "n22",
+        "title": "서사의 부재 (p.84)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          84
+        ],
+        "gloss": "서사의 부재로 인해 데이터는 의미의 공허를 채우기만 할 뿐이다."
+      },
+      {
+        "id": "n23",
+        "title": "데이터와 자아 (p.85)",
+        "parentId": "n40",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          85
+        ],
+        "gloss": "신체 데이터는 자아에 대한 질문에 답하지 못하며, 자아는 이야기로 형성된다."
+      },
+      {
+        "id": "n24",
+        "title": "셀프 트래킹 (p.86)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          86
+        ],
+        "gloss": "셀프 트래킹은 자기 감시의 양상을 띤다."
+      },
+      {
+        "id": "n25",
+        "title": "디지털 심리정치 (p.89)",
+        "parentId": "n35",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          89
+        ],
+        "gloss": "디지털 심리정치는 자유 의지를 추월할 수 있는 능력을 갖추고 있다."
+      },
+      {
+        "id": "n26",
+        "title": "경험의 비연속성 (p.109)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          109
+        ],
+        "gloss": "경험은 주체를 예속 상태에서 벗어나게 하는 비연속성을 바탕으로 한다."
+      },
+      {
+        "id": "n27",
+        "title": "삶의 기술 (p.110)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          110
+        ],
+        "gloss": "삶의 기술은 심리학을 죽이고 자발적으로 관계와 특성을 생성하는 것을 의미한다."
+      },
+      {
+        "id": "n28",
+        "title": "바보의 사유 (p.111)",
+        "parentId": "n37",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          111
+        ],
+        "gloss": "모든 철학자는 본래 바보였으며, 오직 바보만이 완전히 다른 것에 접근할 수 있다."
+      },
+      {
+        "id": "n29",
+        "title": "바보의 자유 (p.113)",
+        "parentId": "n37",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          113
+        ],
+        "gloss": "바보짓은 커뮤니케이션과 순응의 압박에 저항하는 자유의 실천을 의미한다."
+      },
+      {
+        "id": "n30",
+        "title": "자유로운 고독 (p.115)",
+        "parentId": "n41",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          115
+        ],
+        "gloss": "자유로운 고독과 침묵의 공간을 만드는 것이 오늘날의 난관이다."
+      },
+      {
+        "id": "n31",
+        "title": "주체의 특성 (p.118)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          118
+        ],
+        "gloss": "주체는 특성들이 아니라 사건이다."
+      },
+      {
+        "id": "n32",
+        "title": "자본의 자유화 (p.132)",
+        "parentId": "n39",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          132
+        ],
+        "gloss": "자본은 자본주의 체제에 대한 도전을 국가 권력의 폭력으로 제압할 필요가 있지만, 발전한 산업 국가에서는 국가 권력의 억압적 성격이 약화되었다."
+      },
+      {
+        "id": "n33",
+        "title": "선택적 자유화 (p.140)",
+        "parentId": "n41",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          140
+        ],
+        "gloss": "선택적 자유화는 자유의 형태가 정권이나 자본에 의해 결정될 수 있음을 암시한다."
+      },
+      {
+        "id": "n34",
+        "title": "권력",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n35",
+        "title": "디지털",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n36",
+        "title": "기분",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n37",
+        "title": "바보",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n38",
+        "title": "자기",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n39",
+        "title": "자본",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n40",
+        "title": "자아",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n41",
+        "title": "자유",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      }
+    ]
+  }
+}

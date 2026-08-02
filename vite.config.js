@@ -7,6 +7,7 @@ import { readdirSync, statSync, existsSync, readFileSync } from 'fs'
 import { tmpdir } from 'os'
 import { aladinPlugin } from './src/shared/plugins/aladinPlugin.js'
 import { openaiPlugin } from './src/shared/plugins/openaiPlugin.js'
+import { evalApiPlugin } from './scripts/vite-eval-api.mjs'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -92,6 +93,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     editTrailPlugin(),
+    evalApiPlugin(),
     aladinPlugin(),
     openaiPlugin(),
   ],

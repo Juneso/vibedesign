@@ -1,0 +1,57 @@
+<svg width="680" height="356" viewBox="0 0 680 356" xmlns="http://www.w3.org/2000/svg" font-family="Apple SD Gothic Neo, AppleSDGothicNeo, sans-serif">
+<rect x="0" y="0" width="680" height="356" fill="#ffffff"/>
+<defs>
+<marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#5F5E5A"/></marker>
+<marker id="arp" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#7F77DD"/></marker>
+</defs>
+<text x="40" y="22" font-size="15" font-weight="500" fill="#2C2C2A">넛지 구조 — 행동 → 데이터 → 저장·연관 (BKT-343)</text>
+<line x1="40" y1="30" x2="640" y2="30" stroke="#B4B2A9"/>
+<text x="111" y="62" font-size="12" font-weight="500" fill="#0F6E56" text-anchor="middle">유저 행동</text>
+<text x="320" y="62" font-size="12" font-weight="500" fill="#854F0B" text-anchor="middle">데이터 변환</text>
+<text x="547" y="62" font-size="12" font-weight="500" fill="#534AB7" text-anchor="middle">저장 &amp; 연관</text>
+
+<g><rect x="36" y="72" width="150" height="54" rx="6" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="111" y="95" font-size="13" font-weight="500" fill="#085041" text-anchor="middle">넛지 생성 트리거</text>
+<text x="111" y="113" font-size="11" fill="#0F6E56" text-anchor="middle">스케줄 → 푸시(5_)</text></g>
+<g><rect x="202" y="72" width="236" height="54" rx="6" fill="#FAEEDA" stroke="#BA7517"/>
+<text x="320" y="93" font-size="12" font-weight="500" fill="#854F0B" text-anchor="middle">입력 = WikiPage + Profile</text>
+<text x="320" y="109" font-size="11" fill="#854F0B" text-anchor="middle">derivedKeywords(4-4) 결합</text>
+<text x="320" y="122" font-size="11" fill="#BA7517" text-anchor="middle">앵커 문장 + 각도 선택</text></g>
+<g><rect x="454" y="72" width="186" height="54" rx="6" fill="#EEEDFE" stroke="#534AB7"/>
+<text x="547" y="95" font-size="11" font-weight="500" fill="#3C3489" text-anchor="middle">(읽기) wiki · profile</text>
+<text x="547" y="113" font-size="11" fill="#534AB7" text-anchor="middle">개인화 입력</text></g>
+<path d="M186 99 L200 99" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M438 99 L452 99" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<g><rect x="36" y="132" width="150" height="54" rx="6" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="111" y="155" font-size="12" font-weight="500" fill="#085041" text-anchor="middle">generateNudgeBatch</text>
+<text x="111" y="173" font-size="11" fill="#0F6E56" text-anchor="middle">best-of-n → judge</text></g>
+<g><rect x="202" y="132" width="236" height="54" rx="6" fill="#FAEEDA" stroke="#BA7517"/>
+<text x="320" y="153" font-size="12" font-weight="500" fill="#854F0B" text-anchor="middle">Nudge (2층 구조)</text>
+<text x="320" y="169" font-size="11" fill="#854F0B" text-anchor="middle">L1~L2 해석 + L4 질문</text>
+<text x="320" y="182" font-size="11" fill="#BA7517" text-anchor="middle">원터치 선택지 3개</text></g>
+<g><rect x="454" y="132" width="186" height="54" rx="6" fill="#EEEDFE" stroke="#534AB7"/>
+<text x="547" y="155" font-size="13" font-weight="500" fill="#3C3489" text-anchor="middle">nudges/{id}</text>
+<text x="547" y="173" font-size="11" fill="#534AB7" text-anchor="middle">sourcePageIds → wiki</text></g>
+<path d="M186 159 L200 159" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M438 159 L452 159" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M464 126 L464 131" stroke="#7F77DD" stroke-width="1.5" marker-end="url(#arp)"/>
+<text x="470" y="132" font-size="10" fill="#534AB7">Profile·Wiki → Nudge</text>
+
+<g><rect x="36" y="192" width="150" height="54" rx="6" fill="#E1F5EE" stroke="#0F6E56"/>
+<text x="111" y="215" font-size="13" font-weight="500" fill="#085041" text-anchor="middle">답변 (원터치/입력)</text>
+<text x="111" y="233" font-size="11" fill="#0F6E56" text-anchor="middle">안 눌러도 가치 완결</text></g>
+<g><rect x="202" y="192" width="236" height="54" rx="6" fill="#FAEEDA" stroke="#BA7517"/>
+<text x="320" y="213" font-size="12" font-weight="500" fill="#854F0B" text-anchor="middle">Answer → 메모처럼 재인제스트</text>
+<text x="320" y="229" font-size="11" fill="#854F0B" text-anchor="middle">선택/텍스트가 구조화 데이터</text></g>
+<g><rect x="454" y="192" width="186" height="54" rx="6" fill="#EEEDFE" stroke="#534AB7"/>
+<text x="547" y="215" font-size="12" font-weight="500" fill="#3C3489" text-anchor="middle">wiki/{pageId} 갱신</text>
+<text x="547" y="233" font-size="11" fill="#534AB7" text-anchor="middle">사고 누적 루프</text></g>
+<path d="M186 219 L200 219" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M438 219 L452 219" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M548 186 L548 132" stroke="#7F77DD" stroke-width="1.5" marker-end="url(#arp)" fill="none"/>
+<text x="554" y="172" font-size="10" fill="#534AB7">답변 → wiki 재편입</text>
+
+<text x="40" y="300" font-size="11" fill="#5F5E5A">목적 = 리텐션(저장한 문장과 다시 마주침). 알림만 봐도 완결(L1~L2), 펼치면 질문(L4). judge 루브릭 = 공감·풀이정확·응용거리(4-5).</text>
+<text x="40" y="320" font-size="11" fill="#5F5E5A">연관: Profile(4-4) → Nudge, WikiPage(4-1) → Nudge, Answer → WikiPage 재편입(폐쇄 루프).</text>
+</svg>

@@ -1,0 +1,47 @@
+{
+  "label": "피로사회",
+  "runAt": "2026-07-26T03:19:32.121Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-46.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 23,
+  "total": 4,
+  "density": 0.174,
+  "byType": {
+    "hollowAxis": 1,
+    "underMin": 1,
+    "relationMiss": 2
+  },
+  "defects": [
+    {
+      "type": "hollowAxis",
+      "by": "code",
+      "nodeId": "n53",
+      "title": "면역학적 패러다임과 세계화의 충돌 · 대조",
+      "why": "유일한 자식 \"면역학적 조직\" 과 이름이 겹친다"
+    },
+    {
+      "type": "underMin",
+      "by": "code",
+      "nodeId": "n53",
+      "title": "면역학적 패러다임과 세계화의 충돌 · 대조",
+      "why": "대조 는 최소 2개가 필요한데 1개다"
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n48",
+      "title": "성과사회의 문제점 · 분석",
+      "why": "자식 '자기 착취'·'노동사회'는 성과사회의 문제점이 아니라 그 결과와 배경이다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n51",
+      "title": "부정성과 긍정성의 대조 · 대조",
+      "why": "자식 '부정성과 긍정성의 대조'는 부정성과 긍정성의 관계가 아니라 그 결과와 배경이다."
+    }
+  ],
+  "reading": "개념 23개 중 결함 4건 — 관계-멤버 불일치 2 · 헛도는 층 1 · 관계 최소 위반 1"
+}

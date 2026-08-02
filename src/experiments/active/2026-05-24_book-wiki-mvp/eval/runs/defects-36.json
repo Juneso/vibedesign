@@ -1,0 +1,31 @@
+{
+  "label": "공정하다는 착각",
+  "runAt": "2026-07-26T06:03:13.167Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-63.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 11,
+  "total": 2,
+  "density": 0.182,
+  "byType": {
+    "relationMiss": 2
+  },
+  "defects": [
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n20",
+      "title": "정치적 담론의 변화 · 분류",
+      "why": "자식 '진보 정치'는 정치적 담론의 변화와 관련이 없고, 오히려 정치적 정보와 결정의 범주에 속해야 한다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n21",
+      "title": "정치적 정보와 결정 · 분류",
+      "why": "자식 '정보 부족'은 정치적 정보와 결정의 범주에 속하지만, 정치적 담론의 변화와는 관련이 없다."
+    }
+  ],
+  "reading": "개념 11개 중 결함 2건 — 관계-멤버 불일치 2"
+}

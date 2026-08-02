@@ -19,10 +19,14 @@
     "vite": "^7.3.3"
   },
   "dependencies": {
+    "@astryxdesign/cli": "^0.1.2",
+    "@astryxdesign/core": "^0.1.2",
+    "@astryxdesign/theme-neutral": "^0.1.2",
     "cheerio": "^1.2.0",
     "firebase": "^12.17.0",
     "jiti": "^2.7.0",
     "jsdom": "^29.0.2",
+    "mermaid": "^11.16.0",
     "motion": "^12.38.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"

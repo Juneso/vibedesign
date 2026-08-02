@@ -1,0 +1,33 @@
+{
+  "label": "서양미술사",
+  "runAt": "2026-07-26T02:40:16.510Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-45.json",
+  "sourceVariant": "v10",
+  "model": "gpt-4o-mini",
+  "nConcepts": 38,
+  "total": 2,
+  "density": 0.053,
+  "byType": {
+    "thinPillar": 1,
+    "unpromoted": 1
+  },
+  "defects": [
+    {
+      "type": "thinPillar",
+      "by": "code",
+      "nodeId": "n9",
+      "title": "2 · 중세 미술",
+      "why": "축 0개 · 하위 키워드 1개뿐이다"
+    },
+    {
+      "type": "unpromoted",
+      "by": "llm",
+      "nodeId": "n25",
+      "otherId": "",
+      "title": "미술의 본질과 이론",
+      "why": "자식 '미술의 전통과 미래 지향'은 독립된 개념으로 다루어져야 할 주제이다."
+    }
+  ],
+  "reading": "개념 38개 중 결함 2건 — 실속 없는 기둥 1 · 미승격 1"
+}

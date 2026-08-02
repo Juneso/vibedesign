@@ -1,0 +1,238 @@
+{
+  "id": "hier-ingest-v7",
+  "title": "책별 키워드 위계 인제스트 — 검증된 위계 + 테마 주역화 (V7)",
+  "shortTitle": "위계 인제스트 V7",
+  "order": 90,
+  "script": "lib/hierEngine.mjs (variant=v7) · 실행: runHierStability.mjs v7",
+  "goal": "키워드 트리를 쌓되 **위아래 위계는 교차검증을 통과한 것만** 만들고, \"정리되는 느낌\"은 책 논지에 붙인 **테마**가 맡는다. 테마는 이름뿐 아니라 근거 인용과 설명을 반드시 갖는다.",
+  "designIntent": "- V5 셔플 측정에서 배치가 만든 위계 대부분이 재현되지 않았다 — 위계쌍 자카드 **11%**, 사실상 지어낸 위계.\n- V6에서 치환 테스트와 양방향 교차검증을 넣자 배치발 위계가 전원 기각됐다. 수집 문장의 키워드 사이에 엄밀한 포함관계가 드물다는 뜻이다.\n- 그래서 V7은 둘로 나눴다 — 위아래 위계는 **검증 통과분만** 남기고, 정리되는 느낌은 **테마**가 맡는다.\n- 테마는 책 요약·목차에서 근거 구절을 그대로 인용해야만 만들어진다.\n- 독립 critic(gpt-4o)이 인용을 근거로 반증한다. \"확신 없으면 기각\"식 지시는 mini 에게 기각 도장이 되어버려 \"인용해야만 기각 가능\"으로 고쳤다.\n- 결과 — 책의 3대 논지 축이 셔플 3회 모두 테마로 재현, 뜬금없는 우산 키워드 0건, 위계쌍 자카드 **32%**.",
+  "diagram": {
+    "flowchart": "flowchart TD\n  subgraph G1[\"① 키워드 뽑기\"]\n    memo[\"독서 메모 문장<br/>책별 · 한 문장씩 순차 투입\"]:::data\n    extract(\"<b>1 · 키워드 추출</b> <span class='pl-llm'>LLM</span><br/>gpt-4o-mini · 일반어 금지\"):::proc\n    concepts[\"핵심 키워드 1~2개<br/>명사구 + 한 줄 설명\"]:::data\n  end\n  subgraph G2[\"② 위계 만들기\"]\n    embed(\"<b>2 · 키워드 임베딩 · 후보 검색</b><br/>비슷한 노드 상위 4개\"):::proc\n    place(\"<b>3 · 위계 배치 · 치환 테스트</b> <span class='pl-llm'>LLM</span><br/>합치기 · 아래 · 위 · 그냥 붙이기\"):::proc\n  end\n  subgraph G3[\"③ 위계 검증\"]\n    verify(\"<b>4 · 양방향 교차검증</b> <span class='pl-llm'>LLM</span><br/>어긋나면 강등\"):::proc\n    tree1[\"1차 키워드 트리<br/>검증 통과 위계 + root 직속 잎\"]:::data\n  end\n  subgraph G4[\"④ 중복 정리\"]\n    dedup(\"<b>5 · 동의어 사후 병합</b> <span class='pl-llm'>LLM</span><br/>같은 메모 출신은 무조건 검사\"):::proc\n  end\n  subgraph G5[\"⑤ 테마 만들기\"]\n    themegen(\"<b>6 · 테마 생성</b> <span class='pl-llm'>LLM</span><br/>책 인용(anchor) 필수\"):::proc\n    themes[\"테마 후보<br/>이름 · 인용 · 설명 · 멤버 2개 이상\"]:::data\n  end\n  subgraph G6[\"⑥ 테마 검증\"]\n    critic(\"<b>7 · 테마 critic 반증</b> <span class='pl-llm'>LLM</span><br/>gpt-4o · 인용해야만 기각\"):::proc\n    final[\"최종 키워드 트리<br/>책 → 검증된 테마 → 키워드\"]:::data\n  end\n  memo -->|\"문장 + 유저 생각\"| extract\n  extract --> concepts\n  concepts -->|\"벡터화\"| embed\n  embed -->|\"유사도 0.3 이상 상위 4개\"| place\n  place -->|\"위·아래 제안만\"| verify\n  verify -->|\"확정 또는 강등\"| tree1\n  tree1 -->|\"전체 키워드 쌍\"| dedup\n  dedup -->|\"root 직속 키워드들\"| themegen\n  themegen -->|\"인용 가능한 축만\"| themes\n  themes -->|\"테마별 독립 검증\"| critic\n  critic -->|\"승인 편성 · 기각 해체\"| final",
+    "stageOf": {
+      "extract": "extract",
+      "embed": "embed_concept",
+      "place": "place",
+      "verify": "verify_direction",
+      "dedup": "dedup_merge",
+      "themegen": "theme_gen",
+      "critic": "theme_critic"
+    }
+  },
+  "stages": [
+    {
+      "id": "extract",
+      "name": "키워드 추출",
+      "why": "- 메모는 서술형 문장이라 트리 노드로 쓸 수 없다.\n- 이 문장만의 구체적 명사구를 뽑아야 병합·테마 편성이 가능하다.\n- '디자인', '정보' 같은 일반어는 모든 메모에 걸려 트리를 뭉갠다.",
+      "how": "- 메모 문장과 유저 생각을 LLM 에 보내 핵심 키워드를 1~2개 뽑는다(온도 0.1).\n- 정말 별개 키워드가 섞였을 때만 2개를 허용한다.\n- V5와 같게 고정했다 — 셔플 안정성을 공정하게 비교하기 위해서다.",
+      "params": [
+        {
+          "name": "MODEL",
+          "value": "gpt-4o-mini",
+          "meaning": "추출·배치에 사용하는 LLM (EVAL_MODEL로 덮어쓰기 가능)",
+          "effect": "gpt-4o로 올리면 명사구 구체성이 높아지나 비용 증가. 단 critic은 별도로 gpt-4o 고정"
+        },
+        {
+          "name": "temperature_extract",
+          "value": 0.1,
+          "meaning": "키워드 추출 온도",
+          "effect": "높이면 일반어 금지 위반과 키워드 표현 흔들림이 늘어난다"
+        },
+        {
+          "name": "max_concepts_per_memo",
+          "value": 2,
+          "meaning": "메모당 최대 키워드 수",
+          "effect": "같은 메모에서 나온 키워드 2개는 자기중복 위험이 있어 Phase 1.5에서 강제 동의어 검사를 받는다"
+        }
+      ],
+      "prompt": "[문장] ${memo.text}\n[내 생각] ${memo.my || '(없음)'}\n\n이 메모의 핵심 개념을 뽑아라. 기본 1개. 정말로 별개의 두 개념이 섞였을 때만 2개. 한 개념을 측면별로 쪼개지 마라(예: \"질감\"과 \"기억\"은 하나).\n⚠ \"디자인\"·\"책\"·\"개념\"·\"정보\"처럼 너무 일반적인 단어 금지 — 이 문장만의 구체적 키워드로.\n출력 JSON: {\"concepts\":[{\"name\":\"짧은 명사구\",\"gloss\":\"한 줄 설명\"}]}",
+      "output": "메모마다 {name, gloss} 키워드 배열 (1~2개).",
+      "funnel": {
+        "in": 14,
+        "out": null
+      },
+      "llm": true
+    },
+    {
+      "id": "embed_concept",
+      "name": "키워드 임베딩 · 후보 검색",
+      "why": "- 새 키워드를 트리 전체와 LLM 으로 비교하면 비싸고 부정확하다.\n- 임베딩으로 닮은 후보만 좁혀 LLM 에 넘긴다.\n- 다만 코사인 유사도는 대칭이라 **어느 쪽이 넓은지는 모른다** — 방향 판단은 배치·검증의 몫이다.",
+      "how": "- `name: gloss` 를 `text-embedding-3-small` 로 벡터화한다.\n- 기존 키워드 노드와 유사도 0.3 이상인 것 중 상위 4개를 후보로 넘긴다.",
+      "params": [
+        {
+          "name": "embed_model",
+          "value": "text-embedding-3-small",
+          "meaning": "키워드 임베딩 모델",
+          "effect": "large로 바꾸면 유사 탐지 품질↑ 비용↑"
+        },
+        {
+          "name": "sim_threshold",
+          "value": 0.3,
+          "meaning": "후보 최소 유사도",
+          "effect": "낮추면 무관 후보 유입, 높이면 후보 소실"
+        },
+        {
+          "name": "top_k_cand",
+          "value": 4,
+          "meaning": "LLM에 넘길 후보 수",
+          "effect": "늘리면 선택지↑ 프롬프트 길이↑"
+        }
+      ],
+      "prompt": null,
+      "output": "새 키워드 벡터 + 유사도 상위 4개 후보 리스트.",
+      "funnel": {
+        "in": null,
+        "out": null
+      },
+      "llm": false
+    },
+    {
+      "id": "place",
+      "name": "위계 배치 — 치환 테스트 (V6의 A)",
+      "why": "- \"넓다/좁다\"는 LLM 에게 어려운 열린 판단이라 실행마다 뒤집혔다(V5).\n- **치환 테스트**로 바꾸면 쉬운 문제가 된다 — \"〈새 키워드〉은 〈후보〉의 한 종류/사례/부분이다\"가 자연스러운가.\n- 양방향 모두 자연스러우면 동의어를 의심하고, 모두 어색하면 그냥 붙인다.",
+      "how": "- 새 키워드 + 후보 4개 + 현재 트리를 LLM(온도 0.1)에 보내 연산을 JSON 으로 받는다.\n- 위·아래 판정은 **다음 단계의 교차검증을 거쳐야** 확정된다.",
+      "params": [
+        {
+          "name": "MAX_LEVEL",
+          "value": 3,
+          "meaning": "위계 최대 깊이 (root=L0)",
+          "effect": "초과하는 parent 승격은 root 직속으로 강등"
+        },
+        {
+          "name": "temperature_place",
+          "value": 0.1,
+          "meaning": "배치 판단 온도",
+          "effect": "0에 가까울수록 일관, 경계 케이스 발견력은 감소"
+        }
+      ],
+      "prompt": "이 새 개념을 트리에 어떻게 꽂을지 판단하라. 위계 판단은 아래 **치환 테스트**를 통과할 때만 한다:\n- op=\"merge\": 후보가 **같은 한 단어로 부를 같은 개념**(동의어·바꿔말하기)일 때만.\n- op=\"child\": 치환 테스트 → \"〈새 개념〉은 〈후보〉의 한 종류/사례/부분이다\" 문장이 자연스럽고, 그 역방향은 어색할 때만.\n- op=\"parent\": 역방향 치환 테스트 통과 시. adoptIds로 함께 편입할 기존 개념 지정. 남발 금지.\n- op=\"attach\": 치환 테스트가 양방향 모두 어색하거나 양방향 모두 자연스러우면(=동의어 의심이면 merge 검토) root 직속 leaf.\n확신 없으면 attach. 위계는 최대 3단까지만.",
+      "output": "op 제안. merge/attach는 즉시 적용, child/parent는 verify_direction으로 전달.",
+      "funnel": {
+        "in": null,
+        "out": null
+      },
+      "llm": true
+    },
+    {
+      "id": "verify_direction",
+      "name": "양방향 교차검증 (V6의 B)",
+      "why": "- 방향 판단은 제시 순서에 휘둘려서, 배치 1회 판정을 믿을 수 없다.\n- 맥락 없는 중립 문장으로 정방향·역방향을 따로 묻고, 일치할 때만 확정한다.\n- V5의 지어낸 위계를 걸러낸 핵심 장치다 — 실측에서 배치의 위·아래 제안 대부분이 여기서 기각됐고, 그 기각이 옳았다.",
+      "how": "- \"〈A〉는 〈B〉의 한 종류/사례/부분이다 — 자연스러운가?\"를 (A,B)와 (B,A) 두 방향으로 각각 호출한다(온도 0).\n- 정방향 yes + 역방향 no → **확정**.\n- 양방향 yes → 동의어 의심으로 합치기 강등.\n- 그 밖 → 그냥 붙이기 강등.\n- 강등은 `[flip]` 로그로 추적한다.",
+      "params": [
+        {
+          "name": "temperature_verify",
+          "value": 0,
+          "meaning": "검증 온도",
+          "effect": "판정 일관성 최우선으로 0 고정"
+        },
+        {
+          "name": "verify_calls",
+          "value": 2,
+          "meaning": "child/parent 제안당 추가 LLM 호출 수",
+          "effect": "child/parent가 드물어 총비용 영향 미미. 검증 없인 가짜 위계가 트리에 영구히 박힌다"
+        }
+      ],
+      "prompt": "책 \"${book.title}\"의 개념이다.\nA: ${a.name} — ${a.gloss}\nB: ${b.name} — ${b.gloss}\n\n\"${a.name}은(는) ${b.name}의 한 종류/사례/부분이다\" — 이 문장이 자연스러운가?\n출력 JSON: {\"natural\":true|false}",
+      "output": "확정된 child/parent만 트리에 위계로 반영. 나머지는 merge/attach로 강등.",
+      "funnel": {
+        "in": null,
+        "out": null
+      },
+      "llm": true
+    },
+    {
+      "id": "dedup_merge",
+      "name": "동의어 사후 병합 (Phase 1.5 + 같은 메모 쌍 강제검사)",
+      "why": "- 배치는 들어온 순서대로 처리해서 동의어를 놓칠 수 있다.\n- 특히 한 메모에서 뽑은 키워드 2개는 자기중복 위험이 크다('엑스포메이션'과 '미지화').\n- 이런 쌍은 유사도 문턱(0.55)을 못 넘어도 같은 키워드일 수 있어, **문턱을 무시하고 무조건 검사**한다.",
+      "how": "- 유사도 0.55 이상이거나 같은 메모 출신인 쌍을 후보로 올린다.\n- LLM(온도 0)에 동의어 여부를 묻는다.\n- 같다고 하면 남길 노드로 자식·출처를 옮기고 나머지를 지운다.\n- 이미 위계 관계인 쌍은 뺀다.",
+      "params": [
+        {
+          "name": "sim_dedup_threshold",
+          "value": 0.55,
+          "meaning": "동의어 후보 최소 유사도",
+          "effect": "낮추면 호출↑ 오병합 위험↑"
+        },
+        {
+          "name": "same_memo_force_check",
+          "value": true,
+          "meaning": "같은 메모 출신 쌍은 유사도 무관 검사 (V7 신규)",
+          "effect": "V5에서 3-run 모두 실패하던 같은 메모 자기중복(엑스포메이션=미지화)이 잡히게 됨"
+        }
+      ],
+      "prompt": "책 \"${book.title}\"에서 나온 두 개념이 **같은 한 단어로 부를 같은 개념**(동의어·바꿔말하기)인가, 아니면 관련될 뿐 다른 개념인가?\n관련·인접·같은 테마일 뿐이면 \"다름\"이다. 확신 없으면 \"다름\".\n출력 JSON: {\"same\":true|false,\"keep\":\"A|B\",\"reason\":\"한 줄\"}",
+      "output": "동의어가 합쳐진 트리.",
+      "funnel": {
+        "in": null,
+        "out": null
+      },
+      "llm": true
+    },
+    {
+      "id": "theme_gen",
+      "name": "테마 생성 — anchor + description 필수 (V7 핵심)",
+      "why": "- 수집 문장의 키워드 사이에 엄밀한 포함관계는 드물다(V6에서 실증).\n- 사용자가 원하는 \"정리되는 느낌\"은 키워드들이 **책의 논지 축**으로 묶이는 것이다.\n- 다만 뜬금없는 우산 키워드나 책 핵심과 어긋난 테마는 역효과다.\n- 그래서 책 요약·목차에서 근거 구절을 그대로 인용할 수 있을 때만 테마를 만든다.",
+      "how": "- root 직속 키워드 전체를 책 맥락(제목·저자·핵심 논지·목차)과 함께 LLM(온도 0.1)에 보낸다.\n- 테마마다 다음을 요구한다 — 이름, **인용(anchor)**, 설명 2~3문장, 멤버 2개 이상.\n- 인용할 구절이 없거나 멤버가 부족하면 테마를 만들지 않는다.",
+      "params": [
+        {
+          "name": "min_root_kids",
+          "value": 3,
+          "meaning": "테마 생성을 시도할 최소 root 직속 키워드 수",
+          "effect": "너무 적으면 묶을 게 없어 스킵"
+        },
+        {
+          "name": "min_members",
+          "value": 2,
+          "meaning": "테마당 최소 멤버 수",
+          "effect": "1이면 단일노드 중첩이 생겨 금지"
+        },
+        {
+          "name": "anchor_required",
+          "value": true,
+          "meaning": "책 맥락 인용 필수 (V7 핵심)",
+          "effect": "일반 상식 분류('삶의 지혜' 류)나 책과 무관한 우산 키워드가 구조적으로 차단된다"
+        }
+      ],
+      "prompt": "[책 맥락 — 테마의 근거는 반드시 여기서]\n책: ${book.title} · 핵심 논지: ${book.summary} · 목차 흐름: ${book.toc}\n\n**이 책을 읽은 독자의 머릿속에 자연스럽게 생기는 이해의 큰 축**만 테마로 만들어라.\n- 테마마다 anchor 필수: 핵심 논지·목차에서 근거 구절을 **그대로 인용**. 인용할 구절이 없으면 만들지 마라.\n- 테마마다 description 필수: 이 책이 이 테마로 무엇을 말하는지 + 왜 이 멤버들이 묶이는지, 2~3문장.\n- ⚠ memberIds 2개 미만 테마는 출력 금지. 어울리는 테마가 없는 개념은 그냥 남겨라.\n- 테마명은 멤버 이름 복사·목차 복붙 금지.\n출력 JSON: {\"themes\":[{\"name\",\"anchor\",\"description\",\"memberIds\"}]}",
+      "output": "anchor·description을 갖춘 테마 후보 목록 (보통 3개 내외).",
+      "funnel": {
+        "in": null,
+        "out": null
+      },
+      "llm": true
+    },
+    {
+      "id": "theme_critic",
+      "name": "테마 critic 반증 — 인용해야만 기각 가능",
+      "why": "- 만든 쪽이 스스로 승인하면 자화자찬이 된다(작성자 ≠ 검토자).\n- 그런데 V7 초판의 \"회의적으로 반증하라, 확신 없으면 기각\" 지시는 mini 에게 **기각 도장**이 되어 책 핵심 테마까지 전부 날렸다.\n- 그래서 \"분위기 판정 금지, 기각하려면 어긋나는 대목을 인용하라\"로 고쳤다 — 판정을 검증 가능한 문제로 바꾸는 것이 핵심.",
+      "how": "- 테마마다 독립 critic 을 호출한다(gpt-4o, 온도 0).\n- ① 인용이 책 맥락의 실제 구절과 맞으면 기각할 수 없다.\n- ② 기각은 인용이 지어낸 구절이거나 설명이 책 주장과 정면으로 어긋남을 **인용으로 보일 때만** 가능하다.\n- ③ 테마는 타당한데 일부 멤버만 억지면 그 멤버만 뺀다.\n- 기각된 테마는 해체되고 멤버는 최상위에 남는다.",
+      "params": [
+        {
+          "name": "critic_model",
+          "value": "gpt-4o",
+          "meaning": "critic 전용 모델 (본체 mini와 분리)",
+          "effect": "mini critic은 판정 지시를 패턴 복사해 전부 기각/전부 승인으로 쏠린다. 테마 수가 적어 비용 영향 미미"
+        },
+        {
+          "name": "temperature_critic",
+          "value": 0,
+          "meaning": "critic 온도",
+          "effect": "판정 일관성 고정"
+        }
+      ],
+      "prompt": "아래 \"테마\"가 이 책의 핵심 내용에 부합하는 우산 개념인지 검증하라. 판정은 반드시 **인용 근거**로 한다 — 분위기로 판단하지 마라.\n판정 절차:\n1) anchor가 [책 맥락]의 실제 구절과 대응하는가? 대응하면 기각하지 마라.\n2) 기각(valid=false)은 다음을 **구체적 인용과 함께** 보일 수 있을 때만: anchor가 지어낸 구절 / description이 책 맥락과 정면으로 어긋남 / 테마명이 멤버 절반 이상과 무관.\n3) 일부 멤버만 억지 편입이면 valid=true + dropMemberIds.\n출력 JSON: {\"valid\":true|false,\"dropMemberIds\":[],\"reason\":\"판정 근거 인용 포함 한 줄\"}",
+      "output": "승인된 테마만 트리에 편성(멤버 safeReparent). 최종 트리 = 책 → 검증된 테마 → 키워드. 실측: 3대 논지 축(재발견/정보의 건축+감각/비움)이 셔플 3회 모두 재현, 기각 0.",
+      "funnel": {
+        "in": null,
+        "out": null
+      },
+      "llm": true
+    }
+  ],
+  "knownIssues": [
+    "경계에 걸친 키워드의 테마 소속이 실행마다 바뀐다 — '여백의 전달력'이 정보 테마(run1·2)와 비움 테마(run3)를 오갔다. 키워드 자체가 양쪽에 걸친 케이스라 심각도는 낮다",
+    "테마 이름의 표현이 실행마다 다르다('디자인의 재발견' ↔ '디자인의 재구성') — 뜻은 같은데 문자열이 어긋난다. 누적 인제스트에서 기존 테마를 재사용하도록 붙잡는 장치가 필요하다(미구현)",
+    "critic 은 gpt-4o 가 필수다 — mini 로 내리면 기각 도장 문제가 재발한다. 테마 수가 적어 비용 영향은 작지만 온디바이스 이행에는 제약이다",
+    "문학 장르(조르바 등)에서는 검증되지 않았다 — 인용 방식이 논지가 뚜렷한 비문학에서만 확인됐고, 서사 중심 책에서 요약 인용이 잘 되는지 확인이 필요하다",
+    "위계쌍 자카드가 11% → 32% 로 올랐지만 여전히 낮다 — 남은 불안정의 대부분은 위의 경계 키워드·테마명 흔들림에서 온다",
+    "키워드 설명이 한 줄뿐인 문제는 V8에서 planIngest 통합으로 해결됐다 — 키워드 노드 설명이 알라딘 리치데이터 기반 개요 전문으로 바뀌었다"
+  ]
+}

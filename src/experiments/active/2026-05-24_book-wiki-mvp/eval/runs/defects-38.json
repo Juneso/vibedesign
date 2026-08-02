@@ -1,0 +1,33 @@
+{
+  "label": "호모 루덴스",
+  "runAt": "2026-07-26T06:03:18.184Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-65.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 27,
+  "total": 2,
+  "density": 0.074,
+  "byType": {
+    "relationMiss": 1,
+    "misplaced": 1
+  },
+  "defects": [
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n66",
+      "title": "놀이의 사회적 측면 · 예시",
+      "why": "자식 '놀이의 공간적 특성'은 놀이의 사회적 측면을 구체적 사례로 제시하는 것이 아니라 놀이의 특성을 설명하고 있다."
+    },
+    {
+      "type": "misplaced",
+      "by": "llm",
+      "nodeId": "n67",
+      "otherId": "n66",
+      "title": "전쟁과 놀이의 관계 · 비교",
+      "why": "전쟁과 놀이의 관계는 놀이의 사회적 측면과 비교되는 것이 아니라 놀이의 문화적 기능과 관련이 있어야 한다."
+    }
+  ],
+  "reading": "개념 27개 중 결함 2건 — 관계-멤버 불일치 1 · 오배치 1"
+}

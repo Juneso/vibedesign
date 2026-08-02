@@ -1,0 +1,38 @@
+{
+  "label": "돈으로 살 수 없는 것들",
+  "runAt": "2026-07-26T03:19:35.033Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-47.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 17,
+  "total": 3,
+  "density": 0.176,
+  "byType": {
+    "relationMiss": 3
+  },
+  "defects": [
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n36",
+      "title": "상품화의 사회적 영향 · 분석",
+      "why": "자식 '라이브콘서트'·'출산 허가증'은 상품화의 사회적 영향이 아니라 상품화의 결과로 나타나는 현상이다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n37",
+      "title": "금전적 거래의 사회적 변화 · 인과",
+      "why": "자식 '금전적 지불'·'시민의 의무'는 금전적 거래의 사회적 변화가 아니라 그로 인해 발생하는 사회적 변화의 결과이다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n39",
+      "title": "경제적 인센티브와 사회적 가치의 충돌 · 대조",
+      "why": "자식 '재정적 인센티브가 보호해야 할 태도와 규범을 변질시킬 수 있는지 고려해야 한다.'·'재정적 인센티브가 공공정신에서 우러난 활동을 보상받기 위한 노동으로 바꿀 수 있다.'는 경제적 인센티브와 사회적 가치의 충돌이 아니라 그 결과로 나타나는 현상이다."
+    }
+  ],
+  "reading": "개념 17개 중 결함 3건 — 관계-멤버 불일치 3"
+}

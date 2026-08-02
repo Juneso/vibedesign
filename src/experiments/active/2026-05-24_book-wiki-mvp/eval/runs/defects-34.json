@@ -1,0 +1,33 @@
+{
+  "label": "기술적복제시대의 예술작품",
+  "runAt": "2026-07-26T06:03:07.385Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-61.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 18,
+  "total": 2,
+  "density": 0.111,
+  "byType": {
+    "relationMiss": 1,
+    "misplaced": 1
+  },
+  "defects": [
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n50",
+      "title": "진본성과 복제의 관계 · 분석",
+      "why": "자식 '진본성'·'정신의 분산'·'영화의 물질성과 상호작용'은 진본성과 복제의 관계를 이루는 구성 요소가 아니라 그 자체로 독립된 개념이다."
+    },
+    {
+      "type": "misplaced",
+      "by": "llm",
+      "nodeId": "n51",
+      "otherId": "n47",
+      "title": "대중의 예술 수용 변화 · 인과",
+      "why": "'대중의 예술 수용 변화'는 '아우라의 붕괴'와 관련된 개념이 아니라 기술적 복제와 관련된 인과적 관계에 있어야 한다."
+    }
+  ],
+  "reading": "개념 18개 중 결함 2건 — 관계-멤버 불일치 1 · 오배치 1"
+}

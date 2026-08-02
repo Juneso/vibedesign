@@ -1,0 +1,50 @@
+{
+  "label": "돈으로 살 수 없는 것들",
+  "runAt": "2026-07-26T02:40:11.415Z",
+  "kind": "defects",
+  "sourceRun": "runs/hier-auto-43.json",
+  "sourceVariant": "v11",
+  "model": "gpt-4o-mini",
+  "nConcepts": 19,
+  "total": 4,
+  "density": 0.211,
+  "byType": {
+    "loneChild": 1,
+    "relationMiss": 2,
+    "misplaced": 1
+  },
+  "defects": [
+    {
+      "type": "loneChild",
+      "by": "code",
+      "nodeId": "n36",
+      "title": "상품화의 한계 · 분석",
+      "why": "자식이 \"라이브콘서트\" 하나뿐이다"
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n35",
+      "otherId": "n4",
+      "title": "시장 규범과 비시장 규범의 충돌 · 대조",
+      "why": "자식 '줄서기 도덕'은 시장 규범과 비시장 규범의 충돌을 다루고 있지만, 실제로는 비시장 규범의 일종으로 대조의 관계가 아니다."
+    },
+    {
+      "type": "relationMiss",
+      "by": "llm",
+      "nodeId": "n38",
+      "otherId": "n15",
+      "title": "시장 효율성과 사회적 선 · 대조",
+      "why": "자식 '시장은 선택의 가치를 평가하지 않고'는 시장 효율성과 사회적 선의 대조 관계에 적합하지 않다."
+    },
+    {
+      "type": "misplaced",
+      "by": "llm",
+      "nodeId": "n40",
+      "otherId": "n13",
+      "title": "상업적 영향 · 대조",
+      "why": "자식 '상업용 광고'는 상업적 영향의 범주에 속하지만, 그 내용은 사회적 배경과의 대조 관계에 더 적합하다."
+    }
+  ],
+  "reading": "개념 19개 중 결함 4건 — 관계-멤버 불일치 2 · 자식 1개 축 1 · 오배치 1"
+}

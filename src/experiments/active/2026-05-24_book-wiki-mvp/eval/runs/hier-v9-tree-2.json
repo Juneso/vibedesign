@@ -1,0 +1,580 @@
+{
+  "label": "디자인과 인간 심리",
+  "runAt": "2026-07-23T05:02:21.995Z",
+  "kind": "hier-v9-tree",
+  "variant": "v9",
+  "model": "gpt-4o-mini",
+  "note": "hier-v9-batch 스냅샷에서 변환 — 재실행 없음. 목차 없는 폴백 모드 결과다.",
+  "memoN": 46,
+  "stability": {
+    "agree": 1,
+    "jac": 1
+  },
+  "counts": {
+    "keywords": 44,
+    "promoted": 7,
+    "thick": 2
+  },
+  "tree": {
+    "rootId": "root",
+    "nodes": [
+      {
+        "id": "root",
+        "title": "디자인과 인간 심리",
+        "parentId": null,
+        "level": 0,
+        "kind": "root",
+        "sources": []
+      },
+      {
+        "id": "n1",
+        "title": "제품에 대한 통제권 (p.8)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          8
+        ],
+        "gloss": "이 책은 생활에 있는 제품에 대한 통제권을 돌려주는 것을 목표로 한다."
+      },
+      {
+        "id": "n2",
+        "title": "좋은 디자인의 특성 (p.23)",
+        "parentId": "n46",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          23
+        ],
+        "gloss": "좋은 디자인은 발견 가능성과 이해라는 두 가지 중요한 특성을 가진다."
+      },
+      {
+        "id": "n3",
+        "title": "인간 행동 (p.28)",
+        "parentId": "n49",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          28
+        ],
+        "gloss": "우리는 인간 행동을 있는 그대로 받아들여야 한다."
+      },
+      {
+        "id": "n4",
+        "title": "좋은 디자인 (p.29)",
+        "parentId": "n46",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          29
+        ],
+        "gloss": "좋은 디자인은 기계와 인간 간의 효과적인 의사소통을 필요로 한다."
+      },
+      {
+        "id": "n5",
+        "title": "좋은 개념 모형 (p.56)",
+        "parentId": "n52",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          56,
+          134
+        ],
+        "gloss": "좋은 개념 모형은 일이 잘못될 때 사용자를 안내하는 데 중요하다."
+      },
+      {
+        "id": "n6",
+        "title": "기술의 역설 (p.58)",
+        "parentId": "n48",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          58
+        ],
+        "gloss": "기술이 장치에 더 많은 기능을 제공하여 삶을 단순화하려 하지만, 실제로는 장치를 배우고 사용하기 더 어렵게 만들어 삶을 복잡하게 만든다."
+      },
+      {
+        "id": "n7",
+        "title": "디자이너의 역할 (p.7)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          7
+        ],
+        "gloss": "디자이너는 목표 설정과 근본 원인 분석을 통해 실행과 평가의 간격을 연결하는 역할을 한다."
+      },
+      {
+        "id": "n8",
+        "title": "기회주의적 행위 (p.70)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          70
+        ],
+        "gloss": "기회주의적 행위는 구체적인 목표나 의도를 가지고 있지 않으며, 주변 환경을 이용하는 행동이다."
+      },
+      {
+        "id": "n9",
+        "title": "감정 시스템 (p.74)",
+        "parentId": "n51",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          74
+        ],
+        "gloss": "감정 시스템은 인지와 함께 작동하며, 상황의 안전성 및 가치를 결정하는 강력한 정보처리 시스템이다."
+      },
+      {
+        "id": "n10",
+        "title": "즉각적인 상태 변화 (p.1)",
+        "parentId": "n50",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          1
+        ],
+        "gloss": "즉각적인 상태 변화는 맥락이나 내력에 비교적 영향을 받지 않는다."
+      },
+      {
+        "id": "n11",
+        "title": "피드백 (p.2)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          2
+        ],
+        "gloss": "피드백은 기대를 관리하는 데 핵심이며, 좋은 디자인은 피드백을 제공한다."
+      },
+      {
+        "id": "n12",
+        "title": "미래 예측 (p.3)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          3
+        ],
+        "gloss": "미래에 대한 예측은 감정의 동요를 가져온다."
+      },
+      {
+        "id": "n13",
+        "title": "놀이공원 (p.83)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          83
+        ],
+        "gloss": "놀이공원은 감정적 단계의 갈등적 반응에 균형을 맞추는 전문가이다."
+      },
+      {
+        "id": "n14",
+        "title": "몰입 상태 (p.85)",
+        "parentId": "n50",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          85
+        ],
+        "gloss": "몰입 상태는 활동의 도전 수준이 우리의 기술 수준을 아주 살짝 초과할 때 발생한다."
+      },
+      {
+        "id": "n15",
+        "title": "개념모형 (p.85)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          85,
+          87
+        ],
+        "gloss": "개념모형은 우리의 경험을 이해하고 행위의 결과를 예측하는 데 필수적이다."
+      },
+      {
+        "id": "n16",
+        "title": "행동 귀인 (p.90)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          90
+        ],
+        "gloss": "사람들은 자신의 행동을 환경 탓으로 돌리지만, 타인의 행동은 성격 탓으로 귀인하는 경향이 있다."
+      },
+      {
+        "id": "n17",
+        "title": "인간 오류 (p.95)",
+        "parentId": "n49",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          95
+        ],
+        "gloss": "인간 오류는 보통 나쁜 디자인의 결과이다."
+      },
+      {
+        "id": "n18",
+        "title": "복잡한 시스템 (p.104)",
+        "parentId": "n51",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          104
+        ],
+        "gloss": "제품과 우리의 상호작용 중 대부분은 복잡한 시스템과의 상호작용이다."
+      },
+      {
+        "id": "n19",
+        "title": "보안의 역설 (p.125)",
+        "parentId": "n48",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          125
+        ],
+        "gloss": "무엇인가를 너무 안전하게 하면, 그것은 덜 안전해진다."
+      },
+      {
+        "id": "n20",
+        "title": "기억의 종류 (p.129)",
+        "parentId": "n47",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          129
+        ],
+        "gloss": "기억은 단기 기억과 장기 기억으로 나뉘며, 의미 있는 기억은 의미적 기억으로 분류된다."
+      },
+      {
+        "id": "n22",
+        "title": "기억의 구조 (p.135)",
+        "parentId": "n47",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          135
+        ],
+        "gloss": "디자인은 의미 있는 구조를 제공하여 사람들이 기억할 필요 없게 만드는 것이 중요하다."
+      },
+      {
+        "id": "n23",
+        "title": "기억 보조물 (p.138)",
+        "parentId": "n47",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          138
+        ],
+        "gloss": "기억 보조물은 머릿속의 지식과 세상 속의 지식을 결합하여 인지 기억을 도와준다."
+      },
+      {
+        "id": "n24",
+        "title": "스크롤 (p.157)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          157
+        ],
+        "gloss": "스크롤은 창과 텍스트 간의 상호작용을 결정짓는 요소이다."
+      },
+      {
+        "id": "n25",
+        "title": "디자인의 의미 (p.158)",
+        "parentId": "n46",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          158
+        ],
+        "gloss": "디자인은 관점과 비유의 선택, 즉 문화에 따라 달라진다."
+      },
+      {
+        "id": "n26",
+        "title": "디자인에서의 제약 (p.163)",
+        "parentId": "n46",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          163
+        ],
+        "gloss": "디자인에서 제약의 사려깊은 사용은 사람들이 새로운 상황에서도 적당한 행동 방침을 즉각 결정할 수 있게 한다."
+      },
+      {
+        "id": "n27",
+        "title": "활동 중심 조절기 (p.180)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          180
+        ],
+        "gloss": "활동 중심 조절기는 활동이 실제 요구 조건에 대응하도록 신중하게 선택되어야 한다."
+      },
+      {
+        "id": "n28",
+        "title": "창의적 존재 (p.212)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          212
+        ],
+        "gloss": "사람들은 창의적이고, 건설적이며, 탐색적인 존재이다."
+      },
+      {
+        "id": "n29",
+        "title": "강제기능 (p.221)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          221
+        ],
+        "gloss": "강제기능은 특정 행동을 유도하는 효과적인 방법이다."
+      },
+      {
+        "id": "n30",
+        "title": "후견지명 (p.228)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          228
+        ],
+        "gloss": "후견지명은 예견보다 우수하다."
+      },
+      {
+        "id": "n31",
+        "title": "디자인의 난제 (p.229)",
+        "parentId": "n46",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          229
+        ],
+        "gloss": "디자인의 난제는 시스템의 상태에 관한 정보를 이해하고 해석하기 쉬운 방식으로 제시하는 것이다."
+      },
+      {
+        "id": "n32",
+        "title": "정상적인 대화 (p.244)",
+        "parentId": "n52",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          244
+        ],
+        "gloss": "정상적인 대화에서는 오류가 발생하더라도 그것이 오류로 취급되지 않으며, 상호 이해를 위해 질문하고 논의하는 과정이 중요하다."
+      },
+      {
+        "id": "n33",
+        "title": "자동화의 역설 (p.249)",
+        "parentId": "n48",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          249
+        ],
+        "gloss": "사고는 여러 변수 중 하나라도 발생하지 않으면 일어나지 않으며, 디자인은 실수와 착오를 막기 위해 행위의 함축을 명확히 해야 한다."
+      },
+      {
+        "id": "n34",
+        "title": "자동화 실패 (p.260)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          260
+        ],
+        "gloss": "자동화가 실패할 때는 종종 경고 없이 발생하며, 인간은 그 조작에 주의를 기울이지 않기 때문에 실패를 탐지하고 평가하는 데 시간이 걸린다."
+      },
+      {
+        "id": "n35",
+        "title": "실재 문제 (p.268)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          268
+        ],
+        "gloss": "문제들은 발견되어야 하며 표면 문제만을 보고 실재 문제를 건드리기 위해서는 깊이 파고들어야 한다."
+      },
+      {
+        "id": "n36",
+        "title": "HCD (p.269)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          269
+        ],
+        "gloss": "HCD는 사람의 필요를 충족하고 긍정적이고 즐거운 사용자 경험을 보장하는 디자인 과정이다."
+      },
+      {
+        "id": "n37",
+        "title": "요구 조건 (p.281)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          281
+        ],
+        "gloss": "요구 조건은 자연스러운 환경에서 사람들을 관찰하여 개발되어야 한다."
+      },
+      {
+        "id": "n38",
+        "title": "활동을 위한 디자인 (p.283)",
+        "parentId": "n46",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          283
+        ],
+        "gloss": "활동을 위한 디자인은 여러 과제를 함께 제시하여 매끄럽게 작동하도록 지원한다."
+      },
+      {
+        "id": "n39",
+        "title": "고객 연구 (p.293)",
+        "parentId": "n52",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          293
+        ],
+        "gloss": "디자인 과정에서 제품을 구입하는 고객과 실제로 사용하는 고객 모두를 연구하는 것이 중요하다."
+      },
+      {
+        "id": "n40",
+        "title": "혼란의 원인 (p.299)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          299
+        ],
+        "gloss": "혼란은 부엌에 있지 않고 마음속에 있다."
+      },
+      {
+        "id": "n41",
+        "title": "디자인 규칙 (p.323)",
+        "parentId": "n46",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          323
+        ],
+        "gloss": "시간이 지나도 인간 존재의 근본적인 심리는 변하지 않기 때문에 디자인 규칙은 계속 적용될 것이다."
+      },
+      {
+        "id": "n42",
+        "title": "언덕 오르기 (p.336)",
+        "parentId": "root",
+        "level": 1,
+        "kind": "keyword",
+        "sources": [
+          336
+        ],
+        "gloss": "언덕 오르기는 출발한 언덕의 정상에 도달하는 방법이지만, 더 높은 언덕을 찾는 것은 아니다."
+      },
+      {
+        "id": "n43",
+        "title": "인간과 컴퓨터의 팀 (p.342)",
+        "parentId": "n49",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          342
+        ],
+        "gloss": "오늘날 세계에서 가장 뛰어난 체스 선수는 인간과 컴퓨터가 함께 일하는 팀이다."
+      },
+      {
+        "id": "n44",
+        "title": "디자인의 중요성 (p.351)",
+        "parentId": "n46",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          351
+        ],
+        "gloss": "디자인에서 작은 세세한 요소들이 중요하다는 것을 인식해야 한다."
+      },
+      {
+        "id": "n45",
+        "title": "디자인의 힘 (p.354)",
+        "parentId": "n46",
+        "level": 2,
+        "kind": "keyword",
+        "sources": [
+          354
+        ],
+        "gloss": "디자인은 평등을 이루는 데 강력한 도구이다."
+      },
+      {
+        "id": "n46",
+        "title": "디자인",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n47",
+        "title": "기억",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n48",
+        "title": "역설",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n49",
+        "title": "인간",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n50",
+        "title": "상태",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n51",
+        "title": "시스템",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      },
+      {
+        "id": "n52",
+        "title": "중요하다",
+        "parentId": "root",
+        "level": 1,
+        "kind": "promoted",
+        "sources": [],
+        "gloss": ""
+      }
+    ]
+  }
+}

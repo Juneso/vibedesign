@@ -1,0 +1,636 @@
+/* astryx 디자인시스템 — 이 실험 폴더 전용 (다른 실험 페이지로 새지 않도록 여기서만 import) */
+@import '@astryxdesign/core/reset.css';
+@import '@astryxdesign/core/astryx.css';
+@import '@astryxdesign/theme-neutral/theme.css';
+
+html, body, #app-root {
+  height: 100%;
+  margin: 0;
+}
+
+/* astryx 토큰은 light-dark()로 정의됨 → color-scheme를 light로 고정해
+   OS 다크모드에서도 배경·텍스트가 일관된 라이트 테마로 해석되게 한다. */
+html {
+  color-scheme: light;
+}
+
+body {
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  background: var(--color-background-body, #f1f4f7);
+  color: var(--color-text-primary, #0a1317);
+}
+
+/* 대시보드 셸 — 화면 전체를 좌우로 반분할 */
+.eval-app {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* 좌: 파이프라인 · 우: 활성 파이프라인의 eval 결과. 각 열 독립 스크롤. */
+.eval-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100%;
+  overflow: hidden;
+}
+
+.eval-split-col {
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.eval-pipeline-col {
+  border-right: 1px solid var(--color-border, #e5e5e5);
+}
+
+/* 파이프라인 선택 — 컴팩트 칩 리스트 */
+.eval-pl-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.eval-pl-chip {
+  padding: 5px 12px;
+  border: 1px solid var(--color-border-emphasized, #ccd3db);
+  border-radius: 999px;
+  background: var(--color-background-card, #fff);
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: nowrap; /* pill 안에서 줄바꿈되면 서로 겹쳐 보임 */
+  color: var(--color-text-primary, #111);
+}
+
+.eval-pl-chip:hover {
+  background: var(--color-background-muted, #f5f5f5);
+}
+
+/* 문서 제목 더블클릭 편집 */
+.pl-title-editable {
+  cursor: text;
+  border-bottom: 1px dashed transparent;
+}
+
+.pl-title-editable:hover {
+  border-bottom-color: var(--color-border-emphasized, #ccd3db);
+}
+
+.pl-title-input {
+  font: inherit;
+  font-size: 1.4rem;
+  font-weight: 700;
+  width: 100%;
+  padding: 2px 6px;
+  border: 1px solid var(--color-accent, #6366f1);
+  border-radius: 6px;
+  background: var(--color-background-card, #fff);
+  color: var(--color-text-primary, #111);
+  outline: none;
+}
+
+.eval-pl-chip.is-active {
+  border-color: var(--color-accent, #6366f1);
+  background: var(--color-accent-muted, #eef);
+  color: var(--color-text-accent, #4f46e5);
+  font-weight: 600;
+}
+
+.eval-runlist-group + .eval-runlist-group {
+  margin-top: 8px;
+}
+
+.eval-run-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  padding: 6px 10px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--color-text-primary, #111);
+}
+
+.eval-run-item:hover {
+  background: var(--color-background-muted, #f5f5f5);
+}
+
+.eval-run-item.is-active {
+  background: var(--color-accent-muted, #eef);
+  font-weight: 600;
+}
+
+.eval-series-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+  padding: 6px 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-text-primary, #111);
+  font-size: 13px;
+}
+
+.eval-series-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.eval-series-purpose {
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--color-text-secondary, #888);
+}
+
+.eval-run-item {
+  justify-content: space-between;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.eval-run-row {
+  border-radius: 6px;
+}
+
+.eval-run-row.is-expanded {
+  background: var(--color-background-muted, #fafafa);
+}
+
+.eval-run-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.eval-run-action {
+  flex: 0 0 auto;
+  padding-right: 6px;
+}
+
+.eval-run-body {
+  padding: 8px 12px 16px;
+}
+
+.eval-run-date {
+  font-size: 11px;
+  color: var(--color-text-secondary, #888);
+}
+
+.eval-md-pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  background: var(--color-background-muted, #f7f7f7);
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.eval-dropped {
+  opacity: 0.6;
+  margin-top: 24px;
+}
+
+/* ── eval 문서 md 렌더링 ─────────────────────────────────── */
+.eval-md {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+/* 문서 상단 메타(모델·순서·시간 등) — 칩 나열 */
+.eval-md-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.eval-md-chip {
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--color-background-muted, #f1f4f7);
+  color: var(--color-text-secondary, #667);
+  border: 1px solid var(--color-border, #e5e5e5);
+}
+
+.eval-md-section .eval-md-h {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-primary, #111);
+}
+
+/* 👀 체크포인트 — 이번 eval에서 봐야 할 것. 최상위 시각 위계 */
+.eval-md-section.is-checkpoint {
+  background: var(--color-accent-muted, #eef2ff);
+  border: 1.5px solid var(--color-accent, #6366f1);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.eval-md-section.is-checkpoint .eval-md-h {
+  color: var(--color-text-accent, #4f46e5);
+  font-size: 14px;
+}
+
+.eval-md-list {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.eval-md-p { margin: 0; }
+
+/* 단계별 서사 — 박스 하나에 담고 단계 사이는 박스 좌우 끝까지 닿는 보더로 나눈다 */
+.eval-md-narr {
+  border: 1px solid var(--color-border, #e2e6ec);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.eval-md-narr-step {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 좌우 여백 없이 박스에 닿는 구분선 — 첫 단계 위에는 두지 않는다 */
+.eval-md-narr-step + .eval-md-narr-step {
+  border-top: 1px solid var(--color-border, #e2e6ec);
+}
+
+.eval-md-narr-head {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-primary, #111);
+}
+
+.eval-md-quote {
+  border-left: 3px solid var(--color-border-emphasized, #ccd3db);
+  padding: 4px 12px;
+  color: var(--color-text-secondary, #667);
+  font-size: 12px;
+}
+
+.eval-md-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  background: var(--color-background-muted, #f1f4f7);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.eval-md-table {
+  border-collapse: collapse;
+  font-size: 12px;
+  width: 100%;
+}
+
+.eval-md-table th,
+.eval-md-table td {
+  border: 1px solid var(--color-border, #e5e5e5);
+  padding: 5px 10px;
+  text-align: left;
+}
+
+.eval-md-table th {
+  background: var(--color-background-muted, #f7f7f7);
+  font-weight: 600;
+}
+
+/* 긴 코드블록·로그 섹션 접기 */
+.eval-md-collapse > summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary, #667);
+  padding: 6px 0;
+  user-select: none;
+}
+
+.eval-md-collapse > summary:hover {
+  color: var(--color-text-primary, #111);
+}
+
+.eval-md-logsec {
+  border-top: 1px dashed var(--color-border, #e5e5e5);
+  padding-top: 4px;
+}
+
+/* ── PipelineView : 상세 구조도 ───────────────────────────── */
+/* 구조는 전부 마크다운 위계(제목·불렛·표)로 표현한다.
+   커스텀 박스·인용 스타일은 쓰지 않고, 흐름도만 Mermaid 가 그린 svg 를 감싼다. */
+
+.pl-doc {
+  gap: 18px;
+}
+
+/* 파이프라인 문서는 불렛 기호를 살린다 — 위계를 마크다운만으로 읽히게 하는 게 목적이라
+   점이 보여야 한다. (런 문서는 기존 모양을 유지하려고 여기서만 켠다) */
+.pl-doc .eval-md-list {
+  list-style: disc;
+  padding-left: 20px;
+}
+
+/* 마크다운 조각(goal / designIntent / why / how) — 블록 사이 간격만 준다 */
+.eval-md-frag {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 소제목(h5) — 섹션 제목(h4)보다 한 단계 아래 위계 */
+.eval-md-h5 {
+  margin: 10px 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary, #667);
+}
+
+.pl-flow-hint {
+  color: var(--color-text-secondary, #667);
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+/* ── Mermaid 흐름도 ─────────────────────────────────────── */
+.pl-mermaid {
+  border: 1px solid var(--color-border, #e5e5e5);
+  border-radius: 10px;
+  padding: 14px 10px;
+  background: var(--color-background-body, #fff);
+  overflow-x: auto;
+}
+
+.pl-mermaid svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* 노드 라벨 — 앱 본문 폰트에 맞춘다 (mermaid 기본 크기는 너무 크다) */
+.pl-mermaid .nodeLabel {
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.pl-mermaid .edgeLabel {
+  font-size: 11px;
+  color: var(--color-text-secondary, #667);
+  background: var(--color-background-body, #fff);
+}
+
+/* 노드 종류별 색 — 정의 파일의 `:::data` / `:::proc` / `:::human` 이 그대로 클래스가 된다.
+   Mermaid 가 svg 안에 `#id .node rect` 형태(=id 선택자)로 기본 스타일을 심어서
+   여기서 이기려면 !important 가 필요하다. classDef 로는 var(--토큰)을 못 쓴다. */
+.pl-mermaid .node.data > :is(rect, polygon, path) {
+  fill: var(--color-background-card, #fff) !important;
+  stroke: var(--color-border-emphasized, #ccd3db) !important;
+  stroke-width: 1px !important;
+}
+
+.pl-mermaid .node.proc > :is(rect, polygon, path) {
+  fill: var(--color-accent-muted, #eef2ff) !important;
+  stroke: var(--color-accent, #6366f1) !important;
+  stroke-width: 1.5px !important;
+}
+
+.pl-mermaid .node.human > :is(rect, polygon, path) {
+  fill: var(--color-background-muted, #f1f4f7) !important;
+  stroke: var(--color-border-emphasized, #ccd3db) !important;
+  stroke-width: 1.2px !important;
+  stroke-dasharray: 5 4 !important;
+}
+
+/* 역할 묶음(subgraph) — 단계들이 무슨 일을 하는 덩어리인지 보이게 하는 게 목적이라
+   테두리는 옅게 두고 제목만 또렷하게 한다. */
+.pl-mermaid .cluster > rect {
+  fill: var(--color-background-muted, #f7f9fb) !important;
+  stroke: var(--color-border, #e5e5e5) !important;
+  stroke-width: 1px !important;
+  rx: 10px;
+}
+
+.pl-mermaid .cluster-label .nodeLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-secondary, #667);
+}
+
+/* LLM 뱃지 — 흐름도 노드 라벨 안(mermaid 가 그린 span)과 상세 제목 옆에서 같은 모양을 쓴다.
+   "이 단계는 LLM 이 판단한다"는 표시라, 뱃지 없는 단계는 코드·임베딩으로만 정해진다는 뜻이 된다. */
+.pl-llm {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 0 5px;
+  border-radius: 4px;
+  border: 1px solid var(--color-accent, #6366f1);
+  background: var(--color-accent-muted, #eef2ff);
+  color: var(--color-text-accent, #4f46e5);
+  font-size: 9.5px;
+  font-weight: 700;
+  line-height: 15px;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* 처리 단계만 클릭 가능 */
+.pl-mermaid .node.is-clickable {
+  cursor: pointer;
+}
+
+.pl-mermaid .node.is-clickable:hover > :is(rect, polygon, path, circle) {
+  filter: brightness(0.96);
+}
+
+.pl-mermaid .node.is-selected > :is(rect, polygon, path, circle) {
+  stroke-width: 3px !important;
+}
+
+/* ── 선택된 단계의 상세 ───────────────────────────────────── */
+.pl-stage-detail {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border, #e5e5e5);
+}
+
+.pl-stage-detail .eval-md-h {
+  font-size: 14px;
+}
+
+.pl-param-table td:first-child {
+  white-space: nowrap;
+}
+
+.pl-prompt {
+  margin-top: 10px;
+}
+
+/* ── eval 키워드 트리 SVG ───────────────────────────────────── */
+.eval-tree-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--color-border, #e5e5e5);
+  border-radius: 10px;
+  padding: 8px;
+  background: var(--color-background-body, #fff);
+  margin-top: 8px;
+}
+
+.eval-tree-svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  font-family: inherit;
+}
+
+/* ── 트리 노드 상세 카드 ──────────────────────────────────── */
+.eval-tree-block {
+  margin-top: 8px;
+}
+
+.eval-tree-detail {
+  margin-top: 8px;
+  border: 1px solid var(--color-border, #e5e5e5);
+  border-left: 3px solid var(--color-accent, #2563eb);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--color-background-card, #fafafa);
+}
+
+.eval-tree-detail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.eval-tree-detail-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary, #111);
+}
+
+.eval-tree-detail-close {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-text-secondary, #666);
+  padding: 0 4px;
+}
+
+.eval-tree-detail-close:hover {
+  color: var(--color-text-primary, #111);
+}
+
+.eval-tree-detail-src {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--color-text-tertiary, #9ca3af);
+}
+
+.eval-tree-detail-gloss {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-primary, #333);
+}
+
+.eval-tree-detail-anchor {
+  margin-top: 6px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  font-style: italic;
+  color: var(--color-text-secondary, #666);
+  border-left: 2px solid var(--color-border-emphasized, #ccc);
+  padding-left: 8px;
+}
+
+/* ── 평가축 개요 ─────────────────────────────────────────────── */
+.eval-axis {
+  border: 1px solid var(--color-border, #e2e6ec);
+  border-radius: 10px;
+  overflow: hidden;
+  background: none; /* 로그 박스와 같은 규칙 — 배경 없이 보더로만 구분한다 */
+}
+.eval-axis.is-retired { opacity: 0.72; }
+
+.eval-axis-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border, #e2e6ec);
+}
+.eval-axis-titles { display: flex; flex-direction: column; gap: 2px; }
+
+.eval-axis-badge {
+  flex: none;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border-emphasized, #ccc);
+  color: var(--color-text-secondary, #666);
+  white-space: nowrap;
+}
+.eval-axis-badge.is-live { color: #0f7b45; border-color: #9dd6b6; }
+.eval-axis-badge.is-retired { color: #8a8f98; }
+.eval-axis-badge.is-planned { color: #9a6b12; border-color: #e3cb92; }
+
+.eval-axis-defs { margin: 0; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+.eval-axis-defs > div { display: grid; grid-template-columns: 76px 1fr; gap: 10px; align-items: start; }
+.eval-axis-defs dt {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--color-text-tertiary, #9ca3af);
+  padding-top: 1px;
+}
+.eval-axis-defs dd {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-text-primary, #333);
+}
+.eval-axis-caution { color: var(--color-text-secondary, #666); }
+
+.eval-axis-table-wrap {
+  border-top: 1px solid var(--color-border, #e2e6ec);
+  overflow-x: auto;
+}
+.eval-axis-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.eval-axis-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 11.5px;
+  color: var(--color-text-tertiary, #9ca3af);
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--color-border, #e2e6ec);
+}
+.eval-axis-table th:last-child, .eval-axis-num { text-align: right; }
+.eval-axis-table td { padding: 7px 16px; border-bottom: 1px solid var(--color-border, #f0f2f5); }
+.eval-axis-table tr:last-child td { border-bottom: none; }
+.eval-axis-num { font-variant-numeric: tabular-nums; color: var(--color-text-secondary, #666); white-space: nowrap; }

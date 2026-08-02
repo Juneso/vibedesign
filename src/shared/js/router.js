@@ -16,6 +16,8 @@ export const initRouter = () => {
   }
 
   const VIEWER_PATH = 'src/shared/viewer/viewer.html';
+  const EVAL_DASHBOARD_ID = '2026-07-03_eval-dashboard';
+  const EVAL_DASHBOARD_PATH = `src/experiments/active/${EVAL_DASHBOARD_ID}/index.html`;
   let firstValidLoadFn = null;
 
   const renderGroup = (title, items) => {
@@ -323,13 +325,106 @@ export const initRouter = () => {
     });
   };
 
-  const activeExp = experiments.filter(e => e.status === 'active');
-  const archiveExp = experiments.filter(e => e.status === 'archive');
-  const playgroundExp = experiments.filter(e => e.status === 'playground');
+  // ─── Canvas 모드: 기존 실험 목록 렌더 (eval-dashboard 제외) ───
+  const renderCanvas = () => {
+    firstValidLoadFn = null;
+    const activeExp = experiments.filter(e => e.status === 'active' && e.id !== EVAL_DASHBOARD_ID);
+    const archiveExp = experiments.filter(e => e.status === 'archive' && e.id !== EVAL_DASHBOARD_ID);
+    const playgroundExp = experiments.filter(e => e.status === 'playground' && e.id !== EVAL_DASHBOARD_ID);
 
-  renderGroup('Current', activeExp);
-  renderGroup('Archived', archiveExp);
-  renderPlayground('Playground', playgroundExp);
+    renderGroup('Current', activeExp);
+    renderGroup('Archived', archiveExp);
+    renderPlayground('Playground', playgroundExp);
+
+    if (firstValidLoadFn) firstValidLoadFn();
+  };
+
+  // ─── Logic 모드: eval 파이프라인을 셸 사이드바 항목으로 렌더 ───
+  const renderLogicItems = (pipelines) => {
+    let firstLogicLoad = null;
+
+    const header = document.createElement('div');
+    header.className = 'nav-section-title';
+    header.textContent = 'Eval 파이프라인';
+    desktopNav.appendChild(header);
+
+    // file → 라벨 span. 대시보드 본문에서 이름을 고치면 postMessage 로 여기 라벨도 갱신한다
+    const labelByFile = new Map();
+
+    const makeItem = (label, pipelineParam) => {
+      const item = document.createElement('a');
+      item.href = '#';
+      item.className = 'lab-nav-item logic-item';
+      item.innerHTML = `<span class="lab-nav-label"></span>`;
+      const labelEl = item.querySelector('.lab-nav-label');
+      labelEl.textContent = label;
+      labelByFile.set(pipelineParam, labelEl);
+      const load = (e) => {
+        e?.preventDefault();
+        document.querySelectorAll('.nav-group-title, .lab-nav-item, .mobile-nav-list li').forEach(el => el.classList.remove('active'));
+        item.classList.add('active');
+        iframeContainer.src = `${EVAL_DASHBOARD_PATH}?pipeline=${encodeURIComponent(pipelineParam)}`;
+      };
+      item.addEventListener('click', load);
+      desktopNav.appendChild(item);
+      if (!firstLogicLoad) firstLogicLoad = load;
+    };
+
+    // 대시보드 본문 제목과 같은 이름(shortTitle)을 쓰고, 같은 기준(order 내림차순)으로 정렬한다
+    [...pipelines]
+      .sort((a, b) => (b.order ?? 0) - (a.order ?? 0) || String(a.title || '').localeCompare(String(b.title || '')))
+      .forEach((p) => makeItem(p.shortTitle || p.title || p.file, p.file));
+    makeItem('기타 eval', '__misc__');
+
+    // 대시보드(iframe)에서 이름을 고치면 사이드바 라벨도 즉시 따라간다
+    window.addEventListener('message', (e) => {
+      const d = e.data;
+      if (!d || d.type !== 'pipeline-renamed') return;
+      const el = labelByFile.get(d.file);
+      if (el && d.shortTitle) el.textContent = d.shortTitle;
+    });
+
+    if (firstLogicLoad) firstLogicLoad();
+  };
+
+  const renderLogic = () => {
+    fetch('/api/eval/pipelines')
+      .then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
+      .then((pipelines) => renderLogicItems(Array.isArray(pipelines) ? pipelines : []))
+      .catch(() => {
+        const note = document.createElement('div');
+        note.className = 'nav-section-title';
+        note.textContent = 'dev 서버에서만 파이프라인 목록이 보입니다';
+        desktopNav.appendChild(note);
+        iframeContainer.src = EVAL_DASHBOARD_PATH;
+      });
+  };
+
+  // ─── 모드 컨트롤러 ───
+  const layout = document.querySelector('.lab-layout');
+  const MODE_KEY = 'lab-mode';
+  const applyMode = (mode) => {
+    const isLogic = mode === 'logic';
+    if (layout) {
+      layout.classList.toggle('mode-logic', isLogic);
+      layout.classList.toggle('mode-canvas', !isLogic);
+    }
+    document.querySelectorAll('.lab-mode-btn').forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.mode === mode);
+    });
+    try { localStorage.setItem(MODE_KEY, mode); } catch { /* ignore */ }
+
+    desktopNav.innerHTML = '';
+    if (isLogic) renderLogic();
+    else renderCanvas();
+  };
+
+  document.querySelectorAll('.lab-mode-btn').forEach((btn) => {
+    btn.addEventListener('click', () => applyMode(btn.dataset.mode));
+  });
+
+  let savedMode = 'canvas';
+  try { savedMode = localStorage.getItem(MODE_KEY) || 'canvas'; } catch { /* ignore */ }
 
   if (themeToggleLi && mobileNavList) {
     mobileNavList.appendChild(themeToggleLi);
@@ -340,7 +435,5 @@ export const initRouter = () => {
     desktopThemeBtn.addEventListener('click', toggleTheme);
   }
 
-  if (firstValidLoadFn) {
-    firstValidLoadFn();
-  }
+  applyMode(savedMode === 'logic' ? 'logic' : 'canvas');
 };
