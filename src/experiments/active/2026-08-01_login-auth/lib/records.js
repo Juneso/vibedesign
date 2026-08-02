@@ -1,7 +1,7 @@
 // 기록 저장소 목업. 모든 레코드는 user_id 필드로 auth uid에 귀속된다.
 // 익명 → 소셜 전환 후에도 uid가 같으므로 record.user_id는 값 변경 없이 그대로 유지된다.
 
-import { getAuthState } from './mockAuth.js';
+import { getAuthState } from './auth.js';
 
 const KEY = 'login-auth/records/v1';
 

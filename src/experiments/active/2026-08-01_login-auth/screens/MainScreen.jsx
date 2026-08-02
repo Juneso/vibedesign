@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAuthState, onAuthStateChange, signOut } from '../lib/mockAuth.js';
+import { getAuthState, onAuthStateChange, signOut } from '../lib/auth.js';
 import { getRecords, subscribeRecords, addRecord, resetRecords } from '../lib/records.js';
 import AuthNudgeSheet from './AuthNudgeSheet.jsx';
 

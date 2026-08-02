@@ -56,6 +56,6 @@ export const experiments = [
     status: 'active',
     path: 'src/experiments/active/2026-08-01_login-auth/index.html',
     folder: 'src/experiments/active/2026-08-01_login-auth',
-    files: ['index.html', 'main.jsx', 'App.jsx', 'style.css', 'meta.json', 'lib/mockAuth.js', 'lib/records.js', 'screens/MainScreen.jsx', 'screens/AuthNudgeSheet.jsx']
+    files: ['index.html', 'main.jsx', 'App.jsx', 'style.css', 'meta.json', 'lib/firebase.js', 'lib/auth.js', 'lib/records.js', 'screens/OnboardingScreen.jsx', 'screens/MainScreen.jsx', 'screens/AuthNudgeSheet.jsx']
   },
 ];
