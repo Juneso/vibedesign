@@ -1,0 +1,40 @@
+// claude -p transport (BKT-342 3단계) — 헤드리스 claude CLI 를 transport 계약
+// ({system,user} → 응답 텍스트)에 맞춘 어댑터. 재생성을 구독 요금 안에서 돌린다
+// (개발 루프 API 0원 방침의 실행 버전 — 설계 문서 "비용 전략" 2).
+//
+// 토큰·지연 로깅(onUsage)은 대고객 전환 대비 ④ — 런 로그에 쌓아 모델별
+// "메모 1건당 몇 원·몇 초" 단가표가 자동 축적되게 한다.
+
+import { spawn } from 'node:child_process';
+
+export function claudeCliTransport({ model = 'claude-haiku-4-5-20251001', bin = 'claude', timeoutMs = 180000, onUsage } = {}) {
+  return ({ system, user }) => new Promise((resolveP, rejectP) => {
+    const args = ['-p', '--output-format', 'json', '--model', model];
+    if (system) args.push('--system-prompt', system);
+    const t0 = Date.now();
+    const child = spawn(bin, args, { stdio: ['pipe', 'pipe', 'pipe'] });
+    const timer = setTimeout(() => { child.kill('SIGKILL'); rejectP(new Error(`claude -p 타임아웃 ${timeoutMs}ms`)); }, timeoutMs);
+    let out = '', err = '';
+    child.stdout.on('data', (d) => { out += d; });
+    child.stderr.on('data', (d) => { err += d; });
+    child.on('error', (e) => { clearTimeout(timer); rejectP(e); });
+    child.on('close', (code) => {
+      clearTimeout(timer);
+      if (code !== 0) return rejectP(new Error(`claude -p exit ${code}: ${err.slice(0, 300)}`));
+      let j;
+      try { j = JSON.parse(out); } catch { return rejectP(new Error(`claude -p 출력 파싱 실패: ${out.slice(0, 200)}`)); }
+      if (j.is_error) return rejectP(new Error(`claude -p 오류: ${String(j.result).slice(0, 300)}`));
+      onUsage?.({
+        model, ms: Date.now() - t0, apiMs: j.duration_api_ms ?? null,
+        inputTokens: j.usage?.input_tokens ?? null, outputTokens: j.usage?.output_tokens ?? null,
+        cacheReadTokens: j.usage?.cache_read_input_tokens ?? null, costUsd: j.total_cost_usd ?? null,
+      });
+      // 프롬프트는 "JSON만 출력"을 요구하지만 모델이 ```json 펜스를 두르는 일이 있다 — 벗겨서 반환
+      let text = String(j.result ?? '');
+      const m = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (m) text = m[1];
+      resolveP(text.trim());
+    });
+    child.stdin.end(user);
+  });
+}
