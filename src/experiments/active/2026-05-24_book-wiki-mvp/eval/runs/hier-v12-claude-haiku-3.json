@@ -1,0 +1,2926 @@
+{
+  "label": "hier-v12-claude-haiku-3",
+  "runAt": "2026-08-06T04:35:35.897Z",
+  "kind": "hier-v12",
+  "provider": "claude",
+  "promptVersion": "lift-v12.2",
+  "nMemos": 24,
+  "llmCalls": 1,
+  "counts": {
+    "memos": 24,
+    "claims": 85,
+    "clusters": 79,
+    "promoted": 4,
+    "blocks": 4,
+    "orphans": 0,
+    "contrastEdges": 27,
+    "escalation": [
+      "ds-b50-피로사회-1#c5(med)",
+      "ds-b50-피로사회-1#c6(med)",
+      "ds-b50-피로사회-5#c1(med)",
+      "ds-b50-피로사회-7#c6(med)",
+      "ds-b50-피로사회-14#c5(med)",
+      "ds-b50-피로사회-15#c4(med)",
+      "ds-b50-피로사회-17#c3(med)"
+    ]
+  },
+  "sec": 78.8,
+  "tree": {
+    "rootId": "n1",
+    "nodes": [
+      {
+        "id": "n1",
+        "title": "피로사회",
+        "parentId": null,
+        "level": 0,
+        "kind": "root",
+        "sources": []
+      },
+      {
+        "id": "n2",
+        "title": "신경성 질환과 긍정성의 폭력",
+        "parentId": "n1",
+        "level": 1,
+        "kind": "concept",
+        "role": "문제의식",
+        "sources": [
+          11,
+          13,
+          20,
+          52,
+          101
+        ],
+        "gloss": "신경성 질환이 21세기의 주요 병리이며, 긍정성의 과잉에서 비롯된 새로운 형태의 폭력이 기존 면역학적 틀로는 포착되지 않는 문제임을 제기한다"
+      },
+      {
+        "id": "n3",
+        "title": "신경성 질환",
+        "parentId": "n2",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          11
+        ],
+        "gloss": "신경성 질환들이 21세기 초의 병리학적 상황을 지배하고 있다",
+        "promoted": false,
+        "clusterId": "k0"
+      },
+      {
+        "id": "n4",
+        "title": "신경성 질환들이 21세기 초의 병리학적 상황을 지배하고 있다",
+        "parentId": "n3",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          11
+        ],
+        "gloss": "신경성 질환",
+        "memoId": "ds-b50-피로사회-0",
+        "claimKey": "ds-b50-피로사회-0#c1",
+        "devices": [
+          "예시"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n5",
+        "title": "경색성 질병",
+        "parentId": "n2",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          11
+        ],
+        "gloss": "신경성 질환은 전염성 질병이 아니라 경색성 질병이다",
+        "promoted": false,
+        "clusterId": "k1"
+      },
+      {
+        "id": "n6",
+        "title": "신경성 질환은 전염성 질병이 아니라 경색성 질병이다",
+        "parentId": "n5",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          11
+        ],
+        "gloss": "경색성 질병",
+        "memoId": "ds-b50-피로사회-0",
+        "claimKey": "ds-b50-피로사회-0#c2",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n7",
+        "title": "긍정성의 과잉",
+        "parentId": "n2",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          11
+        ],
+        "gloss": "신경성 질환은 면역학적 타자의 부정성이 아니라 긍정성의 과잉으로 인한다",
+        "promoted": false,
+        "clusterId": "k2"
+      },
+      {
+        "id": "n8",
+        "title": "신경성 질환은 면역학적 타자의 부정성이 아니라 긍정성의 과잉으로 인한다",
+        "parentId": "n7",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          11
+        ],
+        "gloss": "긍정성의 과잉",
+        "memoId": "ds-b50-피로사회-0",
+        "claimKey": "ds-b50-피로사회-0#c3",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n9",
+        "title": "새로운 구도",
+        "parentId": "n2",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          13
+        ],
+        "gloss": "사회는 면역학적 조직과 방어의 도식으로는 더 이상 파악할 수 없는 새로운 구도 속으로 진입했다.",
+        "promoted": false,
+        "clusterId": "k3"
+      },
+      {
+        "id": "n10",
+        "title": "사회는 면역학적 조직과 방어의 도식으로는 더 이상 파악할 수 없는 새로운 구도 속으로 진입했다.",
+        "parentId": "n9",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          13
+        ],
+        "gloss": "새로운 구도",
+        "memoId": "ds-b50-피로사회-1",
+        "claimKey": "ds-b50-피로사회-1#c1",
+        "devices": [
+          "대조",
+          "유추"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n11",
+        "title": "긍정성의 폭력",
+        "parentId": "n2",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          20
+        ],
+        "gloss": "긍정성의 폭력은 적대성을 전제하지 않으며 관용적이고 평화로운 사회에서 확산되고 눈에 덜 띈다.",
+        "promoted": false,
+        "clusterId": "k11"
+      },
+      {
+        "id": "n12",
+        "title": "긍정성의 폭력은 적대성을 전제하지 않으며 관용적이고 평화로운 사회에서 확산되고 눈에 덜 띈다.",
+        "parentId": "n11",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          20
+        ],
+        "gloss": "긍정성의 폭력",
+        "memoId": "ds-b50-피로사회-3",
+        "claimKey": "ds-b50-피로사회-3#c1",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n13",
+        "title": "동질적 공간",
+        "parentId": "n11",
+        "level": 3,
+        "kind": "concept",
+        "sources": [
+          20
+        ],
+        "gloss": "긍정성의 폭력이 깃드는 곳은 부정이 없고 양극화가 일어나지 않는 동질적인 공간이다.",
+        "promoted": false,
+        "clusterId": "k12"
+      },
+      {
+        "id": "n14",
+        "title": "긍정성의 폭력이 깃드는 곳은 부정이 없고 양극화가 일어나지 않는 동질적인 공간이다.",
+        "parentId": "n13",
+        "level": 4,
+        "kind": "sentence",
+        "sources": [
+          20
+        ],
+        "gloss": "동질적 공간",
+        "memoId": "ds-b50-피로사회-3",
+        "claimKey": "ds-b50-피로사회-3#c2",
+        "devices": [
+          "정의"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n15",
+        "title": "전면적 긍정화",
+        "parentId": "n2",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          52
+        ],
+        "gloss": "인간이 부정의 존재인 조건 하에서 세계의 전면적 긍정화는 무시할 수 없는 위험을 초래할 수 있다",
+        "promoted": false,
+        "clusterId": "k41"
+      },
+      {
+        "id": "n16",
+        "title": "인간이 부정의 존재인 조건 하에서 세계의 전면적 긍정화는 무시할 수 없는 위험을 초래할 수 있다",
+        "parentId": "n15",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          52
+        ],
+        "gloss": "전면적 긍정화",
+        "memoId": "ds-b50-피로사회-12",
+        "claimKey": "ds-b50-피로사회-12#c1",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n17",
+        "title": "긍정화",
+        "parentId": "n2",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          101
+        ],
+        "gloss": "사회의 긍정화는 폭력을 철폐하지 않는다",
+        "promoted": false,
+        "clusterId": "k69"
+      },
+      {
+        "id": "n18",
+        "title": "사회의 긍정화는 폭력을 철폐하지 않는다",
+        "parentId": "n17",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          101
+        ],
+        "gloss": "긍정화",
+        "memoId": "ds-b50-피로사회-20",
+        "claimKey": "ds-b50-피로사회-20#c1",
+        "devices": [
+          "통념 반박"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n19",
+        "title": "폭력",
+        "parentId": "n2",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          101
+        ],
+        "gloss": "폭력은 분쟁이나 갈등의 부정성에서만 발생하는 것이 아니다",
+        "promoted": false,
+        "clusterId": "k70"
+      },
+      {
+        "id": "n20",
+        "title": "폭력은 분쟁이나 갈등의 부정성에서만 발생하는 것이 아니다",
+        "parentId": "n19",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          101
+        ],
+        "gloss": "폭력",
+        "memoId": "ds-b50-피로사회-20",
+        "claimKey": "ds-b50-피로사회-20#c2",
+        "devices": [
+          "통념 반박"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n21",
+        "title": "동의",
+        "parentId": "n2",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          101
+        ],
+        "gloss": "동의는 폭력의 원천이 된다",
+        "promoted": false,
+        "clusterId": "k71"
+      },
+      {
+        "id": "n22",
+        "title": "동의는 폭력의 원천이 된다",
+        "parentId": "n21",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          101
+        ],
+        "gloss": "동의",
+        "memoId": "ds-b50-피로사회-20",
+        "claimKey": "ds-b50-피로사회-20#c3",
+        "devices": [
+          "정의"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n23",
+        "title": "긍정성",
+        "parentId": "n2",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          101
+        ],
+        "gloss": "긍정성은 폭력의 원천이 된다",
+        "promoted": false,
+        "clusterId": "k72"
+      },
+      {
+        "id": "n24",
+        "title": "긍정성은 폭력의 원천이 된다",
+        "parentId": "n23",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          101
+        ],
+        "gloss": "긍정성",
+        "memoId": "ds-b50-피로사회-20",
+        "claimKey": "ds-b50-피로사회-20#c4",
+        "devices": [
+          "정의"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n25",
+        "title": "규율에서 성과로의 이행",
+        "parentId": "n1",
+        "level": 1,
+        "kind": "concept",
+        "role": "배경",
+        "sources": [
+          13,
+          15,
+          23,
+          24,
+          28,
+          41,
+          43,
+          99
+        ],
+        "gloss": "규율사회에서 성과사회로의 전환 속에서 이질성 소실, 타자성의 상품화, 노동 주체의 변화를 통해 신경성 질환의 사회사적 배경을 설명한다"
+      },
+      {
+        "id": "n26",
+        "title": "이질성의 대체",
+        "parentId": "n38",
+        "level": 3,
+        "kind": "concept",
+        "sources": [
+          13
+        ],
+        "gloss": "이질성은 면역학의 근본 범주로서 모든 면역 반응의 대상이었으나, 오늘날 아무런 면역 반응도 일으키지 않는 차이로 대체되었다.",
+        "promoted": false,
+        "clusterId": "k4"
+      },
+      {
+        "id": "n27",
+        "title": "이질성은 면역학의 근본 범주로서 모든 면역 반응의 대상이었으나, 오늘날 아무런 면역 반응도 일으키지 않는 차이로 대체되었다.",
+        "parentId": "n26",
+        "level": 4,
+        "kind": "sentence",
+        "sources": [
+          13
+        ],
+        "gloss": "이질성의 대체",
+        "memoId": "ds-b50-피로사회-1",
+        "claimKey": "ds-b50-피로사회-1#c2",
+        "devices": [
+          "정의",
+          "대조",
+          "통시"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n28",
+        "title": "후기근대적 차이",
+        "parentId": "n25",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          13
+        ],
+        "gloss": "후기근대적 차이는 면역학적으로 무차별적이며, 격렬한 면역 반응을 촉발하는 가시가 빠져 있다.",
+        "promoted": false,
+        "clusterId": "k5"
+      },
+      {
+        "id": "n29",
+        "title": "후기근대적 차이는 면역학적으로 무차별적이며, 격렬한 면역 반응을 촉발하는 가시가 빠져 있다.",
+        "parentId": "n28",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          13
+        ],
+        "gloss": "후기근대적 차이",
+        "memoId": "ds-b50-피로사회-1",
+        "claimKey": "ds-b50-피로사회-1#c3",
+        "devices": [
+          "대조",
+          "묘사"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n30",
+        "title": "타자성",
+        "parentId": "n25",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          13
+        ],
+        "gloss": "타자성은 날카로운 이질성을 잃고 상투적인 소비주의로 전락했다.",
+        "promoted": false,
+        "clusterId": "k6"
+      },
+      {
+        "id": "n31",
+        "title": "타자성은 날카로운 이질성을 잃고 상투적인 소비주의로 전락했다.",
+        "parentId": "n30",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          13
+        ],
+        "gloss": "타자성",
+        "memoId": "ds-b50-피로사회-1",
+        "claimKey": "ds-b50-피로사회-1#c4",
+        "devices": [
+          "대조",
+          "묘사"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n32",
+        "title": "이국화",
+        "parentId": "n25",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          13
+        ],
+        "gloss": "낯선 것이 이국적인 것으로 변질되어 여행하는 관광객의 향유 대상이 됨으로써, 타자성의 소멸이 구체화된다.",
+        "promoted": false,
+        "clusterId": "k7"
+      },
+      {
+        "id": "n33",
+        "title": "낯선 것이 이국적인 것으로 변질되어 여행하는 관광객의 향유 대상이 됨으로써, 타자성의 소멸이 구체화된다.",
+        "parentId": "n32",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          13
+        ],
+        "gloss": "이국화",
+        "memoId": "ds-b50-피로사회-1",
+        "claimKey": "ds-b50-피로사회-1#c5",
+        "devices": [
+          "예시",
+          "통시"
+        ],
+        "confidence": "med"
+      },
+      {
+        "id": "n34",
+        "title": "소비자",
+        "parentId": "n25",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          13
+        ],
+        "gloss": "관광객 또는 소비자는 더 이상 면역학적 주체가 아니다.",
+        "promoted": false,
+        "clusterId": "k8"
+      },
+      {
+        "id": "n35",
+        "title": "관광객 또는 소비자는 더 이상 면역학적 주체가 아니다.",
+        "parentId": "n34",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          13
+        ],
+        "gloss": "소비자",
+        "memoId": "ds-b50-피로사회-1",
+        "claimKey": "ds-b50-피로사회-1#c6",
+        "devices": [
+          "통시"
+        ],
+        "confidence": "med"
+      },
+      {
+        "id": "n36",
+        "title": "면역학적 패러다임",
+        "parentId": "n25",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          15
+        ],
+        "gloss": "면역학적 패러다임은 세계화 과정과 양립하기 어렵다",
+        "promoted": false,
+        "clusterId": "k9"
+      },
+      {
+        "id": "n37",
+        "title": "면역학적 패러다임은 세계화 과정과 양립하기 어렵다",
+        "parentId": "n36",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          15
+        ],
+        "gloss": "면역학적 패러다임",
+        "memoId": "ds-b50-피로사회-2",
+        "claimKey": "ds-b50-피로사회-2#c1",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n38",
+        "title": "이질성",
+        "parentId": "n25",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          15
+        ],
+        "gloss": "면역 반응을 촉발하는 이질성이 탈경계 과정의 걸림돌이 된다",
+        "promoted": false,
+        "clusterId": "k10"
+      },
+      {
+        "id": "n39",
+        "title": "면역 반응을 촉발하는 이질성이 탈경계 과정의 걸림돌이 된다",
+        "parentId": "n38",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          15
+        ],
+        "gloss": "이질성",
+        "memoId": "ds-b50-피로사회-2",
+        "claimKey": "ds-b50-피로사회-2#c2",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n40",
+        "title": "성과사회",
+        "parentId": "n25",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          23,
+          24
+        ],
+        "gloss": "사회는 규율사회에서 성과사회로 변모했다.",
+        "promoted": true,
+        "clusterId": "k13"
+      },
+      {
+        "id": "n41",
+        "title": "사회는 규율사회에서 성과사회로 변모했다.",
+        "parentId": "n40",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          23
+        ],
+        "gloss": "성과사회",
+        "memoId": "ds-b50-피로사회-4",
+        "claimKey": "ds-b50-피로사회-4#c1",
+        "devices": [
+          "대조",
+          "통시"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n42",
+        "title": "성과사회는 무한한 '할 수 있음'과 긍정성을 특징으로 한다.",
+        "parentId": "n40",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          24
+        ],
+        "gloss": "성과사회",
+        "memoId": "ds-b50-피로사회-5",
+        "claimKey": "ds-b50-피로사회-5#c2",
+        "devices": [
+          "분석"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n43",
+        "title": "탈규제",
+        "parentId": "n25",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          24
+        ],
+        "gloss": "성과사회에서 탈규제의 경향이 부정성을 폐기한다.",
+        "promoted": false,
+        "clusterId": "k14"
+      },
+      {
+        "id": "n44",
+        "title": "성과사회에서 탈규제의 경향이 부정성을 폐기한다.",
+        "parentId": "n43",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          24
+        ],
+        "gloss": "탈규제",
+        "memoId": "ds-b50-피로사회-5",
+        "claimKey": "ds-b50-피로사회-5#c1",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "med"
+      },
+      {
+        "id": "n45",
+        "title": "규율사회와 성과사회",
+        "parentId": "n40",
+        "level": 3,
+        "kind": "concept",
+        "sources": [
+          24
+        ],
+        "gloss": "규율사회와 성과사회는 부정성과 긍정성에서 대조되며 서로 다른 인간형을 배출한다.",
+        "promoted": false,
+        "clusterId": "k15"
+      },
+      {
+        "id": "n46",
+        "title": "규율사회와 성과사회는 부정성과 긍정성에서 대조되며 서로 다른 인간형을 배출한다.",
+        "parentId": "n45",
+        "level": 4,
+        "kind": "sentence",
+        "sources": [
+          24
+        ],
+        "gloss": "규율사회와 성과사회",
+        "memoId": "ds-b50-피로사회-5",
+        "claimKey": "ds-b50-피로사회-5#c3",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n47",
+        "title": "노동하는 동물",
+        "parentId": "n25",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          28
+        ],
+        "gloss": "아렌트에 따르면, 근대에 이르러 인간은 노동하는 동물로 전락하여 모든 창조적 활동이 노동의 수준으로 하락하고 치명적 수동성으로 귀결된다.",
+        "promoted": false,
+        "clusterId": "k22"
+      },
+      {
+        "id": "n48",
+        "title": "아렌트에 따르면, 근대에 이르러 인간은 노동하는 동물로 전락하여 모든 창조적 활동이 노동의 수준으로 하락하고 치명적 수동성으로 귀결된다.",
+        "parentId": "n47",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          28
+        ],
+        "gloss": "노동하는 동물",
+        "memoId": "ds-b50-피로사회-7",
+        "claimKey": "ds-b50-피로사회-7#c6",
+        "devices": [
+          "인용",
+          "분석"
+        ],
+        "confidence": "med"
+      },
+      {
+        "id": "n49",
+        "title": "후기근대 노동",
+        "parentId": "n25",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          41
+        ],
+        "gloss": "후기근대의 노동하는 인간은 동물적이지 않으며 오히려 과도하게 활동적이고 신경과민 상태에 있다.",
+        "promoted": false,
+        "clusterId": "k23"
+      },
+      {
+        "id": "n50",
+        "title": "후기근대의 노동하는 인간은 동물적이지 않으며 오히려 과도하게 활동적이고 신경과민 상태에 있다.",
+        "parentId": "n49",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          41
+        ],
+        "gloss": "후기근대 노동",
+        "memoId": "ds-b50-피로사회-8",
+        "claimKey": "ds-b50-피로사회-8#c1",
+        "devices": [
+          "통념 반박"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n51",
+        "title": "노동사회",
+        "parentId": "n40",
+        "level": 3,
+        "kind": "concept",
+        "sources": [
+          43
+        ],
+        "gloss": "노동사회와 성과사회는 자유로운 사회가 아니며 계속 새로운 강제를 만들어낸다.",
+        "promoted": false,
+        "clusterId": "k30"
+      },
+      {
+        "id": "n52",
+        "title": "노동사회와 성과사회는 자유로운 사회가 아니며 계속 새로운 강제를 만들어낸다.",
+        "parentId": "n51",
+        "level": 4,
+        "kind": "sentence",
+        "sources": [
+          43
+        ],
+        "gloss": "노동사회",
+        "memoId": "ds-b50-피로사회-9",
+        "claimKey": "ds-b50-피로사회-9#c1",
+        "devices": [
+          "정의"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n53",
+        "title": "사회",
+        "parentId": "n25",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          99
+        ],
+        "gloss": "규율사회는 변함없는 정체성에 의존했으나, 성과주의적 후산업사회는 생산 증대를 위해 유연한 개인을 필요로 한다",
+        "promoted": false,
+        "clusterId": "k67"
+      },
+      {
+        "id": "n54",
+        "title": "규율사회는 변함없는 정체성에 의존했으나, 성과주의적 후산업사회는 생산 증대를 위해 유연한 개인을 필요로 한다",
+        "parentId": "n53",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          99
+        ],
+        "gloss": "사회",
+        "memoId": "ds-b50-피로사회-19",
+        "claimKey": "ds-b50-피로사회-19#c3",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n55",
+        "title": "성과주체의 자기착취와 피로",
+        "parentId": "n1",
+        "level": 1,
+        "kind": "concept",
+        "role": "진단",
+        "sources": [
+          26,
+          94,
+          95,
+          28,
+          102,
+          103,
+          41,
+          66,
+          91,
+          99,
+          114
+        ],
+        "gloss": "성과사회의 성과주체가 우울증, 자기착취, 분열적 피로, 공허한 자아에 빠지는 인과 메커니즘을 분석하며, 성격 없는 유연한 인간의 형성 과정을 진단한다"
+      },
+      {
+        "id": "n56",
+        "title": "우울증",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          26,
+          94,
+          95
+        ],
+        "gloss": "우울증은 규율적 행위 조종의 모델이 새로운 성과 규범으로 대체되는 순간부터 나타나는 현상이다.",
+        "promoted": true,
+        "clusterId": "k16"
+      },
+      {
+        "id": "n57",
+        "title": "우울증은 규율적 행위 조종의 모델이 새로운 성과 규범으로 대체되는 순간부터 나타나는 현상이다.",
+        "parentId": "n56",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          26
+        ],
+        "gloss": "우울증",
+        "memoId": "ds-b50-피로사회-6",
+        "claimKey": "ds-b50-피로사회-6#c1",
+        "devices": [
+          "정의",
+          "대조",
+          "인과",
+          "인용"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n58",
+        "title": "우울증은 타자의 차원이 개입되지 않는 특성을 갖는다",
+        "parentId": "n56",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          94
+        ],
+        "gloss": "우울증",
+        "memoId": "ds-b50-피로사회-17",
+        "claimKey": "ds-b50-피로사회-17#c1",
+        "devices": [
+          "정의"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n59",
+        "title": "우울증은 대상을 갖지 않으므로 무방향성인 반면 슬픔은 대상과의 강력한 리비도적 유대에서 발생한다는 점에서 구별된다",
+        "parentId": "n56",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          95
+        ],
+        "gloss": "우울증",
+        "memoId": "ds-b50-피로사회-18",
+        "claimKey": "ds-b50-피로사회-18#c4",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n60",
+        "title": "성과주체",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          26,
+          28,
+          102
+        ],
+        "gloss": "번아웃은 자유의 적응 불가가 아니라, 자유로운 강제를 내면화한 성과주체의 자기착취로부터 비롯된다.",
+        "promoted": true,
+        "clusterId": "k17"
+      },
+      {
+        "id": "n61",
+        "title": "번아웃은 자유의 적응 불가가 아니라, 자유로운 강제를 내면화한 성과주체의 자기착취로부터 비롯된다.",
+        "parentId": "n60",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          26
+        ],
+        "gloss": "성과주체",
+        "memoId": "ds-b50-피로사회-6",
+        "claimKey": "ds-b50-피로사회-6#c2",
+        "devices": [
+          "통념 반박"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n62",
+        "title": "성과주체는 외적 지배기구에서 자유로우므로 자신의 주인이자 주권자이며, 이는 성과주체를 복종적 주체와 구별한다.",
+        "parentId": "n60",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          28
+        ],
+        "gloss": "성과주체",
+        "memoId": "ds-b50-피로사회-7",
+        "claimKey": "ds-b50-피로사회-7#c2",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n63",
+        "title": "성과주체는 복종적 주체와 달리, 초자아에 예속하지 않고 이상 자아에 자신을 기투한다.",
+        "parentId": "n60",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          102
+        ],
+        "gloss": "성과주체",
+        "memoId": "ds-b50-피로사회-21",
+        "claimKey": "ds-b50-피로사회-21#c1",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n64",
+        "title": "우울중",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          28
+        ],
+        "gloss": "성과주체의 우울중은 더 이상 할 수 없게 되었을 때 발발하며, 이는 아무것도 불가능하지 않다고 믿는 사회에서만 성립하는 역설적 현상이다.",
+        "promoted": false,
+        "clusterId": "k18"
+      },
+      {
+        "id": "n65",
+        "title": "성과주체의 우울중은 더 이상 할 수 없게 되었을 때 발발하며, 이는 아무것도 불가능하지 않다고 믿는 사회에서만 성립하는 역설적 현상이다.",
+        "parentId": "n64",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          28
+        ],
+        "gloss": "우울중",
+        "memoId": "ds-b50-피로사회-7",
+        "claimKey": "ds-b50-피로사회-7#c1",
+        "devices": [
+          "인과",
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n66",
+        "title": "자유와 강제",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          28
+        ],
+        "gloss": "지배기구의 소멸은 자유로 이어지지 않으며, 그 결과는 자유와 강제가 일치하는 상태이다.",
+        "promoted": false,
+        "clusterId": "k19"
+      },
+      {
+        "id": "n67",
+        "title": "지배기구의 소멸은 자유로 이어지지 않으며, 그 결과는 자유와 강제가 일치하는 상태이다.",
+        "parentId": "n66",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          28
+        ],
+        "gloss": "자유와 강제",
+        "memoId": "ds-b50-피로사회-7",
+        "claimKey": "ds-b50-피로사회-7#c3",
+        "devices": [
+          "통념 반박"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n68",
+        "title": "자기 착취",
+        "parentId": "n60",
+        "level": 3,
+        "kind": "concept",
+        "sources": [
+          28,
+          103
+        ],
+        "gloss": "성과주체는 자유로운 강제에 몸을 맡기며, 자기 착취는 자유롭다는 느낌을 동반하기 때문에 타자의 착취보다 더 효율적이다.",
+        "promoted": true,
+        "clusterId": "k20"
+      },
+      {
+        "id": "n69",
+        "title": "성과주체는 자유로운 강제에 몸을 맡기며, 자기 착취는 자유롭다는 느낌을 동반하기 때문에 타자의 착취보다 더 효율적이다.",
+        "parentId": "n68",
+        "level": 4,
+        "kind": "sentence",
+        "sources": [
+          28
+        ],
+        "gloss": "자기 착취",
+        "memoId": "ds-b50-피로사회-7",
+        "claimKey": "ds-b50-피로사회-7#c4",
+        "devices": [
+          "분석",
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n70",
+        "title": "자본주의가 일정한 생산수준에 이르면, 자기 착취는 타자에 의한 착취보다 효과적이고 능률적이다. 자기 착취가 자유의 감정을 동반하기 때문이다.",
+        "parentId": "n68",
+        "level": 4,
+        "kind": "sentence",
+        "sources": [
+          103
+        ],
+        "gloss": "자기 착취",
+        "memoId": "ds-b50-피로사회-22",
+        "claimKey": "ds-b50-피로사회-22#c1",
+        "devices": [
+          "대조",
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n71",
+        "title": "심리적 질병",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          28
+        ],
+        "gloss": "성과사회의 심리적 질병은 역설적 자유의 병리적 표출이다.",
+        "promoted": false,
+        "clusterId": "k21"
+      },
+      {
+        "id": "n72",
+        "title": "성과사회의 심리적 질병은 역설적 자유의 병리적 표출이다.",
+        "parentId": "n71",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          28
+        ],
+        "gloss": "심리적 질병",
+        "memoId": "ds-b50-피로사회-7",
+        "claimKey": "ds-b50-피로사회-7#c5",
+        "devices": [
+          "정의"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n73",
+        "title": "신앙 상실",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          41
+        ],
+        "gloss": "근대의 신앙 상실이 인간 삶을 극단적인 허무 속에 빠뜨린다.",
+        "promoted": false,
+        "clusterId": "k24"
+      },
+      {
+        "id": "n74",
+        "title": "근대의 신앙 상실이 인간 삶을 극단적인 허무 속에 빠뜨린다.",
+        "parentId": "n73",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          41
+        ],
+        "gloss": "신앙 상실",
+        "memoId": "ds-b50-피로사회-8",
+        "claimKey": "ds-b50-피로사회-8#c2",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n75",
+        "title": "존재의 결핍",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          41
+        ],
+        "gloss": "삶과 세계의 극단적 덧없음, 즉 지속과 불변의 부재가 초조와 불안을 야기한다.",
+        "promoted": false,
+        "clusterId": "k25"
+      },
+      {
+        "id": "n76",
+        "title": "삶과 세계의 극단적 덧없음, 즉 지속과 불변의 부재가 초조와 불안을 야기한다.",
+        "parentId": "n75",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          41
+        ],
+        "gloss": "존재의 결핍",
+        "memoId": "ds-b50-피로사회-8",
+        "claimKey": "ds-b50-피로사회-8#c3",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n77",
+        "title": "종교의 시효",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          41
+        ],
+        "gloss": "종교의 시효 만료로 더 이상 죽음에 대한 공포를 덜어주지 못한다.",
+        "promoted": false,
+        "clusterId": "k26"
+      },
+      {
+        "id": "n78",
+        "title": "종교의 시효 만료로 더 이상 죽음에 대한 공포를 덜어주지 못한다.",
+        "parentId": "n77",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          41
+        ],
+        "gloss": "종교의 시효",
+        "memoId": "ds-b50-피로사회-8",
+        "claimKey": "ds-b50-피로사회-8#c4",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n79",
+        "title": "탈서사화",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          41
+        ],
+        "gloss": "세계의 전반적 탈서사화는 허무의 감정을 더욱 강화한다.",
+        "promoted": false,
+        "clusterId": "k27"
+      },
+      {
+        "id": "n80",
+        "title": "세계의 전반적 탈서사화는 허무의 감정을 더욱 강화한다.",
+        "parentId": "n79",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          41
+        ],
+        "gloss": "탈서사화",
+        "memoId": "ds-b50-피로사회-8",
+        "claimKey": "ds-b50-피로사회-8#c5",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n81",
+        "title": "벌거벗은 생명",
+        "parentId": "n79",
+        "level": 3,
+        "kind": "concept",
+        "sources": [
+          41
+        ],
+        "gloss": "탈서사화는 삶을 벌거벗은 생명으로 만든다.",
+        "promoted": false,
+        "clusterId": "k28"
+      },
+      {
+        "id": "n82",
+        "title": "탈서사화는 삶을 벌거벗은 생명으로 만든다.",
+        "parentId": "n81",
+        "level": 4,
+        "kind": "sentence",
+        "sources": [
+          41
+        ],
+        "gloss": "벌거벗은 생명",
+        "memoId": "ds-b50-피로사회-8",
+        "claimKey": "ds-b50-피로사회-8#c6",
+        "devices": [
+          "정의"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n83",
+        "title": "벌거벗은 노동",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          41
+        ],
+        "gloss": "벌거벗은 노동은 벌거벗은 생명과 정확히 조응한다.",
+        "promoted": false,
+        "clusterId": "k29"
+      },
+      {
+        "id": "n84",
+        "title": "벌거벗은 노동은 벌거벗은 생명과 정확히 조응한다.",
+        "parentId": "n83",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          41
+        ],
+        "gloss": "벌거벗은 노동",
+        "memoId": "ds-b50-피로사회-8",
+        "claimKey": "ds-b50-피로사회-8#c7",
+        "devices": [
+          "비교"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n85",
+        "title": "분열적 피로",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          66
+        ],
+        "gloss": "성과사회의 피로는 한트케가 말한 '분열적 피로'로, 공동의 경험을 개인의 고립된 피로로 변환한다.",
+        "promoted": false,
+        "clusterId": "k45"
+      },
+      {
+        "id": "n86",
+        "title": "성과사회의 피로는 한트케가 말한 '분열적 피로'로, 공동의 경험을 개인의 고립된 피로로 변환한다.",
+        "parentId": "n85",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          66
+        ],
+        "gloss": "분열적 피로",
+        "memoId": "ds-b50-피로사회-14",
+        "claimKey": "ds-b50-피로사회-14#c1",
+        "devices": [
+          "대조",
+          "인용"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n87",
+        "title": "피로와 폭력",
+        "parentId": "n85",
+        "level": 3,
+        "kind": "concept",
+        "sources": [
+          66
+        ],
+        "gloss": "분열적 피로는 말할 수 없고 볼 수 없는 상태로 몰아넣으며, 이에 따라 공동체·친밀함·언어 자체를 파괴하고 필연적으로 폭력을 낳는다.",
+        "promoted": false,
+        "clusterId": "k46"
+      },
+      {
+        "id": "n88",
+        "title": "분열적 피로는 말할 수 없고 볼 수 없는 상태로 몰아넣으며, 이에 따라 공동체·친밀함·언어 자체를 파괴하고 필연적으로 폭력을 낳는다.",
+        "parentId": "n87",
+        "level": 4,
+        "kind": "sentence",
+        "sources": [
+          66
+        ],
+        "gloss": "피로와 폭력",
+        "memoId": "ds-b50-피로사회-14",
+        "claimKey": "ds-b50-피로사회-14#c2",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n89",
+        "title": "자아의 축소",
+        "parentId": "n85",
+        "level": 3,
+        "kind": "concept",
+        "sources": [
+          66
+        ],
+        "gloss": "줄어든 자아의 피로는 자아의 조임쇠를 느슨하게 해 자아와 타자의 경계를 해제하고, 아무도 지배하지 않는 무차별적인 친절의 공간을 연다.",
+        "promoted": false,
+        "clusterId": "k47"
+      },
+      {
+        "id": "n90",
+        "title": "줄어든 자아의 피로는 자아의 조임쇠를 느슨하게 해 자아와 타자의 경계를 해제하고, 아무도 지배하지 않는 무차별적인 친절의 공간을 연다.",
+        "parentId": "n89",
+        "level": 4,
+        "kind": "sentence",
+        "sources": [
+          66
+        ],
+        "gloss": "자아의 축소",
+        "memoId": "ds-b50-피로사회-14",
+        "claimKey": "ds-b50-피로사회-14#c3",
+        "devices": [
+          "대조",
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n91",
+        "title": "중력의 이동",
+        "parentId": "n89",
+        "level": 4,
+        "kind": "concept",
+        "sources": [
+          66
+        ],
+        "gloss": "자아가 줄어들면서 존재의 중력이 개인에서 세계로 이동하며, 이것이 세계의 증대로 나타난다.",
+        "promoted": false,
+        "clusterId": "k48"
+      },
+      {
+        "id": "n92",
+        "title": "자아가 줄어들면서 존재의 중력이 개인에서 세계로 이동하며, 이것이 세계의 증대로 나타난다.",
+        "parentId": "n91",
+        "level": 5,
+        "kind": "sentence",
+        "sources": [
+          66
+        ],
+        "gloss": "중력의 이동",
+        "memoId": "ds-b50-피로사회-14",
+        "claimKey": "ds-b50-피로사회-14#c4",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n93",
+        "title": "무차별성의 공간",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          66
+        ],
+        "gloss": "깊은 피로는 정체성의 조임쇠를 느슨하게 풀어줌으로써 사물의 확정적 성질을 약화시키고, 경계 없는 무차별성 속에서 우애의 분위기를 띠게 한다.",
+        "promoted": false,
+        "clusterId": "k49"
+      },
+      {
+        "id": "n94",
+        "title": "깊은 피로는 정체성의 조임쇠를 느슨하게 풀어줌으로써 사물의 확정적 성질을 약화시키고, 경계 없는 무차별성 속에서 우애의 분위기를 띠게 한다.",
+        "parentId": "n93",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          66
+        ],
+        "gloss": "무차별성의 공간",
+        "memoId": "ds-b50-피로사회-14",
+        "claimKey": "ds-b50-피로사회-14#c5",
+        "devices": [
+          "묘사",
+          "분석"
+        ],
+        "confidence": "med"
+      },
+      {
+        "id": "n95",
+        "title": "페이스북 친구",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          91
+        ],
+        "gloss": "페이스북의 수많은 친구들은 후기근대적 자아가 성격 없고 무형적임을 보여주는 증거이다.",
+        "promoted": false,
+        "clusterId": "k54"
+      },
+      {
+        "id": "n96",
+        "title": "페이스북의 수많은 친구들은 후기근대적 자아가 성격 없고 무형적임을 보여주는 증거이다.",
+        "parentId": "n95",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          91
+        ],
+        "gloss": "페이스북 친구",
+        "memoId": "ds-b50-피로사회-16",
+        "claimKey": "ds-b50-피로사회-16#c1",
+        "devices": [
+          "예시"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n97",
+        "title": "성격 없는 인간",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          91
+        ],
+        "gloss": "성격 없는 인간은 긍정적으로 보면 어떤 모습으로도 나타나고 어떤 역할도 수행할 수 있는 유연한 인간이다.",
+        "promoted": false,
+        "clusterId": "k55"
+      },
+      {
+        "id": "n98",
+        "title": "성격 없는 인간은 긍정적으로 보면 어떤 모습으로도 나타나고 어떤 역할도 수행할 수 있는 유연한 인간이다.",
+        "parentId": "n97",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          91
+        ],
+        "gloss": "성격 없는 인간",
+        "memoId": "ds-b50-피로사회-16",
+        "claimKey": "ds-b50-피로사회-16#c2",
+        "devices": [
+          "통념 반박"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n99",
+        "title": "유연성",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          91
+        ],
+        "gloss": "무형성 내지 유연성은 높은 경제적 효율을 가능하게 한다.",
+        "promoted": false,
+        "clusterId": "k56"
+      },
+      {
+        "id": "n100",
+        "title": "무형성 내지 유연성은 높은 경제적 효율을 가능하게 한다.",
+        "parentId": "n99",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          91
+        ],
+        "gloss": "유연성",
+        "memoId": "ds-b50-피로사회-16",
+        "claimKey": "ds-b50-피로사회-16#c3",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n101",
+        "title": "소진",
+        "parentId": "n56",
+        "level": 3,
+        "kind": "concept",
+        "sources": [
+          94
+        ],
+        "gloss": "과잉 자기 관계에서 출발한 인과 사슬이 소진을 거쳐 우울증으로 귀결된다",
+        "promoted": false,
+        "clusterId": "k57"
+      },
+      {
+        "id": "n102",
+        "title": "과잉 자기 관계에서 출발한 인과 사슬이 소진을 거쳐 우울증으로 귀결된다",
+        "parentId": "n101",
+        "level": 4,
+        "kind": "sentence",
+        "sources": [
+          94
+        ],
+        "gloss": "소진",
+        "memoId": "ds-b50-피로사회-17",
+        "claimKey": "ds-b50-피로사회-17#c2",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n103",
+        "title": "공허한 자아",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          94
+        ],
+        "gloss": "성과주체는 자신과의 전쟁 → 지침과 탈진 → 자신으로부터의 단절 → 공허한 자아라는 인과 고리에 갇힌다",
+        "promoted": false,
+        "clusterId": "k58"
+      },
+      {
+        "id": "n104",
+        "title": "성과주체는 자신과의 전쟁 → 지침과 탈진 → 자신으로부터의 단절 → 공허한 자아라는 인과 고리에 갇힌다",
+        "parentId": "n103",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          94
+        ],
+        "gloss": "공허한 자아",
+        "memoId": "ds-b50-피로사회-17",
+        "claimKey": "ds-b50-피로사회-17#c3",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "med"
+      },
+      {
+        "id": "n105",
+        "title": "가상화",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          95
+        ],
+        "gloss": "가상화와 디지털화 과정이 실재의 저항성을 제거하여 실재 자체를 지워나간다",
+        "promoted": false,
+        "clusterId": "k59"
+      },
+      {
+        "id": "n106",
+        "title": "가상화와 디지털화 과정이 실재의 저항성을 제거하여 실재 자체를 지워나간다",
+        "parentId": "n105",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          95
+        ],
+        "gloss": "가상화",
+        "memoId": "ds-b50-피로사회-18",
+        "claimKey": "ds-b50-피로사회-18#c1",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n107",
+        "title": "유대",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          95
+        ],
+        "gloss": "과도한 선택의 자유는 후기근대의 성과주체로 하여금 강력한 유대 능력을 잃게 만든다",
+        "promoted": false,
+        "clusterId": "k61"
+      },
+      {
+        "id": "n108",
+        "title": "과도한 선택의 자유는 후기근대의 성과주체로 하여금 강력한 유대 능력을 잃게 만든다",
+        "parentId": "n107",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          95
+        ],
+        "gloss": "유대",
+        "memoId": "ds-b50-피로사회-18",
+        "claimKey": "ds-b50-피로사회-18#c3",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n109",
+        "title": "후기근대 자아",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          95
+        ],
+        "gloss": "후기근대의 자아는 리비도 에너지 대부분을 자신에게 사용하므로 남은 리비도가 계속 늘어나는 연락처와 일시적 관계에 배분되고 흩어진다",
+        "promoted": false,
+        "clusterId": "k62"
+      },
+      {
+        "id": "n110",
+        "title": "후기근대의 자아는 리비도 에너지 대부분을 자신에게 사용하므로 남은 리비도가 계속 늘어나는 연락처와 일시적 관계에 배분되고 흩어진다",
+        "parentId": "n109",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          95
+        ],
+        "gloss": "후기근대 자아",
+        "memoId": "ds-b50-피로사회-18",
+        "claimKey": "ds-b50-피로사회-18#c5",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n111",
+        "title": "애도",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          95
+        ],
+        "gloss": "약한 리비도의 유대는 새로운 대상으로의 전환이 간단하므로 길고 고통스러운 애도 작업이 불필요하다",
+        "promoted": false,
+        "clusterId": "k63"
+      },
+      {
+        "id": "n112",
+        "title": "약한 리비도의 유대는 새로운 대상으로의 전환이 간단하므로 길고 고통스러운 애도 작업이 불필요하다",
+        "parentId": "n111",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          95
+        ],
+        "gloss": "애도",
+        "memoId": "ds-b50-피로사회-18",
+        "claimKey": "ds-b50-피로사회-18#c6",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n113",
+        "title": "친구",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          95
+        ],
+        "gloss": "소셜 네트워크의 친구는 상품처럼 전시된 자아에게 주의를 선사함으로써 자아 감정을 높여주는 소비자로서만 기능한다",
+        "promoted": false,
+        "clusterId": "k64"
+      },
+      {
+        "id": "n114",
+        "title": "소셜 네트워크의 친구는 상품처럼 전시된 자아에게 주의를 선사함으로써 자아 감정을 높여주는 소비자로서만 기능한다",
+        "parentId": "n113",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          95
+        ],
+        "gloss": "친구",
+        "memoId": "ds-b50-피로사회-18",
+        "claimKey": "ds-b50-피로사회-18#c7",
+        "devices": [
+          "정의"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n115",
+        "title": "명령",
+        "parentId": "n56",
+        "level": 3,
+        "kind": "concept",
+        "sources": [
+          99
+        ],
+        "gloss": "정체성 상품이 개성 발명 명령을 유발하고, 이 명령이 우울증을 초래한다",
+        "promoted": false,
+        "clusterId": "k65"
+      },
+      {
+        "id": "n116",
+        "title": "정체성 상품이 개성 발명 명령을 유발하고, 이 명령이 우울증을 초래한다",
+        "parentId": "n115",
+        "level": 4,
+        "kind": "sentence",
+        "sources": [
+          99
+        ],
+        "gloss": "명령",
+        "memoId": "ds-b50-피로사회-19",
+        "claimKey": "ds-b50-피로사회-19#c1",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n117",
+        "title": "정체성",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          99
+        ],
+        "gloss": "정체성 변화 빈도가 높을수록 생산이 더욱 증대된다",
+        "promoted": false,
+        "clusterId": "k66"
+      },
+      {
+        "id": "n118",
+        "title": "정체성 변화 빈도가 높을수록 생산이 더욱 증대된다",
+        "parentId": "n117",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          99
+        ],
+        "gloss": "정체성",
+        "memoId": "ds-b50-피로사회-19",
+        "claimKey": "ds-b50-피로사회-19#c2",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n119",
+        "title": "이상 자아",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          102
+        ],
+        "gloss": "초자아는 부정적 강제를 발휘하고, 이상 자아는 긍정적 강제력을 발휘한다.",
+        "promoted": false,
+        "clusterId": "k75"
+      },
+      {
+        "id": "n120",
+        "title": "초자아는 부정적 강제를 발휘하고, 이상 자아는 긍정적 강제력을 발휘한다.",
+        "parentId": "n119",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          102
+        ],
+        "gloss": "이상 자아",
+        "memoId": "ds-b50-피로사회-21",
+        "claimKey": "ds-b50-피로사회-21#c3",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n121",
+        "title": "이상 자아의 덫",
+        "parentId": "n119",
+        "level": 3,
+        "kind": "concept",
+        "sources": [
+          102
+        ],
+        "gloss": "이상 자아를 향한 기투는 표면적으로 자유의 행위로 해석되지만, 실제로는 도달 불가능한 덫에서 자아가 완전히 쇠락한다.",
+        "promoted": false,
+        "clusterId": "k76"
+      },
+      {
+        "id": "n122",
+        "title": "이상 자아를 향한 기투는 표면적으로 자유의 행위로 해석되지만, 실제로는 도달 불가능한 덫에서 자아가 완전히 쇠락한다.",
+        "parentId": "n121",
+        "level": 4,
+        "kind": "sentence",
+        "sources": [
+          102
+        ],
+        "gloss": "이상 자아의 덫",
+        "memoId": "ds-b50-피로사회-21",
+        "claimKey": "ds-b50-피로사회-21#c4",
+        "devices": [
+          "통념 반박",
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n123",
+        "title": "자학",
+        "parentId": "n119",
+        "level": 3,
+        "kind": "concept",
+        "sources": [
+          102
+        ],
+        "gloss": "현실의 자아와 이상 자아의 간극은 자학으로 이어진다.",
+        "promoted": false,
+        "clusterId": "k77"
+      },
+      {
+        "id": "n124",
+        "title": "현실의 자아와 이상 자아의 간극은 자학으로 이어진다.",
+        "parentId": "n123",
+        "level": 4,
+        "kind": "sentence",
+        "sources": [
+          102
+        ],
+        "gloss": "자학",
+        "memoId": "ds-b50-피로사회-21",
+        "claimKey": "ds-b50-피로사회-21#c5",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n125",
+        "title": "성과사회 호모 사케르",
+        "parentId": "n55",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          114
+        ],
+        "gloss": "성과사회의 호모 사케르는 주권사회와 달리 절대로 죽일 수 없으며, 죽음과 삶의 모호한 상태에 있다.",
+        "promoted": false,
+        "clusterId": "k78"
+      },
+      {
+        "id": "n126",
+        "title": "성과사회의 호모 사케르는 주권사회와 달리 절대로 죽일 수 없으며, 죽음과 삶의 모호한 상태에 있다.",
+        "parentId": "n125",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          114
+        ],
+        "gloss": "성과사회 호모 사케르",
+        "memoId": "ds-b50-피로사회-23",
+        "claimKey": "ds-b50-피로사회-23#c1",
+        "devices": [
+          "대조",
+          "유추",
+          "묘사"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n127",
+        "title": "중단과 부정성의 회복",
+        "parentId": "n1",
+        "level": 1,
+        "kind": "concept",
+        "role": "처방",
+        "sources": [
+          43,
+          49,
+          50,
+          52,
+          54,
+          86,
+          95,
+          99,
+          101,
+          102
+        ],
+        "gloss": "현재의 위기를 벗어나기 위해서는 활동을 중단하는 부정적 계기, 분노의 변혁 능력, 실재의 저항성, 도덕적 보상 구조의 재정립이 필수적임을 주장한다"
+      },
+      {
+        "id": "n128",
+        "title": "주인-노예의 변증법",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          43
+        ],
+        "gloss": "주인-노예의 변증법이 모두가 자유롭고 빈둥거릴 수 있는 사회를 만든다는 기대는 현실과 다르며, 오히려 주인이 스스로 노동하는 노예가 되는 노동사회를 낳는다.",
+        "promoted": false,
+        "clusterId": "k31"
+      },
+      {
+        "id": "n129",
+        "title": "주인-노예의 변증법이 모두가 자유롭고 빈둥거릴 수 있는 사회를 만든다는 기대는 현실과 다르며, 오히려 주인이 스스로 노동하는 노예가 되는 노동사회를 낳는다.",
+        "parentId": "n128",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          43
+        ],
+        "gloss": "주인-노예의 변증법",
+        "memoId": "ds-b50-피로사회-9",
+        "claimKey": "ds-b50-피로사회-9#c2",
+        "devices": [
+          "통념 반박"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n130",
+        "title": "순수한 활동성",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          49
+        ],
+        "gloss": "순수한 활동성은 이미 존재하는 것을 연장할 뿐이다",
+        "promoted": false,
+        "clusterId": "k32"
+      },
+      {
+        "id": "n131",
+        "title": "순수한 활동성은 이미 존재하는 것을 연장할 뿐이다",
+        "parentId": "n130",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          49
+        ],
+        "gloss": "순수한 활동성",
+        "memoId": "ds-b50-피로사회-10",
+        "claimKey": "ds-b50-피로사회-10#c1",
+        "devices": [
+          "묘사"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n132",
+        "title": "전환",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          49
+        ],
+        "gloss": "다른 것으로의 전환을 위해서는 중단의 부정성이 필요하다",
+        "promoted": false,
+        "clusterId": "k33"
+      },
+      {
+        "id": "n133",
+        "title": "다른 것으로의 전환을 위해서는 중단의 부정성이 필요하다",
+        "parentId": "n132",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          49
+        ],
+        "gloss": "전환",
+        "memoId": "ds-b50-피로사회-10",
+        "claimKey": "ds-b50-피로사회-10#c2",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n134",
+        "title": "부정적 계기",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          49
+        ],
+        "gloss": "멈춘다는 부정적 계기를 통해 우연의 공간 전체를 가로질러 볼 수 있다",
+        "promoted": false,
+        "clusterId": "k34"
+      },
+      {
+        "id": "n135",
+        "title": "멈춘다는 부정적 계기를 통해 우연의 공간 전체를 가로질러 볼 수 있다",
+        "parentId": "n134",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          49
+        ],
+        "gloss": "부정적 계기",
+        "memoId": "ds-b50-피로사회-10",
+        "claimKey": "ds-b50-피로사회-10#c3",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n136",
+        "title": "머뭇거림",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          49
+        ],
+        "gloss": "머뭇거림은 긍정적 태도는 아니지만 행동의 노동화를 막는 필수 요소다",
+        "promoted": false,
+        "clusterId": "k35"
+      },
+      {
+        "id": "n137",
+        "title": "머뭇거림은 긍정적 태도는 아니지만 행동의 노동화를 막는 필수 요소다",
+        "parentId": "n136",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          49
+        ],
+        "gloss": "머뭇거림",
+        "memoId": "ds-b50-피로사회-10",
+        "claimKey": "ds-b50-피로사회-10#c4",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n138",
+        "title": "오늘날",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          49
+        ],
+        "gloss": "오늘날은 중단과 막간의 시간이 아주 적은 시대다",
+        "promoted": false,
+        "clusterId": "k36"
+      },
+      {
+        "id": "n139",
+        "title": "오늘날은 중단과 막간의 시간이 아주 적은 시대다",
+        "parentId": "n138",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          49
+        ],
+        "gloss": "오늘날",
+        "memoId": "ds-b50-피로사회-10",
+        "claimKey": "ds-b50-피로사회-10#c5",
+        "devices": [
+          "묘사"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n140",
+        "title": "분노의 시간성",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          50
+        ],
+        "gloss": "분노는 현재에 대해 총체적인 의문을 제기하면서 현재 속에서 중단하고 멈추는 특별한 시간적 특성을 가지며, 이는 전반적인 가속화 및 활동과잉과 양립할 수 없다.",
+        "promoted": false,
+        "clusterId": "k37"
+      },
+      {
+        "id": "n141",
+        "title": "분노는 현재에 대해 총체적인 의문을 제기하면서 현재 속에서 중단하고 멈추는 특별한 시간적 특성을 가지며, 이는 전반적인 가속화 및 활동과잉과 양립할 수 없다.",
+        "parentId": "n140",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          50
+        ],
+        "gloss": "분노의 시간성",
+        "memoId": "ds-b50-피로사회-11",
+        "claimKey": "ds-b50-피로사회-11#c1",
+        "devices": [
+          "정의"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n142",
+        "title": "분노와 짜증",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          50
+        ],
+        "gloss": "분노는 상황을 중단시키고 새로운 상황을 시작하게 하는 심대한 변화의 능력을 가지는 반면, 짜증은 그러한 변화를 일으키지 못하며, 현대에는 분노 대신 짜증과 신경질이 점점 더 확산된다.",
+        "promoted": false,
+        "clusterId": "k38"
+      },
+      {
+        "id": "n143",
+        "title": "분노는 상황을 중단시키고 새로운 상황을 시작하게 하는 심대한 변화의 능력을 가지는 반면, 짜증은 그러한 변화를 일으키지 못하며, 현대에는 분노 대신 짜증과 신경질이 점점 더 확산된다.",
+        "parentId": "n142",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          50
+        ],
+        "gloss": "분노와 짜증",
+        "memoId": "ds-b50-피로사회-11",
+        "claimKey": "ds-b50-피로사회-11#c2",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n144",
+        "title": "분노의 부정성",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          50
+        ],
+        "gloss": "분노는 전체를 부정하는 부정성의 에너지를 가진 예외적 상태이다.",
+        "promoted": false,
+        "clusterId": "k39"
+      },
+      {
+        "id": "n145",
+        "title": "분노는 전체를 부정하는 부정성의 에너지를 가진 예외적 상태이다.",
+        "parentId": "n144",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          50
+        ],
+        "gloss": "분노의 부정성",
+        "memoId": "ds-b50-피로사회-11",
+        "claimKey": "ds-b50-피로사회-11#c3",
+        "devices": [
+          "정의"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n146",
+        "title": "긍정화와 부정성 소실",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          50
+        ],
+        "gloss": "세계가 점점 더 긍정적으로 되어가면서, 부정성의 예외적 상태도 더 줄어든다.",
+        "promoted": false,
+        "clusterId": "k40"
+      },
+      {
+        "id": "n147",
+        "title": "세계가 점점 더 긍정적으로 되어가면서, 부정성의 예외적 상태도 더 줄어든다.",
+        "parentId": "n146",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          50
+        ],
+        "gloss": "긍정화와 부정성 소실",
+        "memoId": "ds-b50-피로사회-11",
+        "claimKey": "ds-b50-피로사회-11#c4",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n148",
+        "title": "부정성",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          52
+        ],
+        "gloss": "부정성은 인간 존재를 생동하는 상태로 지탱해주는 것이다",
+        "promoted": false,
+        "clusterId": "k42"
+      },
+      {
+        "id": "n149",
+        "title": "부정성은 인간 존재를 생동하는 상태로 지탱해주는 것이다",
+        "parentId": "n148",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          52
+        ],
+        "gloss": "부정성",
+        "memoId": "ds-b50-피로사회-12",
+        "claimKey": "ds-b50-피로사회-12#c2",
+        "devices": [
+          "인용",
+          "정의"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n150",
+        "title": "활동과잉",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          54
+        ],
+        "gloss": "긍정적 힘의 절대화가 활동과잉을 초래하고, 이는 자유로운 행동의 여지를 주지 않는 수동적 행위다.",
+        "promoted": false,
+        "clusterId": "k43"
+      },
+      {
+        "id": "n151",
+        "title": "긍정적 힘의 절대화가 활동과잉을 초래하고, 이는 자유로운 행동의 여지를 주지 않는 수동적 행위다.",
+        "parentId": "n150",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          54
+        ],
+        "gloss": "활동과잉",
+        "memoId": "ds-b50-피로사회-13",
+        "claimKey": "ds-b50-피로사회-13#c1",
+        "devices": [
+          "인과",
+          "통념 반박"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n152",
+        "title": "부정",
+        "parentId": "n150",
+        "level": 3,
+        "kind": "concept",
+        "sources": [
+          54
+        ],
+        "gloss": "활동과잉은 수동적 행위를 만드는 반면, 부정(멈춤)은 능동적 행위를 만든다.",
+        "promoted": false,
+        "clusterId": "k44"
+      },
+      {
+        "id": "n153",
+        "title": "활동과잉은 수동적 행위를 만드는 반면, 부정(멈춤)은 능동적 행위를 만든다.",
+        "parentId": "n152",
+        "level": 4,
+        "kind": "sentence",
+        "sources": [
+          54
+        ],
+        "gloss": "부정",
+        "memoId": "ds-b50-피로사회-13",
+        "claimKey": "ds-b50-피로사회-13#c2",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n154",
+        "title": "보상의 타자성",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          86
+        ],
+        "gloss": "인정으로서의 보상은 타자 또는 제3자라는 심급을 전제하므로, 자기보상의 불가능성을 수반한다.",
+        "promoted": false,
+        "clusterId": "k50"
+      },
+      {
+        "id": "n155",
+        "title": "인정으로서의 보상은 타자 또는 제3자라는 심급을 전제하므로, 자기보상의 불가능성을 수반한다.",
+        "parentId": "n154",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          86
+        ],
+        "gloss": "보상의 타자성",
+        "memoId": "ds-b50-피로사회-15",
+        "claimKey": "ds-b50-피로사회-15#c1",
+        "devices": [
+          "정의"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n156",
+        "title": "신의 심급",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          86
+        ],
+        "gloss": "칸트에게는 신이 도덕적 업적을 보상하고 인정해주는 심급의 역할을 한다.",
+        "promoted": false,
+        "clusterId": "k51"
+      },
+      {
+        "id": "n157",
+        "title": "칸트에게는 신이 도덕적 업적을 보상하고 인정해주는 심급의 역할을 한다.",
+        "parentId": "n156",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          86
+        ],
+        "gloss": "신의 심급",
+        "memoId": "ds-b50-피로사회-15",
+        "claimKey": "ds-b50-피로사회-15#c2",
+        "devices": [
+          "예시"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n158",
+        "title": "강박관념",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          86
+        ],
+        "gloss": "타자와의 관계가 사라지면서 보상 위기가 오고, 보상구조에 이상이 생기면 성과주체는 강박관념에 빠진다.",
+        "promoted": false,
+        "clusterId": "k52"
+      },
+      {
+        "id": "n159",
+        "title": "타자와의 관계가 사라지면서 보상 위기가 오고, 보상구조에 이상이 생기면 성과주체는 강박관념에 빠진다.",
+        "parentId": "n158",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          86
+        ],
+        "gloss": "강박관념",
+        "memoId": "ds-b50-피로사회-15",
+        "claimKey": "ds-b50-피로사회-15#c3",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n160",
+        "title": "도덕적 보상",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          86
+        ],
+        "gloss": "신이나 규율이라는 보상의 심급이 존재한다면 규율 준수를 통해 도덕적 보상을 느낄 수 있으나, 그렇지 않으면 강박관념에 빠진다.",
+        "promoted": false,
+        "clusterId": "k53"
+      },
+      {
+        "id": "n161",
+        "title": "신이나 규율이라는 보상의 심급이 존재한다면 규율 준수를 통해 도덕적 보상을 느낄 수 있으나, 그렇지 않으면 강박관념에 빠진다.",
+        "parentId": "n160",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          86
+        ],
+        "gloss": "도덕적 보상",
+        "memoId": "ds-b50-피로사회-15",
+        "claimKey": "ds-b50-피로사회-15#c4",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "med"
+      },
+      {
+        "id": "n162",
+        "title": "실재",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          95
+        ],
+        "gloss": "실재는 일을 중단시키는 저항과 기댈 수 있는 받침대라는 이중의 방식으로 인간을 구속한다",
+        "promoted": false,
+        "clusterId": "k60"
+      },
+      {
+        "id": "n163",
+        "title": "실재는 일을 중단시키는 저항과 기댈 수 있는 받침대라는 이중의 방식으로 인간을 구속한다",
+        "parentId": "n162",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          95
+        ],
+        "gloss": "실재",
+        "memoId": "ds-b50-피로사회-18",
+        "claimKey": "ds-b50-피로사회-18#c2",
+        "devices": [
+          "분석"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n164",
+        "title": "트렌드",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          99
+        ],
+        "gloss": "자본이 요구하는 필요가 트렌드를 만들어낸다",
+        "promoted": false,
+        "clusterId": "k68"
+      },
+      {
+        "id": "n165",
+        "title": "자본이 요구하는 필요가 트렌드를 만들어낸다",
+        "parentId": "n164",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          99
+        ],
+        "gloss": "트렌드",
+        "memoId": "ds-b50-피로사회-19",
+        "claimKey": "ds-b50-피로사회-19#c4",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n166",
+        "title": "합의적 폭력",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          101
+        ],
+        "gloss": "자본의 전일적 지배는 현재 합의적 폭력의 형태다",
+        "promoted": false,
+        "clusterId": "k73"
+      },
+      {
+        "id": "n167",
+        "title": "자본의 전일적 지배는 현재 합의적 폭력의 형태다",
+        "parentId": "n166",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          101
+        ],
+        "gloss": "합의적 폭력",
+        "memoId": "ds-b50-피로사회-20",
+        "claimKey": "ds-b50-피로사회-20#c5",
+        "devices": [
+          "예시"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n168",
+        "title": "존재 양식",
+        "parentId": "n127",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          102
+        ],
+        "gloss": "예속과 기투는 상이한 두 가지 존재 양식이다.",
+        "promoted": false,
+        "clusterId": "k74"
+      },
+      {
+        "id": "n169",
+        "title": "예속과 기투는 상이한 두 가지 존재 양식이다.",
+        "parentId": "n168",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          102
+        ],
+        "gloss": "존재 양식",
+        "memoId": "ds-b50-피로사회-21",
+        "claimKey": "ds-b50-피로사회-21#c2",
+        "devices": [
+          "분류"
+        ],
+        "confidence": "high"
+      }
+    ],
+    "edges": [
+      {
+        "type": "대조",
+        "axis": "질병의 유형",
+        "pair": [
+          "전염성 질병",
+          "경색성 질병"
+        ],
+        "claimKey": "ds-b50-피로사회-0#c2",
+        "a": "n5",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "질병의 원인",
+        "pair": [
+          "면역학적 타자의 부정성",
+          "긍정성의 과잉"
+        ],
+        "claimKey": "ds-b50-피로사회-0#c3",
+        "a": "n7",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "사회 조직의 인식 가능성",
+        "pair": [
+          "면역학적인 조직과 방어의 도식",
+          "이질성과 타자성 소멸의 새로운 구도"
+        ],
+        "claimKey": "ds-b50-피로사회-1#c1",
+        "a": "n9",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "면역 반응 촉발 여부",
+        "pair": [
+          "이질성",
+          "차이"
+        ],
+        "claimKey": "ds-b50-피로사회-1#c2",
+        "a": "n26",
+        "b": "n38"
+      },
+      {
+        "type": "대조",
+        "axis": "병을 유발하는 능력",
+        "pair": [
+          "면역학의 이질성(차이)",
+          "후기근대적 차이"
+        ],
+        "claimKey": "ds-b50-피로사회-1#c3",
+        "a": "n28",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "타자성의 질적 속성",
+        "pair": [
+          "과거의 타자성(날카로움)",
+          "현대의 타자성(상투적 소비주의)"
+        ],
+        "claimKey": "ds-b50-피로사회-1#c4",
+        "a": "n30",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "양립 가능성",
+        "pair": [
+          "면역학적 패러다임",
+          "세계화 과정"
+        ],
+        "claimKey": "ds-b50-피로사회-2#c1",
+        "a": "n36",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "폭력이 전제하는 적대성의 유무 및 사회적 조건",
+        "pair": [
+          "적대성의 폭력",
+          "긍정성의 폭력"
+        ],
+        "claimKey": "ds-b50-피로사회-3#c1",
+        "a": "n11",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "사회 체계와 주체 유형",
+        "pair": [
+          "규율사회",
+          "성과사회"
+        ],
+        "claimKey": "ds-b50-피로사회-4#c1",
+        "a": "n40",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "부정성과 긍정성",
+        "pair": [
+          "규율사회",
+          "성과사회"
+        ],
+        "claimKey": "ds-b50-피로사회-5#c3",
+        "a": "n45",
+        "b": "n40"
+      },
+      {
+        "type": "대조",
+        "axis": "사회적 조종의 방식",
+        "pair": [
+          "권위적 강제와 금지를 통한 규율적 행위 조종의 모델",
+          "자기 주도적으로 될 것을 요구하는 새로운 성과 규범"
+        ],
+        "claimKey": "ds-b50-피로사회-6#c1",
+        "a": "n56",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "가능성에 대한 신념",
+        "pair": [
+          "아무것도 가능하지 않다는 개인의 신념",
+          "아무것도 불가능하지 않다고 믿는 사회"
+        ],
+        "claimKey": "ds-b50-피로사회-7#c1",
+        "a": "n64",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "외적 지배기구로부터의 자유",
+        "pair": [
+          "성과주체",
+          "복종적 주체"
+        ],
+        "claimKey": "ds-b50-피로사회-7#c2",
+        "a": "n60",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "효율성",
+        "pair": [
+          "타자의 착취",
+          "자기 착취"
+        ],
+        "claimKey": "ds-b50-피로사회-7#c4",
+        "a": "n68",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "머뭇거림",
+        "pair": [
+          "긍정적 태도 아님",
+          "필요불가결한 요소"
+        ],
+        "claimKey": "ds-b50-피로사회-10#c4",
+        "a": "n136",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "상황 변화 능력",
+        "pair": [
+          "분노(Wut)",
+          "짜증(Ärger)"
+        ],
+        "claimKey": "ds-b50-피로사회-11#c2",
+        "a": "n142",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "인간 존재의 생동성",
+        "pair": [
+          "부정의 존재",
+          "전면적 긍정화"
+        ],
+        "claimKey": "ds-b50-피로사회-12#c1",
+        "a": "n15",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "행위의 성격",
+        "pair": [
+          "활동과잉",
+          "부정"
+        ],
+        "claimKey": "ds-b50-피로사회-13#c2",
+        "a": "n152",
+        "b": "n150"
+      },
+      {
+        "type": "대조",
+        "axis": "개인화와 분리",
+        "pair": [
+          "공동의 피로",
+          "개인 각자의 분리된 피로"
+        ],
+        "claimKey": "ds-b50-피로사회-14#c1",
+        "a": "n85",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "자아 중심성의 해체 여부",
+        "pair": [
+          "분열적 피로(말할 수 없고 보지 못하고 분열시키는)",
+          "줄어든 자아의 피로(말 잘하고 보고 화해시키는)"
+        ],
+        "claimKey": "ds-b50-피로사회-14#c3",
+        "a": "n89",
+        "b": "n85"
+      },
+      {
+        "type": "대조",
+        "axis": "보상 심급의 존재 여부",
+        "pair": [
+          "보상 심급이 존재하는 상태",
+          "보상 심급이 없는 상태"
+        ],
+        "claimKey": "ds-b50-피로사회-15#c4",
+        "a": "n160",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "대상과의 유대 존재 여부 및 리비도 투여",
+        "pair": [
+          "슬픔",
+          "우울증"
+        ],
+        "claimKey": "ds-b50-피로사회-18#c4",
+        "a": "n56",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "개인 정체성 요구",
+        "pair": [
+          "규율사회",
+          "후산업사회"
+        ],
+        "claimKey": "ds-b50-피로사회-19#c3",
+        "a": "n53",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "자아에 대한 관계의 양식",
+        "pair": [
+          "복종적 주체",
+          "성과주체"
+        ],
+        "claimKey": "ds-b50-피로사회-21#c1",
+        "a": "n60",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "강제의 성질",
+        "pair": [
+          "초자아",
+          "이상 자아"
+        ],
+        "claimKey": "ds-b50-피로사회-21#c3",
+        "a": "n119",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "효과성과 능률성",
+        "pair": [
+          "자기 착취",
+          "타자에 의한 착취"
+        ],
+        "claimKey": "ds-b50-피로사회-22#c1",
+        "a": "n68",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "죽일 수 있는가",
+        "pair": [
+          "성과사회의 호모 사케르",
+          "주권 사회의 호모 사케르"
+        ],
+        "claimKey": "ds-b50-피로사회-23#c1",
+        "a": "n125",
+        "b": "n40"
+      }
+    ]
+  },
+  "log": [
+    "[v12] 입력: 메모 24건 → 주장 85개 (조립 입력 = 주장)",
+    "[v12] 클러스터 79개 · 승격(2회 이상) 4개: 성과사회(2) · 우울증(3) · 성과주체(3) · 자기 착취(2) — 임베딩 없음: 자구 일치만",
+    "[v12] 역할 블록 4개: 신경성 질환과 긍정성의 폭력(문제의식·11) · 규율에서 성과로의 이행(배경·14) · 성과주체의 자기착취와 피로(진단·33) · 중단과 부정성의 회복(처방·21)",
+    "[v12] 대조 엣지 27개 (lift 슬롯 그대로 · 재판정 0콜) — 클러스터 간 해석 5개",
+    "[v12] 키워드 위계 14건: 이질성의 대체 → 이질성(대조) · 동질적 공간 → 긍정성의 폭력(정의) · 규율사회와 성과사회 → 성과사회(대조) · 자기 착취 → 성과주체(분석) · 벌거벗은 생명 → 탈서사화(정의) · 노동사회 → 성과사회(정의) · 부정 → 활동과잉(대조) · 피로와 폭력 → 분열적 피로(인과) · 자아의 축소 → 분열적 피로(대조) · 중력의 이동 → 자아의 축소(인과) · 소진 → 우울증(인과) · 명령 → 우울증(인과) · 이상 자아의 덫 → 이상 자아(인과) · 자학 → 이상 자아(인과)",
+    "[v12] fold-back 스킵 — 임베딩 없음(개발 루프 0원 모드)"
+  ]
+}
