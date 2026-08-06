@@ -61,6 +61,18 @@ const CONTRASTS = [
   { name: '슬픔 ↔ 우울증', a: ['슬픔'], b: ['우울증'] },
 ];
 const M95 = ['나르시스', '슬픔', '리비도']; // p.95 다개념 메모 — v11에서 증발한 실측
+// ⑥ 위계 — 오라클이 들여쓰기로 명시한 부모-자식 8쌍 (0806 트리 깊이 판정의 채점화).
+// 각 변은 동의어 집합. 트리에서 조상-자손 관계로 재현되면 1쌍 인정.
+const HIERARCHY = [
+  { name: '성과사회 > 성과주체', p: ['성과사회'], c: ['성과주체'] },
+  { name: '성과주체 > 자기 착취', p: ['성과주체'], c: ['자기착취'] },
+  { name: '성과주체 > 보상', p: ['성과주체'], c: ['보상'] },
+  { name: '성과주체 > 나르시스', p: ['성과주체'], c: ['나르시스'] },
+  { name: '성과사회 > 우울증', p: ['성과사회'], c: ['우울증'] },
+  { name: '분노 > 짜증', p: ['분노'], c: ['짜증'] },
+  { name: '깊은 피로 > 고독한 피로', p: ['깊은피로'], c: ['고독한피로', '성과사회의피로', '분열'] },
+  { name: '후기근대적 자아 > 능률', p: ['성격없는', '후기근대', '유연한인간'], c: ['능률'] },
+];
 
 function score(run) {
   const { nodes, edges = [] } = run.tree;
@@ -108,6 +120,19 @@ function score(run) {
     if (hit) { m95Found++; homes.add(hit.parentId); }
   }
   const ax4 = Math.round((m95Found / M95.length) * (homes.size >= Math.min(m95Found, 2) ? 100 : 50));
+  // ⑥ 위계 — 오라클 부모-자식 쌍이 조상-자손으로 재현되는가
+  // 블록·fold-back 노드 제외 — 블록 이름("성과주체의 자기 착취")이 부모로 잡히면
+  // 블록 소속을 위계로 오인한다. 위계 축은 키워드 간 중첩만 잰다.
+  const kws = concepts.filter((n) => !n.role && !n.crossCut);
+  const findC = (syn) => kws.find((n) => syn.some((s) => nrm(n.title).includes(s)))
+    || kws.find((n) => syn.some((s) => hay(n).includes(s)));
+  const isDesc = (aId, bId) => { let c = byId.get(bId); while (c && c.parentId) { if (c.parentId === aId) return true; c = byId.get(c.parentId); } return false; };
+  let hier = 0;
+  const missedH = [];
+  for (const h of HIERARCHY) {
+    const pn = findC(h.p), cn = findC(h.c);
+    if (pn && cn && pn !== cn && isDesc(pn.id, cn.id)) hier++; else missedH.push(h.name);
+  }
   // ⑤ 편성
   const orphanKws = concepts.filter((n) => byId.get(n.parentId)?.kind === 'root' && !n.role && !n.crossCut);
   const kwTotal = concepts.filter((n) => !n.role && !n.crossCut).length || 1;
@@ -130,6 +155,7 @@ function score(run) {
     { axis: '대조', score: Math.round((contrasts / CONTRASTS.length) * 100), basis: `골든 대조 구도 ${CONTRASTS.length}개 중 ${contrasts}개 재현`, failures: missedC },
     { axis: '다개념', score: ax4, basis: `m95 개념 ${m95Found}/${M95.length} 보존 · 거처 ${homes.size}곳`, failures: M95.filter((s) => !m95Sents.some((n) => nrm(`${n.gloss || ''} ${n.title}`).includes(s))) },
     { axis: '편성', score: ax5, basis: `블록 ${blocks.length}개 · 최대 점유 ${Math.round((Math.max(0, ...shares)) * 100)}% · 미배정 ${orphanKws.length}`, failures: ax5why },
+    { axis: '위계', score: Math.round((hier / HIERARCHY.length) * 100), basis: `오라클 부모-자식 ${HIERARCHY.length}쌍 중 ${hier}쌍 조상-자손 재현`, failures: missedH },
   ].map((r) => ({ book, run: null, ...r })); // run 라벨은 호출부가 채운다
   const total = Math.round(records.reduce((a, r) => a + r.score, 0) / records.length);
   return { records, total };
