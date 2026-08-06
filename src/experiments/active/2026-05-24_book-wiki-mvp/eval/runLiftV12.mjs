@@ -7,7 +7,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
-import { buildLiftPrompt, normalizeLift, LIFT_PROMPT_VERSION } from './lib/liftV12.mjs';
+import { buildLiftPrompt, normalizeLift, slotHeadwordGaps, LIFT_PROMPT_VERSION } from './lib/liftV12.mjs';
 import { claudeCliTransport } from './lib/claudeCliTransport.mjs';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
@@ -49,6 +49,27 @@ for (let k = 0; k < book.memos.length; k++) {
   warnTotal += warnings.length;
   lifts.push({ memoId, p: memo.p, claims: lift.claims, promptVersion: LIFT_PROMPT_VERSION, warnings });
   console.log(`  · [${k}] p.${memo.p} → 주장 ${lift.claims.length}개${warnings.length ? ` ⚠${warnings.length}` : ''} (${Math.round((Date.now() - t0) / 1000)}초)`);
+}
+
+// GAPFIX=1 — 슬롯-표제어 격차 보정 (하네스 다개념 보정, 0806 준서 제안). 전역 2패스:
+// 책 전체 표제어 합집합에 없는 개념이 어느 메모의 쌍·대상 슬롯에 자구로 남아 있으면,
+// 그 메모만 개념 목록을 명시해 같은 모델로 재lift — 열린 판정을 폐쇄 판정으로 바꾼다.
+if (process.env.GAPFIX === '1') {
+  const globalHeads = () => lifts.flatMap((l) => l.claims.map((c) => c.headword));
+  for (const l of lifts) {
+    if (!l.claims.length) continue;
+    const memo = book.memos[Number(l.memoId.split('-').pop())];
+    const gaps = slotHeadwordGaps(l, memo.text, globalHeads().filter((h) => !l.claims.some((c) => c.headword === h)));
+    if (!gaps.length) continue;
+    try {
+      const p2 = buildLiftPrompt({ book: { title: '피로사회', author: book.author }, memo });
+      p2.user += `\n\n이 문단은 다음 개념도 별개로 다룰 수 있다: ${gaps.join(', ')} — 문단이 실제로 그 개념을 독립된 주장으로 다루는 경우에만, 그 개념을 주어·표제어로 하는 주장을 포함하라.`;
+      const r2 = normalizeLift(JSON.parse(await llm(p2)), { memoId: l.memoId });
+      const gained = gaps.filter((g) => r2.lift.claims.some((c) => c.headword.includes(g) || g.includes(c.headword)));
+      if (r2.lift.claims.length && gained.length) { l.claims = r2.lift.claims; l.warnings = r2.warnings; l.gapFixed = { gaps, gained }; }
+      console.log(`  ⊕ ${l.memoId} 격차 [${gaps.join(',')}] → ${gained?.length ? `보정 +${gained.join(',')}` : '무효(1차 유지)'}`);
+    } catch (e) { console.log(`  ⊕ ${l.memoId} 격차 보정 실패(1차 유지): ${e.message.slice(0, 50)}`); }
+  }
 }
 
 // (a) 다개념 에스컬레이션 — 하이쿠 1차 lift 뒤, 다개념 의심 메모만 상위 모델로 재lift.

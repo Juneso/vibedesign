@@ -88,6 +88,33 @@ ${memo.text}${memo.my ? `\n\n독자 메모: ${memo.my}` : ''}`;
   return { system, user };
 }
 
+// 슬롯-표제어 격차 검출 (하네스 다개념 보정, 0806 준서 제안) — 슬롯의 쌍·사슬·대상에
+// 등장하는 명사구인데 어느 표제어에도 안 잡힌 것을 찾는다. 실측 근거: m18에서 표제어는
+// 뭉개져도 슬롯 안에는 슬픔·리비도가 살아 있었다 — 모델이 개념을 못 본 게 아니라
+// 표제어로 승격을 안 한 것이므로, 코드가 격차를 잡아 폐쇄 재지시하면 싼 모델로 충분하다.
+const nrmG = (s) => String(s || '').normalize('NFC').replace(/\s+/g, '').toLowerCase();
+// extraHeads: 전역 표제어(다른 메모 포함) — 배치에선 책 전체에서 이미 커버된 개념을 제외한다.
+// 사슬(chain)은 후보에서 뺀다 — 사슬 항목은 "파괴적 자책과 자학" 같은 사건 서술이라
+// 개념명이 아니다(발동 17/24 실측 소음의 주범). 쌍·사례·정의 대상만 개념명으로 신뢰한다.
+export function slotHeadwordGaps(lift, memoText, extraHeads = []) {
+  const heads = [...lift.claims.map((c) => nrmG(c.headword)), ...extraHeads.map(nrmG)];
+  const cands = new Set();
+  for (const c of lift.claims) for (const [rel, s] of Object.entries(c.slots || {})) {
+    if (rel === '인용') continue; // 인용의 source 는 인물·텍스트명 — 개념 후보가 아니다
+    for (const v of [...(s.pair || []), s.of, s.concept, s.source, s.target].filter(Boolean)) {
+      const name = String(v).normalize('NFC').split('—')[0].replace(/[()""'']/g, ' ').trim();
+      if (name.length >= 2 && name.length <= 12) cands.add(name);
+    }
+  }
+  const text = nrmG(memoText);
+  return [...cands].filter((n) => {
+    const k = nrmG(n);
+    // 2자 개념(슬픔·분노·능률)도 잡는다 — 후보가 슬롯의 이름부 자체라 일반어 오염이 적다
+    return k.length >= 2 && text.includes(k)                     // 문단 자구에 실재
+      && !heads.some((h) => h.includes(k) || k.includes(h));     // 표제어 미커버
+  });
+}
+
 // LLM 응답(또는 수동 골든)을 Lift 스키마로 정규화·검증한다.
 // 실패를 던지지 않고 warnings 로 모은다 — 골든은 warnings 0개가 통과 기준,
 // 런타임은 warnings 를 로그로 남기고 confidence 를 low 로 강등해 에스컬레이션 대상에 넣는다.
