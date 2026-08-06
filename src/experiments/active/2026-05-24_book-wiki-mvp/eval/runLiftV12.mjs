@@ -63,7 +63,9 @@ if (process.env.GAPFIX === '1') {
     if (!gaps.length) continue;
     try {
       const p2 = buildLiftPrompt({ book: { title: '피로사회', author: book.author }, memo });
-      p2.user += `\n\n이 문단은 다음 개념도 별개로 다룰 수 있다: ${gaps.join(', ')} — 문단이 실제로 그 개념을 독립된 주장으로 다루는 경우에만, 그 개념을 주어·표제어로 하는 주장을 포함하라.`;
+      // 단정형 재지시 — 격차 검출이 문단 자구 실재를 이미 확인했으므로 거짓이 아니다.
+      // "경우에만" 소프트 조건은 하이쿠가 보수적으로 무시했다(실측: 무효 7/9건).
+      p2.user += `\n\n확인된 사실: 이 문단은 다음 개념을 각각 별개로 다루고 있다 — ${gaps.join(', ')}. 각 개념을 주어·표제어로 하는 주장을 반드시 포함하라.`;
       const r2 = normalizeLift(JSON.parse(await llm(p2)), { memoId: l.memoId });
       const gained = gaps.filter((g) => r2.lift.claims.some((c) => c.headword.includes(g) || g.includes(c.headword)));
       if (r2.lift.claims.length && gained.length) { l.claims = r2.lift.claims; l.warnings = r2.warnings; l.gapFixed = { gaps, gained }; }
