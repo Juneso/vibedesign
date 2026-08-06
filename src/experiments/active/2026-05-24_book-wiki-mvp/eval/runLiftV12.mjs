@@ -51,6 +51,24 @@ for (let k = 0; k < book.memos.length; k++) {
   console.log(`  · [${k}] p.${memo.p} → 주장 ${lift.claims.length}개${warnings.length ? ` ⚠${warnings.length}` : ''} (${Math.round((Date.now() - t0) / 1000)}초)`);
 }
 
+// (a) 다개념 에스컬레이션 — 하이쿠 1차 lift 뒤, 다개념 의심 메모만 상위 모델로 재lift.
+// 의심 신호: 주장 3개 이상(과분할이거나 진짜 다개념) 또는 비-high confidence 존재.
+// "싼 모델 기본 + 어려운 케이스만 비싼 모델" 프로덕션 비용 구조의 개발판 (MODEL_ESC=claude-sonnet-5)
+if (process.env.MODEL_ESC) {
+  const esc = claudeCliTransport({ model: process.env.MODEL_ESC, onUsage: (u) => usages.push(u) });
+  for (const l of lifts) {
+    const suspect = l.claims.length >= 3 || l.claims.some((c) => c.confidence !== 'high');
+    if (!suspect) continue;
+    try {
+      const memo = book.memos[Number(l.memoId.split('-').pop())];
+      const raw = await esc(buildLiftPrompt({ book: { title: '피로사회', author: book.author }, memo }));
+      const { lift, warnings } = normalizeLift(JSON.parse(raw), { memoId: l.memoId });
+      if (lift.claims.length) { l.claims = lift.claims; l.escalated = process.env.MODEL_ESC; l.warnings = warnings; }
+      console.log(`  ↑ ${l.memoId} 에스컬레이션 → 주장 ${lift.claims.length}개`);
+    } catch (e) { console.log(`  ↑ ${l.memoId} 에스컬레이션 실패(1차 유지): ${e.message.slice(0, 60)}`); }
+  }
+}
+
 const sum = (f) => usages.reduce((s, u) => s + (f(u) || 0), 0);
 const out = {
   label: `lift-v12-${MODEL.includes('haiku') ? 'haiku' : MODEL}-${label}`,
