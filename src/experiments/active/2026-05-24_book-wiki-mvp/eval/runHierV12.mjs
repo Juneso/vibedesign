@@ -16,13 +16,32 @@ const __dir = dirname(fileURLToPath(import.meta.url));
 const PROVIDER = process.env.PROVIDER || 'manual';
 const label = process.argv[2] || '1';
 
-const golden = JSON.parse(await readFile(resolve(__dir, 'golden/lift-golden-피로사회.json'), 'utf-8'));
+// LIFTS 로 lift 소스를 바꾼다 — 골든(기본) 또는 실 모델 lift 런 (4단계 재생성)
+const golden = JSON.parse(await readFile(resolve(__dir, process.env.LIFTS || 'golden/lift-golden-피로사회.json'), 'utf-8'));
 const ds = JSON.parse(await readFile(resolve(__dir, 'golden/books50-memos.json'), 'utf-8'));
 const book = ds.books.find((b) => nrmT(b.title) === '피로사회');
 function nrmT(s) { return String(s || '').normalize('NFC').trim(); }
 
 let llm, embedFn = null;
-if (PROVIDER === 'manual') {
+if (PROVIDER === 'claude') {
+  // 4단계 재생성 경로 — 조립 LLM 콜을 claude CLI(구독 요금)로. 임베딩은 EMBED=1 일 때만
+  // (openai text-embedding-3-small, 런당 수십 분의 1원 — fold-back·패러프레이즈 병합용)
+  const { claudeCliTransport } = await import('./lib/claudeCliTransport.mjs');
+  llm = claudeCliTransport({ model: process.env.MODEL || 'claude-haiku-4-5-20251001' });
+  if (process.env.EMBED === '1') {
+    await loadDotEnvLocal(__dir);
+    embedFn = async (text) => {
+      const r = await fetch('https://api.openai.com/v1/embeddings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` },
+        body: JSON.stringify({ model: 'text-embedding-3-small', input: text }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d?.error?.message || 'embed fail');
+      return d.data[0].embedding;
+    };
+  }
+} else if (PROVIDER === 'manual') {
   const fx = JSON.parse(await readFile(resolve(__dir, 'golden/hier-v12-manual-피로사회.json'), 'utf-8'));
   // 시스템 프롬프트 문면으로 어떤 콜인지 식별하는 개발용 스텁 — transport 계약과 동일 시그니처
   llm = async ({ system }) => {

@@ -7,8 +7,10 @@
 
 import { spawn } from 'node:child_process';
 
-export function claudeCliTransport({ model = 'claude-haiku-4-5-20251001', bin = 'claude', timeoutMs = 180000, onUsage } = {}) {
-  return ({ system, user }) => new Promise((resolveP, rejectP) => {
+// retries: CLI 는 동시 실행·순간 한도에서 exit 1(스트더러 빈 채)로 즉사할 수 있다
+// (실측: 병렬 2프로세스에서 16콜 연쇄 실패). 백오프 재시도로 흡수한다.
+export function claudeCliTransport({ model = 'claude-haiku-4-5-20251001', bin = 'claude', timeoutMs = 180000, onUsage, retries = 2 } = {}) {
+  const once = ({ system, user }) => new Promise((resolveP, rejectP) => {
     const args = ['-p', '--output-format', 'json', '--model', model];
     if (system) args.push('--system-prompt', system);
     const t0 = Date.now();
@@ -37,4 +39,14 @@ export function claudeCliTransport({ model = 'claude-haiku-4-5-20251001', bin = 
     });
     child.stdin.end(user);
   });
+  return async (prompt) => {
+    for (let i = 0; ; i++) {
+      try { return await once(prompt); } catch (e) {
+        if (i >= retries) throw e;
+        const wait = (i + 1) * 10000;
+        console.warn(`  ⚠ claude -p 실패(${e.message.slice(0, 60)}) — ${wait / 1000}초 후 재시도 ${i + 1}/${retries}`);
+        await new Promise((r) => setTimeout(r, wait));
+      }
+    }
+  };
 }
