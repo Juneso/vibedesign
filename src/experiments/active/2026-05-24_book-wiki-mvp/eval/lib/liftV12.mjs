@@ -15,7 +15,10 @@ import { RELATION_NAMES, relationGuide, MEMBER_SPEC } from './relationVocab.mjs'
 // 표제어 일반화(m18 나르시스 증발), JSON 이탈(마크다운 응답 1건)을 겨냥해 조임.
 // v12.2: v12.1 이 과병합으로 반동(28주장·m18 여전히 증발) — 분할 기준을 숫자 감각이
 // 아니라 슬롯 신호로 재정의하고, 표제어를 "책의 반복 명사구 자구"로 못박음.
-export const LIFT_PROMPT_VERSION = 'lift-v12.2';
+// v12.3: 반복 원칙을 1차 지시로 — "문단 내 2회 이상 반복되는 명사구는 그 문단의 개념"
+// (준서 골든 관찰의 lift 버전). 수리 패스(GAPFIX)는 슬롯에 남은 것만 회수할 수 있어서
+// 1차에서 반복 개념을 안 놓치는 게 근본 대책이라는 gapfix-6 실측(55점)의 결론.
+export const LIFT_PROMPT_VERSION = 'lift-v12.3';
 
 // 쌍 관계의 최소 개수는 relationVocab.MEMBER_SPEC 과 단일 소스
 const minOf = (rel) => MEMBER_SPEC[rel]?.min ?? 1;
@@ -67,6 +70,7 @@ export function buildLiftPrompt({ book, memo }) {
 - 한 전개 방식의 슬롯으로 묶이는 내용은 주장 하나다. 대조의 양쪽, 인과 사슬의 단계들을 따로 주장으로 쪼개지 마라.
 - 반대로, 슬롯을 채우다 보면 **주어가 다른 개념**이 나온다 — "A는 ~다"와 "B는 ~다"가 한 슬롯에 안 들어가면 그것은 별개의 주장이다. 문단이 개념 A를 말하다가 B로, B에서 C로 넘어가면 개념마다 주장을 나눠라. 병렬된 개념들을 하나의 추상 어휘로 흡수하는 것이 최악이다 — 개념 하나가 통째로 증발한다.
 - 표제어는 그 주장의 **주어가 되는 책의 명사구 자구**다. 문단에 실제로 등장하는 구체 명사구(고유 개념)를 두고 그것의 상위 개념이나 바꿔 말한 추상어를 만들지 마라.
+- **문단 안에서 2회 이상 반복되는 명사구는 그 문단의 개념이다.** 표제어를 정하기 전에 반복 명사구를 찾고, 반복 명사구마다 그것을 주어로 하는 주장이 나왔는지 검토하라. 반복 개념이 표제어에 하나도 없으면 그 lift 는 틀린 것이다.
 문단에 없는 내용 추가 금지. 출력은 JSON 하나뿐이다 — 첫 문자는 반드시 { 이고, 코드 펜스·설명 문장·이모지를 붙이지 마라.
 
 [14종 전개 방식 — 정의와 오용 주의]
@@ -109,8 +113,12 @@ export function slotHeadwordGaps(lift, memoText, extraHeads = []) {
   const text = nrmG(memoText);
   return [...cands].filter((n) => {
     const k = nrmG(n);
-    // 2자 개념(슬픔·분노·능률)도 잡는다 — 후보가 슬롯의 이름부 자체라 일반어 오염이 적다
-    return k.length >= 2 && text.includes(k)                     // 문단 자구에 실재
+    // 2자 개념(슬픔·분노·능률)도 잡는다 — 후보가 슬롯의 이름부 자체라 일반어 오염이 적다.
+    // 문단 내 2회 이상 반복 요구 — 진짜 개념은 문단 안에서 반복되고(슬픔 4회·리비도 4회),
+    // 역할 명사(전염성 질병·광인과 범죄자)는 1회다. 단정형 재지시가 역할 명사까지 주장으로
+    // 승격시켜 88주장 과분할이 된 실측(gapfix-6, 55점)의 방지.
+    const freq = text.split(k).length - 1;
+    return k.length >= 2 && freq >= 2
       && !heads.some((h) => h.includes(k) || k.includes(h));     // 표제어 미커버
   });
 }
