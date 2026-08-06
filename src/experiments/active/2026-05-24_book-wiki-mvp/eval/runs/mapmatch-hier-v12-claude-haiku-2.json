@@ -1,0 +1,61 @@
+{
+  "kind": "map-match-v12",
+  "book": "피로사회",
+  "run": "hier-v12-claude-haiku-2",
+  "scoredAt": "2026-08-06T03:34:40.730Z",
+  "total": 78,
+  "records": [
+    {
+      "book": "피로사회",
+      "run": "hier-v12-claude-haiku-2",
+      "axis": "커버",
+      "score": 88,
+      "basis": "골든 지도 개념 26개 중 23개 존재",
+      "failures": [
+        "소비주의",
+        "나르시스",
+        "짜증"
+      ]
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-v12-claude-haiku-2",
+      "axis": "소속",
+      "score": 87,
+      "basis": "역할 블록 소속 판정 가능 23개 중 20개 일치",
+      "failures": [
+        "신경성 질환(진단→문제의식)",
+        "할 수 있다(진단→배경)",
+        "분노(진단→처방)"
+      ]
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-v12-claude-haiku-2",
+      "axis": "대조",
+      "score": 83,
+      "basis": "골든 대조 구도 6개 중 5개 재현",
+      "failures": [
+        "깊은 피로 ↔ 성과사회의 피로"
+      ]
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-v12-claude-haiku-2",
+      "axis": "다개념",
+      "score": 33,
+      "basis": "m95 개념 2/3 보존 · 거처 1곳",
+      "failures": [
+        "나르시스"
+      ]
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-v12-claude-haiku-2",
+      "axis": "편성",
+      "score": 100,
+      "basis": "블록 4개 · 최대 점유 54% · 미배정 0",
+      "failures": []
+    }
+  ]
+}

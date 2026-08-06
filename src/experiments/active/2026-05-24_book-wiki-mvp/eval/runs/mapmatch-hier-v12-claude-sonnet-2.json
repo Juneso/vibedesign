@@ -1,0 +1,61 @@
+{
+  "kind": "map-match-v12",
+  "book": "피로사회",
+  "run": "hier-v12-claude-sonnet-2",
+  "scoredAt": "2026-08-06T03:34:40.736Z",
+  "total": 47,
+  "records": [
+    {
+      "book": "피로사회",
+      "run": "hier-v12-claude-sonnet-2",
+      "axis": "커버",
+      "score": 88,
+      "basis": "골든 지도 개념 26개 중 23개 존재",
+      "failures": [
+        "소비주의",
+        "나르시스",
+        "짜증"
+      ]
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-v12-claude-sonnet-2",
+      "axis": "소속",
+      "score": 0,
+      "basis": "역할 블록 소속 판정 가능 0개 중 0개 일치",
+      "failures": []
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-v12-claude-sonnet-2",
+      "axis": "대조",
+      "score": 83,
+      "basis": "골든 대조 구도 6개 중 5개 재현",
+      "failures": [
+        "깊은 피로 ↔ 성과사회의 피로"
+      ]
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-v12-claude-sonnet-2",
+      "axis": "다개념",
+      "score": 33,
+      "basis": "m95 개념 2/3 보존 · 거처 1곳",
+      "failures": [
+        "나르시스"
+      ]
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-v12-claude-sonnet-2",
+      "axis": "편성",
+      "score": 30,
+      "basis": "블록 0개 · 최대 점유 0% · 미배정 26",
+      "failures": [
+        "블록 0개",
+        "처방 블록 없음",
+        "미배정 26"
+      ]
+    }
+  ]
+}

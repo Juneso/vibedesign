@@ -34,6 +34,8 @@ let warnTotal = 0;
 for (let k = 0; k < book.memos.length; k++) {
   const memo = book.memos[k];
   const memoId = `ds-b50-피로사회-${k}`;
+  // MEMOS=11,18 — 표적 메모만 lift (프롬프트 튜닝 반복을 24콜이 아니라 2~3콜로)
+  if (process.env.MEMOS && !process.env.MEMOS.split(',').includes(String(k))) continue;
   if (prev.has(memoId)) { lifts.push(prev.get(memoId)); continue; }
   const t0 = Date.now();
   let raw, parsed = null;

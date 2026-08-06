@@ -31,11 +31,18 @@ export function claudeCliTransport({ model = 'claude-haiku-4-5-20251001', bin = 
         inputTokens: j.usage?.input_tokens ?? null, outputTokens: j.usage?.output_tokens ?? null,
         cacheReadTokens: j.usage?.cache_read_input_tokens ?? null, costUsd: j.total_cost_usd ?? null,
       });
-      // 프롬프트는 "JSON만 출력"을 요구하지만 모델이 ```json 펜스를 두르는 일이 있다 — 벗겨서 반환
+      // 프롬프트는 "JSON만 출력"을 요구하지만 모델이 펜스나 산문을 두르는 일이 있다
+      // (실측: sonnet 역할 블록 응답이 산문 섞임 → 파싱 실패 → 블록 0개).
+      // 펜스 제거 후에도 JSON 이 아니면 첫 { 부터 마지막 } 까지를 추출한다.
       let text = String(j.result ?? '');
       const m = text.match(/```(?:json)?\s*([\s\S]*?)```/);
       if (m) text = m[1];
-      resolveP(text.trim());
+      text = text.trim();
+      if (!text.startsWith('{')) {
+        const a = text.indexOf('{'), b = text.lastIndexOf('}');
+        if (a >= 0 && b > a) text = text.slice(a, b + 1);
+      }
+      resolveP(text);
     });
     child.stdin.end(user);
   });
