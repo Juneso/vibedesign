@@ -154,6 +154,52 @@ ${clusterLine}
   }
   log.push(`[v12] 대조 엣지 ${edges.length}개 (lift 슬롯 그대로 · 재판정 0콜) — 클러스터 간 해석 ${edges.filter((e) => e.b).length}개`);
 
+  // ── 4.5) 키워드 위계 — 큰 맥을 부모로, 슬롯 신호로 자식 매달기 (0806 준서 판정) ──
+  // "우울증·성과사회·성과주체라는 큰 맥이 분명하니 그걸 부모로 하고 상세를 하위로."
+  // lift 슬롯을 그대로 재사용하는 규칙 처리 — LLM 0콜. 같은 블록 안에서만 중첩한다
+  // (블록을 넘는 관계는 엣지로 남긴다 — 슬픔↔우울증처럼).
+  {
+    const blockOfC = new Map();
+    for (const b of blocks) for (const k of b.members) blockOfC.set(k.id, b);
+    const weight = (k) => k.claims.length;
+    const nodeC = (k) => nodes.get(k.nodeId);
+    const isAnc = (aId, bId) => { let c = nodes.get(bId); while (c && c.parentId) { if (c.parentId === aId) return true; c = nodes.get(c.parentId); } return false; };
+    const relevel = (nid) => { const x = nodes.get(nid); x.level = nodes.get(x.parentId).level + 1; for (const ch of nodes.values()) if (ch.parentId === nid) relevel(ch.id); };
+    const nested = [];
+    const nest = (child, parent, why) => {
+      if (!child || !parent || child === parent) return;
+      if (blockOfC.get(child.id) !== blockOfC.get(parent.id)) return;           // 블록 밖 이동 금지
+      const cn = nodeC(child), pn = nodeC(parent);
+      if (!cn || !pn || cn.parentId !== blockOfC.get(child.id) && nodes.get(cn.parentId)?.kind !== 'concept') return;
+      if (nodes.get(cn.parentId)?.clusterId) return;                            // 이미 중첩됐으면 유지 (첫 신호 우선)
+      if (isAnc(cn.id, pn.id)) return;                                          // 순환 방지
+      if (weight(child) > weight(parent)) return;                               // 큰 맥이 밑으로 가는 역전 금지
+      cn.parentId = pn.id; relevel(cn.id);
+      nested.push(`${child.rep} → ${parent.rep}(${why})`);
+    };
+    const byHeadIn = (text, exclude) => findByText(text, exclude);
+    for (const k of clusters) for (const c of k.claims) {
+      // 대조: 반대개념은 참조된 쪽 아래로 (준서 지도의 "짜증 — 분노의 반대개념" 동형)
+      const ct = c.slots?.['대조'];
+      if (ct) { const other = ct.pair.map((t) => byHeadIn(t, k)).find(Boolean); if (other) nest(k, other, '대조'); }
+      // 인과: 사슬 항목이 다른 키워드면 그중 가장 큰 맥 아래로
+      const ch = c.slots?.['인과'];
+      if (ch) {
+        const hits = ch.chain.map((t) => byHeadIn(t, k)).filter(Boolean);
+        const big = hits.sort((a, b) => weight(b) - weight(a))[0];
+        if (big) nest(k, big, '인과');
+      }
+      // 예시·분석·정의: 대상(of/concept)이 다른 키워드면 그 밑으로
+      for (const rel of ['예시', '분석', '정의']) {
+        const s = c.slots?.[rel]; if (!s) continue;
+        const target = byHeadIn(s.of || s.concept || '', k);
+        if (target) nest(k, target, rel);
+      }
+    }
+    if (nested.length) log.push(`[v12] 키워드 위계 ${nested.length}건: ${nested.join(' · ')}`);
+    else log.push('[v12] 키워드 위계 신호 없음 — 평면 유지');
+  }
+
   // ── 5) fold-back — 여러 블록에 걸친 느슨한 클러스터를 후보로 1콜 (보완점 ④) ──
   // 준서 골든 관찰: 능률·경제 효율·생산 증대는 펼친 맵을 거꾸로 "묶는" 개념이 된다.
   if (embedFn && llm) {

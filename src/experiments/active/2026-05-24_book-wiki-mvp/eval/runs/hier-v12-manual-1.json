@@ -1,6 +1,6 @@
 {
   "label": "hier-v12-manual-1",
-  "runAt": "2026-08-05T08:08:20.247Z",
+  "runAt": "2026-08-06T02:55:59.916Z",
   "kind": "hier-v12",
   "provider": "manual",
   "promptVersion": "lift-v12.0",
@@ -78,8 +78,8 @@
       {
         "id": "n5",
         "title": "긍정성의 과잉",
-        "parentId": "n2",
-        "level": 2,
+        "parentId": "n3",
+        "level": 3,
         "kind": "concept",
         "sources": [
           11
@@ -92,7 +92,7 @@
         "id": "n6",
         "title": "신경성 질환은 면역학적 타자의 부정성이 아니라 긍정성의 과잉으로 인한 질병이다.",
         "parentId": "n5",
-        "level": 3,
+        "level": 4,
         "kind": "sentence",
         "sources": [
           11
@@ -341,8 +341,8 @@
       {
         "id": "n22",
         "title": "할 수 있음",
-        "parentId": "n11",
-        "level": 2,
+        "parentId": "n18",
+        "level": 3,
         "kind": "concept",
         "sources": [
           24
@@ -355,7 +355,7 @@
         "id": "n23",
         "title": "성과사회는 부정성을 폐기하며, 금지·명령·법률의 '노' 대신 무한정한 '할 수 있음'이 지배하는 사회다.",
         "parentId": "n22",
-        "level": 3,
+        "level": 4,
         "kind": "sentence",
         "sources": [
           24
@@ -401,8 +401,8 @@
       {
         "id": "n26",
         "title": "호모 사케르",
-        "parentId": "n11",
-        "level": 2,
+        "parentId": "n18",
+        "level": 3,
         "kind": "concept",
         "sources": [
           114
@@ -415,7 +415,7 @@
         "id": "n27",
         "title": "성과사회의 호모 사케르는 절대로 죽일 수 없다는 점에서 주권 사회의 호모 사케르와 구별되며, 그 생명은 완전히 죽지 않은 자들(Untote)의 생명과 비슷하다.",
         "parentId": "n26",
-        "level": 3,
+        "level": 4,
         "kind": "sentence",
         "sources": [
           114
@@ -871,8 +871,8 @@
       {
         "id": "n55",
         "title": "정체성 상품",
-        "parentId": "n28",
-        "level": 2,
+        "parentId": "n29",
+        "level": 3,
         "kind": "concept",
         "sources": [
           99
@@ -885,7 +885,7 @@
         "id": "n56",
         "title": "개성을 확장·변형·발명해야 한다는 명령이 우울증을 초래하며, 그 명령의 원천은 정체성과 관련된 상품 — 자본이 요구하는 필요가 만든 트렌드다.",
         "parentId": "n55",
-        "level": 3,
+        "level": 4,
         "kind": "sentence",
         "sources": [
           99
@@ -961,8 +961,8 @@
       {
         "id": "n61",
         "title": "자학",
-        "parentId": "n28",
-        "level": 2,
+        "parentId": "n59",
+        "level": 3,
         "kind": "concept",
         "sources": [
           102
@@ -975,7 +975,7 @@
         "id": "n62",
         "title": "도달 불가능한 이상 자아의 덫에 걸린 자아는 완전히 녹초가 되며, 현실의 자아와 이상 자아의 간극은 자학으로 이어진다.",
         "parentId": "n61",
-        "level": 3,
+        "level": 4,
         "kind": "sentence",
         "sources": [
           102
@@ -991,8 +991,8 @@
       {
         "id": "n63",
         "title": "능률",
-        "parentId": "n28",
-        "level": 2,
+        "parentId": "n38",
+        "level": 3,
         "kind": "concept",
         "sources": [
           103
@@ -1005,7 +1005,7 @@
         "id": "n64",
         "title": "자본주의가 일정한 생산수준에 이르면 자기 착취는 타자에 의한 착취보다 더 능률적이다 — 자유의 감정을 동반하기 때문이다.",
         "parentId": "n63",
-        "level": 3,
+        "level": 4,
         "kind": "sentence",
         "sources": [
           103
@@ -1129,8 +1129,8 @@
       {
         "id": "n72",
         "title": "짜증",
-        "parentId": "n65",
-        "level": 2,
+        "parentId": "n70",
+        "level": 3,
         "kind": "concept",
         "sources": [
           50
@@ -1143,7 +1143,7 @@
         "id": "n73",
         "title": "가속화와 활동과잉 속에서 분노는 사라지고, 어떤 심대한 변화도 일으키지 못하는 짜증과 신경질만 확산된다.",
         "parentId": "n72",
-        "level": 3,
+        "level": 4,
         "kind": "sentence",
         "sources": [
           50
@@ -1454,6 +1454,7 @@
     "[v12] 클러스터 36개 · 승격(2회 이상) 3개: 우울증(3) · 강제하는 자유(2) · 노동하는 동물(2) — 임베딩 없음: 자구 일치만",
     "[v12] 역할 블록 4개: 긍정성 과잉의 병리(문제의식·4) · 규율사회에서 성과사회로(배경·8) · 성과주체의 자기 착취(진단·16) · 부정성의 회복(처방·8)",
     "[v12] 대조 엣지 15개 (lift 슬롯 그대로 · 재판정 0콜) — 클러스터 간 해석 7개",
+    "[v12] 키워드 위계 7건: 긍정성의 과잉 → 신경성 질환(인과) · 할 수 있음 → 성과사회(대조) · 짜증 → 분노(대조) · 정체성 상품 → 우울증(인과) · 자학 → 이상 자아(인과) · 능률 → 자기 착취(인과) · 호모 사케르 → 성과사회(대조)",
     "[v12] fold-back 스킵 — 임베딩 없음(개발 루프 0원 모드)"
   ]
 }

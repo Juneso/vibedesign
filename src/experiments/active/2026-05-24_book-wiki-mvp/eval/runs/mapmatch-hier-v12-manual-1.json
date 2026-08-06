@@ -2,7 +2,7 @@
   "kind": "map-match-v12",
   "book": "피로사회",
   "run": "hier-v12-manual-1",
-  "scoredAt": "2026-08-05T08:38:05.795Z",
+  "scoredAt": "2026-08-06T02:56:00.128Z",
   "total": 100,
   "records": [
     {
@@ -42,7 +42,7 @@
       "run": "hier-v12-manual-1",
       "axis": "편성",
       "score": 100,
-      "basis": "블록 4개 · 최대 점유 44% · 미배정 0",
+      "basis": "블록 4개 · 최대 점유 36% · 미배정 0",
       "failures": []
     }
   ]
