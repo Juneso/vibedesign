@@ -18,7 +18,10 @@ import { RELATION_NAMES, relationGuide, MEMBER_SPEC } from './relationVocab.mjs'
 // v12.3: 반복 원칙을 1차 지시로 — "문단 내 2회 이상 반복되는 명사구는 그 문단의 개념"
 // (준서 골든 관찰의 lift 버전). 수리 패스(GAPFIX)는 슬롯에 남은 것만 회수할 수 있어서
 // 1차에서 반복 개념을 안 놓치는 게 근본 대책이라는 gapfix-6 실측(55점)의 결론.
-export const LIFT_PROMPT_VERSION = 'lift-v12.3';
+// v12.4: 합성 표제어 근절 — v12.3 실측에서 "슬픔과 우울증의 대상 관계" 같은 구절형
+// 표제어가 나르시스 증발과 임베딩 병합 무력화를 동시에 유발. 표제어=주어 하나,
+// 책 고유 개념어는 반복 없어도 표제어 자격.
+export const LIFT_PROMPT_VERSION = 'lift-v12.4';
 
 // 쌍 관계의 최소 개수는 relationVocab.MEMBER_SPEC 과 단일 소스
 const minOf = (rel) => MEMBER_SPEC[rel]?.min ?? 1;
@@ -71,6 +74,8 @@ export function buildLiftPrompt({ book, memo }) {
 - 반대로, 슬롯을 채우다 보면 **주어가 다른 개념**이 나온다 — "A는 ~다"와 "B는 ~다"가 한 슬롯에 안 들어가면 그것은 별개의 주장이다. 문단이 개념 A를 말하다가 B로, B에서 C로 넘어가면 개념마다 주장을 나눠라. 병렬된 개념들을 하나의 추상 어휘로 흡수하는 것이 최악이다 — 개념 하나가 통째로 증발한다.
 - 표제어는 그 주장의 **주어가 되는 책의 명사구 자구**다. 문단에 실제로 등장하는 구체 명사구(고유 개념)를 두고 그것의 상위 개념이나 바꿔 말한 추상어를 만들지 마라.
 - **문단 안에서 2회 이상 반복되는 명사구는 그 문단의 개념이다.** 표제어를 정하기 전에 반복 명사구를 찾고, 반복 명사구마다 그것을 주어로 하는 주장이 나왔는지 검토하라. 반복 개념이 표제어에 하나도 없으면 그 lift 는 틀린 것이다.
+- **책 고유의 개념어(일반어가 아닌 명사구 — 예: 흔한 말이 아닌 학술어·조어)가 주어로 등장하면 반복이 없어도 그것이 표제어다.**
+- 표제어는 **명사구 하나**다. "A와 B", "A의 B 관계"처럼 개념 둘을 연결한 구절은 표제어가 아니다 — 그런 표제어가 나오면 주장을 잘못 묶은 것이니 개념별로 다시 나눠라.
 문단에 없는 내용 추가 금지. 출력은 JSON 하나뿐이다 — 첫 문자는 반드시 { 이고, 코드 펜스·설명 문장·이모지를 붙이지 마라.
 
 [14종 전개 방식 — 정의와 오용 주의]
@@ -172,6 +177,7 @@ export function normalizeLift(raw, { memoId } = {}) {
     const headword = String(c.headword || '').trim();
     if (!headword) warnings.push(`${where}: headword 가 비었다`);
     else if (headword.length > 12) warnings.push(`${where}: headword "${headword}" 가 너무 길다 (2~10자 명사구)`);
+    else if (/[와과]\s|의 .+ /.test(headword)) warnings.push(`${where}: headword "${headword}" 합성 의심 — 명사구 하나여야 한다`);
 
     const confidence = ['high', 'med', 'low'].includes(c.confidence) ? c.confidence : 'low';
     if (confidence !== c.confidence) warnings.push(`${where}: confidence "${c.confidence}" 비정상 — low 로 강등`);

@@ -74,6 +74,22 @@ if (process.env.GAPFIX === '1') {
   }
 }
 
+// THINK_ESC — 에스컬레이션 축은 모델이 아니라 생각 예산 (소네트 기각 후 확정).
+// 트리거 = 합성 표제어 경고("슬픔과 우울증"류) — 뭉갬의 리트머스. 그 메모만 같은
+// 하이쿠를 thinking 8k 로 재lift (21초 → 118초, 실측: 합성 소멸·슬픔 분리).
+if (process.env.THINK_ESC === '1') {
+  const esc = claudeCliTransport({ model: MODEL, maxThinkingTokens: 8000, onUsage: (u) => usages.push(u) });
+  for (const l of lifts) {
+    if (!l.warnings?.some((w) => w.includes('합성 의심'))) continue;
+    try {
+      const memo = book.memos[Number(l.memoId.split('-').pop())];
+      const r2 = normalizeLift(JSON.parse(await esc(buildLiftPrompt({ book: { title: '피로사회', author: book.author }, memo }))), { memoId: l.memoId });
+      if (r2.lift.claims.length && r2.warnings.length < l.warnings.length) { l.claims = r2.lift.claims; l.warnings = r2.warnings; l.thinkEsc = true; }
+      console.log(`  ↑ ${l.memoId} thinking 재lift → 경고 ${r2.warnings.length}`);
+    } catch (e) { console.log(`  ↑ ${l.memoId} thinking 재lift 실패(1차 유지)`); }
+  }
+}
+
 // (a) 다개념 에스컬레이션 — 하이쿠 1차 lift 뒤, 다개념 의심 메모만 상위 모델로 재lift.
 // 의심 신호: 주장 3개 이상(과분할이거나 진짜 다개념) 또는 비-high confidence 존재.
 // "싼 모델 기본 + 어려운 케이스만 비싼 모델" 프로덕션 비용 구조의 개발판 (MODEL_ESC=claude-sonnet-5)

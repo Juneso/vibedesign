@@ -168,7 +168,9 @@ ${clusterLine}
     const nested = [];
     const nest = (child, parent, why) => {
       if (!child || !parent || child === parent) return;
-      if (blockOfC.get(child.id) !== blockOfC.get(parent.id)) return;           // 블록 밖 이동 금지
+      // 블록 밖 이동은 부모가 승격 큰 맥일 때만 — 오라클의 성과사회>우울증처럼
+      // 큰 맥은 블록을 넘어 자식을 갖는다 (0806 위계 축 실측: 기준선 1/8의 주범)
+      if (blockOfC.get(child.id) !== blockOfC.get(parent.id) && weight(parent) < 2) return;
       const cn = nodeC(child), pn = nodeC(parent);
       if (!cn || !pn || cn.parentId !== blockOfC.get(child.id) && nodes.get(cn.parentId)?.kind !== 'concept') return;
       if (nodes.get(cn.parentId)?.clusterId) return;                            // 이미 중첩됐으면 유지 (첫 신호 우선)
@@ -195,6 +197,11 @@ ${clusterLine}
         const target = byHeadIn(s.of || s.concept || '', k);
         if (target) nest(k, target, rel);
       }
+      // 통시: 시기·국면 항목도 사슬처럼 — "규율사회→성과사회" phases 가 큰 맥을 가리킨다
+      const ts = c.slots?.['통시'];
+      if (ts) { const hit = ts.phases.map((t) => byHeadIn(t, k)).find(Boolean); if (hit) nest(k, hit, '통시'); }
+      // ⚠ "주장 문장이 큰 맥을 언급하면 그 아래로" 규칙은 기각 — 언급은 종속이 아니다
+      // (실측: 신경성 질환이 우울증을 예시로 나열했다고 우울증 밑으로 들어감, 소속 100→96)
     }
     if (nested.length) log.push(`[v12] 키워드 위계 ${nested.length}건: ${nested.join(' · ')}`);
     else log.push('[v12] 키워드 위계 신호 없음 — 평면 유지');
