@@ -39,11 +39,15 @@ for (let k = 0; k < book.memos.length; k++) {
   if (prev.has(memoId)) { lifts.push(prev.get(memoId)); continue; }
   const t0 = Date.now();
   let raw, parsed = null;
-  try {
-    raw = await llm(buildLiftPrompt({ book: { title: '피로사회', author: book.author }, memo }));
-    parsed = JSON.parse(raw);
-  } catch (e) {
-    console.log(`  ✗ [${k}] p.${memo.p} 실패: ${e.message.slice(0, 120)}`);
+  // JSON 이탈은 transport 재시도(exit 실패만 흡수) 밖이라 여기서 1회 재콜한다 —
+  // 실측: lift-9 에서 m17 이 파싱 실패로 주장 0개가 되어 커버·위계를 깎았다
+  for (let attempt = 0; attempt < 2 && !parsed; attempt++) {
+    try {
+      raw = await llm(buildLiftPrompt({ book: { title: '피로사회', author: book.author }, memo }));
+      parsed = JSON.parse(raw);
+    } catch (e) {
+      console.log(`  ✗ [${k}] p.${memo.p} ${attempt ? '실패(재시도 소진)' : '실패 — 재시도'}: ${e.message.slice(0, 120)}`);
+    }
   }
   const { lift, warnings } = normalizeLift(parsed || { claims: [] }, { memoId });
   warnTotal += warnings.length;

@@ -204,13 +204,19 @@ ${clusterLine}
       return clusters.find((p) => p !== self && nrm(p.rep).endsWith(headN) && stems.some((s) => fullText(p).includes(s))) || null;
     };
 
-    // ① 조사 참조: 주장 문면의 "P의|P로의|P는|P이|P가" — 방향이 자구로 고정되므로 무게 guard 없음
+    // ① 조사 참조: 주장 문면의 "P의|P로의|P는|P이|P가" — 방향이 자구로 고정되므로 무게 guard 없음.
+    // 부모 자격: 4자 이상이거나, 승격 큰 맥이면서 같은 블록. 하이쿠 lift 의 2자 일반어
+    // 클러스터(타자·자아·부정·폭력·심급·실재)가 부모로 잡히면 성과주체 사슬 전체가 "타자"
+    // 밑으로 끌려가 소속이 무너진다(rule2-9 실측: 90→57) — 일반어는 짧고 승격도 안 되므로
+    // 이 자격 조건이 걸러낸다. 수동 골든의 정방향(성과사회·성과주체 4자, 짜증→분노 같은
+    // 블록 승격)은 전부 통과.
     const PARTICLES = ['의', '는', '이', '가'];
     const refParent = (k, c) => {
       const t = nrm(c.claim);
       let best = null;
       for (const p of clusters) {
         if (p === k) continue;
+        if (!(nrm(p.rep).length >= 4 || (weight(p) >= 2 && blockOfC.get(p.id) === blockOfC.get(k.id)))) continue;
         for (const h of p.headwords) {
           if (h.length < 2) continue;
           let i = t.indexOf(h);
@@ -251,7 +257,8 @@ ${clusterLine}
               // 상대가 클러스터로 없으면 자식 키워드로 신설 — 승격 큰 맥일 때만 (분노 ⊃ 짜증)
               if (weight(k) >= 2) {
                 const name = N(side).split('—')[0].split(/[과와]\s/)[0].trim();
-                if (name.length >= 2 && name.length <= 10 && !nrm(k.rep).includes(nrm(name)) && nrm(c.claim).includes(nrm(name)))
+                if (name.length >= 2 && name.length <= 10 && !nrm(k.rep).includes(nrm(name)) && nrm(c.claim).includes(nrm(name))
+                  && !foilChildren.some((f) => f.name === name && f.under === k))
                   foilChildren.push({ name, under: k, from: c });
               }
             }
