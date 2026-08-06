@@ -1,0 +1,75 @@
+{
+  "kind": "map-match-v12",
+  "book": "피로사회",
+  "run": "hier-v12-claude-final-8",
+  "scoredAt": "2026-08-06T08:55:13.725Z",
+  "total": 70,
+  "records": [
+    {
+      "book": "피로사회",
+      "run": "hier-v12-claude-final-8",
+      "axis": "커버",
+      "score": 85,
+      "basis": "골든 지도 개념 26개 중 22개 존재",
+      "failures": [
+        "능률",
+        "나르시스",
+        "짜증",
+        "슬픔"
+      ]
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-v12-claude-final-8",
+      "axis": "소속",
+      "score": 90,
+      "basis": "역할 블록 소속 판정 가능 21개 중 19개 일치",
+      "failures": [
+        "합의적 폭력(진단→문제의식)",
+        "분노(진단→처방)"
+      ]
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-v12-claude-final-8",
+      "axis": "대조",
+      "score": 100,
+      "basis": "골든 대조 구도 6개 중 6개 재현",
+      "failures": []
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-v12-claude-final-8",
+      "axis": "다개념",
+      "score": 33,
+      "basis": "m95 개념 2/3 보존 · 거처 1곳",
+      "failures": [
+        "나르시스"
+      ]
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-v12-claude-final-8",
+      "axis": "편성",
+      "score": 100,
+      "basis": "블록 4개 · 최대 점유 38% · 미배정 3",
+      "failures": []
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-v12-claude-final-8",
+      "axis": "위계",
+      "score": 13,
+      "basis": "오라클 부모-자식 8쌍 중 1쌍 조상-자손 재현",
+      "failures": [
+        "성과사회 > 성과주체",
+        "성과주체 > 자기 착취",
+        "성과주체 > 나르시스",
+        "성과사회 > 우울증",
+        "분노 > 짜증",
+        "깊은 피로 > 고독한 피로",
+        "후기근대적 자아 > 능률"
+      ]
+    }
+  ]
+}
