@@ -90,6 +90,37 @@ if (process.env.THINK_ESC === '1') {
   }
 }
 
+// SAMPLE2 — 다개념 메모 2샘플 합집합 (0806 잔여 대책, m18 나르시스 분산 흡수).
+// 하이쿠는 같은 프롬프트·같은 메모에서 런마다 다른 개념을 잃는다(나르시스 8회 중 1회 출현).
+// 프롬프트 조이기의 한계가 실측으로 확정됐으므로 표본을 늘린다: 다개념 의심 메모(주장 3개
+// 이상 또는 비-high confidence — MODEL_ESC 와 같은 신호)만 같은 모델로 1회 더 lift 하고,
+// 1차 표제어에 없으면서 문단 자구에 실재하는 표제어의 주장만 합친다 — 자구 조건이
+// 추상어 잡음 유입을 막고, 기존 주장은 건드리지 않아 1차 품질이 회귀하지 않는다.
+if (process.env.SAMPLE2 === '1') {
+  const nrmS = (s) => String(s || '').normalize('NFC').replace(/\s+/g, '').toLowerCase();
+  for (const l of lifts) {
+    const suspect = l.claims.length >= 3 || l.claims.some((c) => c.confidence !== 'high');
+    if (!suspect || !l.claims.length) continue;
+    try {
+      const memo = book.memos[Number(l.memoId.split('-').pop())];
+      const r2 = normalizeLift(JSON.parse(await llm(buildLiftPrompt({ book: { title: '피로사회', author: book.author }, memo }))), { memoId: l.memoId });
+      const heads = l.claims.map((c) => nrmS(c.headword));
+      const text = nrmS(memo.text);
+      const fresh = r2.lift.claims.filter((c) => {
+        const h = nrmS(c.headword);
+        return h.length >= 2 && text.includes(h)
+          && !heads.some((x) => x.includes(h) || h.includes(x));
+      });
+      if (fresh.length) {
+        fresh.forEach((c, i) => { c.id = `s2-${i + 1}`; });
+        l.claims.push(...fresh);
+        l.sample2 = fresh.map((c) => c.headword);
+      }
+      console.log(`  ⊎ ${l.memoId} 2샘플 → ${fresh.length ? `합집합 +${fresh.map((c) => c.headword).join(',')}` : '신규 없음'}`);
+    } catch (e) { console.log(`  ⊎ ${l.memoId} 2샘플 실패(1차 유지): ${e.message.slice(0, 50)}`); }
+  }
+}
+
 // (a) 다개념 에스컬레이션 — 하이쿠 1차 lift 뒤, 다개념 의심 메모만 상위 모델로 재lift.
 // 의심 신호: 주장 3개 이상(과분할이거나 진짜 다개념) 또는 비-high confidence 존재.
 // "싼 모델 기본 + 어려운 케이스만 비싼 모델" 프로덕션 비용 구조의 개발판 (MODEL_ESC=claude-sonnet-5)

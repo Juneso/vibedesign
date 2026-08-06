@@ -1,0 +1,68 @@
+{
+  "kind": "map-match-v12",
+  "book": "피로사회",
+  "run": "hier-v12-manual-4",
+  "scoredAt": "2026-08-06T10:58:30.176Z",
+  "total": 93,
+  "records": [
+    {
+      "book": "피로사회",
+      "run": "hier-v12-manual-4",
+      "axis": "커버",
+      "score": 100,
+      "basis": "골든 지도 개념 26개 중 26개 존재",
+      "failures": []
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-v12-manual-4",
+      "axis": "소속",
+      "score": 69,
+      "basis": "역할 블록 소속 판정 가능 26개 중 18개 일치",
+      "failures": [
+        "성과주체(처방→배경)",
+        "할 수 있다(처방→배경)",
+        "우울증(처방→진단)",
+        "강제하는 자유(처방→진단)",
+        "보상(처방→진단)",
+        "능률(처방→진단)",
+        "나르시스(처방→진단)",
+        "정체성(처방→진단)"
+      ]
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-v12-manual-4",
+      "axis": "대조",
+      "score": 100,
+      "basis": "골든 대조 구도 6개 중 6개 재현",
+      "failures": []
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-v12-manual-4",
+      "axis": "다개념",
+      "score": 100,
+      "basis": "m95 개념 3/3 보존 · 거처 3곳",
+      "failures": []
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-v12-manual-4",
+      "axis": "편성",
+      "score": 100,
+      "basis": "블록 4개 · 최대 점유 11% · 미배정 0",
+      "failures": []
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-v12-manual-4",
+      "axis": "위계",
+      "score": 88,
+      "basis": "오라클 부모-자식 8쌍 중 7쌍 조상-자손 재현",
+      "failures": [
+        "후기근대적 자아 > 능률"
+      ]
+    }
+  ]
+}

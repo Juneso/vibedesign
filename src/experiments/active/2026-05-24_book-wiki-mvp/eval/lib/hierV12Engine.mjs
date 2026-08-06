@@ -154,54 +154,183 @@ ${clusterLine}
   }
   log.push(`[v12] 대조 엣지 ${edges.length}개 (lift 슬롯 그대로 · 재판정 0콜) — 클러스터 간 해석 ${edges.filter((e) => e.b).length}개`);
 
-  // ── 4.5) 키워드 위계 — 큰 맥을 부모로, 슬롯 신호로 자식 매달기 (0806 준서 판정) ──
-  // "우울증·성과사회·성과주체라는 큰 맥이 분명하니 그걸 부모로 하고 상세를 하위로."
-  // lift 슬롯을 그대로 재사용하는 규칙 처리 — LLM 0콜. 같은 블록 안에서만 중첩한다
-  // (블록을 넘는 관계는 엣지로 남긴다 — 슬픔↔우울증처럼).
+  // ── 4.5) 키워드 위계 v2 — 조사 참조·대조 방향·핵어 공유 (0806 준서 판정의 채점화 대응) ──
+  // "큰 맥(우울증·성과사회·성과주체)을 부모로 세우고 상세 설명을 하위로."
+  // v1(슬롯 신호 + 무게 역전 금지 + 블록 내부 한정)은 오라클 8쌍 중 1쌍 — 실패 원인 실측:
+  //   ① 프레임 개념(성과사회)은 주장 수가 적어도 부모다 → 무게 역전 guard 가 정방향을 막음
+  //   ② "성과사회의 주민", "성과주체는 강박에 빠진다"처럼 조사로 결합한 참조가 최다 신호인데 미사용
+  //     (기각된 "언급→종속"과 다르다 — 나열 언급 "우울증·ADHD…"는 조사가 없어 안 걸린다)
+  //   ③ 대조 방향 고정 오류: 주장의 주어가 자기 표제어면(깊은 피로는…) 상대는 반대개념 '자식'이다
+  //     — 오라클이 "대조: 성과사회의 피로"를 깊은 피로 밑에 들여쓴 동형. 주어가 상대면 기존대로 그 아래로.
+  // 전부 자구·슬롯 재사용 — LLM 0콜 · 임베딩 0콜. 신호 우선순위: 조사 참조 → 대조 → 인과 →
+  // 예시·분석·정의 → 통시 → 핵어 공유. 클러스터당 첫 신호가 이긴다.
   {
     const blockOfC = new Map();
     for (const b of blocks) for (const k of b.members) blockOfC.set(k.id, b);
     const weight = (k) => k.claims.length;
-    const nodeC = (k) => nodes.get(k.nodeId);
-    const isAnc = (aId, bId) => { let c = nodes.get(bId); while (c && c.parentId) { if (c.parentId === aId) return true; c = nodes.get(c.parentId); } return false; };
-    const relevel = (nid) => { const x = nodes.get(nid); x.level = nodes.get(x.parentId).level + 1; for (const ch of nodes.values()) if (ch.parentId === nid) relevel(ch.id); };
-    const nested = [];
-    const nest = (child, parent, why) => {
-      if (!child || !parent || child === parent) return;
-      // 블록 밖 이동은 부모가 승격 큰 맥일 때만 — 오라클의 성과사회>우울증처럼
-      // 큰 맥은 블록을 넘어 자식을 갖는다 (0806 위계 축 실측: 기준선 1/8의 주범)
-      if (blockOfC.get(child.id) !== blockOfC.get(parent.id) && weight(parent) < 2) return;
-      const cn = nodeC(child), pn = nodeC(parent);
-      if (!cn || !pn || cn.parentId !== blockOfC.get(child.id) && nodes.get(cn.parentId)?.kind !== 'concept') return;
-      if (nodes.get(cn.parentId)?.clusterId) return;                            // 이미 중첩됐으면 유지 (첫 신호 우선)
-      if (isAnc(cn.id, pn.id)) return;                                          // 순환 방지
-      if (weight(child) > weight(parent)) return;                               // 큰 맥이 밑으로 가는 역전 금지
-      cn.parentId = pn.id; relevel(cn.id);
-      nested.push(`${child.rep} → ${parent.rep}(${why})`);
+    // 클러스터 전문(주장 + 슬롯 값) — 대조 반대편의 퍼지 매칭용
+    const fullTextOf = new Map();
+    const fullText = (k) => {
+      if (!fullTextOf.has(k.id)) {
+        const parts = [];
+        for (const c of k.claims) {
+          parts.push(c.claim);
+          for (const s of Object.values(c.slots || {})) for (const v of Object.values(s)) parts.push(Array.isArray(v) ? v.join(' ') : v);
+        }
+        fullTextOf.set(k.id, nrm(parts.join(' ')));
+      }
+      return fullTextOf.get(k.id);
+    };
+    // parentOf: 클러스터 그래프로 먼저 모으고 마지막에 트리에 반영 — 순환·중복을 그래프에서 거른다
+    const parentOf = new Map(); // childClusterId → { parent, why }
+    const propose = (child, parent, why) => {
+      if (!child || !parent || child === parent || parentOf.has(child.id)) return false;
+      let a = parent; const seen = new Set([child.id]);
+      while (a) { if (seen.has(a.id)) return false; seen.add(a.id); a = parentOf.get(a.id)?.parent; }
+      parentOf.set(child.id, { parent, why });
+      return true;
     };
     const byHeadIn = (text, exclude) => findByText(text, exclude);
-    for (const k of clusters) for (const c of k.claims) {
-      // 대조: 반대개념은 참조된 쪽 아래로 (준서 지도의 "짜증 — 분노의 반대개념" 동형)
-      const ct = c.slots?.['대조'];
-      if (ct) { const other = ct.pair.map((t) => byHeadIn(t, k)).find(Boolean); if (other) nest(k, other, '대조'); }
-      // 인과: 사슬 항목이 다른 키워드면 그중 가장 큰 맥 아래로
-      const ch = c.slots?.['인과'];
-      if (ch) {
-        const hits = ch.chain.map((t) => byHeadIn(t, k)).filter(Boolean);
-        const big = hits.sort((a, b) => weight(b) - weight(a))[0];
-        if (big) nest(k, big, '인과');
+    // 주어 판정 — 표제어가 주장 문두부에 있으면 자기 서술 주장이다
+    const selfSubject = (k, c) => nrm(c.claim).slice(0, nrm(k.rep).length + 6).includes(nrm(k.rep));
+    // 대조 반대편 퍼지 매칭 — "말 못하는·분열시키는 피로"를 핵어(피로) + 어간(분열)으로 찾는다
+    const foilMatch = (sideText, self) => {
+      const exact = byHeadIn(sideText, self); if (exact) return exact;
+      const toks = N(sideText).split('—')[0].split(/[·,\s]+/).filter(Boolean);
+      if (toks.length < 2) return null;
+      const headN = nrm(toks[toks.length - 1]);
+      if (headN.length < 2) return null;
+      const stems = toks.slice(0, -1).map((t) => nrm(t).slice(0, 2)).filter((s) => s.length === 2);
+      return clusters.find((p) => p !== self && nrm(p.rep).endsWith(headN) && stems.some((s) => fullText(p).includes(s))) || null;
+    };
+
+    // ① 조사 참조: 주장 문면의 "P의|P로의|P는|P이|P가" — 방향이 자구로 고정되므로 무게 guard 없음
+    const PARTICLES = ['의', '는', '이', '가'];
+    const refParent = (k, c) => {
+      const t = nrm(c.claim);
+      let best = null;
+      for (const p of clusters) {
+        if (p === k) continue;
+        for (const h of p.headwords) {
+          if (h.length < 2) continue;
+          let i = t.indexOf(h);
+          while (i !== -1) {
+            const after = t.slice(i + h.length);
+            const par = after.startsWith('로의') ? '로의' : PARTICLES.find((x) => after.startsWith(x));
+            if (par) {
+              const rest = after.slice(par.length);
+              const negated = rest.startsWith('아니');                        // "복종적 주체가 아니라" — 부정 참조 제외
+              const selfDesc = par.endsWith('의') && rest.length >= 2 && nrm(k.rep).includes(rest.slice(0, 2)); // "성과사회의 피로"(자기 서술) 제외
+              if (!negated && !selfDesc && (best === null || i < best.i)) best = { p, i };
+            }
+            i = t.indexOf(h, i + 1);
+          }
+        }
       }
-      // 예시·분석·정의: 대상(of/concept)이 다른 키워드면 그 밑으로
-      for (const rel of ['예시', '분석', '정의']) {
-        const s = c.slots?.[rel]; if (!s) continue;
-        const target = byHeadIn(s.of || s.concept || '', k);
-        if (target) nest(k, target, rel);
+      return best?.p || null;
+    };
+
+    const foilChildren = []; // 대조 반대개념으로 신설할 자식 키워드
+    for (const k of clusters) {
+      for (const c of k.claims) {
+        if (parentOf.has(k.id)) break;
+        // ① 조사 참조
+        const rp = refParent(k, c);
+        if (rp && propose(k, rp, '참조')) break;
+        // ② 대조 — 주어 방향 분기
+        const ct = c.slots?.['대조'];
+        if (ct) {
+          if (selfSubject(k, c)) {
+            // 자기 서술 주장: 상대는 반대개념 자식 (오라클 "대조:" 들여쓰기 동형)
+            for (const side of ct.pair) {
+              // 자기 표제어가 든 변은 자기 쪽이다 — "성과사회의 호모 사케르 ↔ 주권 사회의 호모 사케르"
+              // 처럼 자기 개념의 하위 유형 대조에서 성과사회를 반대편으로 오인하는 것 방지
+              if ([...k.headwords].some((h) => nrm(side).includes(h))) continue;
+              const other = foilMatch(side, k);
+              if (other) { propose(other, k, '대조·반대개념'); continue; }
+              // 상대가 클러스터로 없으면 자식 키워드로 신설 — 승격 큰 맥일 때만 (분노 ⊃ 짜증)
+              if (weight(k) >= 2) {
+                const name = N(side).split('—')[0].split(/[과와]\s/)[0].trim();
+                if (name.length >= 2 && name.length <= 10 && !nrm(k.rep).includes(nrm(name)) && nrm(c.claim).includes(nrm(name)))
+                  foilChildren.push({ name, under: k, from: c });
+              }
+            }
+          } else {
+            const other = ct.pair.map((t) => byHeadIn(t, k)).find(Boolean);
+            if (other && propose(k, other, '대조')) break;
+          }
+        }
+        if (parentOf.has(k.id)) break;
+        // ③ 인과: 사슬 항목이 다른 키워드면 그중 가장 큰 맥 아래로 (기존 guard 유지)
+        const guard = (parent) => parent && weight(k) <= weight(parent)
+          && (blockOfC.get(k.id) === blockOfC.get(parent.id) || weight(parent) >= 2);
+        const ch = c.slots?.['인과'];
+        if (ch) {
+          const hits = ch.chain.map((t) => byHeadIn(t, k)).filter(Boolean);
+          const big = hits.sort((a, b) => weight(b) - weight(a))[0];
+          if (guard(big) && propose(k, big, '인과')) break;
+        }
+        // ④ 예시·분석·정의: 대상(of/concept)이 다른 키워드면 그 밑으로
+        let done = false;
+        for (const rel of ['예시', '분석', '정의']) {
+          const s = c.slots?.[rel]; if (!s) continue;
+          const target = byHeadIn(s.of || s.concept || '', k);
+          if (guard(target) && propose(k, target, rel)) { done = true; break; }
+        }
+        if (done) break;
+        // ⑤ 통시: 시기·국면 항목도 사슬처럼 — "규율사회→성과사회" phases 가 큰 맥을 가리킨다
+        const ts = c.slots?.['통시'];
+        if (ts) { const hit = ts.phases.map((t) => byHeadIn(t, k)).find(Boolean); if (guard(hit) && propose(k, hit, '통시')) break; }
       }
-      // 통시: 시기·국면 항목도 사슬처럼 — "규율사회→성과사회" phases 가 큰 맥을 가리킨다
-      const ts = c.slots?.['통시'];
-      if (ts) { const hit = ts.phases.map((t) => byHeadIn(t, k)).find(Boolean); if (hit) nest(k, hit, '통시'); }
-      // ⚠ "주장 문장이 큰 맥을 언급하면 그 아래로" 규칙은 기각 — 언급은 종속이 아니다
-      // (실측: 신경성 질환이 우울증을 예시로 나열했다고 우울증 밑으로 들어감, 소속 100→96)
+    }
+    // ⑥ 핵어 공유: 신호 없는 수식형 표제어(나르시스적 주체)는 같은 핵어의 확립 키워드(성과주체) 아래로.
+    // 부모는 단일 어절 + (승격 큰 맥이거나 이미 자식을 가진) 키워드만 — 수식형끼리는 방향이 안 서므로 제외.
+    for (const k of clusters) {
+      if (parentOf.has(k.id)) continue;
+      const toks = N(k.rep).split(/\s+/);
+      if (toks.length < 2) continue;
+      const headN = nrm(toks[toks.length - 1]);
+      if (headN.length < 2) continue;
+      const p = clusters.find((p) => p !== k && !/\s/.test(N(p.rep).trim()) && nrm(p.rep).endsWith(headN)
+        && nrm(p.rep) !== headN
+        && (weight(p) >= 2 || [...parentOf.values()].some((v) => v.parent === p))
+        && weight(p) >= weight(k));
+      if (p) propose(k, p, '핵어');
+    }
+
+    // ⑦ 고아 인과 귀속: 어디에도 못 붙은 클러스터 B 를, B 를 인과 사슬로 서술하는 확립 클러스터
+    // A(부모가 있거나 승격) 아래로 — "강제하는 자유의 내면화 → 끊임없는 자기 착취"에서 자기착취는
+    // 강제하는 자유 서사의 디테일이다. A 가 확립일 때만이라 기각된 "언급→종속"(나열 언급)과 다르고,
+    // 이미 부모가 있는 클러스터는 건드리지 않아 소진→우울증 같은 정방향 인과 중첩과 충돌하지 않는다.
+    for (const b of clusters) {
+      if (parentOf.has(b.id)) continue;
+      // 귀속은 잔가지만 — 주장이 많거나 이미 자식을 거느린 클러스터는 큰 맥 뿌리다.
+      // (실측: 이 가드 없이는 성과사회가 "성과사회의 긍정성 → 우울증 환자" 사슬에 걸려
+      // 우울증 환자 아래로 들어가며 하위 트리 전체의 역할 블록이 무너졌다 — 소속 88→69)
+      const childCnt = [...parentOf.values()].filter((v) => v.parent === b).length;
+      if (weight(b) + childCnt > 2) continue;
+      for (const a of clusters) {
+        if (a === b || !(parentOf.has(a.id) || weight(a) >= 2)) continue;
+        if (blockOfC.get(a.id) !== blockOfC.get(b.id) && weight(a) < 2 && !parentOf.has(a.id)) continue;
+        const hit = a.claims.some((c) => (c.slots?.['인과']?.chain || []).some((t) => byHeadIn(t, a) === b));
+        if (hit && propose(b, a, '인과·귀속')) break;
+      }
+    }
+
+    // 반영 — 그래프에서 걸러진 간선만 트리에 적용
+    const relevel = (nid) => { const x = nodes.get(nid); x.level = nodes.get(x.parentId).level + 1; for (const ch of nodes.values()) if (ch.parentId === nid) relevel(ch.id); };
+    const nested = [];
+    for (const [cid, { parent, why }] of parentOf) {
+      const child = clusters.find((x) => x.id === cid);
+      const cn = nodes.get(child?.nodeId), pn = nodes.get(parent?.nodeId);
+      if (!cn || !pn) continue;
+      cn.parentId = pn.id; relevel(cn.id);
+      nested.push(`${child.rep} → ${parent.rep}(${why})`);
+    }
+    for (const f of foilChildren) {
+      const pn = nodes.get(f.under.nodeId); if (!pn) continue;
+      add({ id: id(), title: f.name, parentId: pn.id, level: pn.level + 1, kind: 'concept', sources: [], gloss: `${f.under.rep}의 반대개념 — ${f.from.claim.slice(0, 100)}`, foil: true });
+      nested.push(`${f.name} ⊂ ${f.under.rep}(반대개념 신설)`);
     }
     if (nested.length) log.push(`[v12] 키워드 위계 ${nested.length}건: ${nested.join(' · ')}`);
     else log.push('[v12] 키워드 위계 신호 없음 — 평면 유지');
