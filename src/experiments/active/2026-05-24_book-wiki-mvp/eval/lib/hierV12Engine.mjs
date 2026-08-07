@@ -267,7 +267,7 @@ ${clusterLine}
               if ([...k.headwords].some((h) => nrm(side).includes(h))) continue;
               const other = foilMatch(side, k);
               if (other) { propose(other, k, '대조·반대개념'); continue; }
-              semPending.push({ k, rel: '대조·반대개념', text: side, dir: 'child' });
+              semPending.push({ k, rel: '대조·반대개념', text: side, dir: 'child', claim: c.claim });
               // 상대가 클러스터로 없으면 자식 키워드로 신설 — 승격 큰 맥일 때만 (분노 ⊃ 짜증)
               if (weight(k) >= 2) {
                 const name = N(side).split('—')[0].split(/[과와]\s/)[0].trim();
@@ -290,7 +290,7 @@ ${clusterLine}
           const hits = ch.chain.map((t) => byHeadIn(t, k)).filter(Boolean);
           const big = hits.sort((a, b) => weight(b) - weight(a))[0];
           if (guard(big) && propose(k, big, '인과')) break;
-          if (!big) ch.chain.forEach((t) => semPending.push({ k, rel: '인과', text: t, dir: 'parent' }));
+          if (!big) ch.chain.forEach((t) => semPending.push({ k, rel: '인과', text: t, dir: 'parent', claim: c.claim }));
         }
         // ④ 예시·분석·정의: 대상(of/concept)이 다른 키워드면 그 밑으로
         let done = false;
@@ -299,7 +299,7 @@ ${clusterLine}
           const tx = s.of || s.concept || '';
           const target = byHeadIn(tx, k);
           if (guard(target) && propose(k, target, rel)) { done = true; break; }
-          if (!target && tx) semPending.push({ k, rel, text: tx, dir: 'parent' });
+          if (!target && tx) semPending.push({ k, rel, text: tx, dir: 'parent', claim: c.claim });
         }
         if (done) break;
         // ⑤ 통시: 시기·국면 항목도 사슬처럼 — "규율사회→성과사회" phases 가 큰 맥을 가리킨다
@@ -326,8 +326,8 @@ ${clusterLine}
         try {
           onProgress?.('v12 — 의미 매칭 판정');
           const raw = await llm({
-            system: `구절이 가리키는 개념이 키워드 목록에 있으면 그 키워드를 고른다. 자구가 달라도 같은 개념을 가리키면 매칭한다(예: "경제적 효율" ≈ "능률"). 주제가 이웃인 것으로는 부족하다 — 같은 개념의 다른 표현일 때만. 확신이 없으면 null. JSON만 출력.`,
-            user: `[키워드 목록]\n${clusters.map((p) => p.rep).join(' · ')}\n\n[구절]\n${fresh.map((x, i) => `${i} | ${N(x.text).split('—')[0].trim()}${x.k ? ` (출처 키워드: ${x.k.rep})` : ''}`).join('\n')}\n\n출력 JSON: {"map":{"0":"키워드 또는 null"}}`,
+            system: `구절이 가리키는 개념이 키워드 목록에 있으면 그 키워드를 고른다. 단어 자구가 아니라 **문맥으로** 판정한다 — 구절이 문장 안에서 하는 일과 키워드의 대표 주장이 같은 개념을 서술하면 매칭한다(예: "무형성이 높은 경제적 효율을 가능하게 한다"의 "경제적 효율" ≈ "자기 착취가 더 능률적이다"의 "능률"). 주제가 이웃인 것으로는 부족하다 — 같은 개념의 다른 표현일 때만. 확신이 없으면 null. JSON만 출력.`,
+            user: `[키워드 목록 — 대표 주장 포함]\n${clusters.map((p) => `- ${p.rep}: ${N(p.claims[0].claim).slice(0, 70)}`).join('\n')}\n\n[구절 — 출처 문장 포함]\n${fresh.map((x, i) => `${i} | "${N(x.text).split('—')[0].trim()}" ← ${N(x.claim || '').slice(0, 90)}`).join('\n')}\n\n출력 JSON: {"map":{"0":"키워드 또는 null"}}`,
             temperature: 0.1,
           });
           llmCalls++;
