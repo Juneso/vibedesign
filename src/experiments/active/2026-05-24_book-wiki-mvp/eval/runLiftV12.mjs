@@ -12,10 +12,13 @@ import { claudeCliTransport } from './lib/claudeCliTransport.mjs';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const MODEL = process.env.MODEL || 'claude-haiku-4-5-20251001';
+// BOOK — 일반화 프로브용 책 선택 (0807 준서 지시: 골든 일치보다 타 책 보편성). 기본은 피로사회.
+const BOOK = (process.env.BOOK || '피로사회').normalize('NFC');
 const label = process.argv[2] || '1';
 
 const ds = JSON.parse(await readFile(resolve(__dir, 'golden/books50-memos.json'), 'utf-8'));
-const book = ds.books.find((b) => b.title.normalize('NFC') === '피로사회');
+const book = ds.books.find((b) => b.title.normalize('NFC') === BOOK);
+if (!book) throw new Error(`books50 에 없는 책: ${BOOK}`);
 
 const usages = [];
 const llm = claudeCliTransport({ model: MODEL, onUsage: (u) => usages.push(u) });
@@ -33,7 +36,7 @@ const lifts = [];
 let warnTotal = 0;
 for (let k = 0; k < book.memos.length; k++) {
   const memo = book.memos[k];
-  const memoId = `ds-b50-피로사회-${k}`;
+  const memoId = `ds-b50-${BOOK}-${k}`;
   // MEMOS=11,18 — 표적 메모만 lift (프롬프트 튜닝 반복을 24콜이 아니라 2~3콜로)
   if (process.env.MEMOS && !process.env.MEMOS.split(',').includes(String(k))) continue;
   if (prev.has(memoId)) { lifts.push(prev.get(memoId)); continue; }
@@ -43,7 +46,7 @@ for (let k = 0; k < book.memos.length; k++) {
   // 실측: lift-9 에서 m17 이 파싱 실패로 주장 0개가 되어 커버·위계를 깎았다
   for (let attempt = 0; attempt < 2 && !parsed; attempt++) {
     try {
-      raw = await llm(buildLiftPrompt({ book: { title: '피로사회', author: book.author }, memo }));
+      raw = await llm(buildLiftPrompt({ book: { title: BOOK, author: book.author }, memo }));
       parsed = JSON.parse(raw);
     } catch (e) {
       console.log(`  ✗ [${k}] p.${memo.p} ${attempt ? '실패(재시도 소진)' : '실패 — 재시도'}: ${e.message.slice(0, 120)}`);
@@ -66,7 +69,7 @@ if (process.env.GAPFIX === '1') {
     const gaps = slotHeadwordGaps(l, memo.text, globalHeads().filter((h) => !l.claims.some((c) => c.headword === h)));
     if (!gaps.length) continue;
     try {
-      const p2 = buildLiftPrompt({ book: { title: '피로사회', author: book.author }, memo });
+      const p2 = buildLiftPrompt({ book: { title: BOOK, author: book.author }, memo });
       // 단정형 재지시 — 격차 검출이 문단 자구 실재를 이미 확인했으므로 거짓이 아니다.
       // "경우에만" 소프트 조건은 하이쿠가 보수적으로 무시했다(실측: 무효 7/9건).
       p2.user += `\n\n확인된 사실: 이 문단은 다음 개념을 각각 별개로 다루고 있다 — ${gaps.join(', ')}. 각 개념을 주어·표제어로 하는 주장을 반드시 포함하라.`;
@@ -87,7 +90,7 @@ if (process.env.THINK_ESC === '1') {
     if (!l.warnings?.some((w) => w.includes('합성 의심'))) continue;
     try {
       const memo = book.memos[Number(l.memoId.split('-').pop())];
-      const r2 = normalizeLift(JSON.parse(await esc(buildLiftPrompt({ book: { title: '피로사회', author: book.author }, memo }))), { memoId: l.memoId });
+      const r2 = normalizeLift(JSON.parse(await esc(buildLiftPrompt({ book: { title: BOOK, author: book.author }, memo }))), { memoId: l.memoId });
       if (r2.lift.claims.length && r2.warnings.length < l.warnings.length) { l.claims = r2.lift.claims; l.warnings = r2.warnings; l.thinkEsc = true; }
       console.log(`  ↑ ${l.memoId} thinking 재lift → 경고 ${r2.warnings.length}`);
     } catch (e) { console.log(`  ↑ ${l.memoId} thinking 재lift 실패(1차 유지)`); }
@@ -107,7 +110,7 @@ if (process.env.SAMPLE2 === '1') {
     if (!suspect || !l.claims.length) continue;
     try {
       const memo = book.memos[Number(l.memoId.split('-').pop())];
-      const r2 = normalizeLift(JSON.parse(await llm(buildLiftPrompt({ book: { title: '피로사회', author: book.author }, memo }))), { memoId: l.memoId });
+      const r2 = normalizeLift(JSON.parse(await llm(buildLiftPrompt({ book: { title: BOOK, author: book.author }, memo }))), { memoId: l.memoId });
       const heads = l.claims.map((c) => nrmS(c.headword));
       const text = nrmS(memo.text);
       const fresh = r2.lift.claims.filter((c) => {
@@ -135,7 +138,7 @@ if (process.env.MODEL_ESC) {
     if (!suspect) continue;
     try {
       const memo = book.memos[Number(l.memoId.split('-').pop())];
-      const raw = await esc(buildLiftPrompt({ book: { title: '피로사회', author: book.author }, memo }));
+      const raw = await esc(buildLiftPrompt({ book: { title: BOOK, author: book.author }, memo }));
       const { lift, warnings } = normalizeLift(JSON.parse(raw), { memoId: l.memoId });
       if (lift.claims.length) { l.claims = lift.claims; l.escalated = process.env.MODEL_ESC; l.warnings = warnings; }
       console.log(`  ↑ ${l.memoId} 에스컬레이션 → 주장 ${lift.claims.length}개`);
@@ -145,9 +148,9 @@ if (process.env.MODEL_ESC) {
 
 const sum = (f) => usages.reduce((s, u) => s + (f(u) || 0), 0);
 const out = {
-  label: `lift-v12-${MODEL.includes('haiku') ? 'haiku' : MODEL}-${label}`,
+  label: `lift-v12-${MODEL.includes('haiku') ? 'haiku' : MODEL}-${BOOK === '피로사회' ? '' : BOOK + '-'}${label}`,
   runAt: new Date().toISOString(), kind: 'lift-v12', model: MODEL,
-  promptVersion: LIFT_PROMPT_VERSION, bookId: 'b50-피로사회', nMemos: lifts.length,
+  promptVersion: LIFT_PROMPT_VERSION, bookId: `b50-${BOOK}`, nMemos: lifts.length,
   nClaims: lifts.reduce((s, l) => s + l.claims.length, 0), warnTotal,
   usage: { calls: usages.length, ms: sum((u) => u.ms), inputTokens: sum((u) => u.inputTokens), outputTokens: sum((u) => u.outputTokens), costUsd: Math.round(sum((u) => u.costUsd) * 1000) / 1000 },
   lifts,

@@ -204,31 +204,40 @@ ${clusterLine}
       return clusters.find((p) => p !== self && nrm(p.rep).endsWith(headN) && stems.some((s) => fullText(p).includes(s))) || null;
     };
 
-    // ① 조사 참조: 주장 문면의 "P의|P로의|P는|P이|P가" — 방향이 자구로 고정되므로 무게 guard 없음.
-    // 부모 자격: 4자 이상이거나, 승격 큰 맥이면서 같은 블록. 하이쿠 lift 의 2자 일반어
-    // 클러스터(타자·자아·부정·폭력·심급·실재)가 부모로 잡히면 성과주체 사슬 전체가 "타자"
-    // 밑으로 끌려가 소속이 무너진다(rule2-9 실측: 90→57) — 일반어는 짧고 승격도 안 되므로
-    // 이 자격 조건이 걸러낸다. 수동 골든의 정방향(성과사회·성과주체 4자, 짜증→분노 같은
-    // 블록 승격)은 전부 통과.
-    const PARTICLES = ['의', '는', '이', '가'];
+    // ① 조사 참조: 다른 키워드 P 가 주장의 **주어 자리**에 있을 때만 부모 신호로 인정한다.
+    // 한국어 주제-서술 구조의 일반 논리다 — 주어(주제부)는 주장이 서술하는 프레임이고,
+    // 목적어·부사어 자리의 언급은 서사의 재료일 뿐 종속이 아니다:
+    //   "성과사회의 주민은 … 성과주체다"      → P의-구가 주어 → 성과주체 ⊂ 성과사회 ✓
+    //   "복종적 주체는 타자의 강요에 예속된다"  → 타자의-구가 부사어 → 참조 아님 ✓
+    // 이전 판(모든 조사 + "부모 4자 이상" 자격)은 골든 끼워맞춤이었다(0807 준서 지적) —
+    // 타자·자아 같은 2자 개념도 주어로 서술되는 주장에서는 정당한 부모가 된다.
+    // 인정 형태 둘: (a) P는|P이|P가 — P 자신이 주어  (b) P의 + 짧은 명사구 + 은|는|이|가
+    // — 소유 구가 주어("성과사회의 주민은"). 부정("~가 아니라")과 자기 서술(소유 구의
+    // 핵어가 자기 표제어와 겹침 — "성과사회의 피로는")은 제외.
+    const SUBJ = ['은', '는', '이', '가'];
     const refParent = (k, c) => {
       const t = nrm(c.claim);
       let best = null;
       for (const p of clusters) {
         if (p === k) continue;
-        if (!(nrm(p.rep).length >= 4 || (weight(p) >= 2 && blockOfC.get(p.id) === blockOfC.get(k.id)))) continue;
         for (const h of p.headwords) {
           if (h.length < 2) continue;
           let i = t.indexOf(h);
           while (i !== -1) {
             const after = t.slice(i + h.length);
-            const par = after.startsWith('로의') ? '로의' : PARTICLES.find((x) => after.startsWith(x));
-            if (par) {
-              const rest = after.slice(par.length);
-              const negated = rest.startsWith('아니');                        // "복종적 주체가 아니라" — 부정 참조 제외
-              const selfDesc = par.endsWith('의') && rest.length >= 2 && nrm(k.rep).includes(rest.slice(0, 2)); // "성과사회의 피로"(자기 서술) 제외
-              if (!negated && !selfDesc && (best === null || i < best.i)) best = { p, i };
+            let ok = false;
+            if (SUBJ.some((x) => after.startsWith(x)) && !after.slice(1).startsWith('아니')) ok = true; // (a) P가 주어
+            else if (after.startsWith('의')) {                                                          // (b) 소유 구가 주어
+              const np = after.slice(1, 8);
+              const subjAt = SUBJ.map((x) => np.indexOf(x)).filter((j) => j > 0).sort((a, b) => a - b)[0];
+              const headNoun = subjAt ? np.slice(0, subjAt) : null;
+              // 핵명사는 짧은 명사 연쇄여야 한다 — "집단의 의지를 강조하는"에서 어미 '~하는'의
+              // '는'을 주어 조사로 오인하던 것 방지(존중정치학 프로브 실측): 다른 조사·긴 구 제외
+              if (headNoun && headNoun.length <= 4 && !/[를을에로와과]/.test(headNoun)
+                && !np.slice(subjAt + 1).startsWith('아니')
+                && !nrm(k.rep).includes(headNoun.slice(0, 2))) ok = true;
             }
+            if (ok && (best === null || i < best.i)) best = { p, i };
             i = t.indexOf(h, i + 1);
           }
         }
@@ -290,20 +299,9 @@ ${clusterLine}
         if (ts) { const hit = ts.phases.map((t) => byHeadIn(t, k)).find(Boolean); if (guard(hit) && propose(k, hit, '통시')) break; }
       }
     }
-    // ⑥ 핵어 공유: 신호 없는 수식형 표제어(나르시스적 주체)는 같은 핵어의 확립 키워드(성과주체) 아래로.
-    // 부모는 단일 어절 + (승격 큰 맥이거나 이미 자식을 가진) 키워드만 — 수식형끼리는 방향이 안 서므로 제외.
-    for (const k of clusters) {
-      if (parentOf.has(k.id)) continue;
-      const toks = N(k.rep).split(/\s+/);
-      if (toks.length < 2) continue;
-      const headN = nrm(toks[toks.length - 1]);
-      if (headN.length < 2) continue;
-      const p = clusters.find((p) => p !== k && !/\s/.test(N(p.rep).trim()) && nrm(p.rep).endsWith(headN)
-        && nrm(p.rep) !== headN
-        && (weight(p) >= 2 || [...parentOf.values()].some((v) => v.parent === p))
-        && weight(p) >= weight(k));
-      if (p) propose(k, p, '핵어');
-    }
+    // (기각) 핵어 공유 규칙 — "나르시스적 주체 → 성과주체"처럼 같은 핵어로 끝나는 수식형을
+    // 원형 밑에 넣는 규칙은 골든 1쌍을 잡으려는 끼워맞춤이었고, 일반적으로는 수식형끼리
+    // 형제인 경우("복종적 주체"와 "성과주체"는 대조 쌍)가 더 많다 — 0807 준서 지적으로 삭제.
 
     // ⑦ 고아 인과 귀속: 어디에도 못 붙은 클러스터 B 를, B 를 인과 사슬로 서술하는 확립 클러스터
     // A(부모가 있거나 승격) 아래로 — "강제하는 자유의 내면화 → 끊임없는 자기 착취"에서 자기착취는
