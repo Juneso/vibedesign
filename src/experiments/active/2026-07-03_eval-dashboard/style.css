@@ -335,6 +335,87 @@ body {
   padding-top: 4px;
 }
 
+/* ── 채점 런(map-match) · lift 런 — .md 없이 JSON 만 있는 산출물의 전용 뷰 ── */
+/* 주의를 끌어야 하는 칩(경고·비교 불가 단서)은 색을 달리한다 */
+.eval-md-chip.is-warn {
+  background: var(--color-warning-muted, #fff4e5);
+  border-color: var(--color-warning, #f0b429);
+  color: var(--color-warning-text, #8a5a00);
+}
+
+.eval-score-table td { vertical-align: middle; }
+
+/* 점수 칸 — 숫자만 있으면 축끼리 비교가 눈으로 안 된다. 막대를 옆에 붙인다 */
+.eval-score-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+}
+
+.eval-score-num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  width: 26px;
+  text-align: right;
+}
+
+.eval-score-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-background-muted, #eef1f5);
+  overflow: hidden;
+}
+
+.eval-score-bar > i {
+  display: block;
+  height: 100%;
+  background: var(--color-accent, #6366f1);
+}
+
+/* lift 런 — 메모 하나가 접힘 단위, 그 안에 주장 카드 */
+.eval-lift-memo {
+  border: 1px solid var(--color-border, #e5e5e5);
+  border-radius: 8px;
+  padding: 2px 12px;
+  margin-bottom: 6px;
+}
+
+.eval-lift-heads {
+  font-weight: 400;
+  color: var(--color-text-secondary, #778);
+}
+
+.eval-lift-claim {
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.eval-lift-claim + .eval-lift-claim {
+  border-top: 1px dashed var(--color-border, #e5e5e5);
+}
+
+.eval-lift-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.eval-lift-slot,
+.eval-lift-ev {
+  font-size: 12px;
+  color: var(--color-text-secondary, #667);
+}
+
+.eval-lift-warn {
+  font-size: 11px;
+  color: var(--color-warning-text, #8a5a00);
+}
+
 /* ── PipelineView : 상세 구조도 ───────────────────────────── */
 /* 구조는 전부 마크다운 위계(제목·불렛·표)로 표현한다.
    커스텀 박스·인용 스타일은 쓰지 않고, 흐름도만 Mermaid 가 그린 svg 를 감싼다. */

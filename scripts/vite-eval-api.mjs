@@ -3,7 +3,7 @@
 import { resolve, join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { readdirSync, statSync, existsSync, readFileSync, writeFileSync, mkdirSync, openSync, readSync, closeSync } from 'fs';
-import { execFileSync } from 'child_process';
+import { execFile } from 'child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
@@ -38,24 +38,35 @@ function peekField(filePath, name) {
 // mtime 은 체크아웃·리베이스만 해도 전부 현재 시각으로 바뀌어 실행 시각과 무관해진다.
 // git 시각은 author date(%aI) — committer date 는 리베이스 때 전부 갱신되어 무의미해진다.
 // 한 번의 log 순회로 경로별 최종 시각을 모아 캐시한다(파일당 호출 금지).
-let gitDateCache = { at: 0, map: new Map() };
+// 이 레포는 iCloud 위에 있어 git 이 파일을 실체화하며 수 분씩 멈춘다. 동기로 부르면
+// /runs 요청 하나가 대시보드를 통째로 붙잡아 런 목록이 영영 안 뜬다(실측: 2분+ 무응답).
+// 그래서 **요청 경로에서 git 을 뺐다** — 백그라운드로 한 번 돌려 캐시를 채우고,
+// 준비되기 전 요청은 mtime 으로 답한다. 대부분의 런은 json 에 runAt 이 있어 애초에
+// git 시각이 필요 없으므로, 이 폴백이 실제로 보이는 시각을 바꾸는 경우는 드물다.
+let gitDateCache = { at: 0, map: new Map(), running: false };
 function gitDates() {
-  if (Date.now() - gitDateCache.at < 30000) return gitDateCache.map;
-  const map = new Map();
-  try {
-    const out = execFileSync('git', ['log', '--format=%aI', '--name-only', '--', RUNS_DIR], {
+  const stale = Date.now() - gitDateCache.at > 60000;
+  if (stale && !gitDateCache.running) {
+    gitDateCache.running = true;
+    execFile('git', ['log', '--format=%aI', '--name-only', '--', RUNS_DIR], {
       cwd: REPO_ROOT, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024,
+      timeout: 60000, killSignal: 'SIGKILL',
+    }, (err, out) => {
+      const map = new Map();
+      if (!err) {
+        let cur = null;
+        for (const line of String(out).split('\n')) {
+          const t = line.trim();
+          if (!t) continue;
+          if (/^\d{4}-\d{2}-\d{2}T/.test(t)) { cur = t; continue; }
+          if (cur && !map.has(t)) map.set(t, cur); // 최신 커밋이 먼저 나오므로 최초 등장만 취한다
+        }
+      }
+      // 실패해도 시각을 갱신한다 — 안 그러면 매 요청이 git 을 다시 띄운다
+      gitDateCache = { at: Date.now(), map: map.size ? map : gitDateCache.map, running: false };
     });
-    let cur = null;
-    for (const line of out.split('\n')) {
-      const t = line.trim();
-      if (!t) continue;
-      if (/^\d{4}-\d{2}-\d{2}T/.test(t)) { cur = t; continue; }
-      if (cur && !map.has(t)) map.set(t, cur); // 최신 커밋이 먼저 나오므로 최초 등장만 취한다
-    }
-  } catch { /* git 없음/실패 시 mtime 폴백 */ }
-  gitDateCache = { at: Date.now(), map };
-  return map;
+  }
+  return gitDateCache.map;
 }
 
 function resolveRunAt(file, fullPath, st) {

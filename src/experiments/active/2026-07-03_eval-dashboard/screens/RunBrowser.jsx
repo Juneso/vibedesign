@@ -376,9 +376,143 @@ export function ConnectionsDetail({ runFile, json, labels, setLabels, readOnly }
   );
 }
 
+// ── 채점 런 (kind: map-match-v12) — 축별 점수표 ────────────────
+// 이 런들은 .md 가 없다. 점수가 md 산문이 아니라 {책,런,축,점수,근거,실패} 레코드로
+// 나오도록 설계된 산출물이라(BKT-374), 렌더러가 없으면 raw JSON 으로만 보였다.
+function ScoreDetail({ json }) {
+  const records = json.records || [];
+  return (
+    <div className="eval-md">
+      <div className="eval-md-meta">
+        <span className="eval-md-chip">{json.book}</span>
+        <span className="eval-md-chip">총점 {json.total}</span>
+        <span className="eval-md-chip">축 {records.length}개</span>
+        {records.length === 5 && (
+          <span className="eval-md-chip is-warn">위계 축 도입 전 — 6축 런과 총점 직접 비교 금지</span>
+        )}
+      </div>
+      <section className="eval-md-section">
+        <h4 className="eval-md-h">축별 점수</h4>
+        <table className="eval-md-table eval-score-table">
+          <thead><tr><th>축</th><th>점수</th><th>근거</th></tr></thead>
+          <tbody>
+            {records.map((r, i) => (
+              <tr key={i}>
+                <td><b>{r.axis}</b></td>
+                <td>
+                  <div className="eval-score-cell">
+                    <span className="eval-score-num">{r.score}</span>
+                    <span className="eval-score-bar"><i style={{ width: `${Math.max(0, Math.min(100, r.score))}%` }} /></span>
+                  </div>
+                </td>
+                <td>{r.basis}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+      {records.some((r) => r.failures?.length) && (
+        <section className="eval-md-section">
+          <h4 className="eval-md-h">감점 근거 — 무엇이 안 잡혔나</h4>
+          {records.filter((r) => r.failures?.length).map((r, i) => (
+            <div key={i}>
+              <h5 className="eval-md-h5">{r.axis} ({r.score})</h5>
+              <ul className="eval-md-list">
+                {r.failures.map((f, j) => <li key={j}>{f}</li>)}
+              </ul>
+            </div>
+          ))}
+        </section>
+      )}
+    </div>
+  );
+}
+
+// ── lift 런 (kind: lift-v12) — 메모별 주장 분해 결과 ───────────
+// 조립에 들어가는 재료다. 트리가 이상할 때 원인이 lift 인지 조립인지 여기서 갈린다.
+function LiftDetail({ json }) {
+  const lifts = json.lifts || [];
+  const u = json.usage || {};
+  return (
+    <div className="eval-md">
+      <div className="eval-md-meta">
+        <span className="eval-md-chip">{json.model}</span>
+        <span className="eval-md-chip">{json.promptVersion}</span>
+        <span className="eval-md-chip">메모 {json.nMemos} → 주장 {json.nClaims}</span>
+        {json.warnTotal > 0 && <span className="eval-md-chip is-warn">경고 {json.warnTotal}</span>}
+        {u.calls != null && <span className="eval-md-chip">{u.calls}콜 · {Math.round((u.ms || 0) / 1000)}초 · ${u.costUsd}</span>}
+      </div>
+      <section className="eval-md-section">
+        <h4 className="eval-md-h">메모별 주장</h4>
+        {lifts.map((l) => (
+          <details key={l.memoId} className="eval-md-collapse eval-lift-memo">
+            <summary>
+              p.{l.p} — 주장 {l.claims.length}개
+              {l.claims.length > 0 && <span className="eval-lift-heads"> · {l.claims.map((c) => c.headword).join(' · ')}</span>}
+              {l.thinkEsc && <span className="eval-md-chip">생각 재lift</span>}
+              {l.gapFixed && <span className="eval-md-chip">격차 보정</span>}
+              {l.warnings?.length > 0 && <span className="eval-md-chip is-warn">⚠{l.warnings.length}</span>}
+            </summary>
+            {l.claims.map((c) => (
+              <div key={c.id} className="eval-lift-claim">
+                <div className="eval-lift-head">
+                  <b>{c.headword}</b>
+                  {c.devices.map((d) => <span key={d} className="eval-md-chip">{d}</span>)}
+                  {c.confidence !== 'high' && <span className="eval-md-chip is-warn">{c.confidence}</span>}
+                </div>
+                <p className="eval-md-p">{c.claim}</p>
+                {Object.entries(c.slots || {}).map(([rel, s]) => (
+                  <div key={rel} className="eval-lift-slot">
+                    <code className="eval-md-code">{rel}</code>{' '}
+                    {Object.entries(s).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(' ↔ ') : v}`).join(' / ')}
+                  </div>
+                ))}
+                {c.evidence?.length > 0 && (
+                  <div className="eval-lift-ev">증거 — {c.evidence.join(' · ')}</div>
+                )}
+              </div>
+            ))}
+            {l.warnings?.length > 0 && (
+              <ul className="eval-md-list eval-lift-warn">
+                {l.warnings.map((w, i) => <li key={i}>{w}</li>)}
+              </ul>
+            )}
+          </details>
+        ))}
+      </section>
+    </div>
+  );
+}
+
 // ── 제네릭 뷰 (md 우선, 없으면 JSON pretty) ──────────────────
 // tree가 있는 런: '트리' 섹션(ASCII 코드블록) 대신 SVG 트리 삽입
 export function GenericDetail({ json, md }) {
+  // md 가 없어도 구조를 아는 런은 전용 렌더러로. 남는 것만 JSON 덤프.
+  if (json?.kind === 'map-match-v12') return <ScoreDetail json={json} />;
+  if (json?.kind === 'lift-v12') return <LiftDetail json={json} />;
+  // md 를 안 쓰는 런이라도 트리는 그릴 수 있다 (증분 동화 런이 md 없이 저장된다)
+  if (md == null && json?.tree?.nodes?.length > 0) {
+    return (
+      <div className="eval-md">
+        <div className="eval-md-meta">
+          {json.model && <span className="eval-md-chip">{json.model}</span>}
+          {json.nMemos != null && <span className="eval-md-chip">메모 {json.nMemos}</span>}
+          {json.llmCalls != null && <span className="eval-md-chip">LLM {json.llmCalls}콜</span>}
+          {json.liftsFrom && <span className="eval-md-chip">lift: {json.liftsFrom}</span>}
+        </div>
+        <section className="eval-md-section">
+          <h4 className="eval-md-h">트리</h4>
+          <TreeSvg tree={json.tree} />
+        </section>
+        {Array.isArray(json.log) && json.log.length > 0 && (
+          <details className="eval-md-collapse eval-md-logsec">
+            <summary>로그</summary>
+            <ul className="eval-md-list">{json.log.map((l, i) => <li key={i}>{l}</li>)}</ul>
+          </details>
+        )}
+      </div>
+    );
+  }
   if (md == null) {
     return <pre className="eval-md-pre">{JSON.stringify(json, null, 2)}</pre>;
   }

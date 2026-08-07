@@ -35,6 +35,29 @@ export const SERIES_META = {
   'placement':            { title: '배치 테스트', purpose: '라벨 경로만 보고 메모를 제자리에 놓을 수 있는가 — 임베딩 최근접 기준선과 비교해 관계 라벨의 기여를 잰다', pipelineId: 'hier-ingest-auto' },
   'defects':              { title: '결함 감사', purpose: '알려진 결함 14종이 트리에 몇 건 있는지 — 점수가 아니라 지목된 노드를 열어 사람이 검증하는 지표', pipelineId: 'hier-ingest-auto' },
   'competency':           { title: '역량 질문 채점', purpose: '트리만 보고 핵심 주장·근거·전개·사례 질문에 답할 수 있는지 — 온톨로지 품질 측정', pipelineId: 'hier-ingest-auto' },
+  // V12 — 주장 단위(lift 우선). 런이 세 종류로 갈린다:
+  //   lift-*        메모 1건 → 주장 분해 결과 (조립 전 재료)
+  //   hier-v12-*    그 재료로 세운 트리
+  //   mapmatch-*    그 트리의 지도 일치 6축 점수
+  // 같은 실험의 세 면이라 한 파이프라인 아래 나란히 둔다.
+  'lift-v12-haiku':       { title: 'lift · 하이쿠 전량', purpose: '피로사회 24메모를 구조 먼저로 분해 — 조립에 들어갈 재료 (8회차가 v12.4)', pipelineId: 'hier-ingest-v12' },
+  'lift-v12-haiku-probe': { title: 'lift · 표적 프로브', purpose: '프롬프트 튜닝용 표적 메모만 lift — 24콜 대신 2~3콜', pipelineId: 'hier-ingest-v12' },
+  'hier-v12-manual':      { title: 'V12 · 골든 입력 상한선', purpose: '사람이 만든 lift 골든을 넣었을 때의 조립 성능 — 조립 로직의 천장', pipelineId: 'hier-ingest-v12' },
+  'hier-v12-claude-haiku':{ title: 'V12 · 하이쿠 lift', purpose: '실 모델 lift → 조립. 프롬프트 v12.1~v12.2 구간', pipelineId: 'hier-ingest-v12' },
+  'hier-v12-claude-sonnet':{ title: 'V12 · 소네트 조립', purpose: '조립 콜만 상위 모델로 — 역할 블록 에스컬레이션 효과 측정', pipelineId: 'hier-ingest-v12' },
+  'hier-v12-claude-esc':  { title: 'V12 · 모델 에스컬레이션', purpose: '다개념 의심 메모만 소네트 재lift — 실측 기각된 갈래', pipelineId: 'hier-ingest-v12' },
+  'hier-v12-claude-gapfix':{ title: 'V12 · 슬롯 격차 보정', purpose: '표제어가 놓친 개념을 슬롯에서 회수해 폐쇄 재지시', pipelineId: 'hier-ingest-v12' },
+  'hier-v12-claude-final':{ title: 'V12.4 · 합성 표제어 금지', purpose: '합성 표제어 금지 + 생각 예산 에스컬레이션 — 위계 규칙 v2 직전 기준선', pipelineId: 'hier-ingest-v12' },
+  'hier-v12-claude-rule2':{ title: '위계 규칙 v2 · 최신 자동 경로', purpose: '자구 신호 4종 + 일반어 부모 차단 — 74~77 밴드 (직전 70)', pipelineId: 'hier-ingest-v12' },
+  'hier-v12-incr':        { title: 'V12 · 증분 동화', purpose: '메모 한 건씩 도착하는 실사용 경로 — 배치와의 차이 측정', pipelineId: 'hier-ingest-v12' },
+  'mapmatch-hier-v12-manual':      { title: '6축 채점 · 골든 입력', purpose: '준서 수기 지도 대조 — 상한선 런의 점수', pipelineId: 'hier-ingest-v12' },
+  'mapmatch-hier-v12-claude-haiku':{ title: '6축 채점 · 하이쿠 lift', purpose: '커버·소속·대조·다개념·편성 (위계 축 도입 전)', pipelineId: 'hier-ingest-v12' },
+  'mapmatch-hier-v12-claude-sonnet':{ title: '6축 채점 · 소네트 조립', purpose: '조립 모델 상향의 점수 효과 (위계 축 도입 전)', pipelineId: 'hier-ingest-v12' },
+  'mapmatch-hier-v12-claude-esc':  { title: '6축 채점 · 모델 에스컬레이션', purpose: '상위 모델 재lift 가 점수를 올렸는지 — 기각 근거', pipelineId: 'hier-ingest-v12' },
+  'mapmatch-hier-v12-claude-gapfix':{ title: '6축 채점 · 격차 보정', purpose: '보정 강도별 점수 — 단정형 재지시의 과분화 부작용 포함', pipelineId: 'hier-ingest-v12' },
+  'mapmatch-hier-v12-claude-final':{ title: '6축 채점 · V12.4', purpose: '위계 규칙 v2 직전 점수 — 총점 70 · 위계 13', pipelineId: 'hier-ingest-v12' },
+  'mapmatch-hier-v12-claude-rule2':{ title: '6축 채점 · 위계 규칙 v2', purpose: '현재 기준선 — 총점 74~77 · 위계 25~50 (자동 경로)', pipelineId: 'hier-ingest-v12' },
+  'mapmatch-hier-v12-incr':        { title: '6축 채점 · 증분 동화', purpose: '증분 트리가 배치와 같은 품질인지', pipelineId: 'hier-ingest-v12' },
   'predict-v9':{ title: '전이 채점 · V9 산출', purpose: 'V9 위키로 새 상황을 설명할 수 있는지', pipelineId: null },
   'predict-v9-v2':        { title: '전이 채점 v2 · V9 산출', purpose: '전이 채점 2차 — 오라클 갭 재측정', pipelineId: null },
   'predict-oracle':       { title: '전이 채점 · 오라클', purpose: '사람이 만든 정답 트리 기준선', pipelineId: null },
