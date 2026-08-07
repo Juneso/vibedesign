@@ -246,6 +246,10 @@ ${clusterLine}
     };
 
     const foilChildren = []; // 대조 반대개념으로 신설할 자식 키워드
+    // 의미 매칭 보류함 — 자구로 못 이은 슬롯 구절을 모았다가 폐쇄 LLM 판정 1콜로 잇는다
+    // (0807 준서 지시: "글자만 같은 게 아니라 의미상 유사도"). 임베딩 코사인은 실측에서
+    // 표적(능률↔경제적 효율 0.41)이 잡음(짜증↔우울증 0.45)보다 낮아 문턱 방식을 기각했다.
+    const semPending = [];
     for (const k of clusters) {
       for (const c of k.claims) {
         if (parentOf.has(k.id)) break;
@@ -263,6 +267,7 @@ ${clusterLine}
               if ([...k.headwords].some((h) => nrm(side).includes(h))) continue;
               const other = foilMatch(side, k);
               if (other) { propose(other, k, '대조·반대개념'); continue; }
+              semPending.push({ k, rel: '대조·반대개념', text: side, dir: 'child' });
               // 상대가 클러스터로 없으면 자식 키워드로 신설 — 승격 큰 맥일 때만 (분노 ⊃ 짜증)
               if (weight(k) >= 2) {
                 const name = N(side).split('—')[0].split(/[과와]\s/)[0].trim();
@@ -285,13 +290,16 @@ ${clusterLine}
           const hits = ch.chain.map((t) => byHeadIn(t, k)).filter(Boolean);
           const big = hits.sort((a, b) => weight(b) - weight(a))[0];
           if (guard(big) && propose(k, big, '인과')) break;
+          if (!big) ch.chain.forEach((t) => semPending.push({ k, rel: '인과', text: t, dir: 'parent' }));
         }
         // ④ 예시·분석·정의: 대상(of/concept)이 다른 키워드면 그 밑으로
         let done = false;
         for (const rel of ['예시', '분석', '정의']) {
           const s = c.slots?.[rel]; if (!s) continue;
-          const target = byHeadIn(s.of || s.concept || '', k);
+          const tx = s.of || s.concept || '';
+          const target = byHeadIn(tx, k);
           if (guard(target) && propose(k, target, rel)) { done = true; break; }
+          if (!target && tx) semPending.push({ k, rel, text: tx, dir: 'parent' });
         }
         if (done) break;
         // ⑤ 통시: 시기·국면 항목도 사슬처럼 — "규율사회→성과사회" phases 가 큰 맥을 가리킨다
@@ -302,6 +310,47 @@ ${clusterLine}
     // (기각) 핵어 공유 규칙 — "나르시스적 주체 → 성과주체"처럼 같은 핵어로 끝나는 수식형을
     // 원형 밑에 넣는 규칙은 골든 1쌍을 잡으려는 끼워맞춤이었고, 일반적으로는 수식형끼리
     // 형제인 경우("복종적 주체"와 "성과주체"는 대조 쌍)가 더 많다 — 0807 준서 지적으로 삭제.
+
+    // ⑥ 의미 매칭 — 자구로 못 이은 슬롯 구절을 폐쇄 LLM 판정 1콜로 잇는다 (0807 준서 지시).
+    // "반복이 정확한 단어가 아니라 다른 표현으로 반복된다"(골든 관찰)의 파렌팅 대응:
+    // '경제적 효율'이 '능률' 키워드를 가리키는지 같은 동의 판정은 임베딩 문턱으로는 불가
+    // (표적 0.41 < 잡음 0.45 실측)라, 후보 목록에서 고르는 폐쇄 판정으로 한다.
+    // 방향은 자구 규칙과 동일하게 슬롯 의미가 정한다 — 판정은 "같은 개념인가"만 답한다.
+    if (llm && semPending.length) {
+      const fresh = semPending.filter((x, i) =>
+        (x.dir === 'child' || !parentOf.has(x.k.id))
+        && N(x.text).split('—')[0].trim().length >= 2
+        && semPending.findIndex((y) => y.k === x.k && y.text === x.text && y.dir === x.dir) === i
+      ).slice(0, 30);
+      if (fresh.length) {
+        try {
+          onProgress?.('v12 — 의미 매칭 판정');
+          const raw = await llm({
+            system: `구절이 가리키는 개념이 키워드 목록에 있으면 그 키워드를 고른다. 자구가 달라도 같은 개념을 가리키면 매칭한다(예: "경제적 효율" ≈ "능률"). 주제가 이웃인 것으로는 부족하다 — 같은 개념의 다른 표현일 때만. 확신이 없으면 null. JSON만 출력.`,
+            user: `[키워드 목록]\n${clusters.map((p) => p.rep).join(' · ')}\n\n[구절]\n${fresh.map((x, i) => `${i} | ${N(x.text).split('—')[0].trim()}${x.k ? ` (출처 키워드: ${x.k.rep})` : ''}`).join('\n')}\n\n출력 JSON: {"map":{"0":"키워드 또는 null"}}`,
+            temperature: 0.1,
+          });
+          llmCalls++;
+          // 하이쿠가 코드 펜스·설명을 붙일 수 있다 — 첫 JSON 블록만 추출 (rule4-15 콜 실패 실측)
+          const map = JSON.parse((raw.match(/\{[\s\S]*\}/) || ['{}'])[0]).map || {};
+          const semHits = [];
+          for (const [i, repName] of Object.entries(map)) {
+            const x = fresh[Number(i)];
+            if (!x || !repName || repName === 'null') continue;
+            const p = clusters.find((c2) => nrm(c2.rep) === nrm(String(repName)));
+            if (!p || p === x.k) continue;
+            if (x.dir === 'child') { if (propose(p, x.k, `${x.rel}≈`)) semHits.push(`${p.rep} → ${x.k.rep}`); }
+            // 부모 방향은 상대가 승격 큰 맥일 때만 — 의미 판정은 "같은 개념인가"만 답하므로
+            // 방향 근거가 자구 규칙보다 약하다. 성격 없는 인간(행위자)이 능률(그 행위의 결과)
+            // 밑으로 들어간 sem-14 실측의 방지 — 잔가지끼리는 잇지 않는다.
+            else if (weight(p) >= 2 && weight(x.k) <= weight(p)) {
+              if (propose(x.k, p, `${x.rel}≈`)) semHits.push(`${x.k.rep} → ${p.rep}`);
+            }
+          }
+          log.push(`[v12] 의미 매칭: 후보 ${fresh.length}건 중 ${semHits.length}건 연결${semHits.length ? ` — ${semHits.join(' · ')}` : ''}`);
+        } catch (e) { log.push(`[v12⚠] 의미 매칭 콜 실패 — 자구 결과만 유지 (${String(e.message).slice(0, 120)})`); }
+      }
+    }
 
     // ⑦ 고아 인과 귀속: 어디에도 못 붙은 클러스터 B 를, B 를 인과 사슬로 서술하는 확립 클러스터
     // A(부모가 있거나 승격) 아래로 — "강제하는 자유의 내면화 → 끊임없는 자기 착취"에서 자기착취는

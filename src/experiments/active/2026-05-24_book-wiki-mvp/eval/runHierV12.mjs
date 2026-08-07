@@ -49,6 +49,7 @@ if (PROVIDER === 'claude') {
   llm = async ({ system }) => {
     if (system.includes('역할 블록')) return JSON.stringify(fx.roleBlocks);
     if (system.includes('묶는 개념')) return JSON.stringify(fx.foldBack || { folds: [] });
+    if (system.includes('구절이 가리키는 개념')) return '{"map":{}}'; // 의미 매칭 — 픽스처 경로는 자구만
     throw new Error('픽스처에 없는 콜: ' + system.slice(0, 40));
   };
 } else {
