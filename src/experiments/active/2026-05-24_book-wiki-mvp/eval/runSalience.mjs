@@ -61,13 +61,24 @@ if (!rich.length) {
     if (m) { rich = [m.toc, m.summary].filter(Boolean); console.log('리치데이터: obsidian-books-meta 에서 목차·소개 로드'); }
   } catch {}
 }
-const richText = rich.join(' ');
-const ranked = computeSalience({ lifts: liftRun.lifts, memoTexts, aliasGroups, aspects, richText });
+let richCore = [];
+const richToc = rich[0] || '';
+if (rich.length && process.env.ALIAS === '1') {
+  try {
+    const { claudeCliTransport } = await import('./lib/claudeCliTransport.mjs');
+    const { buildRichCorePrompt } = await import('./lib/salience.mjs');
+    const llm2 = claudeCliTransport({ model: 'claude-haiku-4-5-20251001' });
+    const raw = await llm2(buildRichCorePrompt({ book: nrmT(book.title), toc: rich[0], summary: rich[1] }));
+    richCore = JSON.parse((raw.match(/\{[\s\S]*\}/) || ['{}'])[0]).core || [];
+    console.log(`리치 핵심 ${richCore.length}개: ${richCore.join(' · ')}`);
+  } catch (e) { console.log('리치 핵심 추출 실패 — 목차 자구 폴백:', e.message.slice(0, 60)); }
+}
+const ranked = computeSalience({ lifts: liftRun.lifts, memoTexts, aliasGroups, aspects, richCore, richToc });
 console.log(`\n■ salience — ${nrmT(book.title)} (${liftRun.label})`);
 console.log('점수 | 빈도 | 메모 | 피참조 | 주장 | 개념');
 for (const r of ranked) console.log(`${r.score.toFixed(2)} | ${String(r.freq).padStart(4)} | ${r.memos} | ${String(r.refScore).padStart(5)} | ${r.claims} | ${r.concept}`);
 
-const out = { kind: 'salience', book: nrmT(book.title), lifts: liftRun.label, runAt: new Date().toISOString(), aliasGroups, aspects, ranked };
+const out = { kind: 'salience', book: nrmT(book.title), lifts: liftRun.label, runAt: new Date().toISOString(), aliasGroups, aspects, richCore, ranked };
 const label = `salience-${liftRun.label}`;
 await writeFile(resolve(__dir, `runs/${label}.json`), JSON.stringify(out, null, 2));
 console.log(`\n→ runs/${label}.json`);

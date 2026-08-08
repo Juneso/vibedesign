@@ -26,7 +26,13 @@ const ROLE_SIGNAL = '통념 반박·문답 계열 주장 → 문제의식 / 시�
 const CLUSTER_MIN = 0.78;
 const FOLD_MIN = 0.6;
 
-export async function assembleV12({ book, lifts, llm, embedFn, onProgress }) {
+// salience: computeSalience 결과(ranked). 점수가 룰 문턱 더미를 대체한다(0808 준서 설계):
+// 방향(낮은 점수 → 높은 점수 밑으로) · 강등(바닥 점수 개념은 키워드 승격 금지) ·
+// 대조 축 승격(양변 다 중요한 대조만 구조로) · 구조 예산(재료가 적으면 블록 생략).
+// aliasMap: nrm(이름) → 핵심 개념 이름 — 별칭·측면 귀속(salience 런 산출)을 클러스터
+// 병합에도 적용한다. 합성 표제어 뽑기("자율적 컴퓨터의 네트워크 구조 영향")가 핵심
+// 개념(컴퓨터) 하나로 합쳐진다 (0808 준서: 의미 동일 개념 파악이 최우선).
+export async function assembleV12({ book, lifts, llm, embedFn, onProgress, salience = [], aliasMap = new Map() }) {
   const log = [];
   let llmCalls = 0;
 
@@ -44,8 +50,14 @@ export async function assembleV12({ book, lifts, llm, embedFn, onProgress }) {
   // embedFn 없으면 정규화 자구 일치만으로 묶는다(개발 루프 0원 폴백).
   onProgress?.('v12 — 표제어 클러스터');
   const clusters = []; // { id, rep, headwords:Set, claims:[], emb }
+  const coreOf = (name) => aliasMap.get(nrm(name)) || null;
   for (const c of claims) {
-    let hit = clusters.find((k) => k.headwords.has(nrm(c.headword)));
+    const core = coreOf(c.headword);
+    let hit = clusters.find((k) => k.headwords.has(nrm(c.headword)) || (core && nrm(k.rep) === nrm(core)));
+    if (!hit && core) {
+      hit = clusters.find((k) => coreOf(k.rep) && nrm(coreOf(k.rep)) === nrm(core));
+      if (hit) { hit.rep = core; log.push(`[v12] 별칭 병합: "${c.headword}" ≈ "${core}"`); }
+    }
     if (!hit && embedFn) {
       const e = await embedFn(`${c.headword}: ${c.claim.slice(0, 120)}`);
       let best = null, bs = 0;
@@ -53,14 +65,37 @@ export async function assembleV12({ book, lifts, llm, embedFn, onProgress }) {
       if (best && bs >= CLUSTER_MIN) { hit = best; log.push(`[v12] 패러프레이즈 병합: "${c.headword}" → "${hit.rep}" (cos ${bs.toFixed(2)})`); }
       c._emb = e;
     }
-    if (hit) { hit.claims.push(c); hit.headwords.add(nrm(c.headword)); }
+    if (hit) { hit.claims.push(c); hit.headwords.add(nrm(c.headword)); if (core && nrm(hit.rep) !== nrm(core) && coreOf(hit.rep)) hit.rep = core; }
     else clusters.push({ id: `k${clusters.length}`, rep: c.headword, headwords: new Set([nrm(c.headword)]), claims: [c], emb: c._emb || null });
   }
+  // salience 점수 부착 — 이름·별칭 매칭, 미상은 중간값(0.25)
+  const salN = salience.map((r) => ({ n: nrm(r.concept), score: r.score }));
+  const scoreOf = (k) => {
+    let best = 0.25;
+    for (const n of [nrm(k.rep), ...k.headwords]) {
+      const hit = salN.find((x) => x.n === n) || salN.find((x) => n.length >= 2 && (x.n.includes(n) || n.includes(x.n)));
+      if (hit) { best = hit.score; break; }
+    }
+    return best;
+  };
+  for (const k of clusters) k.score = salience.length ? scoreOf(k) : 0.5;
+  // 강등 — 바닥 점수 + 단발 개념은 키워드로 세우지 않는다(신조어·의식류). 주장은 같은
+  // 메모의 최고점 키워드 밑에 문장으로 붙는다(gloss 에 표제어가 남아 커버는 유지).
+  const DEMOTE = 0.08;
+  const demoted = salience.length ? clusters.filter((k) => k.score < DEMOTE && k.claims.length === 1) : [];
+  for (const k of demoted) clusters.splice(clusters.indexOf(k), 1);
+  if (demoted.length) log.push(`[v12] 강등 ${demoted.length}개(점수<${DEMOTE}): ${demoted.map((k) => `${k.rep}(${k.score})`).join(' · ')}`);
+
   const promoted = clusters.filter((k) => k.claims.length >= 2);
   log.push(`[v12] 클러스터 ${clusters.length}개 · 승격(2회 이상) ${promoted.length}개: ${promoted.map((k) => `${k.rep}(${k.claims.length})`).join(' · ') || '(없음)'}${embedFn ? '' : ' — 임베딩 없음: 자구 일치만'}`);
 
   // ── 2) 역할 블록 편성 — LLM 1콜 ──────────────────────────────
   // 전개 방식 분포가 신호. 대장 1개 독식 금지(보완점 ①②)는 코드가 사후 검사한다.
+  // 구조 예산 (0808 준서: "메모가 부족할 땐 논지·개념 정리에 집중") — 주장이 적으면
+  // 역할 블록을 세우지 않는다. 5메모에 배경·진단·처방을 강제하던 넥서스 실측의 처방.
+  const BLOCK_MIN_CLAIMS = 15;
+  const skipBlocks = claims.length < BLOCK_MIN_CLAIMS;
+  if (skipBlocks) log.push(`[v12] 구조 예산: 주장 ${claims.length} < ${BLOCK_MIN_CLAIMS} — 역할 블록 생략, 개념·파렌팅·대조 중심 평면`);
   onProgress?.('v12 — 역할 블록 편성');
   const devLine = (k) => {
     const d = {}; for (const c of k.claims) for (const x of c.devices) d[x] = (d[x] || 0) + 1;
@@ -68,7 +103,7 @@ export async function assembleV12({ book, lifts, llm, embedFn, onProgress }) {
   };
   const clusterLine = clusters.map((k) =>
     `${k.id} | ${k.rep} — 주장 ${k.claims.length}개 · 방식: ${devLine(k)} · 대표: ${k.claims[0].claim.slice(0, 60)}`).join('\n');
-  const blockRaw = await llm({
+  const blockRaw = skipBlocks ? '{"blocks":[]}' : await llm({
     system: `주장 키워드들을 책의 역할 블록으로 편성한다. 블록은 "이 키워드들이 책의 논지에서 맡는 역할"의 묶음이다 — 신호: ${ROLE_SIGNAL}.
 블록은 2~5개. name 은 이 책의 실제 내용을 가리키는 짧은 명사구, role 은 ${BLOCK_ROLES.join('|')} 중 하나. 모든 키워드를 어느 한 블록에 배정하라(한 키워드는 한 블록에만). 한 블록이 전체를 독식하면 안 된다 — 역할이 정말 갈리는 지점에서 나눠라. JSON만 출력.`,
     user: `책: ${book.title}${book.author ? ` (${book.author})` : ''}
@@ -79,7 +114,7 @@ ${clusterLine}
 출력 JSON: {"blocks":[{"name":"블록 이름","role":"${BLOCK_ROLES.join('|')}","memberIds":["k0"],"why":"이 묶음이 이 역할인 이유 한 줄"}]}`,
     temperature: 0.1,
   });
-  llmCalls++;
+  if (!skipBlocks) llmCalls++;
   let blocksJ = []; try { blocksJ = JSON.parse(blockRaw).blocks || []; } catch { log.push('[v12✗] 역할 블록 파싱 실패 — 전부 미배정'); }
 
   // memberIds 는 id 우선, 표제어로도 받아 준다(수동 픽스처·모델 편차 견딤)
@@ -93,7 +128,7 @@ ${clusterLine}
     blocks.push({ name: String(b.name || '').trim() || b.role, role: BLOCK_ROLES.includes(b.role) ? b.role : '기타', why: String(b.why || '').trim(), members });
   }
   const orphans = clusters.filter((k) => !assigned.has(k.id));
-  if (orphans.length) log.push(`[v12⚠] 미배정 키워드 ${orphans.length}개 → 뿌리 직속: ${orphans.map((k) => k.rep).join(' · ')}`);
+  if (orphans.length && !skipBlocks) log.push(`[v12⚠] 미배정 키워드 ${orphans.length}개 → 뿌리 직속: ${orphans.map((k) => k.rep).join(' · ')}`);
   // 독식 검사 — 하드 컷 대신 경고. 개수 상한으로 조이면 멀쩡한 구조까지 깎인다(v11 실측 교훈).
   for (const b of blocks) {
     const share = b.members.length / clusters.length;
@@ -132,6 +167,12 @@ ${clusterLine}
     b.members.forEach((k) => kwNode(k, bn));
   }
   orphans.forEach((k) => kwNode(k, root));
+  // 강등 개념의 주장은 같은 메모 최고점 키워드 밑에 문장으로 (없으면 뿌리)
+  for (const k of (demoted || [])) for (const c of k.claims) {
+    const sib = clusters.filter((x) => x.claims.some((cc) => cc.memoId === c.memoId) && x.nodeId)
+      .sort((a2, b2) => b2.score - a2.score)[0];
+    claimNode(c, sib ? nodes.get(sib.nodeId) : root);
+  }
 
   // ── 4) 대조 엣지 — lift 슬롯의 쌍을 그대로 엣지로, LLM 0콜 ────
   // 재판정하지 않는다(보완점 ③). 쌍의 문면이 다른 클러스터 표제어와 겹치면 클러스터 간
@@ -283,8 +324,9 @@ ${clusterLine}
         }
         if (parentOf.has(k.id)) break;
         // ③ 인과: 사슬 항목이 다른 키워드면 그중 가장 큰 맥 아래로 (기존 guard 유지)
-        const guard = (parent) => parent && weight(k) <= weight(parent)
-          && (blockOfC.get(k.id) === blockOfC.get(parent.id) || weight(parent) >= 2);
+        // 방향 가드 통일(0808): 무게 대신 salience — 낮은 점수가 높은 점수 밑으로만
+        const guard = (parent) => parent && k.score <= parent.score + 0.1
+          && (blockOfC.get(k.id) === blockOfC.get(parent.id) || parent.score >= 0.35 || weight(parent) >= 2);
         const ch = c.slots?.['인과'];
         if (ch) {
           const hits = ch.chain.map((t) => byHeadIn(t, k)).filter(Boolean);
@@ -343,7 +385,7 @@ ${clusterLine}
             // 부모 방향은 상대가 승격 큰 맥일 때만 — 의미 판정은 "같은 개념인가"만 답하므로
             // 방향 근거가 자구 규칙보다 약하다. 성격 없는 인간(행위자)이 능률(그 행위의 결과)
             // 밑으로 들어간 sem-14 실측의 방지 — 잔가지끼리는 잇지 않는다.
-            else if (weight(p) >= 2 && weight(x.k) <= weight(p)) {
+            else if ((p.score >= 0.35 || weight(p) >= 2) && x.k.score <= p.score + 0.1) {
               if (propose(x.k, p, `${x.rel}≈`)) semHits.push(`${x.k.rep} → ${p.rep}`);
             }
           }
@@ -362,10 +404,10 @@ ${clusterLine}
       // (실측: 이 가드 없이는 성과사회가 "성과사회의 긍정성 → 우울증 환자" 사슬에 걸려
       // 우울증 환자 아래로 들어가며 하위 트리 전체의 역할 블록이 무너졌다 — 소속 88→69)
       const childCnt = [...parentOf.values()].filter((v) => v.parent === b).length;
-      if (weight(b) + childCnt > 2) continue;
+      if (weight(b) + childCnt > 2 || b.score >= 0.5) continue;      // 상위 점수 개념은 뿌리로 남는다
       for (const a of clusters) {
-        if (a === b || !(parentOf.has(a.id) || weight(a) >= 2)) continue;
-        if (blockOfC.get(a.id) !== blockOfC.get(b.id) && weight(a) < 2 && !parentOf.has(a.id)) continue;
+        if (a === b || !(parentOf.has(a.id) || weight(a) >= 2 || a.score >= 0.5)) continue;
+        if (a.score + 0.1 < b.score) continue;
         const hit = a.claims.some((c) => (c.slots?.['인과']?.chain || []).some((t) => byHeadIn(t, a) === b));
         if (hit && propose(b, a, '인과·귀속')) break;
       }
@@ -388,6 +430,30 @@ ${clusterLine}
     }
     if (nested.length) log.push(`[v12] 키워드 위계 ${nested.length}건: ${nested.join(' · ')}`);
     else log.push('[v12] 키워드 위계 신호 없음 — 평면 유지');
+  }
+
+  // ── 4.7) 대조 축 승격 (0808 준서: "지엽적 대조와 책에서 중요한 대조를 가려내는 것") ──
+  // 양변이 모두 키워드이고 min(양변 점수)가 높은 대조만 "A ↔ B" 축 노드로 트리에 세운다
+  // — 인쇄술↔컴퓨터가 표적. 파렌팅이 이미 부모-자식을 정한 쌍(짜증→분노)은 건드리지
+  // 않고, 한 문단 안 완결 대조(위안↔정당성)는 b 가 없어 자연 제외된다.
+  {
+    const isAncN = (aId, bId) => { let c = nodes.get(bId); while (c && c.parentId) { if (c.parentId === aId) return true; c = nodes.get(c.parentId); } return false; };
+    const AXIS_MIN = 0.45;
+    for (const e of edges.filter((x) => x.type === '대조' && x.a && x.b)) {
+      const an = nodes.get(e.a), bn = nodes.get(e.b);
+      if (!an || !bn || an === bn) continue;
+      const ka = clusters.find((k) => k.nodeId === e.a), kb = clusters.find((k) => k.nodeId === e.b);
+      if (!ka || !kb) continue;
+      if (Math.min(ka.score, kb.score) < AXIS_MIN) continue;
+      if (isAncN(an.id, bn.id) || isAncN(bn.id, an.id)) continue;                   // 파렌팅 우선
+      if (nodes.get(an.parentId)?.relation === '대조축' || nodes.get(bn.parentId)?.relation === '대조축') continue;
+      const host = nodes.get(an.parentId) || root;
+      const axis = add({ id: id(), title: `${an.title} ↔ ${bn.title}`, parentId: host.id, level: host.level + 1, kind: 'concept', relation: '대조축', sources: [], gloss: e.axis || '' });
+      an.parentId = axis.id; bn.parentId = axis.id;
+      const relevelN = (nid) => { const x = nodes.get(nid); x.level = nodes.get(x.parentId).level + 1; for (const ch of nodes.values()) if (ch.parentId === nid) relevelN(ch.id); };
+      relevelN(an.id); relevelN(bn.id);
+      log.push(`[v12] 대조 축 승격: ${an.title} ↔ ${bn.title} (${e.axis || ''} · min점수 ${Math.min(ka.score, kb.score)})`);
+    }
   }
 
   // ── 5) fold-back — 여러 블록에 걸친 느슨한 클러스터를 후보로 1콜 (보완점 ④) ──

@@ -71,10 +71,39 @@ if (PROVIDER === 'claude') {
   };
 }
 
+// salience — 조립 전에 계산해 전달 (0808: 점수가 방향·강등·대조 축·구조 예산을 정한다).
+// 기본은 자구·결정적(별칭 없음 — manual 재현성 유지). 리치 핵심은 목차 자구 폴백.
+const { computeSalience } = await import('./lib/salience.mjs');
+const memoTexts = new Map();
+golden.lifts.forEach((l) => {
+  const memo = book.memos[Number(l.memoId.split('-').pop())];
+  memoTexts.set(l.memoId, memo?.text || '');
+});
+let richToc = book.toc || '';
+if (!richToc) {
+  try {
+    const meta = JSON.parse(await readFile(resolve(__dir, 'golden/obsidian-books-meta.json'), 'utf-8'));
+    const m = Object.values(meta).find((b) => nrmT(b.title || b.matchedTitle).includes(nrmT(book.title)));
+    if (m) richToc = m.toc || '';
+  } catch {}
+}
+// SALIENCE=runs/salience-*.json — runSalience 산출(별칭·측면 귀속 포함)을 그대로 쓴다.
+// 합성 표제어 lift 뽑기에서 자구 재계산이 핵심 개념(컴퓨터)을 놓쳐 강등해버린 실측의 수리.
+let salience, aliasMap = new Map();
+if (process.env.SALIENCE) {
+  const sal = JSON.parse(await readFile(resolve(__dir, process.env.SALIENCE), 'utf-8'));
+  salience = sal.ranked;
+  for (const g of (sal.aliasGroups || [])) for (const a of g.slice(1)) aliasMap.set(nrmT(a).replace(/\s+/g, '').toLowerCase(), g[0]);
+  for (const [asp, core] of Object.entries(sal.aspects || {})) aliasMap.set(nrmT(asp).replace(/\s+/g, '').toLowerCase(), core);
+} else {
+  salience = computeSalience({ lifts: golden.lifts, memoTexts, richToc });
+}
+console.log('  · salience 상위:', salience.slice(0, 6).map((r2) => `${r2.concept} ${r2.score}`).join(' · '));
+
 const t0 = Date.now();
 const r = await assembleV12({
   book: { title: nrmT(book.title), author: book.author },
-  lifts: golden.lifts, llm, embedFn,
+  lifts: golden.lifts, llm, embedFn, salience, aliasMap,
   onProgress: (m) => console.log('  ·', m),
 });
 const sec = Math.round((Date.now() - t0) / 100) / 10;

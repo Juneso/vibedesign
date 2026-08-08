@@ -46,7 +46,7 @@ const ROLE_W = {
 // 자식이 부모 빈도를 상속하는 부작용(넥서스 실측)으로 기각, 별칭 판정의 명시 귀속으로 대체.
 // richText: 목차·책 소개 원문 — 여기 등장하는 개념은 저자·출판사가 중요하게 다룬 것이라
 // 가중(0808 준서: 빈도 뻥튀기 보정의 반대편 신호).
-export function computeSalience({ lifts, memoTexts, aliasGroups = [], aspects = {}, richText = '' }) {
+export function computeSalience({ lifts, memoTexts, aliasGroups = [], aspects = {}, richCore = [], richToc = '' }) {
   // 대조·비교 쌍 별칭 금지 — 슬롯에서 맞세워진 양쪽은 정의상 다른 개념이다. 별칭 판정이
   // "점토판·인쇄기·라디오≈컴퓨터", "깊은 피로≈분열적 피로"처럼 반대 개념을 병합한 실측
   // (넥서스 lift-2)의 결정적 차단 — 판정 프롬프트가 아니라 코드가 거른다.
@@ -164,12 +164,18 @@ export function computeSalience({ lifts, memoTexts, aliasGroups = [], aspects = 
     return counts;
   };
   const exCounts = countExclusive(allText);
-  const richN = nrm(richText || '');
+  // 리치 가중 (0808 준서 재판정: "소개에 나왔다고 중요한 게 아니라 중점적으로 설명되는
+  // 핵심을 파악해야") — richCore(폐쇄 추출된 핵심 개념 목록)와 매칭될 때만 가중.
+  // richCore 가 없으면 목차 자구만 폴백으로 쓴다(목차는 편집된 목록이라 산문 오염이 없다)
+  // — 소개 산문 자구 매칭은 '인간' 0.92 실측으로 기각.
+  const coreN = (richCore || []).map(nrm).filter((x) => x.length >= 2);
+  const tocN = nrm(richToc || '');
   for (const c of concepts.values()) {
     c.freq = [...c.names].reduce((s2, n) => s2 + (exCounts.get(n) || 0), 0);
     for (const [mid, text] of memoTexts) if ([...c.names].some((n) => nrm(text).includes(n))) c.memos.add(mid);
-    // 목차·책 소개 가중 — 등장하면 저자 공인 핵심 개념
-    c.rich = richN && [...c.names].some((n) => richN.includes(n));
+    c.rich = coreN.length
+      ? [...c.names].some((n) => coreN.some((x) => x.includes(n) || n.includes(x)))
+      : !!tocN && [...c.names].some((n) => tocN.includes(n));
   }
 
   // 합산 — 빈도 최대 가중(준서). 분포는 책 크기로 정규화(소표본 과벌점 수리: 5메모 책에서
@@ -196,6 +202,16 @@ export function buildAliasPrompt({ book, names }) {
   return {
     system: `개념 이름 목록에서 **의미적으로 같은 개념을 가리키는 이름들**을 묶는다. 묶는 기준: 표현 변형(나르시스적 주체=나르시시스트), 구체형과 총칭(인쇄기=인쇄술), 지시 표현(성과사회의 주민=성과주체). 주제가 이웃인 것·상하위 개념(우울증≠신경성 질환)은 묶지 않는다. 확신이 없으면 묶지 마라. JSON만 출력.`,
     user: `책: ${book}\n\n[이름 목록]\n${names.map((n, i) => `${i} | ${n}`).join('\n')}\n\n출력 JSON: {"groups":[["대표 이름","같은 개념의 다른 이름"]],"aspects":{"측면 이름":"핵심 개념"}} — aspects 는 "X의 Y"처럼 어떤 핵심 개념의 한 측면·속성을 가리키는 이름(컴퓨터의 행위주체성→컴퓨터, 종교의 기능→종교). 해당 없으면 생략`,
+    temperature: 0.1,
+  };
+}
+
+// 리치 핵심 추출 — 목차·소개에서 "이 책이 중점적으로 다루는 핵심 개념"만 뽑는 폐쇄 판정 1콜.
+// 등장 ≠ 핵심 (소개 산문의 일반어 오염 방지, 0808 준서).
+export function buildRichCorePrompt({ book, toc, summary }) {
+  return {
+    system: '책의 목차와 소개에서 이 책이 **중점적으로 설명하는 핵심 개념**을 5~12개 뽑는다. 소개에 스치듯 등장하는 일반어(인간·사회·세계 같은)는 핵심이 아니다 — 이 책 고유의 논지를 이루는 개념만. 각 개념은 2~10자 명사구. JSON만 출력.',
+    user: `책: ${book}\n\n[목차]\n${toc || '(없음)'}\n\n[소개]\n${summary || '(없음)'}\n\n출력 JSON: {"core":["개념"]}`,
     temperature: 0.1,
   };
 }
