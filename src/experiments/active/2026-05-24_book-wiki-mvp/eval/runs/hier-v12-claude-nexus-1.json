@@ -1,0 +1,424 @@
+{
+  "label": "hier-v12-claude-nexus-1",
+  "runAt": "2026-08-08T05:19:46.514Z",
+  "kind": "hier-v12",
+  "provider": "claude",
+  "promptVersion": "lift-v12.4",
+  "nMemos": 5,
+  "llmCalls": 2,
+  "counts": {
+    "memos": 5,
+    "claims": 9,
+    "clusters": 9,
+    "promoted": 0,
+    "blocks": 4,
+    "orphans": 0,
+    "contrastEdges": 5,
+    "escalation": [
+      "ds-b50-넥서스-3#c3(med)"
+    ]
+  },
+  "sec": 19.5,
+  "tree": {
+    "rootId": "n1",
+    "nodes": [
+      {
+        "id": "n1",
+        "title": "넥서스",
+        "parentId": null,
+        "level": 0,
+        "kind": "root",
+        "sources": []
+      },
+      {
+        "id": "n2",
+        "title": "종교와 권위의 기능",
+        "parentId": "n1",
+        "level": 1,
+        "kind": "concept",
+        "role": "배경",
+        "sources": [
+          126
+        ],
+        "gloss": "종교의 역사적 역할과 초인적 권위 체계가 인간 사회의 기본 구조를 이루어온 배경을 설명"
+      },
+      {
+        "id": "n3",
+        "title": "종교의 기능",
+        "parentId": "n2",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          126
+        ],
+        "gloss": "종교의 개인적 기능과 역사적으로 가장 중요한 기능은 다르다.",
+        "promoted": false,
+        "clusterId": "k0"
+      },
+      {
+        "id": "n4",
+        "title": "종교의 개인적 기능과 역사적으로 가장 중요한 기능은 다르다.",
+        "parentId": "n3",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          126
+        ],
+        "gloss": "종교의 기능",
+        "memoId": "ds-b50-넥서스-0",
+        "claimKey": "ds-b50-넥서스-0#c1",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n5",
+        "title": "초인적 권위",
+        "parentId": "n2",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          126
+        ],
+        "gloss": "초인적 권위자의 오류 없는 권위는 인간의 의심과 변경을 금지한다.",
+        "promoted": false,
+        "clusterId": "k1"
+      },
+      {
+        "id": "n6",
+        "title": "초인적 권위자의 오류 없는 권위는 인간의 의심과 변경을 금지한다.",
+        "parentId": "n5",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          126
+        ],
+        "gloss": "초인적 권위",
+        "memoId": "ds-b50-넥서스-0",
+        "claimKey": "ds-b50-넥서스-0#c2",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n7",
+        "title": "정보 기술의 진정한 역할",
+        "parentId": "n1",
+        "level": 1,
+        "kind": "concept",
+        "role": "진단",
+        "sources": [
+          155,
+          299
+        ],
+        "gloss": "인쇄술과 언어 사용이 과학/기술 발전의 진짜 메커니즘을 밝히고, 컴퓨터 논의의 오류를 진단"
+      },
+      {
+        "id": "n8",
+        "title": "인쇄술",
+        "parentId": "n7",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          155
+        ],
+        "gloss": "인쇄술은 과학혁명의 근본 원인이 아니며, 새로운 아이디어를 생성할 수 없고 과학적 사실뿐만 아니라 거짓 정보도 무차별적으로 확산시켰다.",
+        "promoted": false,
+        "clusterId": "k2"
+      },
+      {
+        "id": "n9",
+        "title": "인쇄술은 과학혁명의 근본 원인이 아니며, 새로운 아이디어를 생성할 수 없고 과학적 사실뿐만 아니라 거짓 정보도 무차별적으로 확산시켰다.",
+        "parentId": "n8",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          155
+        ],
+        "gloss": "인쇄술",
+        "memoId": "ds-b50-넥서스-1",
+        "claimKey": "ds-b50-넥서스-1#c1",
+        "devices": [
+          "통념 반박",
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n10",
+        "title": "신조어",
+        "parentId": "n7",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          299
+        ],
+        "gloss": "저자는 신조어를 피하기 위해 컴퓨터, 알고리즘, 챗봇에 대해서도 '목표'와 '결정'이라는 기존 표현을 그대로 사용한다.",
+        "promoted": false,
+        "clusterId": "k4"
+      },
+      {
+        "id": "n11",
+        "title": "저자는 신조어를 피하기 위해 컴퓨터, 알고리즘, 챗봇에 대해서도 '목표'와 '결정'이라는 기존 표현을 그대로 사용한다.",
+        "parentId": "n10",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          299
+        ],
+        "gloss": "신조어",
+        "memoId": "ds-b50-넥서스-3",
+        "claimKey": "ds-b50-넥서스-3#c1",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n12",
+        "title": "의식",
+        "parentId": "n7",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          299
+        ],
+        "gloss": "목표와 결정이라는 표현을 사용한다는 것이 컴퓨터의 의식을 가진다는 것을 암시하지 않는다.",
+        "promoted": false,
+        "clusterId": "k5"
+      },
+      {
+        "id": "n13",
+        "title": "목표와 결정이라는 표현을 사용한다는 것이 컴퓨터의 의식을 가진다는 것을 암시하지 않는다.",
+        "parentId": "n12",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          299
+        ],
+        "gloss": "의식",
+        "memoId": "ds-b50-넥서스-3",
+        "claimKey": "ds-b50-넥서스-3#c2",
+        "devices": [
+          "통념 반박"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n14",
+        "title": "네트워크 혁명과 행위주체의 변화",
+        "parentId": "n1",
+        "level": 1,
+        "kind": "concept",
+        "role": "진단",
+        "sources": [
+          299,
+          301
+        ],
+        "gloss": "컴퓨터의 등장으로 네트워크 구성원 유형 자체가 변했으며, 이것이 인간 중심 사회의 근본적 변화임을 진단"
+      },
+      {
+        "id": "n15",
+        "title": "컴퓨터",
+        "parentId": "n12",
+        "level": 3,
+        "kind": "concept",
+        "sources": [
+          299
+        ],
+        "gloss": "이 책의 논지는 컴퓨터의 의식 가능성이 아니라, 스스로 목표를 추구하고 결정을 내릴 수 있는 컴퓨터의 출현이 정보 네트워크의 기본 구조를 변화시킨다는 것이다.",
+        "promoted": false,
+        "clusterId": "k6"
+      },
+      {
+        "id": "n16",
+        "title": "이 책의 논지는 컴퓨터의 의식 가능성이 아니라, 스스로 목표를 추구하고 결정을 내릴 수 있는 컴퓨터의 출현이 정보 네트워크의 기본 구조를 변화시킨다는 것이다.",
+        "parentId": "n15",
+        "level": 4,
+        "kind": "sentence",
+        "sources": [
+          299
+        ],
+        "gloss": "컴퓨터",
+        "memoId": "ds-b50-넥서스-3",
+        "claimKey": "ds-b50-넥서스-3#c3",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "med"
+      },
+      {
+        "id": "n17",
+        "title": "컴퓨터의 행위주체성",
+        "parentId": "n15",
+        "level": 4,
+        "kind": "concept",
+        "sources": [
+          301
+        ],
+        "gloss": "컴퓨터는 네트워크의 단순한 연결 장치가 아니라 스스로 결정하고 창조하는 능동적 행위자로 네트워크의 완전한 구성원이다.",
+        "promoted": false,
+        "clusterId": "k7"
+      },
+      {
+        "id": "n18",
+        "title": "컴퓨터는 네트워크의 단순한 연결 장치가 아니라 스스로 결정하고 창조하는 능동적 행위자로 네트워크의 완전한 구성원이다.",
+        "parentId": "n17",
+        "level": 5,
+        "kind": "sentence",
+        "sources": [
+          301
+        ],
+        "gloss": "컴퓨터의 행위주체성",
+        "memoId": "ds-b50-넥서스-4",
+        "claimKey": "ds-b50-넥서스-4#c1",
+        "devices": [
+          "대조",
+          "분석"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n19",
+        "title": "네트워크 구성의 변화",
+        "parentId": "n15",
+        "level": 4,
+        "kind": "concept",
+        "sources": [
+          301
+        ],
+        "gloss": "문자·인쇄술·라디오는 인간들 사이의 연결 방식을 혁명적으로 변화시켰지만 네트워크의 구성원 유형을 바꾸지는 못했고, 컴퓨터의 발명은 네트워크 구성 자체를 혁명적으로 변화시켰다.",
+        "promoted": false,
+        "clusterId": "k8"
+      },
+      {
+        "id": "n20",
+        "title": "문자·인쇄술·라디오는 인간들 사이의 연결 방식을 혁명적으로 변화시켰지만 네트워크의 구성원 유형을 바꾸지는 못했고, 컴퓨터의 발명은 네트워크 구성 자체를 혁명적으로 변화시켰다.",
+        "parentId": "n19",
+        "level": 5,
+        "kind": "sentence",
+        "sources": [
+          301
+        ],
+        "gloss": "네트워크 구성의 변화",
+        "memoId": "ds-b50-넥서스-4",
+        "claimKey": "ds-b50-넥서스-4#c2",
+        "devices": [
+          "대조",
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n21",
+        "title": "민주주의와 새로운 질서",
+        "parentId": "n1",
+        "level": 1,
+        "kind": "concept",
+        "role": "처방",
+        "sources": [
+          205
+        ],
+        "gloss": "다중성과 대화를 전제한 민주주의 모델이 컴퓨터 행위주체 등장 이후 필요한 새로운 사회 원리"
+      },
+      {
+        "id": "n22",
+        "title": "민주주의",
+        "parentId": "n21",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          205
+        ],
+        "gloss": "민주주의는 국민 주권과 국민의 다양성·다중성을 전제하며 배제를 거부하고 대화의 형태로 이루어진다",
+        "promoted": false,
+        "clusterId": "k3"
+      },
+      {
+        "id": "n23",
+        "title": "민주주의는 국민 주권과 국민의 다양성·다중성을 전제하며 배제를 거부하고 대화의 형태로 이루어진다",
+        "parentId": "n22",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          205
+        ],
+        "gloss": "민주주의",
+        "memoId": "ds-b50-넥서스-2",
+        "claimKey": "ds-b50-넥서스-2#c1",
+        "devices": [
+          "정의"
+        ],
+        "confidence": "high"
+      }
+    ],
+    "edges": [
+      {
+        "type": "대조",
+        "axis": "종교가 지향하는 수준",
+        "pair": [
+          "위안과 생명의 미스터리 설명",
+          "사회질서에 초인적 정당성 부여"
+        ],
+        "claimKey": "ds-b50-넥서스-0#c1",
+        "a": "n3",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "인쇄술이 확산시킨 정보의 내용물",
+        "pair": [
+          "과학적 사실",
+          "종교적 환상, 가짜 뉴스, 음모론"
+        ],
+        "claimKey": "ds-b50-넥서스-1#c1",
+        "a": "n8",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "책의 탐구 주제",
+        "pair": [
+          "의식",
+          "정보 네트워크 구조의 변화"
+        ],
+        "claimKey": "ds-b50-넥서스-3#c3",
+        "a": "n15",
+        "b": "n12"
+      },
+      {
+        "type": "대조",
+        "axis": "네트워크 내 역할(행위자 vs 연결 장치)",
+        "pair": [
+          "컴퓨터",
+          "점토판·인쇄기·라디오"
+        ],
+        "claimKey": "ds-b50-넥서스-4#c1",
+        "a": "n17",
+        "b": "n15"
+      },
+      {
+        "type": "대조",
+        "axis": "네트워크 구성원의 유형 변화 여부",
+        "pair": [
+          "문자·인쇄술·라디오 발명",
+          "컴퓨터 발명"
+        ],
+        "claimKey": "ds-b50-넥서스-4#c2",
+        "a": "n19",
+        "b": null
+      }
+    ]
+  },
+  "log": [
+    "[v12] 입력: 메모 5건 → 주장 9개 (조립 입력 = 주장)",
+    "[v12] 클러스터 9개 · 승격(2회 이상) 0개: (없음)",
+    "[v12] 역할 블록 4개: 종교와 권위의 기능(배경·2) · 정보 기술의 진정한 역할(진단·3) · 네트워크 혁명과 행위주체의 변화(진단·3) · 민주주의와 새로운 질서(처방·1)",
+    "[v12] 대조 엣지 5개 (lift 슬롯 그대로 · 재판정 0콜) — 클러스터 간 해석 2개",
+    "[v12] 의미 매칭: 후보 8건 중 0건 연결",
+    "[v12] 키워드 위계 3건: 컴퓨터 → 의식(참조) · 컴퓨터의 행위주체성 → 컴퓨터(참조) · 네트워크 구성의 변화 → 컴퓨터(참조)",
+    "[v12] fold-back 후보 없음"
+  ]
+}

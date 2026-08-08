@@ -20,7 +20,9 @@ const BOOK = (process.env.BOOK || '피로사회').normalize('NFC');
 // LIFTS 로 lift 소스를 바꾼다 — 골든(기본) 또는 실 모델 lift 런 (4단계 재생성)
 const golden = JSON.parse(await readFile(resolve(__dir, process.env.LIFTS || 'golden/lift-golden-피로사회.json'), 'utf-8'));
 const ds = JSON.parse(await readFile(resolve(__dir, 'golden/books50-memos.json'), 'utf-8'));
-const book = ds.books.find((b) => nrmT(b.title) === BOOK);
+const book = process.env.MEMOS_FILE
+  ? JSON.parse(await readFile(resolve(__dir, process.env.MEMOS_FILE), 'utf-8'))
+  : ds.books.find((b) => nrmT(b.title) === BOOK);
 if (!book) throw new Error(`books50 에 없는 책: ${BOOK}`);
 function nrmT(s) { return String(s || '').normalize('NFC').trim(); }
 
