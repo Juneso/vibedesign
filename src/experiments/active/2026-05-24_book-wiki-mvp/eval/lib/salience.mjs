@@ -57,7 +57,11 @@ export function computeSalience({ lifts, memoTexts, aliasGroups = [], aspects = 
     for (let i = 0; i < pair.length; i++) for (let j = i + 1; j < pair.length; j++) {
       const a = N(pair[i]).split('—')[0].trim(), b = N(pair[j]).split('—')[0].trim();
       opposed.add(oppKey(a, b));
-      opposed.add(oppKey(cl.headword, a)); opposed.add(oppKey(cl.headword, b));
+      // 자기 표제어가 든 변은 자기 쪽이다 — "우울증 ↔ 슬픔"의 우울증 변을 표제어 우울증과
+      // 대립으로 등록하면 정당한 병합(우울증≈성과주체의 우울증)까지 기각된다 (0808 실측 6건)
+      const h = nrm(cl.headword);
+      if (!nrm(a).includes(h) && !h.includes(nrm(a))) opposed.add(oppKey(cl.headword, a));
+      if (!nrm(b).includes(h) && !h.includes(nrm(b))) opposed.add(oppKey(cl.headword, b));
     }
   }
   const clash = (g) => {

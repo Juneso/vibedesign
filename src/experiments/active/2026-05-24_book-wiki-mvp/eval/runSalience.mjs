@@ -51,7 +51,17 @@ if (process.env.ALIAS === '1') {
   } catch (e) { console.log('별칭 판정 실패 — 자구만:', e.message.slice(0, 80)); }
 }
 
-const richText = [book.toc, book.summary, book.intro].filter(Boolean).join(' ');
+// 목차·책 소개 — 저자·출판사 공인 개념 가중 (0808 준서: 빈도 뻥튀기의 반대편 닻).
+// MEMOS_FILE 의 자체 필드가 우선, 없으면 obsidian-books-meta(알라딘 리치)에서 제목 매칭.
+let rich = [book.toc, book.summary, book.intro].filter(Boolean);
+if (!rich.length) {
+  try {
+    const meta = JSON.parse(await readFile(resolve(__dir, 'golden/obsidian-books-meta.json'), 'utf-8'));
+    const m = Object.values(meta).find((b) => nrmT(b.title || b.matchedTitle).includes(nrmT(book.title)) || nrmT(book.title).includes(nrmT(b.matchedTitle || b.title)));
+    if (m) { rich = [m.toc, m.summary].filter(Boolean); console.log('리치데이터: obsidian-books-meta 에서 목차·소개 로드'); }
+  } catch {}
+}
+const richText = rich.join(' ');
 const ranked = computeSalience({ lifts: liftRun.lifts, memoTexts, aliasGroups, aspects, richText });
 console.log(`\n■ salience — ${nrmT(book.title)} (${liftRun.label})`);
 console.log('점수 | 빈도 | 메모 | 피참조 | 주장 | 개념');
