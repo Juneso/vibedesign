@@ -1,0 +1,403 @@
+{
+  "label": "hier-v12-claude-nexus-8",
+  "runAt": "2026-08-08T08:15:52.350Z",
+  "kind": "hier-v12",
+  "provider": "claude",
+  "promptVersion": "lift-v12.4",
+  "nMemos": 5,
+  "llmCalls": 1,
+  "counts": {
+    "memos": 5,
+    "claims": 12,
+    "clusters": 8,
+    "promoted": 2,
+    "blocks": 0,
+    "orphans": 8,
+    "contrastEdges": 3,
+    "escalation": []
+  },
+  "sec": 5.7,
+  "tree": {
+    "rootId": "n1",
+    "nodes": [
+      {
+        "id": "n1",
+        "title": "넥서스",
+        "parentId": null,
+        "level": 0,
+        "kind": "root",
+        "sources": []
+      },
+      {
+        "id": "n2",
+        "title": "종교의 기능",
+        "parentId": "n4",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          126
+        ],
+        "gloss": "종교의 개인적 기능(위안, 생명의 미스터리 설명)은 다양하지만 역사적으로 가장 중요한 기능은 사회질서에 초인적 정당성을 부여하는 것이다.",
+        "promoted": false,
+        "clusterId": "k0"
+      },
+      {
+        "id": "n3",
+        "title": "종교의 개인적 기능(위안, 생명의 미스터리 설명)은 다양하지만 역사적으로 가장 중요한 기능은 사회질서에 초인적 정당성을 부여하는 것이다.",
+        "parentId": "n2",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          126
+        ],
+        "gloss": "종교의 기능",
+        "memoId": "ds-b50-넥서스-0",
+        "claimKey": "ds-b50-넥서스-0#c1",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n4",
+        "title": "초인적 정당성",
+        "parentId": "n1",
+        "level": 1,
+        "kind": "concept",
+        "sources": [
+          126
+        ],
+        "gloss": "유대교, 기독교, 이슬람교, 힌두교는 자신의 사상과 규칙이 오류 없는 초인적 권위자가 만든 것이므로 인간이 의심하거나 변경해서는 안 된다고 주장한다.",
+        "promoted": false,
+        "clusterId": "k1"
+      },
+      {
+        "id": "n5",
+        "title": "유대교, 기독교, 이슬람교, 힌두교는 자신의 사상과 규칙이 오류 없는 초인적 권위자가 만든 것이므로 인간이 의심하거나 변경해서는 안 된다고 주장한다.",
+        "parentId": "n4",
+        "level": 2,
+        "kind": "sentence",
+        "sources": [
+          126
+        ],
+        "gloss": "초인적 정당성",
+        "memoId": "ds-b50-넥서스-0",
+        "claimKey": "ds-b50-넥서스-0#c2",
+        "devices": [
+          "정의",
+          "예시"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n6",
+        "title": "인쇄술",
+        "parentId": "n22",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          155
+        ],
+        "gloss": "인쇄술은 텍스트를 충실히 복제할 뿐 새로운 아이디어를 생각해낼 수 없으며, 따라서 과학혁명의 근본 원인이 아니다.",
+        "promoted": true,
+        "clusterId": "k2"
+      },
+      {
+        "id": "n7",
+        "title": "인쇄술은 텍스트를 충실히 복제할 뿐 새로운 아이디어를 생각해낼 수 없으며, 따라서 과학혁명의 근본 원인이 아니다.",
+        "parentId": "n6",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          155
+        ],
+        "gloss": "인쇄술",
+        "memoId": "ds-b50-넥서스-1",
+        "claimKey": "ds-b50-넥서스-1#c1",
+        "devices": [
+          "정의"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n8",
+        "title": "인쇄술은 과학적 사실만 아니라 종교적 환상, 가짜 뉴스, 음모론도 동등하게 빠르게 확산시킨다.",
+        "parentId": "n6",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          155
+        ],
+        "gloss": "인쇄술",
+        "memoId": "ds-b50-넥서스-1",
+        "claimKey": "ds-b50-넥서스-1#c2",
+        "devices": [
+          "통념 반박"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n9",
+        "title": "마녀사냥",
+        "parentId": "n1",
+        "level": 1,
+        "kind": "concept",
+        "sources": [
+          155
+        ],
+        "gloss": "사탄을 숭배하는 마녀들의 세계적 음모라는 거짓 믿음이 근대 초반 유럽의 마녀사냥 광풍으로 이어졌다.",
+        "promoted": false,
+        "clusterId": "k3"
+      },
+      {
+        "id": "n10",
+        "title": "사탄을 숭배하는 마녀들의 세계적 음모라는 거짓 믿음이 근대 초반 유럽의 마녀사냥 광풍으로 이어졌다.",
+        "parentId": "n9",
+        "level": 2,
+        "kind": "sentence",
+        "sources": [
+          155
+        ],
+        "gloss": "마녀사냥",
+        "memoId": "ds-b50-넥서스-1",
+        "claimKey": "ds-b50-넥서스-1#c3",
+        "devices": [
+          "예시",
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n11",
+        "title": "민주주의",
+        "parentId": "n13",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          205
+        ],
+        "gloss": "민주주의는 국민이 유일한 권력의 정당한 원천이면서도, 국민은 단일한 실체가 아니므로 단일한 의사를 지닐 수 없다는 모순을 받아들이는 체제다.",
+        "promoted": false,
+        "clusterId": "k4"
+      },
+      {
+        "id": "n12",
+        "title": "민주주의는 국민이 유일한 권력의 정당한 원천이면서도, 국민은 단일한 실체가 아니므로 단일한 의사를 지닐 수 없다는 모순을 받아들이는 체제다.",
+        "parentId": "n11",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          205
+        ],
+        "gloss": "민주주의",
+        "memoId": "ds-b50-넥서스-2",
+        "claimKey": "ds-b50-넥서스-2#c1",
+        "devices": [
+          "정의"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n13",
+        "title": "국민",
+        "parentId": "n1",
+        "level": 1,
+        "kind": "concept",
+        "sources": [
+          205
+        ],
+        "gloss": "국민은 다양한 의견, 의사, 대표자를 지닌 다양한 집단들로 구성된다.",
+        "promoted": false,
+        "clusterId": "k5"
+      },
+      {
+        "id": "n14",
+        "title": "국민은 다양한 의견, 의사, 대표자를 지닌 다양한 집단들로 구성된다.",
+        "parentId": "n13",
+        "level": 2,
+        "kind": "sentence",
+        "sources": [
+          205
+        ],
+        "gloss": "국민",
+        "memoId": "ds-b50-넥서스-2",
+        "claimKey": "ds-b50-넥서스-2#c2",
+        "devices": [
+          "분석"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n15",
+        "title": "집단",
+        "parentId": "n11",
+        "level": 3,
+        "kind": "concept",
+        "sources": [
+          205
+        ],
+        "gloss": "어떤 집단도 다른 집단을 국민에서 배제할 권리가 없으므로, 민주주의는 모든 이해집단 간의 대화로 작동한다.",
+        "promoted": false,
+        "clusterId": "k6"
+      },
+      {
+        "id": "n16",
+        "title": "어떤 집단도 다른 집단을 국민에서 배제할 권리가 없으므로, 민주주의는 모든 이해집단 간의 대화로 작동한다.",
+        "parentId": "n15",
+        "level": 4,
+        "kind": "sentence",
+        "sources": [
+          205
+        ],
+        "gloss": "집단",
+        "memoId": "ds-b50-넥서스-2",
+        "claimKey": "ds-b50-넥서스-2#c3",
+        "devices": [
+          "인과"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n17",
+        "title": "컴퓨터",
+        "parentId": "n22",
+        "level": 2,
+        "kind": "concept",
+        "sources": [
+          299,
+          301
+        ],
+        "gloss": "이 책의 핵심 논제는 컴퓨터의 의식 여부가 아니라, 자율적 목표 추구와 독립적 결정을 할 수 있는 컴퓨터의 출현이 정보 네트워크의 기본 구조를 변화시킨다는 것이다.",
+        "promoted": true,
+        "clusterId": "k8"
+      },
+      {
+        "id": "n18",
+        "title": "이 책의 핵심 논제는 컴퓨터의 의식 여부가 아니라, 자율적 목표 추구와 독립적 결정을 할 수 있는 컴퓨터의 출현이 정보 네트워크의 기본 구조를 변화시킨다는 것이다.",
+        "parentId": "n17",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          299
+        ],
+        "gloss": "자율적 컴퓨터의 네트워크 구조 영향",
+        "memoId": "ds-b50-넥서스-3",
+        "claimKey": "ds-b50-넥서스-3#c2",
+        "devices": [],
+        "confidence": "high"
+      },
+      {
+        "id": "n19",
+        "title": "컴퓨터는 정보 네트워크의 능동적 구성원이지만, 점토판·인쇄기·라디오는 구성원들을 연결하는 수동적 장치일 뿐이다.",
+        "parentId": "n17",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          301
+        ],
+        "gloss": "정보 장치의 능동성",
+        "memoId": "ds-b50-넥서스-4",
+        "claimKey": "ds-b50-넥서스-4#c1",
+        "devices": [
+          "대조"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n20",
+        "title": "저자가 컴퓨터, 알고리즘, 챗봇에 '목표'와 '결정' 표현을 쓰되, 이것이 의식을 암시하지 않는다는 점을 명시적으로 유보한다.",
+        "parentId": "n17",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          299
+        ],
+        "gloss": "의식 암시 유보",
+        "memoId": "ds-b50-넥서스-3",
+        "claimKey": "ds-b50-넥서스-3#c1",
+        "devices": [
+          "통념 반박"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n21",
+        "title": "이전 기술들(문자·인쇄술·라디오)은 인간들의 연결 방식을 혁신했으나 네트워크 구성원의 종류는 바꾸지 않았지만, 컴퓨터는 네트워크의 구성 자체를 혁명적으로 변화시켰다.",
+        "parentId": "n17",
+        "level": 3,
+        "kind": "sentence",
+        "sources": [
+          301
+        ],
+        "gloss": "기술 혁신의 범위",
+        "memoId": "ds-b50-넥서스-4",
+        "claimKey": "ds-b50-넥서스-4#c2",
+        "devices": [
+          "대조",
+          "통시"
+        ],
+        "confidence": "high"
+      },
+      {
+        "id": "n22",
+        "title": "인쇄술 ↔ 컴퓨터",
+        "parentId": "n1",
+        "level": 1,
+        "kind": "concept",
+        "relation": "대조축",
+        "sources": [],
+        "gloss": "네트워크 구성원의 종류 변화 여부"
+      }
+    ],
+    "edges": [
+      {
+        "type": "대조",
+        "axis": "종교 기능의 규모·역사적 중요도",
+        "pair": [
+          "개인적 수준의 종교 기능(위안, 생명의 미스터리 설명)",
+          "역사적으로 가장 중요한 기능(사회질서에 초인적 정당성 부여)"
+        ],
+        "claimKey": "ds-b50-넥서스-0#c1",
+        "a": "n2",
+        "b": "n4"
+      },
+      {
+        "type": "대조",
+        "axis": "정보 네트워크에서의 행위성(능동성 vs 수동성)",
+        "pair": [
+          "컴퓨터",
+          "점토판·인쇄기·라디오"
+        ],
+        "claimKey": "ds-b50-넥서스-4#c1",
+        "a": "n17",
+        "b": null
+      },
+      {
+        "type": "대조",
+        "axis": "네트워크 구성원의 종류 변화 여부",
+        "pair": [
+          "문자·인쇄술·라디오",
+          "컴퓨터"
+        ],
+        "claimKey": "ds-b50-넥서스-4#c2",
+        "a": "n6",
+        "b": "n17"
+      }
+    ]
+  },
+  "log": [
+    "[v12⚠] lift 검증: ds-b50-넥서스-3#c2: 판정된 전개 방식이 없다",
+    "[v12⚠] lift 검증: ds-b50-넥서스-3#c2: headword \"자율적 컴퓨터의 네트워크 구조 영향\" 가 너무 길다 (2~10자 명사구)",
+    "[v12] 입력: 메모 5건 → 주장 12개 (조립 입력 = 주장)",
+    "[v12] 별칭 병합: \"정보 장치의 능동성\" ≈ \"컴퓨터\"",
+    "[v12] 강등 2개(점수<0.08): 의식 암시 유보(0.04) · 기술 혁신의 범위(0.04)",
+    "[v12] 클러스터 8개 · 승격(2회 이상) 2개: 인쇄술(2) · 컴퓨터(2) — 임베딩 없음: 자구 일치만",
+    "[v12] 구조 예산: 주장 12 < 15 — 역할 블록 생략, 개념·파렌팅·대조 중심 평면",
+    "[v12] 역할 블록 0개: ",
+    "[v12] 대조 엣지 3개 (lift 슬롯 그대로 · 재판정 0콜) — 클러스터 간 해석 2개",
+    "[v12] 의미 매칭: 후보 9건 중 0건 연결",
+    "[v12] 키워드 위계 3건: 종교의 기능 → 초인적 정당성(대조) · 민주주의 → 국민(참조) · 집단 → 민주주의(참조)",
+    "[v12] 대조 축 승격: 인쇄술 ↔ 컴퓨터 (네트워크 구성원의 종류 변화 여부 · min점수 0.67)",
+    "[v12] fold-back 스킵 — 임베딩 없음(개발 루프 0원 모드)"
+  ]
+}

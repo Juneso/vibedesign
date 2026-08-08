@@ -182,15 +182,35 @@ ${clusterLine}
   // 쌍의 문면은 "이름 — 설명" 꼴이다. 이름부만 보고, 정확 일치 또는 4자 이상 표제어의
   // 포함일 때만 클러스터로 해석한다 — "면역학적 타자의 부정성"이 '부정성'(3자) 클러스터로
   // 끌려가던 과잉 매칭 실측의 방지.
+  // 별칭 해석을 양변에 적용 — "점토판·인쇄기·라디오"(대조 변)가 컴퓨터 클러스터로
+  // 해석되려면 salience 런의 aliasMap 이 엣지 해석에도 들어와야 한다 (0808 잔여 ①).
   const findByText = (text, exclude) => {
-    const name = nrm(N(text).split('—')[0]);
-    return clusters.find((k) => k !== exclude && [...k.headwords].some((h) =>
-      h === name || (h.length >= 4 && name.includes(h))));
+    const byName = (raw) => {
+      const name = nrm(coreOf(raw) || raw);
+      return clusters.find((k) => k !== exclude && [...k.headwords].some((h0) => {
+        const h = nrm(coreOf(h0) || h0);
+        return h === name || (h.length >= 4 && name.includes(h));
+      })) || null;
+    };
+    const raw = nrm(N(text).split('—')[0]);
+    const whole = byName(raw);
+    if (whole) return whole;
+    // 열거형 변("점토판·인쇄기·라디오") 폴백 — 토큰별 별칭 해석 중 최고 점수 클러스터.
+    // 별칭 판정이 열거 전체를 대조 상대(컴퓨터)로 묶어 자기-변 제외에 걸리는 실측의 우회다.
+    const hits = raw.split(/[·,]/).map((t) => nrm(t)).filter((t) => t.length >= 2)
+      .map(byName).filter(Boolean);
+    return hits.sort((a2, b2) => (b2.score || 0) - (a2.score || 0))[0] || null;
   };
   for (const c of claims) {
     const s = c.slots?.['대조']; if (!s) continue;
-    const a = clusterOf(c);
-    const bSide = s.pair.map((t) => findByText(t, a)).find(Boolean) || null;
+    let a = clusterOf(c);
+    let bSide = s.pair.map((t) => findByText(t, a)).find(Boolean) || null;
+    // 자기 클러스터가 강등·미배정이면 쌍의 양변을 각각 해석 — "문자·인쇄술·라디오 ↔ 컴퓨터"
+    // 를 담은 주장의 표제어(기술 혁신의 범위)가 강등돼도 대조 자체는 살아야 한다 (0808 잔여 ①).
+    if (!a?.nodeId && s.pair.length >= 2) {
+      const a2 = findByText(s.pair[0], null); const b2 = findByText(s.pair[1], a2);
+      if (a2?.nodeId && b2?.nodeId) { a = a2; bSide = b2; }
+    }
     edges.push({ type: '대조', axis: s.axis, pair: s.pair, claimKey: c.key, a: a?.nodeId || null, b: bSide?.nodeId || null });
   }
   log.push(`[v12] 대조 엣지 ${edges.length}개 (lift 슬롯 그대로 · 재판정 0콜) — 클러스터 간 해석 ${edges.filter((e) => e.b).length}개`);
