@@ -1,0 +1,117 @@
+{
+  "kind": "salience",
+  "book": "넥서스",
+  "lifts": "lift-v12-haiku-넥서스-1",
+  "runAt": "2026-08-08T06:47:34.019Z",
+  "aliasGroups": [
+    [
+      "인쇄술",
+      "점토판·인쇄기·라디오",
+      "문자·인쇄술·라디오 발명"
+    ],
+    [
+      "컴퓨터",
+      "컴퓨터 발명"
+    ],
+    [
+      "정보 네트워크 구조의 변화",
+      "네트워크 구성의 변화"
+    ],
+    [
+      "컴퓨터의 행위주체성",
+      "기술의 네트워크 참여 방식"
+    ]
+  ],
+  "ranked": [
+    {
+      "concept": "컴퓨터",
+      "key": "컴퓨터",
+      "score": 1,
+      "freq": 7,
+      "topicFallback": null,
+      "memos": 2,
+      "refScore": 2.2,
+      "claims": 1
+    },
+    {
+      "concept": "컴퓨터의 행위주체성",
+      "key": "컴퓨터의행위주체성",
+      "score": 0.67,
+      "freq": 7,
+      "topicFallback": "컴퓨터",
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "인쇄술",
+      "key": "인쇄술",
+      "score": 0.6,
+      "freq": 4,
+      "topicFallback": null,
+      "memos": 2,
+      "refScore": 0.7,
+      "claims": 1
+    },
+    {
+      "concept": "네트워크 구성의 변화",
+      "key": "정보네트워크구조의변화",
+      "score": 0.58,
+      "freq": 6,
+      "topicFallback": "네트워크",
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "종교의 기능",
+      "key": "종교의기능",
+      "score": 0.49,
+      "freq": 5,
+      "topicFallback": "종교",
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "의식",
+      "key": "의식",
+      "score": 0.38,
+      "freq": 3,
+      "topicFallback": null,
+      "memos": 1,
+      "refScore": 0.7,
+      "claims": 1
+    },
+    {
+      "concept": "민주주의",
+      "key": "민주주의",
+      "score": 0.31,
+      "freq": 3,
+      "topicFallback": null,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "초인적 권위",
+      "key": "초인적권위",
+      "score": 0.22,
+      "freq": 2,
+      "topicFallback": "초인적",
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "신조어",
+      "key": "신조어",
+      "score": 0.13,
+      "freq": 1,
+      "topicFallback": null,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    }
+  ]
+}
