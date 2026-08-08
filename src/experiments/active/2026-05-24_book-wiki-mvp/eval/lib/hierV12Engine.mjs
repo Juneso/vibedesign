@@ -149,7 +149,7 @@ ${clusterLine}
     return n;
   };
   const kwNode = (k, parent) => {
-    const kw = add({ id: id(), title: k.rep, parentId: parent.id, level: parent.level + 1, kind: 'concept', sources: [], gloss: k.claims[0].claim.slice(0, 160), promoted: k.claims.length >= 2, clusterId: k.id });
+    const kw = add({ id: id(), title: k.rep, parentId: parent.id, level: parent.level + 1, kind: 'concept', sources: [], gloss: k.claims[0].claim.slice(0, 160), promoted: k.claims.length >= 2, clusterId: k.id, score: k.score });
     k.nodeId = kw.id;
     if (k.claims.length >= 5) {
       // 밀도 깊이: 주 전개 방식별 하위 묶음 — 규칙 처리, LLM 0콜
