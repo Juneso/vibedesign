@@ -1,0 +1,115 @@
+{
+  "kind": "salience",
+  "book": "넥서스",
+  "lifts": "lift-v12-haiku-넥서스-2",
+  "runAt": "2026-08-08T07:06:30.519Z",
+  "aliasGroups": [],
+  "aspects": {
+    "종교의 기능": "종교",
+    "정보 장치의 능동성": "컴퓨터",
+    "자율적 컴퓨터의 네트워크 구조 영향": "컴퓨터",
+    "기술 혁신의 범위": "기술 혁신"
+  },
+  "ranked": [
+    {
+      "concept": "컴퓨터",
+      "key": "컴퓨터",
+      "score": 1,
+      "freq": 7,
+      "rich": false,
+      "memos": 2,
+      "refScore": 1.4,
+      "claims": 2
+    },
+    {
+      "concept": "인쇄술",
+      "key": "인쇄술",
+      "score": 0.67,
+      "freq": 4,
+      "rich": false,
+      "memos": 2,
+      "refScore": 0.7,
+      "claims": 2
+    },
+    {
+      "concept": "종교",
+      "key": "종교",
+      "score": 0.65,
+      "freq": 5,
+      "rich": false,
+      "memos": 2,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "국민",
+      "key": "국민",
+      "score": 0.4,
+      "freq": 4,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "집단",
+      "key": "집단",
+      "score": 0.4,
+      "freq": 4,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "민주주의",
+      "key": "민주주의",
+      "score": 0.35,
+      "freq": 3,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0.5,
+      "claims": 1
+    },
+    {
+      "concept": "초인적 정당성",
+      "key": "초인적정당성",
+      "score": 0.2,
+      "freq": 1,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0.7,
+      "claims": 1
+    },
+    {
+      "concept": "마녀사냥",
+      "key": "마녀사냥",
+      "score": 0.13,
+      "freq": 1,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "의식 암시 유보",
+      "key": "의식암시유보",
+      "score": 0.04,
+      "freq": 0,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "기술 혁신",
+      "key": "기술혁신",
+      "score": 0.04,
+      "freq": 0,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    }
+  ]
+}

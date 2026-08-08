@@ -106,6 +106,53 @@ if (process.env.THINK_ESC === '1') {
   }
 }
 
+// EVID_PROMOTE — 증거로 강등된 독립 논지 문장의 승격 (0808 준서: "첫 문장 누락" 근본 수리).
+// 실측 원인: 문장이 사라진 게 아니라 evidence 에 강등돼 있었다(포퓰리즘 p.205 · 나르시스
+// p.95) — "디테일을 독립 주장으로 승격하지 마라" 지시가 문단 도입부의 주제 선언 문장까지
+// 디테일로 취급한 것. 검출은 코드가 결정적으로: 어느 주장(문면+슬롯)과도 겹치지 않는데
+// evidence 에는 사는 문장을 찾아, 그 문장을 지목해 **주장 추가만** 요구한다(기존 주장
+// 유지 — 전체 재lift 의 회귀 위험 없음, GAPFIX 역할명사 폭발과 달리 문장 단위 폐쇄 지시).
+if (process.env.EVID_PROMOTE === '1') {
+  const nrmS = (t) => String(t || '').normalize('NFC').replace(/\s+/g, '').toLowerCase();
+  const shingles = (t) => { const n = nrmS(t); const set = new Set(); for (let i = 0; i < n.length - 1; i++) set.add(n.slice(i, i + 2)); return set; };
+  const overlap = (a, bSet) => { const A = shingles(a); if (!A.size) return 1; let hit = 0; for (const x of A) if (bSet.has(x)) hit++; return hit / A.size; };
+  for (const l of lifts) {
+    if (!l.claims.length) continue;
+    const memo = book.memos[Number(l.memoId.split('-').pop())];
+    const claimBlob = shingles(l.claims.map((c) => c.claim + ' ' + JSON.stringify(c.slots || {})).join(' '));
+    const evidBlob = nrmS(l.claims.flatMap((c) => c.evidence || []).join(' '));
+    const sentences = String(memo.text).split(/(?<=다\.|[.!?])\s+/).map((x) => x.trim()).filter((x) => x.length >= 15);
+    // 고아 판정 2종: ① 문장 전체가 주장과 안 겹침 ② 문장의 명사 토큰(조사 제거)이 주장
+    // 어디에도 없음 — "포퓰리즘이 민주주의에 치명적"처럼 문장 대부분이 이웃 주장과 겹쳐
+    // 문턱을 빠져나가도, 포퓰리즘이라는 개념 자체가 주장에 없으면 고아다 (lift-넥서스-2 실측)
+    const claimStr = nrmS(l.claims.map((c) => c.claim + ' ' + c.headword + ' ' + JSON.stringify(c.slots || {})).join(' '));
+    const orphanNoun = (sent) => sent.split(/\s+/).map((w) => w.replace(/(이|가|은|는|을|를|에|의|으로|로|도|만|과|와)$/, ''))
+      .some((w) => w.length >= 3 && /^[가-힣]+$/.test(w) && !claimStr.includes(nrmS(w)));
+    const orphanSents = sentences.filter((sent) =>
+      (overlap(sent, claimBlob) < 0.35 || orphanNoun(sent)) && evidBlob.includes(nrmS(sent).slice(0, 20)));
+    if (!orphanSents.length) continue;
+    try {
+      const p2 = buildLiftPrompt({ book: { title: BOOK_TITLE, author: book.author }, memo });
+      // 판정형 재지시 (0808 준서: 포퓰리즘처럼 "잘 요약된 증거"가 맞는 경우가 있다 —
+      // 검출은 코드, 별개 논지 여부의 최종 판단은 모델. 단정형이면 좋은 요약까지 쪼갠다)
+      p2.user += `\n\n검토 요청: 이 문단의 다음 문장이 위 분해에서 다른 주장의 증거로만 들어갔다 —\n${orphanSents.map((x) => `- "${x}"`).join('\n')}\n각 문장을 판정하라: 그 문장이 **그 자체로 별개 논지**(고유 개념을 세우는 서술)면 그 문장의 주어 개념을 표제어로 하는 주장을 출력하고, 이웃 주장에 잘 요약된 부차 디테일이면 제외하라. 별개 논지가 없으면 {"claims":[]} 를 출력하라(다른 문장의 주장은 다시 만들지 마라).`;
+      const r2 = normalizeLift(JSON.parse(await llm(p2)), { memoId: l.memoId });
+      const heads = l.claims.map((c) => nrmS(c.headword));
+      const fresh = r2.lift.claims.filter((c) => {
+        const h = nrmS(c.headword);
+        return h.length >= 2 && orphanSents.some((sent) => nrmS(sent).includes(h))
+          && !heads.some((x) => x.includes(h) || h.includes(x));
+      });
+      if (fresh.length) {
+        fresh.forEach((c, i) => { c.id = `ev-${i + 1}`; });
+        l.claims.push(...fresh);
+        l.evidPromoted = fresh.map((c) => c.headword);
+      }
+      console.log(`  ⇧ ${l.memoId} 증거 강등 문장 ${orphanSents.length}건 → ${fresh.length ? `승격 +${fresh.map((c) => c.headword).join(',')}` : '무효(유지)'}`);
+    } catch (e) { console.log(`  ⇧ ${l.memoId} 승격 실패(유지): ${e.message.slice(0, 60)}`); }
+  }
+}
+
 // SAMPLE2 — 다개념 메모 2샘플 합집합 (0806 잔여 대책, m18 나르시스 분산 흡수).
 // 하이쿠는 같은 프롬프트·같은 메모에서 런마다 다른 개념을 잃는다(나르시스 8회 중 1회 출현).
 // 프롬프트 조이기의 한계가 실측으로 확정됐으므로 표본을 늘린다: 다개념 의심 메모(주장 3개

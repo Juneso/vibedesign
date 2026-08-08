@@ -2,19 +2,35 @@
   "kind": "salience",
   "book": "피로사회",
   "lifts": "lift-v12-haiku-10",
-  "runAt": "2026-08-08T06:48:11.912Z",
+  "runAt": "2026-08-08T07:02:06.288Z",
   "aliasGroups": [
     [
+      "신경성 질환",
+      "21세기 초의 신경성 질환"
+    ],
+    [
+      "긍정성의 과잉",
       "긍정성 과잉",
-      "긍정성의 과잉"
+      "긍정성의 폭력",
+      "긍정성의 폭력성"
     ],
     [
       "이질성",
+      "차이",
       "이질성(면역 반응 촉발)"
     ],
     [
-      "차이",
-      "차이(면역 반응 불유발)"
+      "타자성",
+      "낯선 것",
+      "이국적인 것(소비 대상화)"
+    ],
+    [
+      "면역학적 패러다임",
+      "면역학적 주체성"
+    ],
+    [
+      "폭력의 계보학",
+      "적대성의 계보학"
     ],
     [
       "규율사회",
@@ -25,36 +41,89 @@
       "성과사회(긍정성)"
     ],
     [
-      "부정",
+      "성과주체",
+      "성과사회의 주민"
+    ],
+    [
+      "우울증",
+      "성과사회의 심리적 질병",
+      "성과주체의 우울증"
+    ],
+    [
+      "자기 착취",
+      "자유감을 동반한 자기착exeter"
+    ],
+    [
+      "노동하는 동물",
+      "후기근대의 노동하는 동물"
+    ],
+    [
+      "삶의 덧없음",
+      "신앙 상실"
+    ],
+    [
+      "부정성",
+      "중단의 부정성",
       "부정(멈춤)"
     ],
     [
-      "우울증의 타자 배제",
-      "우울증(타자 차원 부재)"
+      "부정",
+      "부정성"
+    ],
+    [
+      "피로",
+      "성과사회의 피로",
+      "분열적 피로",
+      "깊은 피로"
+    ],
+    [
+      "무차별성",
+      "무차별성의 공간"
     ],
     [
       "호모 사케르",
-      "성과사회의 호모 사케르",
-      "주권 사회의 호모 사케르"
+      "성과사회의 호모 사케르"
+    ],
+    [
+      "보상",
+      "인정으로서의 보상"
+    ],
+    [
+      "타자성의 약화",
+      "타자 관계의 상실"
+    ],
+    [
+      "나르시시스트",
+      "리비도의 나르시시적 편향"
     ]
   ],
+  "aspects": {
+    "규율사회의 특징": "부정성",
+    "성과사회의 특징": "긍정성",
+    "초자아의 강제": "부정적 강제",
+    "이상자아의 강제": "긍정적 강제",
+    "우울증의 차원": "타자 차원 부재",
+    "깊은 피로의 경험": "세계",
+    "존재의 무게": "중력",
+    "보상의 심급": "종교"
+  },
   "ranked": [
     {
-      "concept": "부정",
+      "concept": "부정성",
       "key": "부정",
       "score": 1,
-      "freq": 16,
-      "topicFallback": null,
+      "freq": 15,
+      "rich": false,
       "memos": 10,
-      "refScore": 0,
-      "claims": 1
+      "refScore": 1.5,
+      "claims": 3
     },
     {
       "concept": "자유",
       "key": "자유",
-      "score": 0.88,
+      "score": 0.91,
       "freq": 17,
-      "topicFallback": null,
+      "rich": false,
       "memos": 7,
       "refScore": 0,
       "claims": 1
@@ -62,9 +131,9 @@
     {
       "concept": "성과주체",
       "key": "성과주체",
-      "score": 0.83,
+      "score": 0.84,
       "freq": 11,
-      "topicFallback": null,
+      "rich": false,
       "memos": 7,
       "refScore": 3,
       "claims": 4
@@ -74,7 +143,7 @@
       "key": "우울증",
       "score": 0.8,
       "freq": 12,
-      "topicFallback": null,
+      "rich": false,
       "memos": 7,
       "refScore": 2,
       "claims": 2
@@ -84,7 +153,7 @@
       "key": "인간",
       "score": 0.78,
       "freq": 14,
-      "topicFallback": null,
+      "rich": false,
       "memos": 7,
       "refScore": 0,
       "claims": 1
@@ -92,149 +161,89 @@
     {
       "concept": "성과사회",
       "key": "성과사회",
-      "score": 0.77,
+      "score": 0.76,
       "freq": 9,
-      "topicFallback": null,
+      "rich": false,
       "memos": 7,
       "refScore": 4.7,
       "claims": 1
     },
     {
-      "concept": "부정성",
-      "key": "부정성",
-      "score": 0.77,
-      "freq": 10,
-      "topicFallback": null,
-      "memos": 8,
-      "refScore": 1.5,
+      "concept": "이질성",
+      "key": "이질성",
+      "score": 0.54,
+      "freq": 9,
+      "rich": false,
+      "memos": 2,
+      "refScore": 1.8,
       "claims": 2
-    },
-    {
-      "concept": "타자 관계의 상실",
-      "key": "타자관계의상실",
-      "score": 0.55,
-      "freq": 16,
-      "topicFallback": "타자",
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
     },
     {
       "concept": "규율사회",
       "key": "규율사회",
       "score": 0.54,
       "freq": 7,
-      "topicFallback": null,
+      "rich": false,
       "memos": 5,
       "refScore": 2.7,
       "claims": 1
     },
     {
-      "concept": "우울증의 타자 배제",
-      "key": "우울증의타자배제",
-      "score": 0.42,
-      "freq": 12,
-      "topicFallback": "우울증",
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "우울증 대 슬픔",
-      "key": "우울증대슬픔",
-      "score": 0.42,
-      "freq": 12,
-      "topicFallback": "우울증",
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "규율의 장벽",
-      "key": "규율의장벽",
-      "score": 0.38,
-      "freq": 11,
-      "topicFallback": "규율",
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
       "concept": "분노",
       "key": "분노",
-      "score": 0.38,
+      "score": 0.51,
       "freq": 10,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 3
     },
     {
-      "concept": "이질성",
-      "key": "이질성",
-      "score": 0.32,
-      "freq": 5,
-      "topicFallback": null,
-      "memos": 2,
-      "refScore": 2.5,
-      "claims": 1
-    },
-    {
-      "concept": "성과사회의 강제성",
-      "key": "성과사회의강제성",
-      "score": 0.32,
-      "freq": 9,
-      "topicFallback": "성과사회",
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "자기 착취",
-      "key": "자기착취",
-      "score": 0.3,
-      "freq": 4,
-      "topicFallback": null,
-      "memos": 3,
-      "refScore": 1.5,
-      "claims": 1
-    },
-    {
-      "concept": "긍정적 힘의 역설",
-      "key": "긍정적힘의역설",
-      "score": 0.28,
-      "freq": 8,
-      "topicFallback": "긍정적",
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
       "concept": "이상 자아",
       "key": "이상자아",
-      "score": 0.26,
+      "score": 0.34,
       "freq": 6,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 1.3,
       "claims": 1
     },
     {
-      "concept": "과잉 선택의 결과",
-      "key": "과잉선택의결과",
-      "score": 0.25,
-      "freq": 7,
-      "topicFallback": "과잉",
-      "memos": 1,
-      "refScore": 0,
+      "concept": "자기 착취",
+      "key": "자기착취",
+      "score": 0.31,
+      "freq": 4,
+      "rich": false,
+      "memos": 3,
+      "refScore": 1.5,
       "claims": 1
+    },
+    {
+      "concept": "타자성",
+      "key": "타자성",
+      "score": 0.26,
+      "freq": 4,
+      "rich": false,
+      "memos": 2,
+      "refScore": 0.3,
+      "claims": 2
+    },
+    {
+      "concept": "긍정성 과잉",
+      "key": "긍정성의과잉",
+      "score": 0.24,
+      "freq": 2,
+      "rich": false,
+      "memos": 3,
+      "refScore": 1,
+      "claims": 3
     },
     {
       "concept": "활동과잉",
       "key": "활동과잉",
-      "score": 0.21,
+      "score": 0.23,
       "freq": 4,
-      "topicFallback": null,
+      "rich": false,
       "memos": 2,
       "refScore": 0.3,
       "claims": 1
@@ -242,81 +251,31 @@
     {
       "concept": "정체성",
       "key": "정체성",
-      "score": 0.2,
+      "score": 0.22,
       "freq": 4,
-      "topicFallback": null,
+      "rich": false,
       "memos": 2,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "차이",
-      "key": "차이",
-      "score": 0.18,
-      "freq": 5,
-      "topicFallback": null,
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "타자성",
-      "key": "타자성",
-      "score": 0.18,
-      "freq": 3,
-      "topicFallback": null,
-      "memos": 2,
-      "refScore": 0.3,
-      "claims": 1
-    },
-    {
-      "concept": "면역학적 주체성",
-      "key": "면역학적주체성",
-      "score": 0.18,
-      "freq": 5,
-      "topicFallback": "면역학적",
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "리비도의 나르시시적 편향",
-      "key": "리비도의나르시시적편향",
-      "score": 0.18,
-      "freq": 5,
-      "topicFallback": "리비도",
-      "memos": 1,
       "refScore": 0,
       "claims": 1
     },
     {
       "concept": "개인",
       "key": "개인",
-      "score": 0.17,
+      "score": 0.18,
       "freq": 3,
-      "topicFallback": null,
+      "rich": false,
       "memos": 2,
       "refScore": 0,
       "claims": 1
     },
     {
-      "concept": "긍정성 과잉",
-      "key": "긍정성과잉",
-      "score": 0.15,
-      "freq": 4,
-      "topicFallback": "긍정성",
+      "concept": "벌거벗은 생명",
+      "key": "벌거벗은생명",
+      "score": 0.14,
+      "freq": 2,
+      "rich": false,
       "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "긍정성의 폭력성",
-      "key": "긍정성의폭력성",
-      "score": 0.15,
-      "freq": 4,
-      "topicFallback": "긍정성",
-      "memos": 1,
-      "refScore": 0,
+      "refScore": 0.7,
       "claims": 1
     },
     {
@@ -324,7 +283,7 @@
       "key": "의식",
       "score": 0.13,
       "freq": 2,
-      "topicFallback": null,
+      "rich": false,
       "memos": 2,
       "refScore": 0,
       "claims": 1
@@ -334,57 +293,17 @@
       "key": "노동하는동물",
       "score": 0.13,
       "freq": 2,
-      "topicFallback": null,
+      "rich": false,
       "memos": 2,
       "refScore": 0,
       "claims": 1
     },
     {
-      "concept": "긍정성의 폭력",
-      "key": "긍정성의폭력",
-      "score": 0.12,
-      "freq": 2,
-      "topicFallback": null,
-      "memos": 1,
-      "refScore": 1,
-      "claims": 1
-    },
-    {
-      "concept": "타자성의 약화",
-      "key": "타자성의약화",
-      "score": 0.12,
-      "freq": 3,
-      "topicFallback": "타자성",
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "실재의 이중성",
-      "key": "실재의이중성",
-      "score": 0.12,
-      "freq": 3,
-      "topicFallback": "실재",
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "벌거벗은 생명",
-      "key": "벌거벗은생명",
-      "score": 0.11,
-      "freq": 2,
-      "topicFallback": null,
-      "memos": 1,
-      "refScore": 0.7,
-      "claims": 1
-    },
-    {
       "concept": "탈서사화",
       "key": "탈서사화",
-      "score": 0.1,
+      "score": 0.13,
       "freq": 2,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0.5,
       "claims": 1
@@ -392,9 +311,9 @@
     {
       "concept": "무차별성",
       "key": "무차별성",
-      "score": 0.1,
+      "score": 0.13,
       "freq": 2,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0.5,
       "claims": 1
@@ -402,49 +321,29 @@
     {
       "concept": "호모 사케르",
       "key": "호모사케르",
-      "score": 0.1,
+      "score": 0.13,
       "freq": 2,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 2
     },
     {
-      "concept": "분열적 피로",
-      "key": "분열적피로",
-      "score": 0.08,
-      "freq": 2,
-      "topicFallback": "분열적",
-      "memos": 1,
+      "concept": "면역학적 주체성",
+      "key": "면역학적패러다임",
+      "score": 0.11,
+      "freq": 1,
+      "rich": false,
+      "memos": 2,
       "refScore": 0,
-      "claims": 1
+      "claims": 2
     },
     {
       "concept": "자아의 조임쇠",
       "key": "자아의조임쇠",
-      "score": 0.08,
+      "score": 0.11,
       "freq": 2,
-      "topicFallback": null,
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "보상의 심급",
-      "key": "보상의심급",
-      "score": 0.08,
-      "freq": 2,
-      "topicFallback": null,
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "호모 사케르의 생명",
-      "key": "호모사케르의생명",
-      "score": 0.08,
-      "freq": 2,
-      "topicFallback": "호모",
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
@@ -452,19 +351,29 @@
     {
       "concept": "순수한 활동성",
       "key": "순수한활동성",
-      "score": 0.07,
+      "score": 0.1,
       "freq": 1,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0.7,
       "claims": 1
     },
     {
+      "concept": "분열적 피로",
+      "key": "피로",
+      "score": 0.09,
+      "freq": 1,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 2
+    },
+    {
       "concept": "무형성",
       "key": "무형성",
-      "score": 0.07,
+      "score": 0.09,
       "freq": 1,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0.5,
       "claims": 1
@@ -472,9 +381,9 @@
     {
       "concept": "존재의 중력",
       "key": "존재의중력",
-      "score": 0.06,
+      "score": 0.08,
       "freq": 1,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0.3,
       "claims": 1
@@ -482,9 +391,9 @@
     {
       "concept": "신경성 질환",
       "key": "신경성질환",
-      "score": 0.05,
+      "score": 0.07,
       "freq": 1,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
@@ -492,9 +401,9 @@
     {
       "concept": "경색성 질병",
       "key": "경색성질병",
-      "score": 0.05,
+      "score": 0.07,
       "freq": 1,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
@@ -502,9 +411,9 @@
     {
       "concept": "새로운 구도",
       "key": "새로운구도",
-      "score": 0.05,
+      "score": 0.07,
       "freq": 1,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
@@ -512,49 +421,19 @@
     {
       "concept": "후기근대적 차이",
       "key": "후기근대적차이",
-      "score": 0.05,
+      "score": 0.07,
       "freq": 1,
-      "topicFallback": null,
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "낯선 것",
-      "key": "낯선것",
-      "score": 0.05,
-      "freq": 1,
-      "topicFallback": null,
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "면역학적 패러다임",
-      "key": "면역학적패러다임",
-      "score": 0.05,
-      "freq": 1,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
     },
     {
       "concept": "적대성의 계보학",
-      "key": "적대성의계보학",
-      "score": 0.05,
+      "key": "폭력의계보학",
+      "score": 0.07,
       "freq": 1,
-      "topicFallback": null,
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "동질적 공간",
-      "key": "동질적공간",
-      "score": 0.05,
-      "freq": 1,
-      "topicFallback": "동질적",
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
@@ -562,9 +441,9 @@
     {
       "concept": "심리적 질병",
       "key": "심리적질병",
-      "score": 0.05,
+      "score": 0.07,
       "freq": 1,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
@@ -572,19 +451,9 @@
     {
       "concept": "존재의 결핍",
       "key": "존재의결핍",
-      "score": 0.05,
+      "score": 0.07,
       "freq": 1,
-      "topicFallback": null,
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "종교의 시효",
-      "key": "종교의시효",
-      "score": 0.05,
-      "freq": 1,
-      "topicFallback": "종교",
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
@@ -592,19 +461,19 @@
     {
       "concept": "벌거벗은 노동",
       "key": "벌거벗은노동",
-      "score": 0.05,
+      "score": 0.07,
       "freq": 1,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
     },
     {
       "concept": "중단의 부정성",
-      "key": "중단의부정성",
-      "score": 0.05,
+      "key": "부정성",
+      "score": 0.07,
       "freq": 1,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
@@ -612,9 +481,9 @@
     {
       "concept": "머뭇거림",
       "key": "머뭇거림",
-      "score": 0.05,
+      "score": 0.07,
       "freq": 1,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
@@ -622,9 +491,9 @@
     {
       "concept": "막간의 시간",
       "key": "막간의시간",
-      "score": 0.05,
+      "score": 0.07,
       "freq": 1,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
@@ -632,69 +501,39 @@
     {
       "concept": "행동의 주체",
       "key": "행동의주체",
-      "score": 0.05,
+      "score": 0.07,
       "freq": 1,
-      "topicFallback": null,
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "깊은 피로",
-      "key": "깊은피로",
-      "score": 0.05,
-      "freq": 1,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
     },
     {
       "concept": "인정으로서의 보상",
-      "key": "인정으로서의보상",
-      "score": 0.05,
+      "key": "보상",
+      "score": 0.07,
       "freq": 1,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
+    },
+    {
+      "concept": "타자 관계의 상실",
+      "key": "타자성의약화",
+      "score": 0.07,
+      "freq": 0,
+      "rich": false,
+      "memos": 2,
+      "refScore": 0,
+      "claims": 2
     },
     {
       "concept": "유연성",
       "key": "유연성",
-      "score": 0.05,
+      "score": 0.07,
       "freq": 1,
-      "topicFallback": null,
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "약한 유대와 대체 가능성",
-      "key": "약한유대와대체가능성",
-      "score": 0.05,
-      "freq": 1,
-      "topicFallback": "약한",
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "소셜 친구의 상품화",
-      "key": "소셜친구의상품화",
-      "score": 0.05,
-      "freq": 1,
-      "topicFallback": "소셜",
-      "memos": 1,
-      "refScore": 0,
-      "claims": 1
-    },
-    {
-      "concept": "개성 명령",
-      "key": "개성명령",
-      "score": 0.05,
-      "freq": 1,
-      "topicFallback": "개성",
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
@@ -702,9 +541,9 @@
     {
       "concept": "합의적 폭력",
       "key": "합의적폭력",
-      "score": 0.05,
+      "score": 0.07,
       "freq": 1,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
@@ -712,29 +551,49 @@
     {
       "concept": "간극",
       "key": "간극",
-      "score": 0.05,
+      "score": 0.07,
       "freq": 1,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
     },
     {
       "concept": "신앙 상실",
-      "key": "신앙상실",
+      "key": "삶의덧없음",
+      "score": 0.04,
+      "freq": 0,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 2
+    },
+    {
+      "concept": "동질적 공간",
+      "key": "동질적공간",
       "score": 0.02,
       "freq": 0,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
     },
     {
-      "concept": "삶의 덧없음",
-      "key": "삶의덧없음",
+      "concept": "규율의 장벽",
+      "key": "규율의장벽",
       "score": 0.02,
       "freq": 0,
-      "topicFallback": null,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "종교의 시효",
+      "key": "종교의시효",
+      "score": 0.02,
+      "freq": 0,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
@@ -744,7 +603,7 @@
       "key": "주노비변증법의부정",
       "score": 0.02,
       "freq": 0,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
@@ -754,7 +613,27 @@
       "key": "노예화하는노동",
       "score": 0.02,
       "freq": 0,
-      "topicFallback": null,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "성과사회의 강제성",
+      "key": "성과사회의강제성",
+      "score": 0.02,
+      "freq": 0,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "긍정적 힘의 역설",
+      "key": "긍정적힘의역설",
+      "score": 0.02,
+      "freq": 0,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
@@ -764,7 +643,27 @@
       "key": "대립하는피로",
       "score": 0.02,
       "freq": 0,
-      "topicFallback": null,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "보상의 심급",
+      "key": "종교",
+      "score": 0.02,
+      "freq": 0,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "우울증의 타자 배제",
+      "key": "우울증의타자배제",
+      "score": 0.02,
+      "freq": 0,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
@@ -774,7 +673,7 @@
       "key": "자기소모의악순환",
       "score": 0.02,
       "freq": 0,
-      "topicFallback": null,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
@@ -784,7 +683,77 @@
       "key": "공허화의역설",
       "score": 0.02,
       "freq": 0,
-      "topicFallback": null,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "실재의 이중성",
+      "key": "실재의이중성",
+      "score": 0.02,
+      "freq": 0,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "과잉 선택의 결과",
+      "key": "과잉선택의결과",
+      "score": 0.02,
+      "freq": 0,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "우울증 대 슬픔",
+      "key": "우울증대슬픔",
+      "score": 0.02,
+      "freq": 0,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "리비도의 나르시시적 편향",
+      "key": "나르시시스트",
+      "score": 0.02,
+      "freq": 0,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "약한 유대와 대체 가능성",
+      "key": "약한유대와대체가능성",
+      "score": 0.02,
+      "freq": 0,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "소셜 친구의 상품화",
+      "key": "소셜친구의상품화",
+      "score": 0.02,
+      "freq": 0,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "개성 명령",
+      "key": "개성명령",
+      "score": 0.02,
+      "freq": 0,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
@@ -794,7 +763,17 @@
       "key": "자유감을동반한자기착취",
       "score": 0.02,
       "freq": 0,
-      "topicFallback": null,
+      "rich": false,
+      "memos": 1,
+      "refScore": 0,
+      "claims": 1
+    },
+    {
+      "concept": "호모 사케르의 생명",
+      "key": "호모사케르의생명",
+      "score": 0.02,
+      "freq": 0,
+      "rich": false,
       "memos": 1,
       "refScore": 0,
       "claims": 1
