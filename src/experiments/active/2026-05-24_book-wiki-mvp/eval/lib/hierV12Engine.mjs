@@ -277,7 +277,17 @@ ${clusterLine}
     // 핵어가 자기 표제어와 겹침 — "성과사회의 피로는")은 제외.
     const SUBJ = ['은', '는', '이', '가'];
     const refParent = (k, c) => {
+      // 자기 정의 주장은 부모 신호를 내지 않는다 (0808 준서: 국민>민주주의 역전 실측).
+      // "민주주의는 국민이 유일한 권력의 정당한 원천…"은 민주주의를 정의하는 문장이다 —
+      // 술부(정의항) 안의 주어 자리 조사("국민이")는 정의 재료지 프레임이 아니다.
+      const def = c.slots?.['정의'];
       const t = nrm(c.claim);
+      if (def && t.startsWith(nrm(k.rep))) {
+        // 단, "성과사회의 주민은 … 성과주체다"처럼 정의 주장이라도 문두가 남의 소유 구면
+        // 그쪽이 프레임이다 — 자기 표제어가 문두 주제어인 정의만 억제한다.
+        const dc = nrm(String(def.concept || ''));
+        if (dc && (dc.includes(nrm(k.rep)) || nrm(k.rep).includes(dc))) return null;
+      }
       let best = null;
       for (const p of clusters) {
         if (p === k) continue;
@@ -473,6 +483,30 @@ ${clusterLine}
       const relevelN = (nid) => { const x = nodes.get(nid); x.level = nodes.get(x.parentId).level + 1; for (const ch of nodes.values()) if (ch.parentId === nid) relevelN(ch.id); };
       relevelN(an.id); relevelN(bn.id);
       log.push(`[v12] 대조 축 승격: ${an.title} ↔ ${bn.title} (${e.axis || ''} · min점수 ${Math.min(ka.score, kb.score)})`);
+    }
+  }
+
+  // ── 4.8) 뿌리 승격 문턱 (0808 준서: "키워드로 세울 만한가"의 적극 판정 부재 지적) ──
+  // 강등(<0.08, 소극)과 별개로, 뿌리에 직접 서는 키워드에는 자격(salience ≥ 0.3)을 요구한다.
+  // 미달이면 같은 메모의 최고점 키워드 밑 문장으로 접는다 — 마녀사냥(0.13)이 인쇄술 밑
+  // 사례로 가는 경로. 개념 자식을 거느린 키워드는 프레임이므로 제외. 블록 밑 키워드는
+  // 뿌리 직속이 아니라 건드리지 않는다(피로사회 블록 경로 무영향).
+  if (salience.length) {
+    const PROMOTE_MIN = 0.3;
+    const relevelP = (nid) => { const x = nodes.get(nid); x.level = nodes.get(x.parentId).level + 1; for (const ch of nodes.values()) if (ch.parentId === nid) relevelP(ch.id); };
+    for (const k of clusters) {
+      const n = k.nodeId ? nodes.get(k.nodeId) : null;
+      if (!n || nodes.get(n.parentId)?.kind !== 'root') continue;
+      if (k.score >= PROMOTE_MIN) continue;
+      if ([...nodes.values()].some((ch) => ch.parentId === n.id && ch.kind === 'concept')) continue;
+      const sib = clusters.filter((x) => x !== k && x.nodeId && nodes.has(x.nodeId) && x.score >= PROMOTE_MIN
+        && x.claims.some((cc) => k.claims.some((kc) => kc.memoId === cc.memoId)))
+        .sort((a, b) => b.score - a.score)[0];
+      if (!sib) continue; // 같은 메모에 자격 있는 이웃이 없으면 유지 — 유일 개념일 수 있다
+      const target = nodes.get(sib.nodeId);
+      for (const ch of [...nodes.values()]) if (ch.parentId === n.id) { ch.parentId = target.id; relevelP(ch.id); }
+      nodes.delete(n.id); k.nodeId = null;
+      log.push(`[v12] 승격 문턱 미달 접기: ${k.rep}(${k.score}) → ${target.title} 밑 문장`);
     }
   }
 
