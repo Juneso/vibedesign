@@ -30,7 +30,8 @@ function score(run) {
   const blocks = concepts.filter((n) => byId.get(n.parentId)?.kind === 'root' && n.role);
   const roleOf = (n) => { let c = n; while (c) { if (c.role) return c.role; c = byId.get(c.parentId); } return null; };
   const hay = (n) => nrm(`${n.title} ${n.gloss || ''}`);
-  const kws = concepts.filter((n) => !n.role && !n.crossCut);
+  // 대조축 노드("인쇄술 ↔ 컴퓨터")는 양변 이름을 다 담아 findKw 에서 자기비교를 만든다 — 제외
+  const kws = concepts.filter((n) => !n.role && !n.crossCut && n.relation !== '대조축');
   const findKw = (syn) => kws.find((n) => syn.some((s) => nrm(n.title).includes(s)))
     || kws.find((n) => syn.some((s) => hay(n).includes(s)));
 
