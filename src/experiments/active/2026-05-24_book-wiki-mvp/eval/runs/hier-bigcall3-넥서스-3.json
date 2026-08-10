@@ -1,0 +1,202 @@
+{
+  "label": "hier-bigcall3-넥서스-3",
+  "runAt": "2026-08-10T07:02:35.195Z",
+  "kind": "hier-bigcall3",
+  "thesis": "인쇄술은 지식을 퍼뜨렸을 뿐 진실을 선별하지 못했고, 컴퓨터는 스스로 결정하는 능동적 네트워크 구성원이 되어 이전 정보기술과 근본적으로 다른 존재가 되었다 — 두 흐름 모두 사회질서를 정당화하고 통제하는 정보 네트워크의 본질을 되짚는다.",
+  "provider": "claude-bigcall",
+  "model": "claude-sonnet-5",
+  "nMemos": 5,
+  "llmCalls": 1,
+  "sec": 93.6,
+  "promptChars": 3834,
+  "rawChars": 1796,
+  "usage": {
+    "model": "claude-sonnet-5",
+    "ms": 93571,
+    "apiMs": 87376,
+    "inputTokens": 4,
+    "outputTokens": 1408,
+    "cacheReadTokens": 80658,
+    "costUsd": 0.19824540000000002
+  },
+  "tree": {
+    "rootId": "root",
+    "nodes": [
+      {
+        "id": "root",
+        "title": "넥서스",
+        "parentId": null,
+        "level": 0,
+        "kind": "root",
+        "sources": []
+      },
+      {
+        "id": "n1",
+        "parentId": "root",
+        "level": 1,
+        "kind": "concept",
+        "title": "종교",
+        "gloss": "",
+        "sources": [],
+        "memoId": null,
+        "p": null,
+        "score": 0.6,
+        "why": "사회질서에 초인적 정당성을 부여하는 정보 네트워크의 원형 사례로, 이후 인쇄술·컴퓨터가 이 질서를 어떻게 흔드는지 비교할 기준점을 제공한다."
+      },
+      {
+        "id": "n2",
+        "parentId": "n1",
+        "level": 2,
+        "kind": "sentence",
+        "title": "종교의 핵심 기능은 사회질서에 오류 불가능한 초인적 정당성을 부여하는 것이다",
+        "gloss": "종교의 핵심 기능은 사회질서에 오류 불가능한 초인적 정당성을 부여하는 것이다",
+        "sources": [],
+        "memoId": "ds-b50-넥서스-0",
+        "p": 126
+      },
+      {
+        "id": "n3",
+        "parentId": "root",
+        "level": 1,
+        "kind": "concept",
+        "title": "인쇄술 ↔ 컴퓨터",
+        "gloss": "",
+        "sources": [],
+        "memoId": null,
+        "p": null,
+        "relation": "대조축",
+        "why": "저자가 정보기술사에서 가장 중요하게 구분하는 경계선 — 단순 연결 장치와 스스로 결정하는 네트워크 구성원의 차이가 이 책 후반부 논지(AI의 특수성)의 토대다."
+      },
+      {
+        "id": "n4",
+        "parentId": "n3",
+        "level": 2,
+        "kind": "concept",
+        "title": "인쇄술",
+        "gloss": "",
+        "sources": [],
+        "memoId": null,
+        "p": null,
+        "score": 0.75
+      },
+      {
+        "id": "n5",
+        "parentId": "n4",
+        "level": 3,
+        "kind": "sentence",
+        "title": "인쇄술은 텍스트를 복제할 뿐 새 아이디어를 만들지 못하는 연결 장치다",
+        "gloss": "인쇄술은 텍스트를 복제할 뿐 새 아이디어를 만들지 못하는 연결 장치다",
+        "sources": [],
+        "memoId": "ds-b50-넥서스-4",
+        "p": 301
+      },
+      {
+        "id": "n6",
+        "parentId": "n4",
+        "level": 3,
+        "kind": "sentence",
+        "title": "인쇄술은 과학적 사실만큼이나 종교적 환상과 가짜 뉴스도 빠르게 퍼뜨렸다",
+        "gloss": "인쇄술은 과학적 사실만큼이나 종교적 환상과 가짜 뉴스도 빠르게 퍼뜨렸다",
+        "sources": [],
+        "memoId": "ds-b50-넥서스-1",
+        "p": 155
+      },
+      {
+        "id": "n7",
+        "parentId": "n4",
+        "level": 3,
+        "kind": "concept",
+        "title": "마녀사냥",
+        "gloss": "",
+        "sources": [],
+        "memoId": null,
+        "p": null,
+        "score": 0.5
+      },
+      {
+        "id": "n8",
+        "parentId": "n7",
+        "level": 4,
+        "kind": "sentence",
+        "title": "사탄 숭배 마녀들의 세계적 음모라는 믿음이 인쇄술을 타고 확산되어 근대 초 유럽의 마녀사냥 광풍으로 이어졌다",
+        "gloss": "사탄 숭배 마녀들의 세계적 음모라는 믿음이 인쇄술을 타고 확산되어 근대 초 유럽의 마녀사냥 광풍으로 이어졌다",
+        "sources": [],
+        "memoId": "ds-b50-넥서스-1",
+        "p": 155
+      },
+      {
+        "id": "n9",
+        "parentId": "n3",
+        "level": 2,
+        "kind": "concept",
+        "title": "컴퓨터",
+        "gloss": "",
+        "sources": [],
+        "memoId": null,
+        "p": null,
+        "score": 0.85
+      },
+      {
+        "id": "n10",
+        "parentId": "n9",
+        "level": 3,
+        "kind": "sentence",
+        "title": "컴퓨터는 의식 여부와 무관하게 스스로 목표를 추구하고 결정을 내릴 수 있다는 점에서 정보 네트워크의 기본 구조를 바꾼다",
+        "gloss": "컴퓨터는 의식 여부와 무관하게 스스로 목표를 추구하고 결정을 내릴 수 있다는 점에서 정보 네트워크의 기본 구조를 바꾼다",
+        "sources": [],
+        "memoId": "ds-b50-넥서스-3",
+        "p": 299
+      },
+      {
+        "id": "n11",
+        "parentId": "n9",
+        "level": 3,
+        "kind": "sentence",
+        "title": "컴퓨터는 점토판·인쇄기·라디오와 달리 네트워크의 완전한 능동적 구성원으로서, 인간 사회에 처음으로 새로운 유형의 구성원을 도입했다",
+        "gloss": "컴퓨터는 점토판·인쇄기·라디오와 달리 네트워크의 완전한 능동적 구성원으로서, 인간 사회에 처음으로 새로운 유형의 구성원을 도입했다",
+        "sources": [],
+        "memoId": "ds-b50-넥서스-4",
+        "p": 301
+      },
+      {
+        "id": "n12",
+        "parentId": "root",
+        "level": 1,
+        "kind": "concept",
+        "title": "포퓰리즘",
+        "gloss": "",
+        "sources": [],
+        "memoId": null,
+        "p": null,
+        "score": 0.55,
+        "why": "국민을 단일 의사로 오인시켜 민주주의의 대화적 전제를 무너뜨리는 정보 네트워크의 정치적 병리 사례다."
+      },
+      {
+        "id": "n13",
+        "parentId": "n12",
+        "level": 2,
+        "kind": "sentence",
+        "title": "국민은 단일 실체가 아니라 다양한 집단의 집합이므로, 어떤 집단도 다른 집단을 배제할 권리가 없다는 것이 민주주의가 대화인 이유다",
+        "gloss": "국민은 단일 실체가 아니라 다양한 집단의 집합이므로, 어떤 집단도 다른 집단을 배제할 권리가 없다는 것이 민주주의가 대화인 이유다",
+        "sources": [],
+        "memoId": "ds-b50-넥서스-2",
+        "p": 205
+      }
+    ],
+    "edges": [
+      {
+        "type": "대조",
+        "pair": [
+          "인쇄술",
+          "컴퓨터"
+        ],
+        "axis": "연결 장치(정보를 전달만 함) ↔ 네트워크 구성원(스스로 결정·생성함)",
+        "a": null,
+        "b": null
+      }
+    ]
+  },
+  "log": [
+    "[bigcall] 1콜 93.6초 · 입력 3834자 · 출력 1796자"
+  ]
+}

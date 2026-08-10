@@ -1,0 +1,39 @@
+{
+  "label": "hier-bigcall3-피로사회-1",
+  "runAt": "2026-08-10T06:55:35.761Z",
+  "kind": "hier-bigcall3",
+  "thesis": null,
+  "provider": "claude-bigcall",
+  "model": "claude-sonnet-5",
+  "nMemos": 24,
+  "llmCalls": 1,
+  "sec": 96.4,
+  "promptChars": 10308,
+  "rawChars": 0,
+  "usage": {
+    "model": "claude-sonnet-5",
+    "ms": 96402,
+    "apiMs": 90300,
+    "inputTokens": 8,
+    "outputTokens": 7496,
+    "cacheReadTokens": 220179,
+    "costUsd": 0.42619769999999996
+  },
+  "tree": {
+    "rootId": "root",
+    "nodes": [
+      {
+        "id": "root",
+        "title": "피로사회",
+        "parentId": null,
+        "level": 0,
+        "kind": "root",
+        "sources": []
+      }
+    ],
+    "edges": []
+  },
+  "log": [
+    "[bigcall] 1콜 96.4초 · 입력 10308자 · 출력 0자"
+  ]
+}

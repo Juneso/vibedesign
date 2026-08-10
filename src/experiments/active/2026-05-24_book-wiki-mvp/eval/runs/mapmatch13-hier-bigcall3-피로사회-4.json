@@ -1,0 +1,82 @@
+{
+  "kind": "map-match-v13",
+  "book": "피로사회",
+  "run": "hier-bigcall3-피로사회-4",
+  "scoredAt": "2026-08-10T06:59:06.905Z",
+  "total": 71,
+  "records": [
+    {
+      "book": "피로사회",
+      "run": "hier-bigcall3-피로사회-4",
+      "axis": "커버",
+      "score": 92,
+      "basis": "골든 개념 26개 중 24개 존재",
+      "failures": [
+        "소비주의",
+        "짜증"
+      ]
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-bigcall3-피로사회-4",
+      "axis": "소속",
+      "score": null,
+      "basis": "블록 없음 — 축 제외 (소량 모드 정답)",
+      "failures": []
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-bigcall3-피로사회-4",
+      "axis": "대조",
+      "score": 33,
+      "basis": "골든 대조 6개 중 2개 재현(엣지 또는 대조축 노드)",
+      "failures": [
+        "복종적 주체 ↔ 성과주체",
+        "부정성 ↔ 긍정성",
+        "분노 ↔ 짜증",
+        "슬픔 ↔ 우울증"
+      ]
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-bigcall3-피로사회-4",
+      "axis": "다개념",
+      "score": 100,
+      "basis": "다개념 메모 3/3 보존 · 거처 2곳",
+      "failures": []
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-bigcall3-피로사회-4",
+      "axis": "편성",
+      "score": 100,
+      "basis": "소량 모드(블록 0): 뿌리 직속 7개",
+      "failures": []
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-bigcall3-피로사회-4",
+      "axis": "위계",
+      "score": 0,
+      "basis": "골든 부모-자식 8쌍 중 0쌍 재현",
+      "failures": [
+        "성과사회 > 성과주체",
+        "성과주체 > 자기 착취",
+        "성과주체 > 보상",
+        "성과주체 > 나르시스",
+        "성과사회 > 우울증",
+        "분노 > 짜증",
+        "깊은 피로 > 고독한 피로",
+        "후기근대적 자아 > 능률"
+      ]
+    },
+    {
+      "book": "피로사회",
+      "run": "hier-bigcall3-피로사회-4",
+      "axis": "중요도",
+      "score": 100,
+      "basis": "high 존재·low 강등·순서쌍 5판정 중 5 정답",
+      "failures": []
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "kind": "map-match-v13",
+  "book": "넥서스",
+  "run": "hier-bigcall3-넥서스-3",
+  "scoredAt": "2026-08-10T07:02:52.045Z",
+  "total": 93,
+  "records": [
+    {
+      "book": "넥서스",
+      "run": "hier-bigcall3-넥서스-3",
+      "axis": "커버",
+      "score": 100,
+      "basis": "골든 개념 5개 중 5개 존재",
+      "failures": []
+    },
+    {
+      "book": "넥서스",
+      "run": "hier-bigcall3-넥서스-3",
+      "axis": "소속",
+      "score": null,
+      "basis": "블록 없음 — 축 제외 (소량 모드 정답)",
+      "failures": []
+    },
+    {
+      "book": "넥서스",
+      "run": "hier-bigcall3-넥서스-3",
+      "axis": "대조",
+      "score": 100,
+      "basis": "골든 대조 1개 중 1개 재현(엣지 또는 대조축 노드)",
+      "failures": []
+    },
+    {
+      "book": "넥서스",
+      "run": "hier-bigcall3-넥서스-3",
+      "axis": "다개념",
+      "score": null,
+      "basis": "스펙 없음 — 축 제외",
+      "failures": []
+    },
+    {
+      "book": "넥서스",
+      "run": "hier-bigcall3-넥서스-3",
+      "axis": "편성",
+      "score": 70,
+      "basis": "소량 모드(블록 0): 뿌리 직속 3개",
+      "failures": [
+        "독식(>70%)"
+      ]
+    },
+    {
+      "book": "넥서스",
+      "run": "hier-bigcall3-넥서스-3",
+      "axis": "위계",
+      "score": null,
+      "basis": "골든 부모-자식 0쌍 중 0쌍 재현",
+      "failures": []
+    },
+    {
+      "book": "넥서스",
+      "run": "hier-bigcall3-넥서스-3",
+      "axis": "중요도",
+      "score": 100,
+      "basis": "high 존재·low 강등·순서쌍 7판정 중 7 정답",
+      "failures": []
+    }
+  ]
+}
