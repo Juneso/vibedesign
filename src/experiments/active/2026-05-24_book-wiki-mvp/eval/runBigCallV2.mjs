@@ -61,12 +61,17 @@ ${memoLines}
    - why: 뿌리 직속 노드와 모든 대조축 노드에, 그 개념/축이 저자의 논증에서 하는 역할을 1~2문장으로. 개념이 무엇인지 다시 요약하지 말고, 왜 이것이 이 책의 큰 축인지 — 어떤 질문에 답하는 자리인지, 어떤 주장을 떠받치는지 — 를 써라.
 10. 목차의 장 제목이 시간 순(시대·연대기)으로 전개되는 책이면 최상위 갈래를 그 순서대로 배열하고, 시대를 다루는 갈래의 제목은 반드시 "1 · ", "2 · " 순서 번호로 시작하라 — 읽는 순서가 트리에 그대로 보여야 한다. 목차가 시간 순이 아니면 절대 번호를 붙이지 마라.
 
+## 출력 전 자기 점검 (속으로 빠르게 — 점검 과정은 쓰지 말고 고친 결과만 출력)
+출력 직전에 딱 두 가지만 확인하고 **빠진 것만** 채워라. 트리 구조를 다시 짜지 마라.
+a. 책의 큰 대비(저자가 반복해서 맞세우는 쌍)가 contrasts 에 빠졌으면 추가. 한 문장에만 스치는 대조는 추가 금지.
+b. 빠진 memoId 가 있으면 가장 맞는 키워드 밑에 추가.
+
 ## 출력 (JSON만, 다른 텍스트 금지)
 {"thesis":"책 전체 주장 1~2문장","tree":[{"title":"키워드","kind":"concept","score":0.9,"relation":null,"why":"논증에서의 역할 (뿌리 직속·대조축만)","children":[{"title":"주장 문장","kind":"sentence","memoId":"ds-…","p":126}]}],"contrasts":[{"pair":["A","B"],"axis":"대조 축 설명"}]}
 tree 는 뿌리 직속 노드의 배열이다. concept 는 children 을 가질 수 있고 sentence 는 잎이다.`;
 
 let usage = null;
-const llm = claudeCliTransport({ model: process.env.MODEL || 'claude-sonnet-5', timeoutMs: 480000, onUsage: (u) => { usage = u; } });
+const llm = claudeCliTransport({ model: process.env.MODEL || 'claude-sonnet-5', timeoutMs: Number(process.env.TIMEOUT_MS) || 480000, onUsage: (u) => { usage = u; } });
 const t0 = Date.now();
 const raw = await llm({ user: prompt });
 const sec = Math.round((Date.now() - t0) / 100) / 10;
