@@ -32,6 +32,11 @@ export const SERIES_META = {
   'hier-auto':            { title: '자동 디스패치 · 최종안', purpose: '목차 시간순(high)이면 v10 시대 편성, 아니면 v11 관계 축 — BKT-380 확정 구조', pipelineId: 'hier-ingest-auto' },
   'hier-incr':            { title: '증분 동화 · 비문학', purpose: '메모 1건씩 동화 — 부트 일괄 + 폐쇄형 배정 + 성장 단계 승격 시 재정리 (BKT-382)', pipelineId: 'hier-ingest-auto' },
   'literature-v1':        { title: '문학 V1 · 모티프 축', purpose: '소설 전용 파이프라인 — 모티프 1차 축 + 인물 조건부 승격, 문장은 페이지순(서사 진행)', pipelineId: 'literature-v1' },
+  // 빅콜 — "판단은 모델, 검증은 코드" 역전 실험 (0809~). 소네트 1콜에 메모 전체를 주고 트리를 통째로 받는다
+  'hier-bigcall-넥서스':   { title: '빅콜 · 넥서스', purpose: '소네트 1콜 재구성 — 2차(역할 어휘·중첩·대조 명시)에서 v13 100', pipelineId: 'hier-ingest-v12' },
+  'hier-bigcall-피로사회': { title: '빅콜 · 피로사회', purpose: '소네트 1콜 재구성 — 2차 86 (룰 최고 76 상회), 편차 원인은 블록 세울지 판단', pipelineId: 'hier-ingest-v12' },
+  'lit-bigcall-조르바':    { title: '문학 빅콜 · 조르바', purpose: '소네트 1콜 모티프 트리 — 2차는 memoId 참조로 출력 절감(3.9분·$0.74)', pipelineId: 'literature-v1' },
+  'lit-bigcall-죄와벌':    { title: '문학 빅콜 · 죄와 벌', purpose: '소네트 1콜 모티프 트리 — 책 고유 심상 이름("이(蝨)"·"1아르신의 삶")', pipelineId: 'literature-v1' },
   'placement':            { title: '배치 테스트', purpose: '라벨 경로만 보고 메모를 제자리에 놓을 수 있는가 — 임베딩 최근접 기준선과 비교해 관계 라벨의 기여를 잰다', pipelineId: 'hier-ingest-auto' },
   'defects':              { title: '결함 감사', purpose: '알려진 결함 14종이 트리에 몇 건 있는지 — 점수가 아니라 지목된 노드를 열어 사람이 검증하는 지표', pipelineId: 'hier-ingest-auto' },
   'competency':           { title: '역량 질문 채점', purpose: '트리만 보고 핵심 주장·근거·전개·사례 질문에 답할 수 있는지 — 온톨로지 품질 측정', pipelineId: 'hier-ingest-auto' },
