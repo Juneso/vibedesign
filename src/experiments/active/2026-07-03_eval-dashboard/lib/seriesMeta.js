@@ -41,6 +41,8 @@ export const SERIES_META = {
   'hier-bigcall3-첫8-하이쿠':{ title: '빅콜 · 첫8 하이쿠', purpose: '초반 소량 재구성 모델 하향 A/B — 구조는 되나 잎 문장화 실패', pipelineId: 'bigcall-v3' },
   'hier-bigcall3-첫8-소네트':{ title: '빅콜 · 첫8 소네트', purpose: '초반 소량 재구성 기준선 — 완전한 주장 문장·깊은 중첩', pipelineId: 'bigcall-v3' },
   'hier-bigcall3':         { title: '빅콜 3차 · 라벨 누락분', purpose: 'v3.4 상세 자기점검 시안 런(10·12: 피로사회, 4: 넥서스) — 라벨에 책 이름 누락', pipelineId: 'bigcall-v3' },
+  'hier-bigcall3-디자인심리': { title: '빅콜 v3.5 · 디자인과 인간 심리', purpose: '개념 해설서 유형 첫 검증 — 분야 기초 개념 갈래 + 대조축, 평면 허용', pipelineId: 'bigcall-v3' },
+  'hier-bigcall3-23가지':  { title: '빅콜 v3.5 · 23가지', purpose: '병렬 모음(쟁점) 유형 첫 검증 — 통념반박 쟁점이 갈래로', pipelineId: 'bigcall-v3' },
   'lit-bigcall-조르바':    { title: '문학 빅콜 · 조르바', purpose: '소네트 1콜 모티프 트리 — 2차는 memoId 참조로 출력 절감(3.9분·$0.74)', pipelineId: 'bigcall-v3' },
   'lit-bigcall-죄와벌':    { title: '문학 빅콜 · 죄와 벌', purpose: '소네트 1콜 모티프 트리 — 책 고유 심상 이름("이(蝨)"·"1아르신의 삶")', pipelineId: 'bigcall-v3' },
   'placement':            { title: '배치 테스트', purpose: '라벨 경로만 보고 메모를 제자리에 놓을 수 있는가 — 임베딩 최근접 기준선과 비교해 관계 라벨의 기여를 잰다', pipelineId: 'hier-ingest-auto' },

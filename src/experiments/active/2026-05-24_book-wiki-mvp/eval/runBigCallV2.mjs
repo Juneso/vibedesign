@@ -48,7 +48,7 @@ ${memoLines}
 ## 정리 원칙
 0. **정리에 앞서 이 책이 이야기를 푸는 방식을 판정하라** — 근거는 목차·소개·메모다. 이후 갈래를 무엇으로 세울지, 어떤 키워드에 높은 score 를 줄지는 전부 이 판정에서 따라 나온다. 주된 방식 하나를 고르되, 섞인 책은 부분적으로 다른 방식의 갈래를 허용한다.
    - **논증서** (하나의 문제를 파고드는 책): 테제를 떠받치는 프레임 개념과 그 귀결의 사슬이 뼈대. 저자가 만든 신조어·핵심 구분이 가중된다.
-   - **통사·연대기** (시대를 따라가는 책): 최상위 갈래는 시대이고 **갈래 이름도 시대명이다** ("1 · 이집트", "2 · 그리스" — 시대순 번호 포함. 주제어 이름 금지). 각 시대에서 저자가 그 시대의 특징으로 꼽는 개념이 그 시대의 중심이며, score 는 언급 횟수가 아니라 **그 시대를 대표하는 정도**로 매긴다. 시대를 관통하는 총론 명제는 시대 사슬과 별도 갈래로 세운다.
+   - **통사·연대기** (시대를 따라가는 책): 최상위 갈래는 시대이고 **갈래 이름도 시대명이다** ("1 · 이집트", "2 · 그리스" — 시대순 번호 포함. 주제어 이름 금지). **각 시대 갈래 밑에는 저자가 그 시대의 특징으로 꼽는 개념을 반드시 키워드로 세우고, 문장은 그 특징 키워드 밑에 매단다** — 시대 밑에 문장만 나열하는 것은 실패다. 그 시대가 무엇을 추구했고 무엇을 발견했는가가 특징 개념이며, score 는 언급 횟수가 아니라 **그 시대를 대표하는 정도**로 매긴다. 저자가 시대 간 차이를 반복해서 맞세우면(재현 방식의 전환 등) 그것은 5의 대조축으로 트리에 세운다. 시대를 관통하는 총론 명제는 시대 사슬과 별도 갈래로 세운다.
    - **개념 해설서** (분야의 핵심 개념을 하나씩 풀어주는 입문·이론서): 저자가 장을 할애해 설명하는 기초 개념이 갈래다. 갈래가 비교적 평평한 것이 정답이며 억지 위계를 만들지 마라. 개념 간 정의·대비가 주된 정보다.
    - **병렬 모음** (독립된 사례·쟁점·에세이가 나란한 책): 여러 장에 반복해서 돌아오는 원칙·통념반박이 개념으로 서고, 개별 사례·인물은 그 밑 문장 잎이다. 쟁점 모음이면 쟁점 자체가 갈래다.
 1. 키워드(개념) 노드를 세우고, 각 메모의 논지를 문장 노드로 그 밑에 배치한다. 메모 원문을 요약한 주장 문장으로 쓰되 출처 memoId 와 페이지를 보존한다.
@@ -77,20 +77,22 @@ tree 는 뿌리 직속 노드의 배열이다. concept 는 children 을 가질 �
 
 let usage = null;
 const llm = claudeCliTransport({ model: process.env.MODEL || 'claude-sonnet-5', timeoutMs: Number(process.env.TIMEOUT_MS) || 480000, onUsage: (u) => { usage = u; } });
+// 혼잡 시간대에 응답이 빈 채·파편만·점검 노트 선행으로 오는 케이스 실측(0815) — 파싱까지 성공해야 콜 성공으로 친다
 const t0 = Date.now();
-const raw = await llm({ user: prompt });
-const sec = Math.round((Date.now() - t0) / 100) / 10;
-// 자기점검 지시 후 드물게 점검 노트 JSON 을 본 출력 앞에 붙인다 — thesis 앵커로 본 객체만 취한다
-let parsed;
-{
+let raw, parsed;
+for (let attempt = 1; ; attempt++) {
+  raw = await llm({ user: prompt });
   const txt = (raw.match(/\{[\s\S]*\}/) || ['{}'])[0];
   try { parsed = JSON.parse(txt); }
   catch {
-    const i = txt.indexOf('{"thesis"');
-    if (i < 0) throw new Error(`빅콜 출력 파싱 실패: ${txt.slice(0, 200)}`);
-    parsed = JSON.parse(txt.slice(i));
+    const i = txt.indexOf('{"thesis"'); // 점검 노트가 앞에 붙은 케이스
+    if (i >= 0) { try { parsed = JSON.parse(txt.slice(i)); } catch { parsed = null; } } else parsed = null;
   }
+  if (parsed?.tree?.length) break;
+  if (attempt >= 3) throw new Error(`빅콜 출력 파싱 실패(${attempt}회): ${txt.slice(0, 200)}`);
+  console.warn(`  ⚠ 빅콜 응답 불량(트리 비었음/파싱 실패) — 재시도 ${attempt}/2`);
 }
+const sec = Math.round((Date.now() - t0) / 100) / 10;
 
 // v13 채점기 포맷으로 변환
 let seq = 0;
