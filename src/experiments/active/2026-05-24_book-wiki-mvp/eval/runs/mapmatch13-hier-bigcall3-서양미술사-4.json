@@ -1,0 +1,76 @@
+{
+  "kind": "map-match-v13",
+  "book": "서양미술사",
+  "run": "hier-bigcall3-서양미술사-4",
+  "scoredAt": "2026-08-15T07:41:10.581Z",
+  "total": 57,
+  "records": [
+    {
+      "book": "서양미술사",
+      "run": "hier-bigcall3-서양미술사-4",
+      "axis": "커버",
+      "score": 100,
+      "basis": "골든 개념 8개 중 8개 존재",
+      "failures": []
+    },
+    {
+      "book": "서양미술사",
+      "run": "hier-bigcall3-서양미술사-4",
+      "axis": "소속",
+      "score": null,
+      "basis": "블록 없음 — 축 제외 (소량 모드 정답)",
+      "failures": []
+    },
+    {
+      "book": "서양미술사",
+      "run": "hier-bigcall3-서양미술사-4",
+      "axis": "대조",
+      "score": 67,
+      "basis": "골든 대조 3개 중 2개 재현(엣지 또는 대조축 노드)",
+      "failures": [
+        "기술(솜씨) ↔ 관념(착상)"
+      ]
+    },
+    {
+      "book": "서양미술사",
+      "run": "hier-bigcall3-서양미술사-4",
+      "axis": "다개념",
+      "score": 50,
+      "basis": "다개념 메모 3/3 보존 · 거처 1곳",
+      "failures": []
+    },
+    {
+      "book": "서양미술사",
+      "run": "hier-bigcall3-서양미술사-4",
+      "axis": "편성",
+      "score": 60,
+      "basis": "소량 모드(블록 0): 뿌리 직속 11개",
+      "failures": [
+        "뿌리 직속 11개"
+      ]
+    },
+    {
+      "book": "서양미술사",
+      "run": "hier-bigcall3-서양미술사-4",
+      "axis": "위계",
+      "score": 0,
+      "basis": "골든 부모-자식 3쌍 중 0쌍 재현",
+      "failures": [
+        "그리스 > 운동감(미론)",
+        "전통의 단절 > 대중과 미술가의 분열",
+        "현대미술 > 입체주의"
+      ]
+    },
+    {
+      "book": "서양미술사",
+      "run": "hier-bigcall3-서양미술사-4",
+      "axis": "중요도",
+      "score": 67,
+      "basis": "high 존재·low 강등·순서쌍 6판정 중 4 정답",
+      "failures": [
+        "관념(착상) 키워드 부재",
+        "전통 키워드 부재"
+      ]
+    }
+  ]
+}
