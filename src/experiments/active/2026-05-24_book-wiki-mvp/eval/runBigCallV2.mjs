@@ -75,7 +75,17 @@ const llm = claudeCliTransport({ model: process.env.MODEL || 'claude-sonnet-5', 
 const t0 = Date.now();
 const raw = await llm({ user: prompt });
 const sec = Math.round((Date.now() - t0) / 100) / 10;
-const parsed = JSON.parse((raw.match(/\{[\s\S]*\}/) || ['{}'])[0]);
+// 자기점검 지시 후 드물게 점검 노트 JSON 을 본 출력 앞에 붙인다 — thesis 앵커로 본 객체만 취한다
+let parsed;
+{
+  const txt = (raw.match(/\{[\s\S]*\}/) || ['{}'])[0];
+  try { parsed = JSON.parse(txt); }
+  catch {
+    const i = txt.indexOf('{"thesis"');
+    if (i < 0) throw new Error(`빅콜 출력 파싱 실패: ${txt.slice(0, 200)}`);
+    parsed = JSON.parse(txt.slice(i));
+  }
+}
 
 // v13 채점기 포맷으로 변환
 let seq = 0;

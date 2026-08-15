@@ -128,6 +128,7 @@ function score(run) {
   for (const o of imp.order) {
     const a = findKw(o.a), b = findKw(o.b);
     if (!a || !b) continue; // 한쪽이 없으면 순서 판정 불가 — 존재 항목이 이미 잰다
+    if (a === b) continue; // 복합 제목이 양변을 다 담아 같은 노드에 걸리면 자기비교 — 판정 불가
     if (typeof a.score !== 'number' || typeof b.score !== 'number') continue;
     impTotal++;
     if (a.score > b.score) impOk++;

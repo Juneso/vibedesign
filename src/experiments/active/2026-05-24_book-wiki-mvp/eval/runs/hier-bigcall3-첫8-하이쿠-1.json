@@ -1,0 +1,447 @@
+{
+  "label": "hier-bigcall3-첫8-하이쿠-1",
+  "runAt": "2026-08-15T06:17:51.247Z",
+  "kind": "hier-bigcall3",
+  "thesis": "현대사회는 규율과 부정성에서 긍정성으로의 패러다임 전환을 겪었으며, 이는 성과사회와 성과주체를 낳았다. 긍정성의 과잉은 자기착취, 우울증, 소진을 초래하는 새로운 형태의 신경성 질환들을 야기한다.",
+  "provider": "claude-bigcall",
+  "model": "claude-haiku-4-5-20251001",
+  "nMemos": 8,
+  "llmCalls": 1,
+  "sec": 44,
+  "promptChars": 5919,
+  "rawChars": 8294,
+  "usage": {
+    "model": "claude-haiku-4-5-20251001",
+    "ms": 44047,
+    "apiMs": 41130,
+    "inputTokens": 3,
+    "outputTokens": 4266,
+    "cacheReadTokens": 0,
+    "costUsd": 0.08583174999999998
+  },
+  "tree": {
+    "rootId": "root",
+    "nodes": [
+      {
+        "id": "root",
+        "title": "피로사회",
+        "parentId": null,
+        "level": 0,
+        "kind": "root",
+        "sources": []
+      },
+      {
+        "id": "n1",
+        "parentId": "root",
+        "level": 1,
+        "kind": "concept",
+        "title": "규율사회 ↔ 성과사회",
+        "gloss": "",
+        "sources": [],
+        "memoId": null,
+        "p": null,
+        "score": 0.95,
+        "relation": "대조축",
+        "why": "저자가 20세기 후반 이후의 사회 패러다임 전환을 설명하기 위해 핵심적으로 대비시키는 두 시대의 사회 구조. 부정성 vs 긍정성이라는 근본적인 차이를 담고 있다."
+      },
+      {
+        "id": "n2",
+        "parentId": "n1",
+        "level": 2,
+        "kind": "concept",
+        "title": "규율사회",
+        "gloss": "",
+        "sources": [],
+        "memoId": null,
+        "p": null,
+        "score": 0.85
+      },
+      {
+        "id": "n3",
+        "parentId": "n2",
+        "level": 3,
+        "kind": "sentence",
+        "title": "기관 구조",
+        "gloss": "기관 구조",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-4",
+        "p": 23
+      },
+      {
+        "id": "n4",
+        "parentId": "n2",
+        "level": 3,
+        "kind": "sentence",
+        "title": "부정성의 지배",
+        "gloss": "부정성의 지배",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-5",
+        "p": 24
+      },
+      {
+        "id": "n5",
+        "parentId": "n2",
+        "level": 3,
+        "kind": "sentence",
+        "title": "복종적 주체의 형성",
+        "gloss": "복종적 주체의 형성",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-4",
+        "p": 23
+      },
+      {
+        "id": "n6",
+        "parentId": "n2",
+        "level": 3,
+        "kind": "sentence",
+        "title": "야기하는 병리",
+        "gloss": "야기하는 병리",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-5",
+        "p": 24
+      },
+      {
+        "id": "n7",
+        "parentId": "n1",
+        "level": 2,
+        "kind": "concept",
+        "title": "성과사회",
+        "gloss": "",
+        "sources": [],
+        "memoId": null,
+        "p": null,
+        "score": 0.95
+      },
+      {
+        "id": "n8",
+        "parentId": "n7",
+        "level": 3,
+        "kind": "sentence",
+        "title": "기관 구조",
+        "gloss": "기관 구조",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-4",
+        "p": 23
+      },
+      {
+        "id": "n9",
+        "parentId": "n7",
+        "level": 3,
+        "kind": "sentence",
+        "title": "긍정성의 지배",
+        "gloss": "긍정성의 지배",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-5",
+        "p": 24
+      },
+      {
+        "id": "n10",
+        "parentId": "n7",
+        "level": 3,
+        "kind": "concept",
+        "title": "성과주체",
+        "gloss": "",
+        "sources": [],
+        "memoId": null,
+        "p": null,
+        "score": 0.9
+      },
+      {
+        "id": "n11",
+        "parentId": "n10",
+        "level": 4,
+        "kind": "sentence",
+        "title": "정의",
+        "gloss": "정의",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-4",
+        "p": 23
+      },
+      {
+        "id": "n12",
+        "parentId": "n10",
+        "level": 4,
+        "kind": "sentence",
+        "title": "자유의 역설",
+        "gloss": "자유의 역설",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-7",
+        "p": 28
+      },
+      {
+        "id": "n13",
+        "parentId": "n10",
+        "level": 4,
+        "kind": "sentence",
+        "title": "자기착취",
+        "gloss": "자기착취",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-7",
+        "p": 28
+      },
+      {
+        "id": "n14",
+        "parentId": "n10",
+        "level": 4,
+        "kind": "sentence",
+        "title": "내적 전쟁 상태",
+        "gloss": "내적 전쟁 상태",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-7",
+        "p": 28
+      },
+      {
+        "id": "n15",
+        "parentId": "n7",
+        "level": 3,
+        "kind": "concept",
+        "title": "긍정성의 폭력",
+        "gloss": "",
+        "sources": [],
+        "memoId": null,
+        "p": null,
+        "score": 0.75
+      },
+      {
+        "id": "n16",
+        "parentId": "n15",
+        "level": 4,
+        "kind": "sentence",
+        "title": "특성",
+        "gloss": "특성",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-3",
+        "p": 20
+      },
+      {
+        "id": "n17",
+        "parentId": "n15",
+        "level": 4,
+        "kind": "sentence",
+        "title": "작용 공간",
+        "gloss": "작용 공간",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-3",
+        "p": 20
+      },
+      {
+        "id": "n18",
+        "parentId": "n7",
+        "level": 3,
+        "kind": "sentence",
+        "title": "야기하는 병리",
+        "gloss": "야기하는 병리",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-5",
+        "p": 24
+      },
+      {
+        "id": "n19",
+        "parentId": "root",
+        "level": 1,
+        "kind": "concept",
+        "title": "이질성과 타자성의 소멸",
+        "gloss": "",
+        "sources": [],
+        "memoId": null,
+        "p": null,
+        "score": 0.8,
+        "why": "긍정성의 사회에서 발생하는 구조적 변화를 설명한다. 세계화와 탈경계 과정에서 면역학적 기제(이질성에 대한 반응)가 작동하지 않음을 보여준다."
+      },
+      {
+        "id": "n20",
+        "parentId": "n19",
+        "level": 2,
+        "kind": "sentence",
+        "title": "면역학의 소멸",
+        "gloss": "면역학의 소멸",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-1",
+        "p": 13
+      },
+      {
+        "id": "n21",
+        "parentId": "n19",
+        "level": 2,
+        "kind": "sentence",
+        "title": "타자성의 상투화",
+        "gloss": "타자성의 상투화",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-1",
+        "p": 13
+      },
+      {
+        "id": "n22",
+        "parentId": "n19",
+        "level": 2,
+        "kind": "sentence",
+        "title": "세계화와의 양립 불가능성",
+        "gloss": "세계화와의 양립 불가능성",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-2",
+        "p": 15
+      },
+      {
+        "id": "n23",
+        "parentId": "root",
+        "level": 1,
+        "kind": "concept",
+        "title": "21세기의 신경성 질환",
+        "gloss": "",
+        "sources": [],
+        "memoId": null,
+        "p": null,
+        "score": 0.85,
+        "why": "성과사회의 긍정성이 낳는 병리적 결과를 진단한다. 규율사회의 신경증(광인, 범죄자)과 구별되는 새로운 형태의 정신 질환들의 공통 원인을 규명한다."
+      },
+      {
+        "id": "n24",
+        "parentId": "n23",
+        "level": 2,
+        "kind": "sentence",
+        "title": "질환의 특징",
+        "gloss": "질환의 특징",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-0",
+        "p": 11
+      },
+      {
+        "id": "n25",
+        "parentId": "n23",
+        "level": 2,
+        "kind": "sentence",
+        "title": "원인의 본질",
+        "gloss": "원인의 본질",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-0",
+        "p": 11
+      },
+      {
+        "id": "n26",
+        "parentId": "n23",
+        "level": 2,
+        "kind": "concept",
+        "title": "우울증",
+        "gloss": "",
+        "sources": [],
+        "memoId": null,
+        "p": null,
+        "score": 0.85
+      },
+      {
+        "id": "n27",
+        "parentId": "n26",
+        "level": 3,
+        "kind": "sentence",
+        "title": "시대적 발생",
+        "gloss": "시대적 발생",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-6",
+        "p": 26
+      },
+      {
+        "id": "n28",
+        "parentId": "n26",
+        "level": 3,
+        "kind": "sentence",
+        "title": "발발 조건",
+        "gloss": "발발 조건",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-7",
+        "p": 28
+      },
+      {
+        "id": "n29",
+        "parentId": "n26",
+        "level": 3,
+        "kind": "sentence",
+        "title": "역설적 기반",
+        "gloss": "역설적 기반",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-7",
+        "p": 28
+      },
+      {
+        "id": "n30",
+        "parentId": "n26",
+        "level": 3,
+        "kind": "sentence",
+        "title": "번아웃",
+        "gloss": "번아웃",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-6",
+        "p": 26
+      },
+      {
+        "id": "n31",
+        "parentId": "root",
+        "level": 1,
+        "kind": "concept",
+        "title": "노동과 인간존재",
+        "gloss": "",
+        "sources": [],
+        "memoId": null,
+        "p": null,
+        "score": 0.65,
+        "why": "근대성의 한 조건으로 제시되며, 아렌트의 이론을 통해 성과사회의 인간 조건이 이미 근대에 예비되었음을 보여준다."
+      },
+      {
+        "id": "n32",
+        "parentId": "n31",
+        "level": 2,
+        "kind": "sentence",
+        "title": "근대의 인간 조건",
+        "gloss": "근대의 인간 조건",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-7",
+        "p": 28
+      },
+      {
+        "id": "n33",
+        "parentId": "n31",
+        "level": 2,
+        "kind": "sentence",
+        "title": "치명적 수동성",
+        "gloss": "치명적 수동성",
+        "sources": [],
+        "memoId": "ds-b50-피로사회-7",
+        "p": 28
+      }
+    ],
+    "edges": [
+      {
+        "type": "대조",
+        "pair": [
+          "규율사회",
+          "성과사회"
+        ],
+        "axis": "부정성과 금지의 지배 vs 긍정성과 '할 수 있음'의 지배",
+        "a": null,
+        "b": null
+      },
+      {
+        "type": "대조",
+        "pair": [
+          "복종적 주체",
+          "성과주체"
+        ],
+        "axis": "외부의 강제에 순응 vs 자기 자신을 착취",
+        "a": null,
+        "b": null
+      },
+      {
+        "type": "대조",
+        "pair": [
+          "광인과 범죄자",
+          "우울증 환자와 낙오자"
+        ],
+        "axis": "규율사회의 산출물 vs 성과사회의 산출물",
+        "a": null,
+        "b": null
+      }
+    ]
+  },
+  "log": [
+    "[bigcall] 1콜 44초 · 입력 5919자 · 출력 8294자"
+  ]
+}

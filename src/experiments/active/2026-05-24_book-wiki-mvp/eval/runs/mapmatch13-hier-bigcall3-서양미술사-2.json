@@ -1,0 +1,73 @@
+{
+  "kind": "map-match-v13",
+  "book": "서양미술사",
+  "run": "hier-bigcall3-서양미술사-2",
+  "scoredAt": "2026-08-15T06:06:42.041Z",
+  "total": 63,
+  "records": [
+    {
+      "book": "서양미술사",
+      "run": "hier-bigcall3-서양미술사-2",
+      "axis": "커버",
+      "score": 100,
+      "basis": "골든 개념 8개 중 8개 존재",
+      "failures": []
+    },
+    {
+      "book": "서양미술사",
+      "run": "hier-bigcall3-서양미술사-2",
+      "axis": "소속",
+      "score": null,
+      "basis": "블록 없음 — 축 제외 (소량 모드 정답)",
+      "failures": []
+    },
+    {
+      "book": "서양미술사",
+      "run": "hier-bigcall3-서양미술사-2",
+      "axis": "대조",
+      "score": 0,
+      "basis": "골든 대조 3개 중 0개 재현(엣지 또는 대조축 노드)",
+      "failures": [
+        "기술(솜씨) ↔ 관념(착상)",
+        "이집트(아는 것) ↔ 그리스(본 것)",
+        "관례 부류 ↔ 고립 부류"
+      ]
+    },
+    {
+      "book": "서양미술사",
+      "run": "hier-bigcall3-서양미술사-2",
+      "axis": "다개념",
+      "score": 50,
+      "basis": "다개념 메모 3/3 보존 · 거처 1곳",
+      "failures": []
+    },
+    {
+      "book": "서양미술사",
+      "run": "hier-bigcall3-서양미술사-2",
+      "axis": "편성",
+      "score": 60,
+      "basis": "소량 모드(블록 0): 뿌리 직속 12개",
+      "failures": [
+        "뿌리 직속 12개"
+      ]
+    },
+    {
+      "book": "서양미술사",
+      "run": "hier-bigcall3-서양미술사-2",
+      "axis": "위계",
+      "score": 67,
+      "basis": "골든 부모-자식 3쌍 중 2쌍 재현",
+      "failures": [
+        "현대미술 > 입체주의"
+      ]
+    },
+    {
+      "book": "서양미술사",
+      "run": "hier-bigcall3-서양미술사-2",
+      "axis": "중요도",
+      "score": 100,
+      "basis": "high 존재·low 강등·순서쌍 8판정 중 8 정답",
+      "failures": []
+    }
+  ]
+}
