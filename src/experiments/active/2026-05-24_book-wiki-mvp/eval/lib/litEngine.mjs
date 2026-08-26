@@ -26,11 +26,30 @@ const nrm = (s) => String(s || '').normalize('NFC').replace(/\s+/g, '').toLowerC
 // ⚠️ **임베딩 문자열은 한 곳에서만 만든다.** consolidateSeeds 와 assimilateLitMemo 가
 //    서로 다른 문자열을 쓰면 같은 노드가 실행 시점마다 다른 벡터를 갖게 되고,
 //    유사도가 조용히 틀어진다 — 에러 없이 판정만 나빠지므로 알아채기 어렵다.
-const motifEmbText = (m) => `${m.title}: ${m.gloss || ''}`;
+// 축의 문장들(직속 + voice 경유). 임베딩 예시·판정 예시가 같은 목록을 쓴다.
+const motifSentences = (nodes, m) => {
+  const direct = [...nodes.values()].filter((n) => n.kind === 'sentence' && n.parentId === m.id);
+  const viaVoice = [...nodes.values()].filter((n) => n.role === 'voice' && n.parentId === m.id)
+    .flatMap((v) => [...nodes.values()].filter((n) => n.kind === 'sentence' && n.parentId === v.id));
+  return [...direct, ...viaVoice];
+};
 
-async function ensureMotifEmbs(motifs, embedFn) {
+// 이름·뜻에 **실제 붙은 문장 예시까지** 넣는다 (BKT-381 A안). 문학은 표면 어휘와
+// 모티프가 멀어서(「벽지 무늬를 셌다」→ 갇힌 마음) 이름 한 줄로는 검색이 빗나간다 —
+// 축의 실제 뜻은 이미 붙은 문장들이 말한다.
+const motifEmbText = (nodes, m) => {
+  const ex = motifSentences(nodes, m).slice(0, 3).map((s) => String(s.title).slice(0, 70));
+  return `${m.title}: ${m.gloss || ''}${ex.length ? `\n예: ${ex.join(' / ')}` : ''}`;
+};
+
+// 임베딩이 **재료 문자열과 함께** 저장된다(embText). 문장이 붙어 예시가 달라지면
+// 재계산 — 없으면 축이 자라도 벡터는 신설 시점에 박제된 채로 남는다.
+async function ensureMotifEmbs(motifs, embedFn, nodes) {
   if (!embedFn) return;
-  for (const m of motifs) if (!m.emb) m.emb = await embedFn(motifEmbText(m));
+  for (const m of motifs) {
+    const t = motifEmbText(nodes, m);
+    if (!m.emb || m.embText !== t) { m.emb = await embedFn(t); m.embText = t; }
+  }
 }
 
 // ─── Phase 1: 문학 분석 (gpt-4o, 러너에서 cachedPlanIngest 로 감싼다) ──────
@@ -416,7 +435,7 @@ export async function consolidateSeeds({ nodes, rootId, book, llm, embedFn, judg
   };
   const relevel = (nid, level) => { const n = nodes.get(nid); n.level = level; for (const k of kidsOf(nid)) relevel(k.id, level + 1); };
 
-  await ensureMotifEmbs(rootMotifs(), embedFn);
+  await ensureMotifEmbs(rootMotifs(), embedFn, nodes);
   const ms = rootMotifs();
   const pairs = [];
   for (let i = 0; i < ms.length; i++) for (let j = i + 1; j < ms.length; j++) {
@@ -474,19 +493,19 @@ B: ${p.b.title}${p.b.gloss ? ` — ${p.b.gloss}` : ''}\n   예시: ${examples(p.
 // 반환: { action:'attach'|'new', motif, escalated, confidence }
 export async function assimilateLitMemo({ nodes, rootId, book, memo, llm, llmEsc, embedFn }) {
   const motifs = [...nodes.values()].filter((n) => n.kind === 'concept' && n.parentId === rootId && n.role !== 'voice');
-  const sentsOf = (m) => {
-    const direct = [...nodes.values()].filter((n) => n.kind === 'sentence' && n.parentId === m.id);
-    const viaVoice = [...nodes.values()].filter((n) => n.role === 'voice' && n.parentId === m.id)
-      .flatMap((v) => [...nodes.values()].filter((n) => n.kind === 'sentence' && n.parentId === v.id));
-    return [...direct, ...viaVoice];
-  };
+  const sentsOf = (m) => motifSentences(nodes, m);
   // ⚠ mini 는 attach|new 경계를 프롬프트 뉘앙스로 못 잡는다 — run 68(16/16 attach) ↔ run 70(16/16 new)
   //   진자 실측. 추상적 경계 판단 대신: 코드가 임베딩으로 후보를 상위 K개로 좁혀서 주고,
   //   LLM 은 "이 후보들의 예시 문장 옆에 놓이는가"라는 구체적 비교 선택만 한다.
-  const e = embedFn ? await embedFn(memo.text) : null;
+  // 검색 질의에 내 생각을 합친다 (BKT-381 A안). 판정 프롬프트는 내 생각을 최우선
+  // 근거로 쓰면서 후보 검색만 그걸 버리면, 정답 축이 후보에 못 들어 판정이 볼
+  // 기회조차 없다 — 「벽지 무늬」 문장의 모티프 단서는 문장이 아니라 내 생각에 있다.
+  const e = embedFn
+    ? await embedFn(memo.myThought ? `${memo.text}\n(내 생각: ${memo.myThought})` : memo.text)
+    : null;
   // 저장된 트리를 불러온 직후엔 emb 가 없다. 여기서 되살리지 않으면 후보가 0개가 되어
   // 매 문장이 NEW 가 된다 — ensureMotifEmbs 주석 참조 (BKT-383).
-  await ensureMotifEmbs(motifs, embedFn);
+  await ensureMotifEmbs(motifs, embedFn, nodes);
   const ranked = e
     ? motifs.map((m) => ({ m, sim: m.emb ? cos(e, m.emb) : -1 })).sort((a, b) => b.sim - a.sim)
     : motifs.map((m) => ({ m, sim: -1 }));
@@ -523,6 +542,36 @@ ${candLine || '(없음)'}
     || (nrm(o.choice) === nrm('NEW') && top.length && top[0].sim >= 0.5);
   if (bad(out) && llmEsc) { out = (await ask(llmEsc)) || out; escalated = true; }
 
+  // NEW 전수 확인 (BKT-381 B안) — 임베딩 검색의 안전망. 판정이 아무리 좋아도 정답
+  // 축이 후보 3개 안에 못 들면 볼 기회조차 없이 NEW 가 되고, 중복 축이 생긴다.
+  // NEW 로 기운 뒤에만 돌아 비용은 NEW 빈도만큼이고, 목록은 이름+뜻 몇 줄이라 짧다.
+  // 후보 3개는 이미 "아니다"로 판정됐으므로 **나머지 축만** 보여 준다.
+  let swept = false;
+  if (out && nrm(out.choice || '') === nrm('NEW')) {
+    const rest = motifs.filter((m) => !top.some((r) => r.m.id === m.id));
+    if (rest.length) {
+      const restLine = rest.map((m) => `- ${m.title}${m.gloss ? ` — ${m.gloss}` : ''}`).join('\n');
+      try {
+        const sweep = JSON.parse(await (llmEsc || llm)({
+          system: '소설 독서 메모가 기존 위키 축 중 하나의 연속인지 최종 확인하는 문학 편집자다. JSON만 출력.',
+          user: `책: ${book.title}
+
+[새 메모] p${memo.p}: ${memo.text}${memo.myThought ? `\n(내 생각: ${memo.myThought})` : ''}
+
+이 메모는 새 축(NEW)으로 판정됐다. 아래는 후보에 오르지 못했던 나머지 축 전체다:
+${restLine}
+
+이 메모가 위 축 중 하나와 **같은 심상·주제의 연속**으로 읽히면 그 이름을 그대로, 확실하지 않으면 "NEW". 억지 편입이 최악이다.
+출력 JSON: {"choice":"축 이름 또는 NEW"}`,
+          temperature: 0.1,
+        }));
+        const found = sweep && sweep.choice && nrm(sweep.choice) !== nrm('NEW')
+          ? rest.find((m) => nrm(m.title) === nrm(sweep.choice)) : null;
+        if (found) { out = { ...out, choice: found.title }; swept = true; }
+      } catch { /* 확인 실패 시 NEW 유지 */ }
+    }
+  }
+
   const id = nextId(nodes);
   let host = findHost(out), action = 'new';
   if (host) action = 'attach';
@@ -541,9 +590,11 @@ ${candLine || '(없음)'}
       if (!name) name = String(memo.text).slice(0, 20);
     }
     const gloss = String(out?.resonance || '').trim();
+    // emb 는 여기서 만들지 않는다 — 다음 판정의 ensureMotifEmbs 가 방금 붙은 문장을
+    // 예시로 넣어 만든다. 여기서 이름만으로 만들면 문자열 단일화 원칙이 깨진다.
     host = {
       id: id(), title: name, parentId: rootId, level: 1, kind: 'concept', sources: [],
-      emb: embedFn ? await embedFn(`${name}: ${gloss}`) : null, gloss,
+      emb: null, gloss,
     };
     nodes.set(host.id, host);
   }
@@ -554,6 +605,6 @@ ${candLine || '(없음)'}
   };
   nodes.set(s.id, s);
   if (memo.p != null && !host.sources.includes(memo.p)) host.sources.push(memo.p);
-  return { action, motif: host.title, escalated, confidence: Number(out?.confidence ?? 0) };
+  return { action, motif: host.title, escalated, swept, confidence: Number(out?.confidence ?? 0) };
 }
 
