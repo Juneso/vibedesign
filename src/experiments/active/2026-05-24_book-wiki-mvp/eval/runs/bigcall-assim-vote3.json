@@ -1,0 +1,1419 @@
+{
+  "label": "bigcall-assim-vote3",
+  "runAt": "2026-08-26T08:23:59.380Z",
+  "book": "그리스인 조르바",
+  "genre": "lit",
+  "config": {
+    "BOOT": 5,
+    "CHUNK": 5,
+    "REPEAT": 3,
+    "MAX_ROOT_AXES": 10,
+    "ESCALATE_BELOW": 0.6
+  },
+  "metrics": {
+    "vsBatchJaccard": [
+      9.4,
+      39.6,
+      10.4
+    ],
+    "amongPassesJaccard": [
+      11.8,
+      77.8,
+      13
+    ],
+    "totalCostUsd": 1.9824
+  },
+  "passes": [
+    {
+      "stats": {
+        "assimCalls": 12,
+        "escalations": 0,
+        "reorgs": 0,
+        "covered": 22,
+        "missing": [],
+        "rootStray": 3
+      },
+      "groups": {
+        "0701BF44-0016-483E-AA9E-9354FB1EEDE0": "'보았다' — 배역으로서의 삶",
+        "0AF04322-2071-4CD9-977E-2B21AD994163": "처음인 듯 보는 눈",
+        "240B7E5D-A281-414E-81B4-F00E31849EA3": "죽음을 생각하며 사는 삶",
+        "30DDC6DD-EC3B-440D-BC82-F22DF1BAF55F": "몸과 리듬의 합일",
+        "35E34C3D-C937-4BA4-8F67-896609F3A2E9": "근심을 벗고 남는 영혼",
+        "3EE2FC2B-4354-40F1-808F-03F8DA4FFC01": "'보았다' — 배역으로서의 삶",
+        "4937D55C-1B38-48C7-817B-783AFF0ADA9F": "처음인 듯 보는 눈",
+        "620D2F1A-099C-4747-A482-DCEB2B37B337": "처음인 듯 보는 눈",
+        "6D6D7BFE-AF2A-4AC0-97C2-74B41E8B2AE0": "근심을 벗고 남는 영혼",
+        "7DBDB73D-04C8-4817-860D-44F1D44B2406": "(보류)",
+        "7FC60E5C-7EF2-4EC2-B339-640B9A62DA08": "처음인 듯 보는 눈",
+        "804987DF-D687-43D6-B797-E05CB0436230": "(보류)",
+        "853B9637-F73C-475B-BAAF-E763F42F74BD": "죽음을 생각하며 사는 삶",
+        "881E37B2-BA7D-4749-9B76-D69B55F1007D": "'보았다' — 배역으로서의 삶",
+        "89C65162-6F66-4FBB-B218-211741A3FB89": "(보류)",
+        "93C2BC34-E380-4041-87EF-FFB4C6817489": "'보았다' — 배역으로서의 삶",
+        "A7068377-C8E5-4DD8-B2E9-8CB5B1A4B142": "근심을 벗고 남는 영혼",
+        "DFA6037C-7C4F-42D6-98F2-15296A014337": "근심을 벗고 남는 영혼",
+        "EAD97BA6-F93D-4F3E-A2D9-50CDF75BF22B": "처음인 듯 보는 눈",
+        "81A9C43D-0413-478D-A2CC-ABC8514AD9C8": "몸과 리듬의 합일",
+        "E3196CDE-627A-4368-BA8C-CB1EA0B7E62E": "'보았다' — 배역으로서의 삶",
+        "F841B714-DD6E-4FEC-8249-925F1C73004E": "죽음을 생각하며 사는 삶"
+      },
+      "log": [
+        "[boot] 빅콜 5건"
+      ]
+    },
+    {
+      "stats": {
+        "assimCalls": 12,
+        "escalations": 3,
+        "reorgs": 1,
+        "covered": 22,
+        "missing": [],
+        "rootStray": 0
+      },
+      "groups": {
+        "4937D55C-1B38-48C7-817B-783AFF0ADA9F": "조르바라는 인간",
+        "93C2BC34-E380-4041-87EF-FFB4C6817489": "조르바라는 인간",
+        "A7068377-C8E5-4DD8-B2E9-8CB5B1A4B142": "조르바라는 인간",
+        "881E37B2-BA7D-4749-9B76-D69B55F1007D": "조르바라는 인간",
+        "6D6D7BFE-AF2A-4AC0-97C2-74B41E8B2AE0": "조르바라는 인간",
+        "89C65162-6F66-4FBB-B218-211741A3FB89": "자유란 무엇인가",
+        "7DBDB73D-04C8-4817-860D-44F1D44B2406": "자유란 무엇인가",
+        "7FC60E5C-7EF2-4EC2-B339-640B9A62DA08": "세상을 처음처럼 보기",
+        "620D2F1A-099C-4747-A482-DCEB2B37B337": "세상을 처음처럼 보기",
+        "0AF04322-2071-4CD9-977E-2B21AD994163": "세상을 처음처럼 보기",
+        "0701BF44-0016-483E-AA9E-9354FB1EEDE0": "말과 영원, 사상이라는 겨",
+        "DFA6037C-7C4F-42D6-98F2-15296A014337": "말과 영원, 사상이라는 겨",
+        "3EE2FC2B-4354-40F1-808F-03F8DA4FFC01": "스승과 제자",
+        "853B9637-F73C-475B-BAAF-E763F42F74BD": "스승과 제자",
+        "240B7E5D-A281-414E-81B4-F00E31849EA3": "죽음과 삶",
+        "EAD97BA6-F93D-4F3E-A2D9-50CDF75BF22B": "죽음과 삶",
+        "30DDC6DD-EC3B-440D-BC82-F22DF1BAF55F": "뜨거운 몰입의 순간",
+        "804987DF-D687-43D6-B797-E05CB0436230": "뜨거운 몰입의 순간",
+        "35E34C3D-C937-4BA4-8F67-896609F3A2E9": "뜨거운 몰입의 순간",
+        "81A9C43D-0413-478D-A2CC-ABC8514AD9C8": "뜨거운 몰입의 순간",
+        "E3196CDE-627A-4368-BA8C-CB1EA0B7E62E": "자유란 무엇인가",
+        "F841B714-DD6E-4FEC-8249-925F1C73004E": "말과 영원, 사상이라는 겨"
+      },
+      "log": [
+        "[reorg] 뿌리 축 5·보류 6 — 전량 빅콜 재구성 (20건)"
+      ]
+    },
+    {
+      "stats": {
+        "assimCalls": 12,
+        "escalations": 0,
+        "reorgs": 0,
+        "covered": 22,
+        "missing": [],
+        "rootStray": 2
+      },
+      "groups": {
+        "0701BF44-0016-483E-AA9E-9354FB1EEDE0": "'보았다' — 배역으로서의 삶",
+        "0AF04322-2071-4CD9-977E-2B21AD994163": "처음인 듯 보는 눈",
+        "240B7E5D-A281-414E-81B4-F00E31849EA3": "죽음을 생각하며 사는 삶",
+        "30DDC6DD-EC3B-440D-BC82-F22DF1BAF55F": "몸과 리듬의 합일",
+        "35E34C3D-C937-4BA4-8F67-896609F3A2E9": "근심을 벗고 남는 영혼",
+        "3EE2FC2B-4354-40F1-808F-03F8DA4FFC01": "'보았다' — 배역으로서의 삶",
+        "4937D55C-1B38-48C7-817B-783AFF0ADA9F": "처음인 듯 보는 눈",
+        "620D2F1A-099C-4747-A482-DCEB2B37B337": "처음인 듯 보는 눈",
+        "6D6D7BFE-AF2A-4AC0-97C2-74B41E8B2AE0": "근심을 벗고 남는 영혼",
+        "7DBDB73D-04C8-4817-860D-44F1D44B2406": "(보류)",
+        "7FC60E5C-7EF2-4EC2-B339-640B9A62DA08": "처음인 듯 보는 눈",
+        "804987DF-D687-43D6-B797-E05CB0436230": "근심을 벗고 남는 영혼",
+        "853B9637-F73C-475B-BAAF-E763F42F74BD": "(보류)",
+        "881E37B2-BA7D-4749-9B76-D69B55F1007D": "'보았다' — 배역으로서의 삶",
+        "89C65162-6F66-4FBB-B218-211741A3FB89": "몸과 리듬의 합일",
+        "93C2BC34-E380-4041-87EF-FFB4C6817489": "'보았다' — 배역으로서의 삶",
+        "A7068377-C8E5-4DD8-B2E9-8CB5B1A4B142": "근심을 벗고 남는 영혼",
+        "DFA6037C-7C4F-42D6-98F2-15296A014337": "근심을 벗고 남는 영혼",
+        "EAD97BA6-F93D-4F3E-A2D9-50CDF75BF22B": "처음인 듯 보는 눈",
+        "81A9C43D-0413-478D-A2CC-ABC8514AD9C8": "몸과 리듬의 합일",
+        "E3196CDE-627A-4368-BA8C-CB1EA0B7E62E": "'보았다' — 배역으로서의 삶",
+        "F841B714-DD6E-4FEC-8249-925F1C73004E": "죽음을 생각하며 사는 삶"
+      },
+      "log": []
+    }
+  ],
+  "usages": [
+    {
+      "model": "claude-sonnet-5",
+      "ms": 85445,
+      "apiMs": 80007,
+      "inputTokens": 2,
+      "outputTokens": 5722,
+      "cacheReadTokens": 27878,
+      "costUsd": 0.27044939999999995,
+      "role": "big"
+    },
+    {
+      "model": "claude-sonnet-5",
+      "ms": 45099,
+      "apiMs": 39800,
+      "inputTokens": 2,
+      "outputTokens": 2769,
+      "cacheReadTokens": 27878,
+      "costUsd": 0.1892604,
+      "role": "big"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 16168,
+      "apiMs": 11835,
+      "inputTokens": 3,
+      "outputTokens": 985,
+      "cacheReadTokens": 18490,
+      "costUsd": 0.032033,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 14306,
+      "apiMs": 9891,
+      "inputTokens": 3,
+      "outputTokens": 815,
+      "cacheReadTokens": 31118,
+      "costUsd": 0.0071898,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 17639,
+      "apiMs": 13068,
+      "inputTokens": 3,
+      "outputTokens": 1114,
+      "cacheReadTokens": 31118,
+      "costUsd": 0.008684800000000001,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 24637,
+      "apiMs": 12953,
+      "inputTokens": 3,
+      "outputTokens": 1062,
+      "cacheReadTokens": 0,
+      "costUsd": 0.078337,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 17741,
+      "apiMs": 10999,
+      "inputTokens": 3,
+      "outputTokens": 885,
+      "cacheReadTokens": 0,
+      "costUsd": 0.078418,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 21884,
+      "apiMs": 14253,
+      "inputTokens": 3,
+      "outputTokens": 1160,
+      "cacheReadTokens": 36995,
+      "costUsd": 0.0095025,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 17771,
+      "apiMs": 10777,
+      "inputTokens": 3,
+      "outputTokens": 906,
+      "cacheReadTokens": 22940,
+      "costUsd": 0.035501000000000005,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 18375,
+      "apiMs": 10480,
+      "inputTokens": 3,
+      "outputTokens": 872,
+      "cacheReadTokens": 37277,
+      "costUsd": 0.008090700000000001,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 23299,
+      "apiMs": 15114,
+      "inputTokens": 6,
+      "outputTokens": 1074,
+      "cacheReadTokens": 74554,
+      "costUsd": 0.016991399999999997,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 10648,
+      "apiMs": 5589,
+      "inputTokens": 3,
+      "outputTokens": 384,
+      "cacheReadTokens": 22940,
+      "costUsd": 0.029591,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 12483,
+      "apiMs": 5919,
+      "inputTokens": 3,
+      "outputTokens": 422,
+      "cacheReadTokens": 22940,
+      "costUsd": 0.031891,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 10756,
+      "apiMs": 4706,
+      "inputTokens": 3,
+      "outputTokens": 366,
+      "cacheReadTokens": 36682,
+      "costUsd": 0.0055011999999999995,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 18831,
+      "apiMs": 12372,
+      "inputTokens": 3,
+      "outputTokens": 1043,
+      "cacheReadTokens": 22940,
+      "costUsd": 0.034308000000000005,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 17257,
+      "apiMs": 10653,
+      "inputTokens": 3,
+      "outputTokens": 844,
+      "cacheReadTokens": 36338,
+      "costUsd": 0.0078568,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 18605,
+      "apiMs": 11715,
+      "inputTokens": 3,
+      "outputTokens": 967,
+      "cacheReadTokens": 36338,
+      "costUsd": 0.008471800000000002,
+      "role": "assim"
+    },
+    {
+      "model": "claude-sonnet-5",
+      "ms": 11429,
+      "apiMs": 3998,
+      "inputTokens": 2,
+      "outputTokens": 149,
+      "cacheReadTokens": 0,
+      "costUsd": 0.194574,
+      "role": "esc"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 23458,
+      "apiMs": 15481,
+      "inputTokens": 6,
+      "outputTokens": 1183,
+      "cacheReadTokens": 59941,
+      "costUsd": 0.044267100000000004,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 16596,
+      "apiMs": 10067,
+      "inputTokens": 3,
+      "outputTokens": 823,
+      "cacheReadTokens": 22940,
+      "costUsd": 0.034534,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 18758,
+      "apiMs": 12403,
+      "inputTokens": 3,
+      "outputTokens": 998,
+      "cacheReadTokens": 37001,
+      "costUsd": 0.0086931,
+      "role": "assim"
+    },
+    {
+      "model": "claude-sonnet-5",
+      "ms": 10751,
+      "apiMs": 4308,
+      "inputTokens": 2,
+      "outputTokens": 170,
+      "cacheReadTokens": 30356,
+      "costUsd": 0.0816792,
+      "role": "esc"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 17658,
+      "apiMs": 11339,
+      "inputTokens": 3,
+      "outputTokens": 991,
+      "cacheReadTokens": 22940,
+      "costUsd": 0.035794,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 15989,
+      "apiMs": 9887,
+      "inputTokens": 3,
+      "outputTokens": 878,
+      "cacheReadTokens": 37211,
+      "costUsd": 0.0081141,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 16284,
+      "apiMs": 9762,
+      "inputTokens": 3,
+      "outputTokens": 860,
+      "cacheReadTokens": 37211,
+      "costUsd": 0.008024100000000001,
+      "role": "assim"
+    },
+    {
+      "model": "claude-sonnet-5",
+      "ms": 9729,
+      "apiMs": 4058,
+      "inputTokens": 2,
+      "outputTokens": 145,
+      "cacheReadTokens": 30356,
+      "costUsd": 0.0808332,
+      "role": "esc"
+    },
+    {
+      "model": "claude-sonnet-5",
+      "ms": 92810,
+      "apiMs": 85516,
+      "inputTokens": 2,
+      "outputTokens": 7392,
+      "cacheReadTokens": 0,
+      "costUsd": 0.331,
+      "role": "big"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 13040,
+      "apiMs": 6292,
+      "inputTokens": 3,
+      "outputTokens": 442,
+      "cacheReadTokens": 22940,
+      "costUsd": 0.033185,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 12260,
+      "apiMs": 5695,
+      "inputTokens": 3,
+      "outputTokens": 421,
+      "cacheReadTokens": 37279,
+      "costUsd": 0.0058359,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 11494,
+      "apiMs": 5117,
+      "inputTokens": 3,
+      "outputTokens": 421,
+      "cacheReadTokens": 37279,
+      "costUsd": 0.0058359,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 16160,
+      "apiMs": 11766,
+      "inputTokens": 3,
+      "outputTokens": 1005,
+      "cacheReadTokens": 22940,
+      "costUsd": 0.032008,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 19043,
+      "apiMs": 12485,
+      "inputTokens": 3,
+      "outputTokens": 1057,
+      "cacheReadTokens": 22940,
+      "costUsd": 0.034378,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 16815,
+      "apiMs": 10222,
+      "inputTokens": 3,
+      "outputTokens": 866,
+      "cacheReadTokens": 22940,
+      "costUsd": 0.035653000000000004,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 17794,
+      "apiMs": 10742,
+      "inputTokens": 3,
+      "outputTokens": 909,
+      "cacheReadTokens": 22940,
+      "costUsd": 0.034952,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 16562,
+      "apiMs": 10158,
+      "inputTokens": 3,
+      "outputTokens": 832,
+      "cacheReadTokens": 36995,
+      "costUsd": 0.0078625,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 19389,
+      "apiMs": 12092,
+      "inputTokens": 3,
+      "outputTokens": 1018,
+      "cacheReadTokens": 36995,
+      "costUsd": 0.0087925,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 18215,
+      "apiMs": 11287,
+      "inputTokens": 3,
+      "outputTokens": 911,
+      "cacheReadTokens": 22940,
+      "costUsd": 0.035652,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 17676,
+      "apiMs": 10881,
+      "inputTokens": 3,
+      "outputTokens": 930,
+      "cacheReadTokens": 37340,
+      "costUsd": 0.008387,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 23214,
+      "apiMs": 14807,
+      "inputTokens": 6,
+      "outputTokens": 1077,
+      "cacheReadTokens": 74680,
+      "costUsd": 0.016961,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 11203,
+      "apiMs": 4802,
+      "inputTokens": 3,
+      "outputTokens": 382,
+      "cacheReadTokens": 22940,
+      "costUsd": 0.031543,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 12555,
+      "apiMs": 5679,
+      "inputTokens": 3,
+      "outputTokens": 425,
+      "cacheReadTokens": 36608,
+      "costUsd": 0.0057888,
+      "role": "assim"
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "ms": 12576,
+      "apiMs": 6098,
+      "inputTokens": 3,
+      "outputTokens": 455,
+      "cacheReadTokens": 36608,
+      "costUsd": 0.005938800000000001,
+      "role": "assim"
+    }
+  ],
+  "finalNodes": [
+    {
+      "id": "root",
+      "kind": "root",
+      "parentID": null,
+      "position": 0,
+      "name": "그리스인 조르바",
+      "gloss": "밑줄들은 사고나 걱정에 갇히지 않고 지금 이 순간을 처음처럼 '보고' 몸으로 살아내려는 태도, 그리고 그 끝에 걱정을 다 떨군 뒤 남는 것에 대한 관심으로 모인다.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n1",
+      "kind": "concept",
+      "parentID": "root",
+      "position": 0,
+      "name": "'보았다' — 배역으로서의 삶",
+      "gloss": "거창한 사상은 껍데기일 뿐이고, 스스로 '보았기에' 두려움 없이 주어진 동시에 스스로 택한 역을 연기한다는 사유.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": {
+        "badge": null,
+        "emphasis": "high"
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "sentence",
+      "parentID": "n1",
+      "position": 0,
+      "name": "그리고 아무리 위대한 사상들이라 해도 그 속을 갈라 보면 역시 겨로 가득 채우고 교묘하게 양철 용수철을 박아놓은 인형들에 불과하다는 것을 발견하게 될 거야.\n   이런 과격하고 극단적인 생각들은 내 안의 불꽃을 피우기 위한 불쏘시개일 뿐, 나를 두려움에 빠뜨리지는 않아. 왜냐하면 나의 스승인 부처가 말한 것처럼 나는 '보았기' 때문이지. 그뿐 아니라, 넘치는 의욕과 상상력으로 무장한 보이지 않는 '연출가'와 무조건 합의를 보았기에, 나는 지금 아무런 지장도 받지 않고 일관성 있게 이 땅에서 내가 맡은 역을 완벽하게 연기할 수 있어. 왜냐하면 이 역은 나의 태엽을 감아 나를 조정하는 '그분'이 일방적으로 정해준 것일 뿐만 아니라, 나 스스로 선택해서, 내 자유 의지로 내 안의 태엽을 감아 맡은 역이기 때문이지. 왜냐고? 그건 내가 '보았기' 때문이고, 나 스스로 하느님의 그림자극인 그 작품을 함께 만들었기 때문이지.",
+      "gloss": "사상을 '겨로 채운 인형'이라 깎아내리면서도 두려움 없음의 근거를 부처의 '봄'과 자유의지의 합의로 설명하는 대목에 끌렸을 법하다.",
+      "sourcePages": [
+        167
+      ],
+      "highlightID": "0701BF44-0016-483E-AA9E-9354FB1EEDE0",
+      "display": {
+        "badge": "서술자 · 초연함",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "concept",
+      "parentID": "root",
+      "position": 1,
+      "name": "처음인 듯 보는 눈",
+      "gloss": "돌이 되살아나는 순간에서 매일 새로운 세상을 보거나 스스로 창조하는 시선을 발견한다.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n4",
+      "kind": "sentence",
+      "parentID": "n3",
+      "position": 0,
+      "name": "\"대장, 봤어요? 돌들은 내리막길에서 다시 생명을 얻어 살아납니다!\"\n나는 아무 말도 하지 않았지만 커다란 기쁨을 느꼈다. 위대한 예언자들이나 시인들은 이와 비슷하게 모든 것을 처음인 듯 보고 느낀다. 매일 아침 자신들 앞에 새로운 세상이 시작되는 것을 본다. 새로운 세상이 안 보이면 스스로 새로운 세상을 창조한다.",
+      "gloss": "내리막길의 돌이 다시 살아난다는 관찰에서, 새로움을 발견하거나 없으면 만들어내는 태도를 예언자·시인의 자질로 읽어낸 통찰.",
+      "sourcePages": [
+        243
+      ],
+      "highlightID": "0AF04322-2071-4CD9-977E-2B21AD994163",
+      "display": {
+        "badge": "서술자 · 경이",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "concept",
+      "parentID": "root",
+      "position": 2,
+      "name": "죽음을 생각하며 사는 삶",
+      "gloss": "죽음을 잊은 채 사는 것과 매 순간 죽음을 의식하며 사는 것이 결국 같다는 역설.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n6",
+      "kind": "sentence",
+      "parentID": "n5",
+      "position": 0,
+      "name": "죽음이 없다는 듯이 행동하는 것과 매 순간 죽음을 생각하면서 행동하는 것은 어쩌면 같은 것일지도 모른다.",
+      "gloss": "상반돼 보이는 두 태도가 결국 하나로 수렴한다는 역설적 문장에 밑줄을 그었을 것.",
+      "sourcePages": [
+        70
+      ],
+      "highlightID": "240B7E5D-A281-414E-81B4-F00E31849EA3",
+      "display": {
+        "badge": "서술자 · 담담함",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "concept",
+      "parentID": "root",
+      "position": 3,
+      "name": "몸과 리듬의 합일",
+      "gloss": "몸과 마음이 어긋나지 않고, 파도의 리듬에 저항 없이 맞춰 춤추는 물아일체의 감각.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n8",
+      "kind": "sentence",
+      "parentID": "n7",
+      "position": 0,
+      "name": "나는 기운이 넘쳤고, 상쾌했고, 내 몸은 내 마음을 잘 따르고 있었다. 파도를 좇던 내 정신은 파도가 되어 바다에 저항하지 않고 그 리듬에 맞춰 춤을 추었다.",
+      "gloss": "몸과 정신이 일치해 파도와 하나가 되는 감각적 묘사에서 느낀 생기와 해방감.",
+      "sourcePages": [
+        66
+      ],
+      "highlightID": "30DDC6DD-EC3B-440D-BC82-F22DF1BAF55F",
+      "display": {
+        "badge": "서술자 · 충만함",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "concept",
+      "parentID": "root",
+      "position": 4,
+      "name": "근심을 벗고 남는 영혼",
+      "gloss": "현실의 잡다한 근심들이 연기처럼 사라지고 오직 노래하는 영혼 하나만 남는 정상의 순간.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n10",
+      "kind": "sentence",
+      "parentID": "n9",
+      "position": 0,
+      "name": "근심이들이 뿔뿔이 사라지고, 경박한 걱정들은 멀리 도망쳤으며, 영혼은 정상에 우뚝 섰다. 롤라나 갈탄, 공중 케이블, '영원', 사소하거나 심각한 걱정들, 이 모두가 파르스름함 연기가 되어 날아가고, 오직 하나, 강철로 된 새 한 마리, 인간의 영혼만이 남아 노래하고 있었다.",
+      "gloss": "구체적 근심들(롤라, 갈탄, 공중 케이블)이 나열되다 연기처럼 사라지고 '강철로 된 새'만 남는 대비적 이미지에 끌렸을 법하다.",
+      "sourcePages": [
+        316
+      ],
+      "highlightID": "35E34C3D-C937-4BA4-8F67-896609F3A2E9",
+      "display": {
+        "badge": "서술자 · 해방감",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n11",
+      "kind": "sentence",
+      "parentID": "n1",
+      "position": 0,
+      "name": "선생들은 자신의 제자들로부터 배울 점을 최대한 이끌어내도록 노력해야 하지. 젊음이 어디를 향해 나아가는지 알아내고, 그들의 영혼 역시 그 방향으로 향하도록 인도해야 하지. 그렇게 제자들의 가르침을 따라 나는 이곳 크레타에 도착했어.",
+      "gloss": "제자가 어디로 나아가는지 보고 인도한다는 것도 '보았기에' 역할을 다하는 배우의 자세. 쓸데없는 이론이 아니라 실제 영혼의 방향을 따르는 실천의 철학",
+      "sourcePages": [
+        165
+      ],
+      "highlightID": "3EE2FC2B-4354-40F1-808F-03F8DA4FFC01",
+      "display": {
+        "badge": "조르바 · 통찰",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n12",
+      "kind": "sentence",
+      "parentID": "n3",
+      "position": 0,
+      "name": "\"그런데 왜 그랬어요?\" \"아이구, 계속 앉아서 묻기만 하는군요. 그냥 그러고 싶었을 뿐이에요. 됐어요? 방앗간 마누라 엉덩이에서 철자법을 찾는군요. 방앗간 마누라의 엉덩이는 인간의 정신이에요.\"",
+      "gloss": "이유를 묻는 것 자체가 무의미 — 매순간 새롭게 행동하는 눈, '왜'라는 틀에서 벗어남",
+      "sourcePages": [
+        30
+      ],
+      "highlightID": "4937D55C-1B38-48C7-817B-783AFF0ADA9F",
+      "display": {
+        "badge": "조르바 · 경쾌함",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n13",
+      "kind": "sentence",
+      "parentID": "n3",
+      "position": 1,
+      "name": "조르바의 말을 들으면 온 세상이 처녀성을 회복한다. 모든 일상의 것들, 빛바랬던 것들이 하느님의 손을 처음으로 벗어나던 때처럼 다시 빛나기 시작했다. 강과 바다도, 여자도, 별도, 빵도, 모두 태초의 신비스러운 근원으로 되돌아가고, 하늘에서는 하느님의 수레바퀴가 원초적 힘을 되찾곤 했다.",
+      "gloss": "조르바의 말이 일상을 '태초의 신비스러운 근원'으로 되돌린다는 것은 정확히 '처음인 듯 보는 눈'이 매일 세상을 새로 창조하는 경험과 일치",
+      "sourcePages": [
+        99
+      ],
+      "highlightID": "620D2F1A-099C-4747-A482-DCEB2B37B337",
+      "display": {
+        "badge": "서술자 · 신성함",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n14",
+      "kind": "sentence",
+      "parentID": "n9",
+      "position": 1,
+      "name": "\"조국으로부터 벗어나고, 신부들로부터 벗어나고, 돈으로부터 벗어나고, 탈탈 먼지를 털었죠. 세월이 흐를수록 난 먼지를 털어냅니다. 그리고 가벼워집니다. 뭐라고 말씀드려야 할까요? 난 자유로워지고, 사람이 돼갑니다.\"",
+      "gloss": "조국, 신부, 돈—근심의 원천들을 먼지처럼 털어내고 가벼워지며 '사람이 돼간다'는 것은 정확히 근심 연기가 흩어지고 영혼만 남는 정상의 순간",
+      "sourcePages": [
+        393
+      ],
+      "highlightID": "6D6D7BFE-AF2A-4AC0-97C2-74B41E8B2AE0",
+      "display": {
+        "badge": "조르바 · 해방감",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n15",
+      "kind": "sentence",
+      "parentID": "root",
+      "position": 0,
+      "name": "그게 자유라는 거로군. 나는 생각에 잠겼다. 금화를 탐내는 탐욕과 갑자기 그 탐욕을 버리고 자기가 가지고 있던 모든 걸 공중에 뿌리는 게 자유로군! 자신의 욕망에서 자유로워져서, 더 높은 욕망에 따르는 것..... 하지만 하나의 이상을 위해, 민족을 위해, 하느님을 위해 자신을 희생하는 것, 이것 역시 노예근성이 아닐까? 아니면 혹시 주인이 높은 곳에 있을수록 우리 노예들의 사슬은 길어지고, 그러면 우리는 더 높이 뛰어야 하고, 훨씬 더 넓응 마당울 뛰어다니다가 끝내 아무것도 알아내지 못한 채 죽어갈 텐데, 이런 걸 자유라고 하나?",
+      "gloss": "자유의 모순과 노예근성의 순환을 묻는 이 문장은 기존 축들의 긍정적 깨달음보다는 그것들의 기반을 의심하는 철학적 질문. 어떤 축에도 완전히 안착하지 못함",
+      "sourcePages": [
+        52
+      ],
+      "highlightID": "7DBDB73D-04C8-4817-860D-44F1D44B2406",
+      "display": {
+        "badge": "서술자 · 회의",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n16",
+      "kind": "sentence",
+      "parentID": "n3",
+      "position": 1,
+      "name": "세상의 모든 것에는 숨겨진 의미가 있다는 생각이 들었다. 사람, 짐승, 나무, 별, 모든 것이 상형문자가. 그것을 읽어내고 무슨 말을 하는지 알아내기 시작한 사람에게 그것은 기쁨일 것이다. 하지만 그것들을 보는 순간에도 우리는 그 의미를 이해하지 못한다. 너는 그것들이 사람이고, 짐승이고, 나무고, 별이라고 생각한다. 그리고 세월이 많이 지난 뒤에야 너무 늦게 그것들의 의미를 깨닫는다.",
+      "gloss": "세상을 처음인 듯 새로운 눈으로 보되, 그 숨겨진 의미를 '읽어내는' 순간의 시각적 깨달음. 예시 문장의 '처음인 듯 보고' 감각과 정확히 겹친다.",
+      "sourcePages": [
+        88
+      ],
+      "highlightID": "7FC60E5C-7EF2-4EC2-B339-640B9A62DA08",
+      "display": {
+        "badge": "서술자 · 깨달음",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n17",
+      "kind": "sentence",
+      "parentID": "root",
+      "position": 1,
+      "name": "이슬비가 내리는 이 슬픈 시간은 마치 나비 같은 우리의 영혼이 비에 젖고, 끝내 파묻히고 마는 비장한 관능적 쾌감을 주는 시간이다. 이럴 때면 마음속 깊숙이에 쌓여 있던, 친구와의 이별, 잊힌 여인의 미소 같은 온갖 가슴 아픈 추억들과, 날개를 잃고 다시 애벌레가 되어 우리의 심장을 기어다니머 심장의 이파리들을 먹어치우는 나비를 닮은 희망들이 떠오른다.",
+      "gloss": "죽음과 회한에 대한 존재론적 명상이 강하지만, 기존 축들(n5의 죽음 의식, n9의 영혼 정상화)과는 감정 톤이 다르고, 관능성·추억의 물리적 침범이라는 독특한 상 때문에 어느 축에도 자연스럽지 않음.",
+      "sourcePages": [
+        164
+      ],
+      "highlightID": "804987DF-D687-43D6-B797-E05CB0436230",
+      "display": {
+        "badge": "서술자 · 향수적 슬픔",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n18",
+      "kind": "sentence",
+      "parentID": "n5",
+      "position": 1,
+      "name": "공자는 \"많은 사람들이 자기보다 더 크거나 작은 행복을 바란다. 하지만 행복은 그 사람의 몸 크기만 하다\"라고 말했지.",
+      "gloss": "행복의 크기는 자신의 몸만 하다는 명제에서, 매순간 자신의 몸(상태)을 재측정하고 불안해하는 역설. n5의 '죽음을 의식하면서도 행동하는 것'과 같은 구조의 불안한 자기 관찰.",
+      "sourcePages": [
+        166
+      ],
+      "highlightID": "853B9637-F73C-475B-BAAF-E763F42F74BD",
+      "display": {
+        "badge": "서술자 · 불안",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n19",
+      "kind": "sentence",
+      "parentID": "n1",
+      "position": 2,
+      "name": "\"이봐요, 조르바! 당신이 직접 쓰지 그래요? 당신이 알고 있는 이 세상의 모든 신비에 대해 왜 이야기해주지 않는 거죠?\" \"왜냐고요? 왜냐고 묻는 거요? 나는 이 세상의 모든 신비스러운 일을 몸소 다 겪어봤지만 시간이 없수다. 한번은 이 세상을, 다른 때는 여자를, 또 언젠가는 산투리를 직접 겪어봤지만 그런 허튼소리를 쓰기 위해 펜대를 잡을 시간은 없수다. 그런 시간을 낼 수 있는 작자들은 그런 신비를 겪지 못하고요. 알아듣겠수?\"",
+      "gloss": "세상을 겪고 신비를 몸으로 살아낸 조르바가, 그것을 '말로 정리하는' 시간을 거부한다. 거창한 사상·말은 껍데기이고 실제 삶의 연기(배역)만 남는다는 n1의 명제와 일맥상통.",
+      "sourcePages": [
+        380
+      ],
+      "highlightID": "881E37B2-BA7D-4749-9B76-D69B55F1007D",
+      "display": {
+        "badge": "조르바 · 실천적 반박",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n20",
+      "kind": "sentence",
+      "parentID": "root",
+      "position": 0,
+      "name": "하지만 나는 조르바에게 다른 대답을 해보려고 애썼다. \"어떻게 똥과 더러운 것들로부터 한 송이 꽃이 싹이 나고 자라나죠? 조르바, 인간이 똥이고 자유가 꽃이라고 생각해봐요.\" \"하지만 씨앗은요?\" 조르바가 주먹으로 탁자를 치며 이렇게 되물었다. \"꽃 한 송이를 피우기 위하서는 씨앗이 필요하죠. 누가 그런 씨앗을 우리들의 더러운 창자 속에 집어넣은 거죠? 그리고 왜 이 씨앗이 남에 대한 배려와 정직으로는 꽃피우지 못하고 피와 더러운 것들을 필요로 하는 거죠?\"",
+      "gloss": "자유와 인간의 본질을 묻는 철학적 대화지만, 기존 축들은 모두 '삶의 경험적 태도'를 다루며 이 문장의 추상적 질문은 적합지 않음",
+      "sourcePages": [
+        49
+      ],
+      "highlightID": "89C65162-6F66-4FBB-B218-211741A3FB89",
+      "display": {
+        "badge": "조르바 · 의문",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n21",
+      "kind": "sentence",
+      "parentID": "n1",
+      "position": 0,
+      "name": "아프리카의 원시 부족들은 뱀을 숭배한다. 왜냐하면 뱀은 온몸을 땅에 붙이고 기어 다니기에 대지의 비밀을 다 알고 있다고 믿기 때문이다. 뱀은 배로, 꼬리로, 남근으로, 머리로 그 비밀들을 캐낸다. 조르바도 그렇다. 우리 지식인들은 공중에 떠 있는 바보 같은 새들일 뿐이다.'",
+      "gloss": "지식인의 추상적 사유를 비판하고 몸과 감각(뱀이 땅의 비밀을 앎)으로 세상을 아는 배역의 자세를 드러냄",
+      "sourcePages": [
+        118
+      ],
+      "highlightID": "93C2BC34-E380-4041-87EF-FFB4C6817489",
+      "display": {
+        "badge": "조르바 · 비판",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n22",
+      "kind": "sentence",
+      "parentID": "n9",
+      "position": 0,
+      "name": "대장, 사람들을 좀 조용히 내버려두쇼. 그들이 그런 일에 눈뜨게 하지 말아요. 그들이 눈을 뜨면 보게 될 게 뭐겠어요? 자신들의 불행과 처참함뿐이죠! 사람들이 눈이 먼 채 꿈을 꾸도록 내버려둬요!\" 그가 잠깐 말을 멈추고는 생각에 잠겨 머리를 긁다가 말을 이었다. \"만약에..... 만약에 말이에요......\" \"뭐에요? 한번 들어봅시다.\" \"만약에 그들이 눈을 떴을 때 대장이 보다 더 좋은 세상을 보여줄 수 있다면 말입니다...... 그럴 자신이 있나요?\" 나로서는 알 길이 없었다. 나는 어떤 것들이 무너져 내리리라는 것은 잘 알고 있었지만 그 폐허 위에 어떤 것이 세워질지는 알지 못했다. .. \"당신에게는 얘기할 수 없어요. 아마 이해하지 못할 거예요.\" \"참, 그렇다면 보여줄 수 없는 거예요!\" 조르바가 머리를 저으며 대꾸했다. \"대장, 내가 뭘 잘못 먹어 바보가 된 줄 아쇼? 대장은 속은 거예요. 나 역시 아나그노티스 영감과 마찬가지로 배운 게 없는 무식쟁이지만 난 결코 그정도로 바보는 아녜요. 내가 이해하지 못하는 걸 그 순진한 인간과 그의 평생 반려자인 순한 마누라가 이해하겠소?\"",
+      "gloss": "사람들의 눈을 뜨게 하면 불행이 보인다는 역설 — 근심과 현실이 연기처럼 사라지는 것과 반대편, 눈을 떴을 때의 고통",
+      "sourcePages": [
+        116
+      ],
+      "highlightID": "A7068377-C8E5-4DD8-B2E9-8CB5B1A4B142",
+      "display": {
+        "badge": "조르바 · 절망과 역설",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n23",
+      "kind": "sentence",
+      "parentID": "n9",
+      "position": 1,
+      "name": "그렇게 아직 어린아이였을 적에 나는 우물 속으로 뛰어들 뻔 했다. 어른이 되어서도 나는 여전히 '영원'이란 말 속으로 뛰어들려는 위험에 빠지곤 한다. '에로스' '희망' '조국' '하느님'과 같은 말들도 마찬가지로 나를 위험에 빠뜨린다. 해마다 나는 그런 위험에서 겨우 벗어나서 앞으로 나아가는 것처럼 느꼈다. 하지만 나는 조금도 앞으로 나아가지 못했다. 단지 말만 바꾸었을 뿐이다. 그리고 나는 그걸 구원이라고 불렀다. ...조르바 덕분에, 이것이 마지막 우물이요, 마지막 낱말이다.",
+      "gloss": "말과 관념(영원, 에로스, 희망)의 우물에서 벗어나고 조르바를 통해 마지막으로 그것들을 거두는 순간, 근심의 껍질을 벗음",
+      "sourcePages": [
+        308
+      ],
+      "highlightID": "DFA6037C-7C4F-42D6-98F2-15296A014337",
+      "display": {
+        "badge": "서술자 · 해탈",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n24",
+      "kind": "sentence",
+      "parentID": "n3",
+      "position": 4,
+      "name": "그런데 당신은 이 폐허에서 뭘 찾고 있는거요?\" \"난 고대 유적지를 찾고 있어요.\" \"그래서 뭘 알게 됐소?\" \"아무것도 모르겠어요.\" \"나도 아무것도 몰라요. 그들은 죽었고, 우린 살아있죠. 어이, 이제 잘 가슈!\"",
+      "gloss": "죽은 것(고대 유적)과 산 것(현재)의 대비 — 지금 이 순간 살아있음을 처음인 듯 보는 감각",
+      "sourcePages": [
+        296
+      ],
+      "highlightID": "EAD97BA6-F93D-4F3E-A2D9-50CDF75BF22B",
+      "display": {
+        "badge": "조르바 · 생생함",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n25",
+      "kind": "sentence",
+      "parentID": "n7",
+      "position": 1,
+      "name": "나는 창피해서 입을 다물었다. 그리고 조르바가 느끼고 있는 고통을 부러워하며 '슬플 때는 진심에서 흘러나오는 굵은 눈물방울을 흘리고, 기쁠 때는 그 기쁨을 아주 가는 추상적인 체로 거르노라 망치지 않는, 뜨거운 피와 단단한 뼈를 가진 인간, 이 사람이야말로 진정한 인간이다!'라고 속으로 생각했다.",
+      "gloss": "조르바의 뜨거운 피와 단단한 뼈, 슬픔과 기쁨을 거르지 않고 온전히 느끼는 몸과 감정의 일치가 물아일체의 감각과 부합함",
+      "sourcePages": [
+        434
+      ],
+      "highlightID": "81A9C43D-0413-478D-A2CC-ABC8514AD9C8",
+      "display": {
+        "badge": "서술자 · 동경",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n26",
+      "kind": "sentence",
+      "parentID": "n1",
+      "position": 4,
+      "name": "나는 아무 말도 하지 않았다. 그 무엇이 꼭 필요한 것이라면 \"네!\"라고 대답하라. 무언가를 피할 수 없다면, 너의 자유의지에 따른 행동으로 그것의 본질을 변화시켜라! 아마도 이것만이 우리 인간에게 주어진 유일한 구원의 길일지 모른다. 나는 그것을 잘 알고 있었다. 그래서 아무 말도 하지 않았다.",
+      "gloss": "필연성 속에서도 '자유의지에 따른 행동'으로 본질을 변화시킨다는 사유 — 주어진 역 안에서 스스로 그것을 살려내는 배우의 결단",
+      "sourcePages": [
+        470
+      ],
+      "highlightID": "E3196CDE-627A-4368-BA8C-CB1EA0B7E62E",
+      "display": {
+        "badge": "조르바 · 결연",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n27",
+      "kind": "sentence",
+      "parentID": "n5",
+      "position": 2,
+      "name": "나는 등잔불을 끄고 침대에 누웠다. 그리고 언제나처럼 나의 나쁜 습관에 따라, 또다시 현실로부터 피와 살과 뼈를 다 제거하여 현실을 추상 개념으로 바꾼 뒤, '이미 일어난 일들은 일어날 수밖에 없는 필연성에 의해 일어난 것'이라는 끔찍한 결론에 도달할 때까지 그 개념들을 아주 보편적인 법칙과 연결시킴으로써 현실에서 도망쳤다. 이미 일어난 일들은 그렇게 되기로 결정되어 있던 이 세상의 리듬 속이서 일어난 것이고, 그런 일이 일어남으로써 세상은 더 큰 조화를 이룬다. 이런 식으로 나는 이미 일어난 일은 그렇게 돼야만 했던 필연성에 의해 일어난 일일 뿐 아니라, 마땅히 그렇게 돼야 했기에 일어난 거라는 혐오스러운 위안에 도달했다. .. 이제 나는 과부에게로 되돌아와서, 그녀가 위대한 법칙에 복종하여 그녀의 살해자들과 화해하고, 이제는 고요하고 성스러운 부동의 세계에 안주했음을 발견한다. 시간은 나의 내면에서 자신의 진실한 모습을 드러냈다. 과부는 이미 수천 년 전에 죽었고, 에게 해 문명 시대 크로노스 궁전의 갈색머리 소녀들은 오늘 아침에 죽었다.",
+      "gloss": "현실에서 추상으로 도망침으로써 필연성을 깨닫고, 그 과정에서 죽음(시간의 진실)과 마주하는 역설 — 죽음을 직시하면서 동시에 초월하려는 정신의 운동",
+      "sourcePages": [
+        432
+      ],
+      "highlightID": "F841B714-DD6E-4FEC-8249-925F1C73004E",
+      "display": {
+        "badge": "서술자 · 체념",
+        "emphasis": null
+      }
+    }
+  ],
+  "batchNodes": [
+    {
+      "id": "root",
+      "kind": "root",
+      "parentID": null,
+      "position": 0,
+      "name": "그리스인 조르바",
+      "gloss": "화자는 조르바라는 몸으로 세상을 처음처럼 사는 인간을 만나면서, 자신이 개념과 필연으로 도피해온 습관을 직시하고 '태엽을 감은 자'로서의 자유의지를 구원의 마지막 언어로 붙잡는다.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n1",
+      "kind": "concept",
+      "parentID": "root",
+      "position": 0,
+      "name": "태엽 인형과 그림자극",
+      "gloss": "운명이 정해준 배역을 자유의지로 다시 선택한다는 역설이 화자의 마지막 낱말로 반복된다.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": {
+        "badge": null,
+        "emphasis": "high"
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "sentence",
+      "parentID": "n1",
+      "position": 0,
+      "name": "그리고 아무리 위대한 사상들이라 해도 그 속을 갈라 보면 역시 겨로 가득 채우고 교묘하게 양철 용수철을 박아놓은 인형들에 불과하다는 것을 발견하게 될 거야.\n   이런 과격하고 극단적인 생각들은 내 안의 불꽃을 피우기 위한 불쏘시개일 뿐, 나를 두려움에 빠뜨리지는 않아. 왜냐하면 나의 스승인 부처가 말한 것처럼 나는 '보았기' 때문이지. 그뿐 아니라, 넘치는 의욕과 상상력으로 무장한 보이지 않는 '연출가'와 무조건 합의를 보았기에, 나는 지금 아무런 지장도 받지 않고 일관성 있게 이 땅에서 내가 맡은 역을 완벽하게 연기할 수 있어. 왜냐하면 이 역은 나의 태엽을 감아 나를 조정하는 '그분'이 일방적으로 정해준 것일 뿐만 아니라, 나 스스로 선택해서, 내 자유 의지로 내 안의 태엽을 감아 맡은 역이기 때문이지. 왜냐고? 그건 내가 '보았기' 때문이고, 나 스스로 하느님의 그림자극인 그 작품을 함께 만들었기 때문이지.",
+      "gloss": "거대 사상을 겨로 보는 냉소 끝에 '보았기에' 지장 없이 역을 연기한다는 결론에 방점을 찍었을 것",
+      "sourcePages": [
+        167
+      ],
+      "highlightID": "0701BF44-0016-483E-AA9E-9354FB1EEDE0",
+      "display": {
+        "badge": "서술자 · 확신",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "sentence",
+      "parentID": "n1",
+      "position": 1,
+      "name": "그렇게 아직 어린아이였을 적에 나는 우물 속으로 뛰어들 뻔 했다. 어른이 되어서도 나는 여전히 '영원'이란 말 속으로 뛰어들려는 위험에 빠지곤 한다. '에로스' '희망' '조국' '하느님'과 같은 말들도 마찬가지로 나를 위험에 빠뜨린다. 해마다 나는 그런 위험에서 겨우 벗어나서 앞으로 나아가는 것처럼 느꼈다. 하지만 나는 조금도 앞으로 나아가지 못했다. 단지 말만 바꾸었을 뿐이다. 그리고 나는 그걸 구원이라고 불렀다. \n...조르바 덕분에, 이것이 마지막 우물이요, 마지막 낱말이다.",
+      "gloss": "'영원' 같은 말들 속으로 도피해온 자기 패턴을 조르바 덕에 알아챈 자백",
+      "sourcePages": [
+        308
+      ],
+      "highlightID": "DFA6037C-7C4F-42D6-98F2-15296A014337",
+      "display": {
+        "badge": "서술자 · 체념 섞인 안도",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "sentence",
+      "parentID": "n1",
+      "position": 2,
+      "name": "나는 등잔불을 끄고 침대에 누웠다. 그리고 언제나처럼 나의 나쁜 습관에 따라, 또다시 현실로부터 피와 살과 뼈를 다 제거하여 현실을 추상 개념으로 바꾼 뒤, '이미 일어난 일들은 일어날 수밖에 없는 필연성에 의해 일어난 것'이라는 끔찍한 결론에 도달할 때까지 그 개념들을 아주 보편적인 법칙과 연결시킴으로써 현실에서 도망쳤다. 이미 일어난 일들은 그렇게 되기로 결정되어 있던 이 세상의 리듬 속이서 일어난 것이고, 그런 일이 일어남으로써 세상은 더 큰 조화를 이룬다. 이런 식으로 나는 이미 일어난 일은 그렇게 돼야만 했던 필연성에 의해 일어난 일일 뿐 아니라, 마땅히 그렇게 돼야 했기에 일어난 거라는 혐오스러운 위안에 도달했다.\n..\n이제 나는 과부에게로 되돌아와서, 그녀가 위대한 법칙에 복종하여 그녀의 살해자들과 화해하고, 이제는 고요하고 성스러운 부동의 세계에 안주했음을 발견한다.\n  시간은 나의 내면에서 자신의 진실한 모습을 드러냈다. 과부는 이미 수천 년 전에 죽었고, 에게 해 문명 시대 크로노스 궁전의 갈색머리 소녀들은 오늘 아침에 죽었다.",
+      "gloss": "현실을 추상화해 도피하는 자신의 '나쁜 습관'을 스스로 혐오스럽다고 명명한 자기고백",
+      "sourcePages": [
+        432
+      ],
+      "highlightID": "F841B714-DD6E-4FEC-8249-925F1C73004E",
+      "display": {
+        "badge": "서술자 · 혐오",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "sentence",
+      "parentID": "n1",
+      "position": 3,
+      "name": "나는 아무 말도 하지 않았다. 그 무엇이 꼭 필요한 것이라면 \"네!\"라고 대답하라. 무언가를 피할 수 없다면, 너의 자유의지에 따른 행동으로 그것의 본질을 변화시켜라! 아마도 이것만이 우리 인간에게 주어진 유일한 구원의 길일지 모른다. 나는 그것을 잘 알고 있었다. 그래서 아무 말도 하지 않았다.",
+      "gloss": "피할 수 없다면 자유의지로 본질을 바꾸라는 문장이 구원의 유일한 길로 제시됨",
+      "sourcePages": [
+        470
+      ],
+      "highlightID": "E3196CDE-627A-4368-BA8C-CB1EA0B7E62E",
+      "display": {
+        "badge": "서술자 · 체념",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "concept",
+      "parentID": "root",
+      "position": 1,
+      "name": "조르바라는 인간",
+      "gloss": "몸으로 세상을 겪고 먼지를 털어내며 자유로워지는 조르바의 말과 행동이 화자를 가장 강하게 뒤흔든다.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": {
+        "badge": null,
+        "emphasis": "high"
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "sentence",
+      "parentID": "n6",
+      "position": 0,
+      "name": "\"그런데 왜 그랬어요?\"\n\"아이구, 계속 앉아서 묻기만 하는군요. 그냥 그러고 싶었을 뿐이에요. 됐어요? 방앗간 마누라 엉덩이에서 철자법을 찾는군요. 방앗간 마누라의 엉덩이는 인간의 정신이에요.\"",
+      "gloss": "이유를 캐묻는 지식인적 태도에 '엉덩이가 인간의 정신'이라는 직설로 맞받는 통쾌함",
+      "sourcePages": [
+        30
+      ],
+      "highlightID": "4937D55C-1B38-48C7-817B-783AFF0ADA9F",
+      "display": {
+        "badge": "조르바 · 단호함",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "sentence",
+      "parentID": "n6",
+      "position": 1,
+      "name": "하지만 나는 조르바에게 다른 대답을 해보려고 애썼다.\n\"어떻게 똥과 더러운 것들로부터 한 송이 꽃이 싹이 나고 자라나죠? 조르바, 인간이 똥이고 자유가 꽃이라고 생각해봐요.\"\n\"하지만 씨앗은요?\" 조르바가 주먹으로 탁자를 치며 이렇게 되물었다. \"꽃 한 송이를 피우기 위하서는 씨앗이 필요하죠. 누가 그런 씨앗을 우리들의 더러운 창자 속에 집어넣은 거죠? 그리고 왜 이 씨앗이 남에 대한 배려와 정직으로는 꽃피우지 못하고 피와 더러운 것들을 필요로 하는 거죠?\"",
+      "gloss": "인간을 똥, 자유를 꽃에 비유한 화자의 관념론에 '씨앗은요?'라고 되묻는 조르바의 반박이 인상적이었을 것",
+      "sourcePages": [
+        49
+      ],
+      "highlightID": "89C65162-6F66-4FBB-B218-211741A3FB89",
+      "display": {
+        "badge": "조르바 · 반박",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "sentence",
+      "parentID": "n6",
+      "position": 2,
+      "name": "그게 자유라는 거로군. 나는 생각에 잠겼다. 금화를 탐내는 탐욕과 갑자기 그 탐욕을 버리고 자기가 가지고 있던 모든 걸 공중에 뿌리는 게 자유로군!\n자신의 욕망에서 자유로워져서, 더 높은 욕망에 따르는 것..... 하지만 하나의 이상을 위해, 민족을 위해, 하느님을 위해 자신을 희생하는 것, 이것 역시 노예근성이 아닐까? 아니면 혹시 주인이 높은 곳에 있을수록 우리 노예들의 사슬은 길어지고, 그러면 우리는 더 높이 뛰어야 하고, 훨씬 더 넓응 마당울 뛰어다니다가 끝내 아무것도 알아내지 못한 채 죽어갈 텐데, 이런 걸 자유라고 하나?",
+      "gloss": "조르바의 돈 뿌리는 행동을 보고 자유의 정의를 스스로 되묻는 지적 동요",
+      "sourcePages": [
+        52
+      ],
+      "highlightID": "7DBDB73D-04C8-4817-860D-44F1D44B2406",
+      "display": {
+        "badge": "서술자 · 의문",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n10",
+      "kind": "sentence",
+      "parentID": "n6",
+      "position": 3,
+      "name": "아프리카의 원시 부족들은 뱀을 숭배한다. 왜냐하면 뱀은 온몸을 땅에 붙이고 기어 다니기에 대지의 비밀을 다 알고 있다고 믿기 때문이다. 뱀은 배로, 꼬리로, 남근으로, 머리로 그 비밀들을 캐낸다. 조르바도 그렇다. 우리 지식인들은 공중에 떠 있는 바보 같은 새들일 뿐이다.'",
+      "gloss": "뱀(조르바)과 새(지식인)의 대비로 자신을 '공중에 뜬 바보'라 낮추는 자기비판",
+      "sourcePages": [
+        118
+      ],
+      "highlightID": "93C2BC34-E380-4041-87EF-FFB4C6817489",
+      "display": {
+        "badge": "서술자 · 자조",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n11",
+      "kind": "sentence",
+      "parentID": "n6",
+      "position": 4,
+      "name": "대장, 사람들을 좀 조용히 내버려두쇼. 그들이 그런 일에 눈뜨게 하지 말아요. 그들이 눈을 뜨면 보게 될 게 뭐겠어요? 자신들의 불행과 처참함뿐이죠! 사람들이 눈이 먼 채 꿈을 꾸도록 내버려둬요!\"\n그가 잠깐 말을 멈추고는 생각에 잠겨 머리를 긁다가 말을 이었다.\n\"만약에..... 만약에 말이에요......\"\n\"뭐에요? 한번 들어봅시다.\"\n\"만약에 그들이 눈을 떴을 때 대장이 보다 더 좋은 세상을 보여줄 수 있다면 말입니다...... 그럴 자신이 있나요?\"\n나로서는 알 길이 없었다. 나는 어떤 것들이 무너져 내리리라는 것은 잘 알고 있었지만 그 폐허 위에 어떤 것이 세워질지는 알지 못했다.\n..\n\"당신에게는 얘기할 수 없어요. 아마 이해하지 못할 거예요.\"\n\"참, 그렇다면 보여줄 수 없는 거예요!\" 조르바가 머리를 저으며 대꾸했다. \"대장, 내가 뭘 잘못 먹어 바보가 된 줄 아쇼? 대장은 속은 거예요. 나 역시 아나그노티스 영감과 마찬가지로 배운 게 없는 무식쟁이지만 난 결코 그정도로 바보는 아녜요. 내가 이해하지 못하는 걸 그 순진한 인간과 그의 평생 반려자인 순한 마누라가 이해하겠소?\"",
+      "gloss": "눈뜨게 하지 말라는 조르바의 말에서 앎과 행복 중 무엇이 나은가 하는 질문을 얻었을 것",
+      "sourcePages": [
+        116
+      ],
+      "highlightID": "A7068377-C8E5-4DD8-B2E9-8CB5B1A4B142",
+      "display": {
+        "badge": "조르바 · 염려",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n12",
+      "kind": "sentence",
+      "parentID": "n6",
+      "position": 5,
+      "name": "\"이봐요, 조르바! 당신이 직접 쓰지 그래요? 당신이 알고 있는 이 세상의 모든 신비에 대해 왜 이야기해주지 않는 거죠?\"\n   \"왜냐고요? 왜냐고 묻는 거요? 나는 이 세상의 모든 신비스러운 일을 몸소 다 겪어봤지만 시간이 없수다. 한번은 이 세상을, 다른 때는 여자를, 또 언젠가는 산투리를 직접 겪어봤지만 그런 허튼소리를 쓰기 위해 펜대를 잡을 시간은 없수다. 그런 시간을 낼 수 있는 작자들은 그런 신비를 겪지 못하고요. 알아듣겠수?\"",
+      "gloss": "신비를 몸소 겪는 자는 그걸 쓸 시간이 없다는 조르바의 반전 논리에 밑줄",
+      "sourcePages": [
+        380
+      ],
+      "highlightID": "881E37B2-BA7D-4749-9B76-D69B55F1007D",
+      "display": {
+        "badge": "조르바 · 통쾌함",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n13",
+      "kind": "sentence",
+      "parentID": "n6",
+      "position": 6,
+      "name": "\"조국으로부터 벗어나고, 신부들로부터 벗어나고, 돈으로부터 벗어나고, 탈탈 먼지를 털었죠. 세월이 흐를수록 난 먼지를 털어냅니다. 그리고 가벼워집니다. 뭐라고 말씀드려야 할까요? 난 자유로워지고, 사람이 돼갑니다.\"",
+      "gloss": "조국·신부·돈에서 벗어나 가벼워진다는 조르바의 자기선언이 자유의 정의로 와닿았을 것",
+      "sourcePages": [
+        393
+      ],
+      "highlightID": "6D6D7BFE-AF2A-4AC0-97C2-74B41E8B2AE0",
+      "display": {
+        "badge": "조르바 · 해방감",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n14",
+      "kind": "sentence",
+      "parentID": "n6",
+      "position": 7,
+      "name": "나는 창피해서 입을 다물었다. 그리고 조르바가 느끼고 있는 고통을 부러워하며 '슬플 때는 진심에서 흘러나오는 굵은 눈물방울을 흘리고, 기쁠 때는 그 기쁨을 아주 가는 추상적인 체로 거르노라 망치지 않는, 뜨거운 피와 단단한 뼈를 가진 인간, 이 사람이야말로 진정한 인간이다!'라고 속으로 생각했다.",
+      "gloss": "슬픔과 기쁨을 여과 없이 느끼는 조르바를 '진정한 인간'이라 부르며 자신의 결핍을 인정",
+      "sourcePages": [
+        434
+      ],
+      "highlightID": "81A9C43D-0413-478D-A2CC-ABC8514AD9C8",
+      "display": {
+        "badge": "서술자 · 부러움",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n15",
+      "kind": "concept",
+      "parentID": "root",
+      "position": 2,
+      "name": "처음인 듯 보는 눈",
+      "gloss": "세상을 상형문자처럼 새로 읽어내는 감각이 조르바의 말과 자연 체험을 통해 반복된다.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n16",
+      "kind": "sentence",
+      "parentID": "n15",
+      "position": 0,
+      "name": "세상의 모든 것에는 숨겨진 의미가 있다는 생각이 들었다. 사람, 짐승, 나무, 별, 모든 것이 상형문자가. 그것을 읽어내고 무슨 말을 하는지 알아내기 시작한 사람에게 그것은 기쁨일 것이다. 하지만 그것들을 보는 순간에도 우리는 그 의미를 이해하지 못한다. 너는 그것들이 사람이고, 짐승이고, 나무고, 별이라고 생각한다. 그리고 세월이 많이 지난 뒤에야 너무 늦게 그것들의 의미를 깨닫는다.",
+      "gloss": "세상 만물이 상형문자라는 발상, 뒤늦게야 의미를 깨닫는다는 데서 오는 아쉬움 섞인 통찰",
+      "sourcePages": [
+        88
+      ],
+      "highlightID": "7FC60E5C-7EF2-4EC2-B339-640B9A62DA08",
+      "display": {
+        "badge": "서술자 · 경이",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n17",
+      "kind": "sentence",
+      "parentID": "n15",
+      "position": 1,
+      "name": "조르바의 말을 들으면 온 세상이 처녀성을 회복한다. 모든 일상의 것들, 빛바랬던 것들이 하느님의 손을 처음으로 벗어나던 때처럼 다시 빛나기 시작했다. 강과 바다도, 여자도, 별도, 빵도, 모두 태초의 신비스러운 근원으로 되돌아가고, 하늘에서는 하느님의 수레바퀴가 원초적 힘을 되찾곤 했다.",
+      "gloss": "조르바의 말이 세상의 처녀성을 회복시킨다는 표현의 신선함",
+      "sourcePages": [
+        99
+      ],
+      "highlightID": "620D2F1A-099C-4747-A482-DCEB2B37B337",
+      "display": {
+        "badge": "서술자 · 경이",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n18",
+      "kind": "sentence",
+      "parentID": "n15",
+      "position": 2,
+      "name": "\"대장, 봤어요? 돌들은 내리막길에서 다시 생명을 얻어 살아납니다!\"\n나는 아무 말도 하지 않았지만 커다란 기쁨을 느꼈다. 위대한 예언자들이나 시인들은 이와 비슷하게 모든 것을 처음인 듯 보고 느낀다. 매일 아침 자신들 앞에 새로운 세상이 시작되는 것을 본다. 새로운 세상이 안 보이면 스스로 새로운 세상을 창조한다.",
+      "gloss": "돌이 다시 살아난다는 조르바의 감탄과, 새 세상을 스스로 창조한다는 예언자적 태도에 대한 공감",
+      "sourcePages": [
+        243
+      ],
+      "highlightID": "0AF04322-2071-4CD9-977E-2B21AD994163",
+      "display": {
+        "badge": "서술자 · 기쁨",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n19",
+      "kind": "concept",
+      "parentID": "root",
+      "position": 3,
+      "name": "자유로워지는 몸",
+      "gloss": "정신이 파도·바람과 하나 되어 근심을 벗어던지는 신체적 해방감의 순간들.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n20",
+      "kind": "sentence",
+      "parentID": "n19",
+      "position": 0,
+      "name": "나는 기운이 넘쳤고, 상쾌했고, 내 몸은 내 마음을 잘 따르고 있었다. 파도를 좇던 내 정신은 파도가 되어 바다에 저항하지 않고 그 리듬에 맞춰 춤을 추었다.",
+      "gloss": "몸과 마음이 일치해 파도와 함께 춤추는 감각적 해방의 순간",
+      "sourcePages": [
+        66
+      ],
+      "highlightID": "30DDC6DD-EC3B-440D-BC82-F22DF1BAF55F",
+      "display": {
+        "badge": "서술자 · 경쾌함",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n21",
+      "kind": "sentence",
+      "parentID": "n19",
+      "position": 1,
+      "name": "근심이들이 뿔뿔이 사라지고, 경박한 걱정들은 멀리 도망쳤으며, 영혼은 정상에 우뚝 섰다. 롤라나 갈탄, 공중 케이블, '영원', 사소하거나 심각한 걱정들, 이 모두가 파르스름함 연기가 되어 날아가고, 오직 하나, 강철로 된 새 한 마리, 인간의 영혼만이 남아 노래하고 있었다.",
+      "gloss": "온갖 걱정이 연기처럼 사라지고 영혼만 남아 노래한다는 절정의 해방 이미지",
+      "sourcePages": [
+        316
+      ],
+      "highlightID": "35E34C3D-C937-4BA4-8F67-896609F3A2E9",
+      "display": {
+        "badge": "서술자 · 고양감",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n22",
+      "kind": "concept",
+      "parentID": "root",
+      "position": 4,
+      "name": "죽음을 마주한 삶",
+      "gloss": "죽음을 의식하는 것과 의식하지 않는 것이 결국 같다는 역설, 폐허 앞에서의 무지의 인정.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n23",
+      "kind": "sentence",
+      "parentID": "n22",
+      "position": 0,
+      "name": "죽음이 없다는 듯이 행동하는 것과 매 순간 죽음을 생각하면서 행동하는 것은 어쩌면 같은 것일지도 모른다.",
+      "gloss": "죽음 무시와 죽음 의식이 같은 것일 수 있다는 역설적 통찰",
+      "sourcePages": [
+        70
+      ],
+      "highlightID": "240B7E5D-A281-414E-81B4-F00E31849EA3",
+      "display": {
+        "badge": "서술자 · 초연함",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n24",
+      "kind": "sentence",
+      "parentID": "n22",
+      "position": 1,
+      "name": "그런데 당신은 이 폐허에서 뭘 찾고 있는거요?\"\n\"난 고대 유적지를 찾고 있어요.\"\n\"그래서 뭘 알게 됐소?\"\n\"아무것도 모르겠어요.\"\n\"나도 아무것도 몰라요. 그들은 죽었고, 우린 살아있죠. 어이, 이제 잘 가슈!\"",
+      "gloss": "유적지에서도 아무것도 모른다는 대답, 죽은 자와 산 자를 가르는 담담한 작별 인사",
+      "sourcePages": [
+        296
+      ],
+      "highlightID": "EAD97BA6-F93D-4F3E-A2D9-50CDF75BF22B",
+      "display": {
+        "badge": "미상 · 허무",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n25",
+      "kind": "concept",
+      "parentID": "root",
+      "position": 5,
+      "name": "가슴에 남은 그리움",
+      "gloss": "슬픔의 관능적 쾌감과 몸 크기만 한 행복이라는 자기 척도에 대한 성찰.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n26",
+      "kind": "sentence",
+      "parentID": "n25",
+      "position": 0,
+      "name": "이슬비가 내리는 이 슬픈 시간은 마치 나비 같은 우리의 영혼이 비에 젖고, 끝내 파묻히고 마는 비장한 관능적 쾌감을 주는 시간이다. 이럴 때면 마음속 깊숙이에 쌓여 있던, 친구와의 이별, 잊힌 여인의 미소 같은 온갖 가슴 아픈 추억들과, 날개를 잃고 다시 애벌레가 되어 우리의 심장을 기어다니머 심장의 이파리들을 먹어치우는 나비를 닮은 희망들이 떠오른다.",
+      "gloss": "이슬비 속에서 옛 추억과 희망이 애벌레처럼 되살아나는 비장한 관능적 슬픔",
+      "sourcePages": [
+        164
+      ],
+      "highlightID": "804987DF-D687-43D6-B797-E05CB0436230",
+      "display": {
+        "badge": "서술자 · 그리움",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n27",
+      "kind": "sentence",
+      "parentID": "n25",
+      "position": 1,
+      "name": "공자는 \"많은 사람들이 자기보다 더 크거나 작은 행복을 바란다. 하지만 행복은 그 사람의 몸 크기만 하다\"라고 말했지.",
+      "gloss": "내 생각 메모에서 확인되듯, 자기 몸(행복)의 크기가 계속 변한다는 데 대한 조바심",
+      "sourcePages": [
+        166
+      ],
+      "highlightID": "853B9637-F73C-475B-BAAF-E763F42F74BD",
+      "display": {
+        "badge": "서술자 · 불안",
+        "emphasis": null
+      }
+    },
+    {
+      "id": "n28",
+      "kind": "sentence",
+      "parentID": "root",
+      "position": 6,
+      "name": "선생들은 자신의 제자들로부터 배울 점을 최대한 이끌어내도록 노력해야 하지. 젊음이 어디를 향해 나아가는지 알아내고, 그들의 영혼 역시 그 방향으로 향하도록 인도해야 하지. 그렇게 제자들의 가르침을 따라 나는 이곳 크레타에 도착했어.",
+      "gloss": "제자에게서 배운다는 사제 관계의 역전이 자신이 크레타에 온 이유로 연결됨",
+      "sourcePages": [
+        165
+      ],
+      "highlightID": "3EE2FC2B-4354-40F1-808F-03F8DA4FFC01",
+      "display": {
+        "badge": "서술자 · 성찰",
+        "emphasis": null
+      }
+    }
+  ]
+}
