@@ -28,7 +28,7 @@ import { claudeCliTransport } from './lib/claudeCliTransport.mjs';
 const IOS_LIB = '/Users/1522684/Developer/booktracking-ios/functions/lib';
 const { buildLitPrompt } = await import(`${IOS_LIB}/ingestLit.js`);
 const { buildPrompt, toTreeNodes } = await import(`${IOS_LIB}/ingest.js`);
-const { buildAssimPrompt, applyPlacements, needsReorg, reorgAnchorBlock } = await import(`${IOS_LIB}/ingestAssim.js`);
+const { buildAssimPrompt, applyPlacements } = await import(`${IOS_LIB}/ingestAssim.js`);
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const N = (s) => String(s || '').normalize('NFC');
@@ -150,52 +150,16 @@ async function assimPass(passNo) {
 
   for (let i = BOOT; i < kase.memos.length; i += CHUNK) {
     const chunk = kase.memos.slice(i, i + CHUNK);
+    // v2 (0827): 소네트 1콜 — 헌장 기반 판정. 다수결·에스컬레이션·자동 재구성 없음.
     const prompt = buildAssimPrompt(kase.title, GENRE, nodes, chunk);
-    // 다수결: 같은 판정을 VOTES회 받아 문장별 target 과반을 택한다.
-    // 부가 속성(화자·정서·resonance)은 당선 target 을 낸 표에서 가져온다.
-    const ballots = [];
-    for (let v = 0; v < VOTES; v++) {
-      assimCalls++;
-      try { ballots.push(JSON.parse(await small(prompt)).placements || []); }
-      catch (e) { log.push(`[assim] 표 ${v + 1} 파싱 실패 (${e.message.slice(0, 60)})`); }
-    }
-    const placements = [];
-    for (const m of chunk) {
-      const votes = ballots.map((b) => b.find((x) => x.memoId === m.id)).filter(Boolean);
-      const tally = new Map();
-      for (const v of votes) tally.set(v.target, (tally.get(v.target) || 0) + 1);
-      const [winner, count] = [...tally.entries()].sort((a, b) => b[1] - a[1])[0] ?? [null, 0];
-      if (winner != null && count > VOTES / 2) {
-        const rep = votes.find((v) => v.target === winner);
-        placements.push({ ...rep, confidence: Math.max(rep.confidence ?? 0, count / VOTES) });
-      }
-      // 과반 없으면 placements 에 안 넣는다 → 아래 weak 로 떨어져 소네트 에스컬레이션
-    }
-
-    // 과반 실패·저확신 문장은 소네트 재판정
-    const weak = chunk.filter((m) => {
-      const p = placements.find((x) => x.memoId === m.id);
-      return !p || (p.confidence ?? 0) < ESCALATE_BELOW;
-    });
-    if (weak.length) {
-      escalations += weak.length;
-      try {
-        const rej = JSON.parse(await esc(buildAssimPrompt(kase.title, GENRE, nodes, weak))).placements || [];
-        placements = placements.filter((p) => !weak.some((w) => w.id === p.memoId)).concat(rej);
-      } catch { /* 재판정도 실패하면 원 판정/ROOT 로 */ }
-    }
-    // 판정이 아예 없는 문장은 ROOT 보류 (잔류 0 보장 — 소속은 있되 뿌리 직속)
+    assimCalls++;
+    let placements = [];
+    try { placements = JSON.parse(await esc(prompt)).placements || []; }
+    catch (e) { log.push(`[assim] 판정 파싱 실패 (${e.message.slice(0, 60)})`); }
     for (const m of chunk) if (!placements.some((p) => p.memoId === m.id))
-      placements.push({ memoId: m.id, target: 'ROOT', confidence: 0 });
-
-    applyPlacements(nodes, placements, memoByID, GENRE);
-
-    if (needsReorg(nodes)) {
-      reorgs++;
-      const soFar = kase.memos.slice(0, i + CHUNK);
-      log.push(`[reorg] 문턱 도달 — 앵커 빅콜 재구성 (${soFar.length}건)`);
-      nodes = parseBig(await big({ user: buildBig(soFar) + reorgAnchorBlock(nodes) }), soFar);
-    }
+      placements.push({ memoId: m.id, target: 'ROOT' });
+    const { added, newAxes } = applyPlacements(nodes, placements, memoByID, GENRE);
+    for (const a of newAxes) log.push(`[assim] NEW 축 「${a.name}」`);
   }
   const placed = new Set(nodes.filter((n) => n.kind === 'sentence' && n.highlightID).map((n) => n.highlightID));
   const missing = kase.memos.filter((m) => !placed.has(m.id));
@@ -209,10 +173,13 @@ async function assimPass(passNo) {
   return { nodes, log, groups, stats: { assimCalls, escalations, reorgs, covered: placed.size, missing: missing.map((m) => m.id), rootStray } };
 }
 
-// 기준선: 전량 빅콜 1회
-console.log('[batch] 전량 빅콜 기준선…');
-const batchNodes = parseBig(await big({ user: buildBig(kase.memos) }), kase.memos);
-const batchPairs = topPairs(batchNodes);
+// 기준선: 전량 빅콜 1회 (SKIP_BATCH=1 이면 생략 — CLI 간헐 실패 시 동화만 검증)
+let batchNodes = [], batchPairs = new Set();
+if (process.env.SKIP_BATCH !== '1') {
+  console.log('[batch] 전량 빅콜 기준선…');
+  batchNodes = parseBig(await big({ user: buildBig(kase.memos) }), kase.memos);
+  batchPairs = topPairs(batchNodes);
+}
 
 const passes = [];
 for (let r = 1; r <= REPEAT; r++) passes.push(await assimPass(r));
