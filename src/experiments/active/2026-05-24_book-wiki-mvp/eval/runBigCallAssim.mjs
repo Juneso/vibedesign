@@ -63,8 +63,10 @@ async function loadCase() {
         const rich = c.richMeta
           ? [(c.richMeta.toc || []).join('\n'), c.richMeta.bookIntro, c.richMeta.inBook].filter((s) => s && s.trim())
           : [];
+        // 서버(index.js)와 같은 짧은 별칭 — 긴 UUID 를 모델이 echo 하다 깨뜨려
+        // 원문 복원이 실패, 빈 잎이 남았다 (richboot 실측 0831)
         return { title: nrmT(c.book.title), rich, memos: c.book.memos.map((m, i) => ({
-          id: m.id || `m${i}`, text: m.text, page: m.p ?? null,
+          id: `m${i + 1}`, text: m.text, page: m.p ?? null,
           thoughts: m.myThought ? [m.myThought] : [],
         })) };
       }
