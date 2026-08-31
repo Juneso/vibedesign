@@ -1,0 +1,50 @@
+{
+  "label": "bigcall-effort-0831-low-vs-medium",
+  "runAt": "2026-08-31T02:38:17.689Z",
+  "book": "피로사회",
+  "nMemos": 25,
+  "promptChars": 13499,
+  "results": [
+    {
+      "effort": "low",
+      "run": 1,
+      "sec": 119.8,
+      "usage": {
+        "model": "claude-sonnet-5",
+        "ms": 119846,
+        "apiMs": 112670,
+        "inputTokens": 2,
+        "outputTokens": 10132,
+        "cacheReadTokens": 0,
+        "costUsd": 0.370076
+      },
+      "error": "Unexpected non-whitespace character after JSON at position 4023 (line 1 column 4024)",
+      "shape": null
+    },
+    {
+      "effort": "medium",
+      "run": 1,
+      "sec": 323.3,
+      "usage": {
+        "model": "claude-sonnet-5",
+        "ms": 323341,
+        "apiMs": 315820,
+        "inputTokens": 8,
+        "outputTokens": 27658,
+        "cacheReadTokens": 269915,
+        "costUsd": 0.5997589999999999
+      },
+      "error": null,
+      "shape": {
+        "root": 3,
+        "concepts": 13,
+        "sentences": 28,
+        "maxDepth": 4,
+        "glossMissing": 0,
+        "contrasts": 6,
+        "placedMemos": 25,
+        "thesis": true
+      }
+    }
+  ]
+}

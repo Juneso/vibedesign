@@ -14,12 +14,18 @@ import { spawn } from 'node:child_process';
 // MAX_THINKING_TOKENS=0 이 정답 — m18 150초/16k → m11 21초/1.3k, 판정 품질도
 // 오히려 개선(과잉 사고가 표제어 추상화를 유발했음: 짜증이 분노에서 분리됨).
 // lift·배정은 고정 어휘에서 고르고 슬롯을 채우는 폐쇄 판정이라 생각이 필요 없다.
-export function claudeCliTransport({ model = 'claude-haiku-4-5-20251001', bin = 'claude', timeoutMs = 300000, onUsage, retries = 2, maxThinkingTokens = 0 } = {}) {
+// effort: 서버 빅콜의 output_config.effort 대응 (CLI --effort). 사고량을 effort 로
+// 조절하는 실험에서는 maxThinkingTokens: null 로 넘겨 위 0 강제를 풀어야 한다 —
+// 0 이 걸린 채면 effort 는 잴 것이 없다.
+export function claudeCliTransport({ model = 'claude-haiku-4-5-20251001', bin = 'claude', timeoutMs = 300000, onUsage, retries = 2, maxThinkingTokens = 0, effort } = {}) {
   const once = ({ system, user }) => new Promise((resolveP, rejectP) => {
     const args = ['-p', '--output-format', 'json', '--model', model];
+    if (effort) args.push('--effort', effort);
     if (system) args.push('--system-prompt', system);
     const t0 = Date.now();
-    const child = spawn(bin, args, { stdio: ['pipe', 'pipe', 'pipe'], env: { ...process.env, MAX_THINKING_TOKENS: String(maxThinkingTokens) } });
+    const env = { ...process.env };
+    if (maxThinkingTokens != null) env.MAX_THINKING_TOKENS = String(maxThinkingTokens);
+    const child = spawn(bin, args, { stdio: ['pipe', 'pipe', 'pipe'], env });
     const timer = setTimeout(() => { child.kill('SIGKILL'); rejectP(new Error(`claude -p 타임아웃 ${timeoutMs}ms`)); }, timeoutMs);
     let out = '', err = '';
     child.stdout.on('data', (d) => { out += d; });

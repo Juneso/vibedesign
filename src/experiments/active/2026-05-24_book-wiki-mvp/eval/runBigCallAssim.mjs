@@ -150,16 +150,24 @@ async function assimPass(passNo) {
 
   for (let i = BOOT; i < kase.memos.length; i += CHUNK) {
     const chunk = kase.memos.slice(i, i + CHUNK);
-    // v2 (0827): 소네트 1콜 — 헌장 기반 판정. 다수결·에스컬레이션·자동 재구성 없음.
+    // v3 (0831): 비문학은 트리 전체 제시 + 어느 자리든 배치 + 갈래 국소 재편(regroup).
     const prompt = buildAssimPrompt(kase.title, GENRE, nodes, chunk);
     assimCalls++;
     let placements = [];
-    try { placements = JSON.parse(await esc(prompt)).placements || []; }
-    catch (e) { log.push(`[assim] 판정 파싱 실패 (${e.message.slice(0, 60)})`); }
+    let regroup = null;
+    try {
+      const parsed = JSON.parse(await esc(prompt));
+      placements = parsed.placements || [];
+      regroup = parsed.regroup || null;
+    } catch (e) { log.push(`[assim] 판정 파싱 실패 (${e.message.slice(0, 60)})`); }
     for (const m of chunk) if (!placements.some((p) => p.memoId === m.id))
       placements.push({ memoId: m.id, target: 'ROOT' });
-    const { added, newAxes } = applyPlacements(nodes, placements, memoByID, GENRE);
+    const { added, newAxes, regrouped } = applyPlacements(nodes, { placements, regroup }, memoByID, GENRE);
     for (const a of newAxes) log.push(`[assim] NEW 축 「${a.name}」`);
+    if (regrouped) {
+      reorgs++;
+      log.push(`[assim] 재편 「${regrouped.axis.name}」 → 하위 ${regrouped.newConcepts.map((c) => c.name).join('·')} · 이동 ${regrouped.moved.length}`);
+    }
   }
   const placed = new Set(nodes.filter((n) => n.kind === 'sentence' && n.highlightID).map((n) => n.highlightID));
   const missing = kase.memos.filter((m) => !placed.has(m.id));

@@ -1,0 +1,59 @@
+{
+  "label": "bigcall-effort-0831-low-retry",
+  "runAt": "2026-08-31T02:46:48.367Z",
+  "book": "피로사회",
+  "nMemos": 25,
+  "promptChars": 13499,
+  "results": [
+    {
+      "effort": "low",
+      "run": 1,
+      "sec": 262.2,
+      "usage": {
+        "model": "claude-sonnet-5",
+        "ms": 262237,
+        "apiMs": 254942,
+        "inputTokens": 6,
+        "outputTokens": 23894,
+        "cacheReadTokens": 173605,
+        "costUsd": 0.5015890000000001
+      },
+      "error": null,
+      "shape": {
+        "root": 7,
+        "concepts": 13,
+        "sentences": 25,
+        "maxDepth": 4,
+        "glossMissing": 0,
+        "contrasts": 5,
+        "placedMemos": 25,
+        "thesis": true
+      }
+    },
+    {
+      "effort": "low",
+      "run": 2,
+      "sec": 222.6,
+      "usage": {
+        "model": "claude-sonnet-5",
+        "ms": 222590,
+        "apiMs": 211757,
+        "inputTokens": 8,
+        "outputTokens": 18299,
+        "cacheReadTokens": 254617,
+        "costUsd": 0.44110140000000003
+      },
+      "error": null,
+      "shape": {
+        "root": 4,
+        "concepts": 16,
+        "sentences": 25,
+        "maxDepth": 4,
+        "glossMissing": 0,
+        "contrasts": 6,
+        "placedMemos": 25,
+        "thesis": true
+      }
+    }
+  ]
+}

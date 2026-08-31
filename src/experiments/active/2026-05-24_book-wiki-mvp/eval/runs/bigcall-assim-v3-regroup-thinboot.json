@@ -1,0 +1,1173 @@
+{
+  "label": "bigcall-assim-v3-regroup-thinboot",
+  "runAt": "2026-08-31T06:36:53.999Z",
+  "book": "피로사회",
+  "genre": "nonfic",
+  "config": {
+    "BOOT": 3,
+    "CHUNK": 6,
+    "REPEAT": 1,
+    "MAX_ROOT_AXES": 10,
+    "ESCALATE_BELOW": 0.6
+  },
+  "metrics": {
+    "vsBatchJaccard": [
+      37.1
+    ],
+    "amongPassesJaccard": [],
+    "totalCostUsd": 1.0509
+  },
+  "passes": [
+    {
+      "stats": {
+        "assimCalls": 4,
+        "escalations": 0,
+        "reorgs": 2,
+        "covered": 25,
+        "missing": [],
+        "rootStray": 2
+      },
+      "groups": {
+        "340856AC-DECB-4993-933E-7FDF9266B819": "시대마다 다른 질병",
+        "836587B5-ADEF-461D-A1EF-F3F6937634FE": "부정성의 사회",
+        "FBA46380-15A6-466D-A949-BB0BE04AE108": "긍정성의 사회",
+        "0425D2A0-AEE2-4731-A15D-26BB459348DF": "긍정성의 사회",
+        "10285092-72BC-4BAC-B02E-0324477DB26C": "긍정성의 사회",
+        "24039FAF-2F3E-4CB0-B25E-117C6DC28DD0": "(보류)",
+        "247D31AF-752B-4C53-B175-DDBF18199666": "부정성의 사회",
+        "25FCF24F-DA0C-4453-A952-8E45C2C8FFDA": "긍정성의 사회",
+        "36F8CB94-7E16-4FFA-8770-7E8EC41F8FC1": "긍정성의 사회",
+        "3CEFDCC7-2595-49FD-A103-623CDAFA98D2": "긍정성의 사회",
+        "3EAB5710-A7ED-45B9-8F60-D72AFCFD9AD2": "(보류)",
+        "43430DE7-1626-4298-942A-641750516162": "긍정성의 사회",
+        "449C5952-E9DE-44FE-A2D5-671CA3F5D7E0": "긍정성의 사회",
+        "4BCD7912-34C9-4F25-AF74-8302DC9F027B": "긍정성의 사회",
+        "5F3556EF-E9A8-4C2C-942F-5C910921EE9C": "긍정성의 사회",
+        "641D6E36-74F6-4358-9CAE-0FEE73438B27": "긍정성의 사회",
+        "69E98193-2D05-4768-B8C4-C25D5825BA8D": "긍정성의 사회",
+        "790A6AA0-870C-4035-8861-32E794BACEE9": "긍정성의 사회",
+        "7989D2B0-677D-4AD7-9B72-512DFF74FDE5": "긍정성의 사회",
+        "BDD673D6-EA2D-4BB6-82C2-921065126A85": "긍정성의 사회",
+        "C2BF2FAF-0956-4329-902D-E2521E250A30": "긍정성의 사회",
+        "DA1FE62D-63AE-4180-8A9D-71C90B0BE81D": "긍정성의 사회",
+        "E5267015-3154-4F1F-9ABB-9575B6A65CC3": "부정성의 사회",
+        "E5C9CB07-B3D5-4BC7-9FC8-BF90D96563CE": "긍정성의 사회",
+        "FA74901A-7630-4F0C-AD8C-28C3A4179D02": "부정성의 사회"
+      },
+      "log": [
+        "[boot] 빅콜 3건",
+        "[assim] NEW 축 「우울증과 유대의 상실」",
+        "[assim] NEW 축 「사유의 중단 상실」",
+        "[assim] NEW 축 「자기 착취의 효율성」",
+        "[assim] 재편 「긍정성의 사회」 → 하위 탈서사화된 허무와 노동하는 동물 · 이동 0",
+        "[assim] NEW 축 「보상의 위기」",
+        "[assim] NEW 축 「합의적 폭력」",
+        "[assim] 재편 「긍정성의 사회」 → 하위 이행기의 우울증 · 이동 0",
+        "[assim] NEW 축 「근본적 피로」"
+      ]
+    }
+  ],
+  "usages": [
+    {
+      "model": "claude-sonnet-5",
+      "ms": 192250,
+      "apiMs": 184161,
+      "inputTokens": 6,
+      "outputTokens": 16358,
+      "cacheReadTokens": 172339,
+      "costUsd": 0.39575180000000004,
+      "role": "big"
+    },
+    {
+      "model": "claude-sonnet-5",
+      "ms": 75127,
+      "apiMs": 67808,
+      "inputTokens": 6,
+      "outputTokens": 6660,
+      "cacheReadTokens": 149146,
+      "costUsd": 0.2410932,
+      "role": "big"
+    },
+    {
+      "model": "claude-sonnet-5",
+      "ms": 26710,
+      "apiMs": 21112,
+      "inputTokens": 2,
+      "outputTokens": 1458,
+      "cacheReadTokens": 25443,
+      "costUsd": 0.10424459999999999,
+      "role": "esc"
+    },
+    {
+      "model": "claude-sonnet-5",
+      "ms": 25397,
+      "apiMs": 18975,
+      "inputTokens": 2,
+      "outputTokens": 1281,
+      "cacheReadTokens": 25443,
+      "costUsd": 0.10527460000000001,
+      "role": "esc"
+    },
+    {
+      "model": "claude-sonnet-5",
+      "ms": 21504,
+      "apiMs": 15189,
+      "inputTokens": 2,
+      "outputTokens": 914,
+      "cacheReadTokens": 25443,
+      "costUsd": 0.1047966,
+      "role": "esc"
+    },
+    {
+      "model": "claude-sonnet-5",
+      "ms": 19461,
+      "apiMs": 12424,
+      "inputTokens": 2,
+      "outputTokens": 764,
+      "cacheReadTokens": 25443,
+      "costUsd": 0.0997446,
+      "role": "esc"
+    }
+  ],
+  "finalNodes": [
+    {
+      "id": "root",
+      "kind": "root",
+      "parentID": null,
+      "position": 0,
+      "name": "피로사회",
+      "gloss": "시대마다 그 시대를 지배하는 질병이 다르다 — 예전엔 남과 다른 것을 밀어내려다 생기는 감염성 질병이 시대를 지배했다면, 지금은 자기 안의 넘치는 긍정성이 만드는 신경성 질환이 시대를 지배한다.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n1",
+      "kind": "concept",
+      "parentID": "root",
+      "position": 0,
+      "name": "시대마다 다른 질병",
+      "charter": "포함: 시대와 질병의 관계를 말하는 총론적 문장. 제외: 특정 시대의 구체적 질병 내용은 아래 대조축의 두 개념 밑으로.",
+      "gloss": "이 책은 이 전제에서 출발해, 지금 시대를 지배하는 질병이 무엇인지 밝히는 방향으로 나아간다.\n\n시대마다 그 시대에 고유한 질병이 있다는 것.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n2",
+      "kind": "sentence",
+      "parentID": "n1",
+      "position": 0,
+      "name": "시대마다 그 시대에 고유한 질병이 있다.",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [],
+      "highlightID": "340856AC-DECB-4993-933E-7FDF9266B819",
+      "display": null
+    },
+    {
+      "id": "n3",
+      "kind": "concept",
+      "parentID": "root",
+      "position": 1,
+      "name": "부정성의 사회",
+      "charter": "포함: 면역 반응, 이질성·타자성에 대한 거부를 다루는 문장. 제외: 오늘날의 소비주의적 변질은 이 개념의 자식으로.",
+      "gloss": "이 책은 이 사회상을 지금 시대와 맞세워, 지금이 얼마나 다른 방식으로 병드는지를 보여준다.\n\n남과 다른 것, 낯선 것을 밀어내는 면역 반응으로 돌아가던 예전 사회.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": {
+        "badge": null,
+        "emphasis": "high"
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "concept",
+      "parentID": "n3",
+      "position": 0,
+      "name": "이질성 소멸",
+      "charter": "포함: 이질성·타자성이 옅어지거나 사라지는 양상을 말하는 문장. 제외: 그 결과로 생기는 새로운 질병 자체는 상위 대조축의 다른 편으로.",
+      "gloss": "부정성의 사회가 무너지고 있다는 근거로 제시된다.\n\n낯선 것을 밀어내던 힘이 오늘날에는 사라졌다는 것.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": {
+        "badge": null,
+        "emphasis": "high"
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "sentence",
+      "parentID": "n4",
+      "position": 0,
+      "name": "사회는 이질성과 타자성이 사라지는 방향으로 가고 있다. 낯선 것에 반응하던 면역학적 방어로는 더 이상 오늘날의 사회를 설명할 수 없다.",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        13
+      ],
+      "highlightID": "836587B5-ADEF-461D-A1EF-F3F6937634FE",
+      "display": null
+    },
+    {
+      "id": "n6",
+      "kind": "concept",
+      "parentID": "n3",
+      "position": 1,
+      "name": "관광객이 된 타자",
+      "charter": "포함: 낯선 것이 소비·향유의 대상으로 변하는 양상. 제외: 이질성 자체의 소멸을 말하는 총론 문장은 부모로.",
+      "gloss": "이질성이 사라진 결과, 낯섦이 어떻게 소비되는지를 구체적으로 보여준다.\n\n낯선 것이 위협이 아니라 소비하고 즐기는 대상으로 바뀌었다는 것.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n7",
+      "kind": "sentence",
+      "parentID": "n6",
+      "position": 0,
+      "name": "낯선 것은 이제 위협이 아니라 이국적인 볼거리로 소비된다. 그것을 즐기는 관광객, 소비자는 더 이상 면역 반응을 일으키는 존재가 아니다.",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        13
+      ],
+      "highlightID": "836587B5-ADEF-461D-A1EF-F3F6937634FE",
+      "display": null
+    },
+    {
+      "id": "n8",
+      "kind": "concept",
+      "parentID": "root",
+      "position": 2,
+      "name": "긍정성의 사회",
+      "charter": "포함: 오늘날의 신경성 질환, 넘침으로 인한 병리를 다루는 문장. 제외: 낯선 것에 대한 면역 반응은 부정성의 사회 쪽으로.",
+      "gloss": "이 책은 이 사회상을 오늘날 병의 실제 원인으로 지목한다.\n\n넘치는 것, 할 수 있음이 지나쳐서 병이 되는 오늘날의 사회.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": {
+        "badge": null,
+        "emphasis": "high"
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "concept",
+      "parentID": "n8",
+      "position": 0,
+      "name": "신경성 질환",
+      "charter": "포함: 우울증·ADHD·경계성성격장애·소진증후군 등 오늘날의 구체적 질병과 그 성격. 제외: 낯선 것을 밀어내는 옛 방식의 질병은 부정성의 사회로.",
+      "gloss": "긍정성의 사회가 실제로 낳는 병의 목록으로, 부정성의 사회의 질병과 대비된다.\n\n우울증, 주의력결핍과잉행동장애, 경계성성격장애, 소진증후군처럼 오늘날을 지배하는 병들.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": {
+        "badge": null,
+        "emphasis": "high"
+      }
+    },
+    {
+      "id": "n10",
+      "kind": "sentence",
+      "parentID": "n9",
+      "position": 0,
+      "name": "우울증, 주의력결핍과잉행동장애, 경계성성격장애, 소진증후군 같은 신경성 질환이 오늘날의 병리를 지배한다. 이들은 남과 다른 것을 밀어내다 생기는 병이 아니라, 넘치는 긍정성 때문에 생기는 병이다.",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        11
+      ],
+      "highlightID": "FBA46380-15A6-466D-A949-BB0BE04AE108",
+      "display": null
+    },
+    {
+      "id": "n11",
+      "kind": "concept",
+      "parentID": "n8",
+      "position": 1,
+      "name": "탈서사화된 허무와 노동하는 동물",
+      "gloss": "믿음의 상실과 탈서사화가 허무를 낳고, 그 허무가 과잉활동적 노동으로 이어지는 기제를 다룬다.",
+      "charter": "포함: 믿음(신·현실)의 상실, 탈서사화, 허무, 벌거벗은 생명·노동을 다루는 문장. 제외: 신경성 질환의 병명 목록은 형제 개념으로.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n12",
+      "kind": "concept",
+      "parentID": "n9",
+      "position": 1,
+      "name": "우울증과 유대의 상실",
+      "gloss": "신경성 질환 중 우울증의 발생 기제를 유대·리비도 개념으로 설명한다.",
+      "charter": "포함: 우울증의 원인·구조를 유대·리비도·나르시시즘으로 설명하는 문장. 제외: 신경성 질환의 목록화·총론은 부모로.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n13",
+      "kind": "sentence",
+      "parentID": "n12",
+      "position": 0,
+      "name": "과잉 선택의 자유를 누리는 성과주체는 유대의 능력을 잃고, 대상도 지향점도 없는 우울증에 빠져 리비도를 자기 자신과 소셜 네트워크의 일시적 관계로 흩뿌린다.",
+      "gloss": "",
+      "sourcePages": [
+        95
+      ],
+      "highlightID": "0425D2A0-AEE2-4731-A15D-26BB459348DF",
+      "display": null
+    },
+    {
+      "id": "n14",
+      "kind": "concept",
+      "parentID": "n8",
+      "position": 2,
+      "name": "사유의 중단 상실",
+      "gloss": "긍정성의 사회에서 행동을 사유로 전환시키는 중단·머뭇거림이 사라졌음을 다룬다.",
+      "charter": "포함: 중단·머뭇거림·막간의 부재가 사유를 막는다는 문장. 제외: 신경성 질환의 구체적 병명 목록은 형제 개념으로.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n15",
+      "kind": "sentence",
+      "parentID": "n14",
+      "position": 0,
+      "name": "중단의 부정성이 있어야 우연을 조망하는 사유가 가능한데, 오늘날은 그런 머뭇거림과 막간이 사라진 시대다.",
+      "gloss": "",
+      "sourcePages": [
+        49
+      ],
+      "highlightID": "10285092-72BC-4BAC-B02E-0324477DB26C",
+      "display": null
+    },
+    {
+      "id": "n16",
+      "kind": "sentence",
+      "parentID": "root",
+      "position": 0,
+      "name": "신에 대한 믿음도 현실에 대한 믿음도 잃은 후기근대는 삶이 탈서사화되어 벌거벗은 생명이 되고, 그 허무 앞에서 인간은 과잉활동적이고 초조한 노동하는 동물이 된다.",
+      "gloss": "",
+      "sourcePages": [
+        41
+      ],
+      "highlightID": "24039FAF-2F3E-4CB0-B25E-117C6DC28DD0",
+      "display": null
+    },
+    {
+      "id": "n17",
+      "kind": "sentence",
+      "parentID": "n4",
+      "position": 1,
+      "name": "면역 반응을 일으키는 이질성은 탈경계를 지향하는 세계화 과정과 양립할 수 없어 밀려난다.",
+      "gloss": "",
+      "sourcePages": [
+        15
+      ],
+      "highlightID": "247D31AF-752B-4C53-B175-DDBF18199666",
+      "display": null
+    },
+    {
+      "id": "n18",
+      "kind": "concept",
+      "parentID": "n8",
+      "position": 3,
+      "name": "자기 착취의 효율성",
+      "gloss": "긍정성의 사회에서 자기 착취가 타자에 의한 착취보다 능률적으로 작동하는 이유를 다룬다.",
+      "charter": "포함: 자기 착취와 자유의 감정, 그 경제적 효율성을 다루는 문장. 제외: 신경성 질환의 구체적 병명·증상은 형제 개념으로.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n19",
+      "kind": "sentence",
+      "parentID": "n18",
+      "position": 0,
+      "name": "자본주의가 일정 수준에 이르면 자유의 감정을 동반하는 자기 착취가 타자에 의한 착취보다 더 효과적으로 작동한다.",
+      "gloss": "",
+      "sourcePages": [
+        103
+      ],
+      "highlightID": "25FCF24F-DA0C-4453-A952-8E45C2C8FFDA",
+      "display": null
+    },
+    {
+      "id": "n20",
+      "kind": "sentence",
+      "parentID": "n8",
+      "position": 0,
+      "name": "규율사회는 이미 사라졌고, 복종적 주체 대신 자기 자신을 경영하는 성과주체가 사는 성과사회가 오늘의 사회다.",
+      "gloss": "",
+      "sourcePages": [
+        23
+      ],
+      "highlightID": "36F8CB94-7E16-4FFA-8770-7E8EC41F8FC1",
+      "display": null
+    },
+    {
+      "id": "n21",
+      "kind": "concept",
+      "parentID": "n9",
+      "position": 2,
+      "name": "이행기의 우울증",
+      "gloss": "우울증을 규율사회에서 성과사회로의 이행기에 나타나는 규범 전환의 산물로 규정한다.",
+      "charter": "포함: 규율사회→성과사회 이행과 그 규범 전환이 낳은 우울증을 다루는 문장. 제외: 우울증의 유대·리비도 기제 자체는 형제 개념(n12)으로, 신경성 질환 목록·총론은 부모(n9)로.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n22",
+      "kind": "concept",
+      "parentID": "n8",
+      "position": 5,
+      "name": "보상의 위기",
+      "gloss": "타자·신이라는 보상의 심급이 사라지면서 성과주체가 스스로를 인정할 수 없게 되는 사태를 다룬다.",
+      "charter": "포함: 인정·보상의 심급 상실과 그로 인한 성과 강박을 다루는 문장. 제외: 우울증의 유대·리비도 기제 자체는 형제 개념(우울증과 유대의 상실)으로.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n23",
+      "kind": "sentence",
+      "parentID": "n22",
+      "position": 0,
+      "name": "보상의 심급(타자·신)이 사라지면서 성과주체는 인정받을 길 없이 성과 강박에 빠진다.",
+      "gloss": "",
+      "sourcePages": [
+        86
+      ],
+      "highlightID": "3CEFDCC7-2595-49FD-A103-623CDAFA98D2",
+      "display": null
+    },
+    {
+      "id": "n24",
+      "kind": "sentence",
+      "parentID": "root",
+      "position": 0,
+      "name": "성과사회는 부정성·금지를 폐기하고 '할 수 있음'이라는 무한긍정으로 규율사회를 대체하며, 광인·범죄자 대신 우울증 환자와 낙오자를 만든다.",
+      "gloss": "",
+      "sourcePages": [
+        24
+      ],
+      "highlightID": "3EAB5710-A7ED-45B9-8F60-D72AFCFD9AD2",
+      "display": null
+    },
+    {
+      "id": "n25",
+      "kind": "sentence",
+      "parentID": "n21",
+      "position": 0,
+      "name": "우울증은 규율사회의 강제가 자기 주도·자기실현을 요구하는 성과사회의 규범으로 대체되는 이행기에 나타난 병이다.",
+      "gloss": "",
+      "sourcePages": [
+        26
+      ],
+      "highlightID": "43430DE7-1626-4298-942A-641750516162",
+      "display": null
+    },
+    {
+      "id": "n26",
+      "kind": "concept",
+      "parentID": "n8",
+      "position": 6,
+      "name": "합의적 폭력",
+      "gloss": "긍정성의 사회에서 폭력은 갈등의 부정성이 아니라 동의와 긍정성 자체, 즉 자본의 전일적 지배에서 나온다.",
+      "charter": "포함: 긍정성·동의가 폭력의 새로운 원천이 됨을 다루는 문장. 제외: 신경성 질환의 구체적 병리는 형제 개념으로.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n27",
+      "kind": "sentence",
+      "parentID": "n26",
+      "position": 0,
+      "name": "긍정성의 사회에서도 폭력은 사라지지 않으며, 갈등 없는 동의와 긍정성 자체가 자본의 전일적 지배라는 합의적 폭력의 원천이 된다.",
+      "gloss": "",
+      "sourcePages": [
+        101
+      ],
+      "highlightID": "449C5952-E9DE-44FE-A2D5-671CA3F5D7E0",
+      "display": null
+    },
+    {
+      "id": "n28",
+      "kind": "sentence",
+      "parentID": "n18",
+      "position": 0,
+      "name": "성과주체는 외적 지배기구에서는 자유롭지만 자유와 강제가 일치하는 자기 착취로 몸을 맡기며, 할 수 있을 수 없을 때 자책과 자학의 우울증이 발발한다.",
+      "gloss": "",
+      "sourcePages": [
+        28
+      ],
+      "highlightID": "4BCD7912-34C9-4F25-AF74-8302DC9F027B",
+      "display": null
+    },
+    {
+      "id": "n29",
+      "kind": "sentence",
+      "parentID": "n14",
+      "position": 1,
+      "name": "긍정적 힘만의 활동과잉은 역설적으로 대상에 완전히 내맡겨진 극단적 수동성이며, 어떤 자유로운 행동의 여지도 남기지 않는다.",
+      "gloss": "",
+      "sourcePages": [
+        54
+      ],
+      "highlightID": "5F3556EF-E9A8-4C2C-942F-5C910921EE9C",
+      "display": null
+    },
+    {
+      "id": "n30",
+      "kind": "sentence",
+      "parentID": "n12",
+      "position": 0,
+      "name": "우울증에는 타자의 차원이 없으며, 소진에 이은 우울증은 과잉된 자기 관계가 자신을 소모시켜 공허한 자아만 남기는 것이다.",
+      "gloss": "",
+      "sourcePages": [
+        94
+      ],
+      "highlightID": "641D6E36-74F6-4358-9CAE-0FEE73438B27",
+      "display": null
+    },
+    {
+      "id": "n31",
+      "kind": "sentence",
+      "parentID": "n21",
+      "position": 1,
+      "name": "복종적 주체가 초자아에 예속된다면 성과주체는 이상 자아에 기투하는데, 도달 불가능한 이상 자아와 현실 자아의 간극이 자학과 우울증으로 이어진다.",
+      "gloss": "",
+      "sourcePages": [
+        102
+      ],
+      "highlightID": "69E98193-2D05-4768-B8C4-C25D5825BA8D",
+      "display": null
+    },
+    {
+      "id": "n32",
+      "kind": "sentence",
+      "parentID": "n14",
+      "position": 1,
+      "name": "분노는 현재를 중단시키고 새 국면을 여는 부정성의 힘인데, 가속화와 활동과잉의 시대는 분노 대신 무력한 짜증만 남긴다.",
+      "gloss": "",
+      "sourcePages": [
+        50
+      ],
+      "highlightID": "790A6AA0-870C-4035-8861-32E794BACEE9",
+      "display": null
+    },
+    {
+      "id": "n33",
+      "kind": "sentence",
+      "parentID": "n18",
+      "position": 1,
+      "name": "주인과 노예의 변증법은 해방으로 귀결되지 않고, 주인 스스로 노동하는 노예가 되는 노동사회·성과사회라는 새로운 강제를 낳는다.",
+      "gloss": "",
+      "sourcePages": [
+        43
+      ],
+      "highlightID": "7989D2B0-677D-4AD7-9B72-512DFF74FDE5",
+      "display": null
+    },
+    {
+      "id": "n34",
+      "kind": "sentence",
+      "parentID": "n11",
+      "position": 0,
+      "name": "성과사회의 호모 사케르는 절대로 죽일 수 없는, 죽기엔 너무 생생하고 살기엔 너무 죽어 있는 완전히 죽지 않은 자의 생명이다.",
+      "gloss": "",
+      "sourcePages": [
+        114
+      ],
+      "highlightID": "BDD673D6-EA2D-4BB6-82C2-921065126A85",
+      "display": null
+    },
+    {
+      "id": "n35",
+      "kind": "sentence",
+      "parentID": "n26",
+      "position": 0,
+      "name": "긍정성의 폭력은 적대성을 전제하지 않고 오히려 적과 동지의 양극화가 없는 동질적이고 관용적인 공간에서 눈에 덜 띄게 확산된다.",
+      "gloss": "",
+      "sourcePages": [
+        20
+      ],
+      "highlightID": "C2BF2FAF-0956-4329-902D-E2521E250A30",
+      "display": null
+    },
+    {
+      "id": "n36",
+      "kind": "sentence",
+      "parentID": "n21",
+      "position": 1,
+      "name": "성과주의적 후산업사회는 생산 증대를 위해 정체성을 자주 바꾸는 유연한 개인을 요구하며, 이 명령이 우울증을 낳는다.",
+      "gloss": "",
+      "sourcePages": [
+        99
+      ],
+      "highlightID": "DA1FE62D-63AE-4180-8A9D-71C90B0BE81D",
+      "display": null
+    },
+    {
+      "id": "n37",
+      "kind": "sentence",
+      "parentID": "n3",
+      "position": 0,
+      "name": "헤겔에 따르면 부정성이야말로 인간 존재를 생동하게 하므로, 세계의 전면적 긍정화는 인간 존재에 위험이 될 수 있다.",
+      "gloss": "",
+      "sourcePages": [
+        52
+      ],
+      "highlightID": "E5267015-3154-4F1F-9ABB-9575B6A65CC3",
+      "display": null
+    },
+    {
+      "id": "n38",
+      "kind": "concept",
+      "parentID": "n8",
+      "position": 7,
+      "name": "근본적 피로",
+      "gloss": "성과사회의 소진적 피로와 대비되는, 자아를 이완시켜 공동체와 사유를 회복시키는 대안적 피로를 다룬다.",
+      "charter": "포함: 한트케적 '할 수 있음'의 피로, 자아 이완과 타자 개방을 다루는 문장. 제외: 소진증후군 등 신경성 질환의 병리적 피로는 신경성 질환으로.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n39",
+      "kind": "sentence",
+      "parentID": "n38",
+      "position": 0,
+      "name": "한트케의 분열적 피로(고립·폭력)와 대비되는 '할 수 있음'의 피로는 자아의 조임쇠를 풀어 타자와의 경계를 허물고 화해의 공동체를 여는 근본적 피로다.",
+      "gloss": "",
+      "sourcePages": [
+        66
+      ],
+      "highlightID": "E5C9CB07-B3D5-4BC7-9FC8-BF90D96563CE",
+      "display": null
+    },
+    {
+      "id": "n40",
+      "kind": "sentence",
+      "parentID": "n4",
+      "position": 2,
+      "name": "부정성이 배제되어 성격 없는 무형적 자아는 어떤 역할도 수행할 수 있는 유연성으로 높은 경제적 효율을 가능하게 한다.",
+      "gloss": "",
+      "sourcePages": [
+        91
+      ],
+      "highlightID": "FA74901A-7630-4F0C-AD8C-28C3A4179D02",
+      "display": null
+    }
+  ],
+  "batchNodes": [
+    {
+      "id": "root",
+      "kind": "root",
+      "parentID": null,
+      "position": 0,
+      "name": "피로사회",
+      "gloss": "사회는 규율사회에서 성과사회로 바뀌었고, 성과사회는 금지 대신 무한한 '할 수 있음'으로 사람을 몰아붙인다. 타자와 부정성이 사라진 자리에서 사람들은 스스로를 착취하며 우울증과 소진에 빠진다.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n1",
+      "kind": "concept",
+      "parentID": "root",
+      "position": 0,
+      "name": "규율사회와 성과사회",
+      "charter": "포함: 두 사회 체제 자체를 비교하는 문장 / 제외: 성과사회가 낳는 개인의 심리는 성과주체 쪽으로.",
+      "gloss": "이 책은 시대에 따라 병이 다르다는 것을 보이려고 두 사회를 맞세운다.\n\n예전 사회는 금지와 규율로 사람을 통제했고, 오늘의 사회는 '할 수 있다'는 긍정으로 사람을 몰아붙인다.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": {
+        "badge": "대조",
+        "emphasis": "axis"
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "sentence",
+      "parentID": "n1",
+      "position": 0,
+      "name": "시대마다 고유한 질병이 있다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [],
+      "highlightID": "340856AC-DECB-4993-933E-7FDF9266B819",
+      "display": null
+    },
+    {
+      "id": "n3",
+      "kind": "sentence",
+      "parentID": "n1",
+      "position": 1,
+      "name": "병원·감옥·공장의 규율사회는 이미 지나갔고, 피트니스클럽·오피스·쇼핑몰의 성과사회가 들어섰다. 사람들은 복종적 주체가 아니라 자기 자신을 경영하는 성과주체가 되었다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        23
+      ],
+      "highlightID": "36F8CB94-7E16-4FFA-8770-7E8EC41F8FC1",
+      "display": null
+    },
+    {
+      "id": "n4",
+      "kind": "concept",
+      "parentID": "n1",
+      "position": 2,
+      "name": "규율사회",
+      "charter": "포함: 규율사회 자체의 특징 / 제외: 성과사회로의 이행 원인은 성과주체 쪽 우울증 문장에.",
+      "gloss": "성과사회가 벗어나온 출발점으로 대비를 위해 필요하다.\n\n'노(No)'가 지배하던, 금지와 명령으로 사람을 통제하던 예전 사회.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n5",
+      "kind": "concept",
+      "parentID": "n1",
+      "position": 3,
+      "name": "성과사회",
+      "charter": "포함: 성과사회 자체의 구조·성격 / 제외: 그 사회가 만드는 개인 병리는 성과주체 쪽으로.",
+      "gloss": "이 책은 성과사회가 왜, 어떻게 사람을 병들게 하는지 파고든다.\n\n금지 대신 '할 수 있다'는 무한 긍정이 사람을 몰아붙이는 오늘의 사회.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": {
+        "badge": null,
+        "emphasis": "high"
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "sentence",
+      "parentID": "n5",
+      "position": 0,
+      "name": "성과사회는 규제를 계속 풀면서 부정성에서 벗어난다. 금지·명령의 자리를 프로젝트와 동기부여가 대신한다. 규율사회가 광인과 범죄자를 낳았다면, 성과사회는 우울증 환자와 낙오자를 낳는다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        24
+      ],
+      "highlightID": "3EAB5710-A7ED-45B9-8F60-D72AFCFD9AD2",
+      "display": null
+    },
+    {
+      "id": "n7",
+      "kind": "sentence",
+      "parentID": "n5",
+      "position": 1,
+      "name": "노동사회, 성과사회는 자유로운 사회가 아니다. 계속 새로운 강제를 만들어낼 뿐이다. 주인이 스스로 노동하는 노예가 되어버린 사회다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        43
+      ],
+      "highlightID": "7989D2B0-677D-4AD7-9B72-512DFF74FDE5",
+      "display": null
+    },
+    {
+      "id": "n8",
+      "kind": "sentence",
+      "parentID": "n5",
+      "position": 2,
+      "name": "성과사회의 신경성 질환자는 죽일 수도 없지만 제대로 살아 있지도 않은, 완전히 죽지 않은 존재가 된다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        114
+      ],
+      "highlightID": "BDD673D6-EA2D-4BB6-82C2-921065126A85",
+      "display": null
+    },
+    {
+      "id": "n9",
+      "kind": "concept",
+      "parentID": "n5",
+      "position": 3,
+      "name": "성과주체",
+      "charter": "포함: 자기착취·우울증·소진·초자아 등 성과주체의 심리와 행동 / 제외: 사회 체제 자체 설명은 성과사회로.",
+      "gloss": "이 책은 성과주체가 왜 스스로를 착취하고 병드는지를 논증의 핵심으로 삼는다.\n\n외부의 명령이 아니라 스스로를 몰아붙이며 자기 자신과 전쟁하는, 성과사회가 만든 개인.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": {
+        "badge": null,
+        "emphasis": "high"
+      }
+    },
+    {
+      "id": "n10",
+      "kind": "sentence",
+      "parentID": "n9",
+      "position": 0,
+      "name": "우울증, 주의력결핍과잉행동장애, 경계성성격장애, 소진증후군 같은 신경성 질환이 오늘의 병리를 지배한다. 이들은 전염병이 아니라 긍정성의 과잉이 낳은 병이다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        11
+      ],
+      "highlightID": "FBA46380-15A6-466D-A949-BB0BE04AE108",
+      "display": null
+    },
+    {
+      "id": "n11",
+      "kind": "sentence",
+      "parentID": "n9",
+      "position": 1,
+      "name": "자본주의가 일정 수준에 이르면 자기 착취가 타자에 의한 착취보다 훨씬 효과적이다. 자유롭다는 느낌이 동반되기 때문이다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        103
+      ],
+      "highlightID": "25FCF24F-DA0C-4453-A952-8E45C2C8FFDA",
+      "display": null
+    },
+    {
+      "id": "n12",
+      "kind": "sentence",
+      "parentID": "n9",
+      "position": 2,
+      "name": "성과주체는 '더 이상 할 수 있을 수 없을 때' 우울증에 빠진다. 그는 외부의 지배에서는 자유롭지만 자유와 강제가 일치해버려 스스로를 착취한다. 자기 착취는 자유롭다는 느낌 때문에 타자의 착취보다 더 잘 먹힌다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        28
+      ],
+      "highlightID": "4BCD7912-34C9-4F25-AF74-8302DC9F027B",
+      "display": null
+    },
+    {
+      "id": "n13",
+      "kind": "sentence",
+      "parentID": "n9",
+      "position": 3,
+      "name": "긍정적 힘만 가진 사람은 오히려 대상에 완전히 내맡겨진다. 활동과잉은 극단적으로 수동적인 행위이며 자유로운 행동의 여지를 남기지 않는다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        54
+      ],
+      "highlightID": "5F3556EF-E9A8-4C2C-942F-5C910921EE9C",
+      "display": null
+    },
+    {
+      "id": "n14",
+      "kind": "sentence",
+      "parentID": "n9",
+      "position": 4,
+      "name": "복종적 주체가 초자아에게 눌린다면, 성과주체는 도달할 수 없는 이상적인 자기 모습을 향해 스스로를 던진다. 그 간극이 좁혀지지 않으면 자학으로 이어진다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        102
+      ],
+      "highlightID": "69E98193-2D05-4768-B8C4-C25D5825BA8D",
+      "display": null
+    },
+    {
+      "id": "n15",
+      "kind": "sentence",
+      "parentID": "n9",
+      "position": 5,
+      "name": "타자가 주는 인정이 사라지면 성과주체는 스스로를 인정할 방법이 없어 점점 더 많은 성과를 내야 한다는 강박에 빠진다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        86
+      ],
+      "highlightID": "3CEFDCC7-2595-49FD-A103-623CDAFA98D2",
+      "display": null
+    },
+    {
+      "id": "n16",
+      "kind": "sentence",
+      "parentID": "n9",
+      "position": 6,
+      "name": "우울증은 규율사회에서 성과사회로 넘어가는 시기에 나타난다. 역할을 정해주던 규율이 사라지고, 모두가 스스로 알아서 자기 자신이 되라는 새로운 명령이 그 자리를 채우면서 번아웃이 생겨난다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        26
+      ],
+      "highlightID": "43430DE7-1626-4298-942A-641750516162",
+      "display": null
+    },
+    {
+      "id": "n17",
+      "kind": "sentence",
+      "parentID": "n9",
+      "position": 7,
+      "name": "새로운 미디어 속에서 타자성이 옅어지고 사람은 점점 자기 자신하고만 마주한다. 후기근대의 사람은 강한 유대를 맺지 못한다. 슬픔은 사랑하는 대상을 잃을 때 생기지만, 우울증에는 애초에 대상도 지향점도 없다. 리비도는 자기 자신에게 대부분 쓰이고 남는 것은 SNS의 얕은 관계들에 흩어질 뿐이다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        95
+      ],
+      "highlightID": "0425D2A0-AEE2-4731-A15D-26BB459348DF",
+      "display": null
+    },
+    {
+      "id": "n18",
+      "kind": "sentence",
+      "parentID": "n9",
+      "position": 8,
+      "name": "우울증에는 타자의 자리가 아예 없다. 소진은 과도한 긴장과 자기 자신과의 전쟁에서 오며, 남는 것은 텅 비어버린 자아뿐이다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        94
+      ],
+      "highlightID": "641D6E36-74F6-4358-9CAE-0FEE73438B27",
+      "display": null
+    },
+    {
+      "id": "n19",
+      "kind": "sentence",
+      "parentID": "n9",
+      "position": 9,
+      "name": "개성을 계속 새로 발명하라는 요구가 우울증을 부른다. 그 요구는 정체성 관련 상품에서 온다. 규율사회가 변함없는 정체성을 원했다면, 성과사회는 생산을 늘리려고 자꾸 바뀌는 유연한 개인을 원한다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        99
+      ],
+      "highlightID": "DA1FE62D-63AE-4180-8A9D-71C90B0BE81D",
+      "display": null
+    },
+    {
+      "id": "n20",
+      "kind": "sentence",
+      "parentID": "n9",
+      "position": 10,
+      "name": "성격이 없는 사람은 어떤 모습으로든 나타나고 어떤 역할이든 해낼 수 있는 유연한 사람이며, 이런 무형성이 높은 경제적 효율을 만든다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        91
+      ],
+      "highlightID": "FA74901A-7630-4F0C-AD8C-28C3A4179D02",
+      "display": null
+    },
+    {
+      "id": "n21",
+      "kind": "sentence",
+      "parentID": "n9",
+      "position": 11,
+      "name": "근대에 인간은 노동하는 동물로 전락했고, 신과 현실에 대한 믿음마저 잃으며 삶은 극단적으로 덧없어졌다. 종교도 힘을 잃었고, 세계에서 이야기가 사라지면서 삶은 벌거벗은 노동으로 남는다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        41
+      ],
+      "highlightID": "24039FAF-2F3E-4CB0-B25E-117C6DC28DD0",
+      "display": null
+    },
+    {
+      "id": "n22",
+      "kind": "concept",
+      "parentID": "root",
+      "position": 1,
+      "name": "부정성의 소멸",
+      "charter": "포함: 면역학적 타자성 상실, 동의·긍정 자체가 폭력이 되는 현상 / 제외: 그로 인해 개인이 겪는 우울증·소진은 성과주체로.",
+      "gloss": "이 책은 부정성이 사라진 자리에서 오히려 새로운 종류의 폭력과 병이 생긴다는 것을 보이려 한다.\n\n이질적인 것, 낯선 것, 맞서는 것이 사라지고 모든 것이 같아지는 흐름.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": {
+        "badge": null,
+        "emphasis": "high"
+      }
+    },
+    {
+      "id": "n23",
+      "kind": "sentence",
+      "parentID": "n22",
+      "position": 0,
+      "name": "인간이 부정의 존재라면, 세계가 전면적으로 긍정화되는 것은 위험하다. 헤겔에 따르면 부정성이야말로 인간을 살아 있게 지탱해준다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        52
+      ],
+      "highlightID": "E5267015-3154-4F1F-9ABB-9575B6A65CC3",
+      "display": null
+    },
+    {
+      "id": "n24",
+      "kind": "concept",
+      "parentID": "n22",
+      "position": 1,
+      "name": "면역학적 부정성",
+      "charter": "포함: 이질성·타자성이 사라지는 현상 자체 / 제외: 그로 인한 개인 심리 변화는 성과주체로.",
+      "gloss": "이 개념으로 저자는 오늘의 사회가 왜 예전 방식으로는 설명되지 않는지를 보인다.\n\n몸이 이질적인 것을 밀어내듯, 사회도 낯선 것에 맞서 자신을 지키던 원리.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n25",
+      "kind": "sentence",
+      "parentID": "n24",
+      "position": 0,
+      "name": "사회는 면역학적 방어의 틀로는 설명할 수 없는 방향으로 가고 있다. 이질성에 반응하던 면역 체계와 달리, 오늘의 차이는 아무 반응도 일으키지 않는다. 낯선 것은 위협이 아니라 관광객이 소비하는 이국적인 것이 되어버렸다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        13
+      ],
+      "highlightID": "836587B5-ADEF-461D-A1EF-F3F6937634FE",
+      "display": null
+    },
+    {
+      "id": "n26",
+      "kind": "sentence",
+      "parentID": "n24",
+      "position": 1,
+      "name": "면역 반응을 일으키는 이질성은 세계화가 국경을 지우는 흐름에 걸림돌이 될 뿐이다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        15
+      ],
+      "highlightID": "247D31AF-752B-4C53-B175-DDBF18199666",
+      "display": null
+    },
+    {
+      "id": "n27",
+      "kind": "concept",
+      "parentID": "n22",
+      "position": 2,
+      "name": "긍정성의 폭력",
+      "charter": "포함: 동의·평화 속에서 생기는 폭력을 말하는 문장 / 제외: 적대·갈등에서 오는 전통적 폭력은 대상이 아니다.",
+      "gloss": "이 개념으로 저자는 폭력이 갈등에서만 나오는 게 아니라는 것을 보인다.\n\n적이 있어서가 아니라, 모두가 동의하고 받아들여서 오히려 생기는 폭력.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n28",
+      "kind": "sentence",
+      "parentID": "n27",
+      "position": 0,
+      "name": "적대성의 계보와 폭력의 계보는 다르다. 긍정성의 폭력은 적을 전제하지 않는다. 오히려 관용적이고 평화로운 사회에서 퍼지기 때문에 눈에 덜 띈다. 이 폭력은 아군과 적, 나와 남이 갈라지지 않는 공간에서 산다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        20
+      ],
+      "highlightID": "C2BF2FAF-0956-4329-902D-E2521E250A30",
+      "display": null
+    },
+    {
+      "id": "n29",
+      "kind": "sentence",
+      "parentID": "n27",
+      "position": 1,
+      "name": "사회가 긍정적으로 변한다고 폭력이 사라지는 것은 아니다. 동의와 긍정 그 자체가 폭력의 뿌리가 될 수 있다. 자본이 모든 것을 빨아들이는 오늘의 지배는 합의된 폭력이라 할 만하다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        101
+      ],
+      "highlightID": "449C5952-E9DE-44FE-A2D5-671CA3F5D7E0",
+      "display": null
+    },
+    {
+      "id": "n30",
+      "kind": "concept",
+      "parentID": "root",
+      "position": 2,
+      "name": "활동과잉과 머뭇거림",
+      "charter": "포함: 활동·머뭇거림·분노처럼 행동의 성격을 다루는 문장 / 제외: 성과주체의 자기착취 서술은 성과주체로.",
+      "gloss": "이 책은 쉼 없는 활동이 오히려 자유를 없앤다는 것을 이 대비로 보여준다.\n\n쉬지 않고 움직이기만 하는 것과, 잠시 멈춰 서서 생각하는 것의 대비.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": {
+        "badge": "대조",
+        "emphasis": "axis"
+      }
+    },
+    {
+      "id": "n31",
+      "kind": "concept",
+      "parentID": "n30",
+      "position": 0,
+      "name": "활동과잉",
+      "charter": "포함: 쉼 없는 활동, 분노 상실을 다루는 문장 / 제외: 자기착취의 심리적 원인은 성과주체로.",
+      "gloss": "저자는 활동과잉이 자유가 아니라 오히려 수동적인 상태임을 보이려 한다.\n\n멈추지 않고 계속 움직이기만 하는 상태.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n32",
+      "kind": "sentence",
+      "parentID": "n31",
+      "position": 0,
+      "name": "모든 것이 빨라지고 활동이 넘치는 흐름 속에서 우리는 분노하는 법도 잊는다. 분노는 하던 것을 멈추고 지금 상황 전체에 의문을 던지는 능력인데, 오늘날은 분노 대신 아무것도 바꾸지 못하는 짜증만 늘어간다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        50
+      ],
+      "highlightID": "790A6AA0-870C-4035-8861-32E794BACEE9",
+      "display": null
+    },
+    {
+      "id": "n33",
+      "kind": "concept",
+      "parentID": "n30",
+      "position": 1,
+      "name": "머뭇거림",
+      "charter": "포함: 멈춤·중단이 만드는 가능성을 다루는 문장 / 제외: 결과로서의 심리 병리는 성과주체로.",
+      "gloss": "저자는 이 멈춤이 있어야 행동이 단순 노동으로 떨어지지 않는다고 본다.\n\n잠시 멈춰 서서 행동을 유보하는 것.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n34",
+      "kind": "sentence",
+      "parentID": "n33",
+      "position": 0,
+      "name": "순수한 활동은 이미 있던 것을 이어갈 뿐이다. 정말 다른 것으로 바뀌려면 잠시 멈추는 부정의 순간이 필요하다. 오늘날 우리는 그런 멈춤과 막간이 거의 없는 시대를 살고 있다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        49
+      ],
+      "highlightID": "10285092-72BC-4BAC-B02E-0324477DB26C",
+      "display": null
+    },
+    {
+      "id": "n35",
+      "kind": "concept",
+      "parentID": "root",
+      "position": 3,
+      "name": "피로",
+      "charter": "포함: 피로 자체를 다루는 문장 / 제외: 소진(번아웃)은 성과주체로.",
+      "gloss": "저자는 나쁜 피로만이 아니라 사람을 다시 열어주는 좋은 피로도 있다는 것을 보여주려 한다.\n\n성과사회가 만드는 지친 상태이지만, 어떤 피로인지에 따라 서로 갈라지는 두 얼굴.",
+      "sourcePages": [],
+      "highlightID": null,
+      "display": null
+    },
+    {
+      "id": "n36",
+      "kind": "sentence",
+      "parentID": "n35",
+      "position": 0,
+      "name": "성과사회의 피로는 사람을 흩어놓고 혼자로 만드는 피로다. 이런 분열적 피로는 사람을 못 보고 못 말하는 상태로 몰아넣으며, 말없이 폭력을 낳는다. 반대로 한트케가 말하는 또 다른 피로는 자아를 조이던 힘을 풀어주고 틈을 연다. 자아가 줄어들수록 세계가 늘어나며, 그 틈에서 우애의 공간이 열린다",
+      "charter": null,
+      "gloss": "",
+      "sourcePages": [
+        66
+      ],
+      "highlightID": "E5C9CB07-B3D5-4BC7-9FC8-BF90D96563CE",
+      "display": null
+    }
+  ]
+}
