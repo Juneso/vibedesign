@@ -1,0 +1,93 @@
+{
+  "label": "lit-effort-ab-0901-1",
+  "runAt": "2026-09-01T08:31:09.887Z",
+  "book": "죄와 벌 1",
+  "nMemos": 13,
+  "results": [
+    {
+      "variant": "A-사고8K-현행",
+      "think": 8000,
+      "tighten": false,
+      "usage": {
+        "model": "claude-sonnet-5",
+        "ms": 62383,
+        "apiMs": 50824,
+        "inputTokens": 4,
+        "outputTokens": 3617,
+        "cacheReadTokens": 88862,
+        "costUsd": 0.18446239999999997
+      },
+      "error": "Expected double-quoted property name in JSON at position 713 (line 1 column 714)",
+      "anchors": "",
+      "motifs": []
+    },
+    {
+      "variant": "B-사고500-조임",
+      "think": 500,
+      "tighten": true,
+      "usage": {
+        "model": "claude-sonnet-5",
+        "ms": 70684,
+        "apiMs": 62728,
+        "inputTokens": 4,
+        "outputTokens": 4573,
+        "cacheReadTokens": 87778,
+        "costUsd": 0.2018296
+      },
+      "error": null,
+      "anchors": "",
+      "motifs": [
+        {
+          "name": "1아르신의 공간이라도",
+          "gloss": "좁고 절망적인 공간이라도 죽음보다는 삶을 택하겠다는 갈망이 반복된다."
+        },
+        {
+          "name": "이(虱)와 사람 사이",
+          "gloss": "자신을 '이'로 규정했다가 다시 '아직은 사람'이라 되뇌는 자기부정과 자기방어가 되풀이된다."
+        },
+        {
+          "name": "범죄자의 권리",
+          "gloss": "입법자·초인은 유혈 앞에서도 멈추지 않는 범죄자라는 이론과, 그것이 실전에서 깨져 부끄러움으로 남는 과정."
+        },
+        {
+          "name": "상처받은 자존심",
+          "gloss": "수치와 죄의식보다 짓밟힌 자존심이 더 아프다는 것, 그리고 인간이 불의에 굴종하는 순응력에 대한 경멸이 겹친"
+        }
+      ]
+    },
+    {
+      "variant": "C-사고500-현행",
+      "think": 500,
+      "tighten": false,
+      "usage": {
+        "model": "claude-sonnet-5",
+        "ms": 83837,
+        "apiMs": 75571,
+        "inputTokens": 4,
+        "outputTokens": 5636,
+        "cacheReadTokens": 87481,
+        "costUsd": 0.21542019999999998
+      },
+      "error": null,
+      "anchors": "",
+      "motifs": [
+        {
+          "name": "살든지 거부하든지",
+          "gloss": "삶을 통째로 받아들이거나 통째로 거부해야 한다는 양자택일적 사유, 그리고 좁은 공간이라도 사는 편이 낫다는 "
+        },
+        {
+          "name": "이(虱)를 죽인 이론",
+          "gloss": "입법자·나폴레옹의 범죄성을 근거로 살인을 정당화했던 이론이, 정작 자신이 죽인 존재(이)와 자기 자신을 등치"
+        },
+        {
+          "name": "거짓말할 권리",
+          "gloss": "자기 생각으로 거짓말(이론)을 짓는 것이 인간의 특권이라는 옹호와, 그 이론이 막상 깨지고 나니 초라해졌다는"
+        },
+        {
+          "name": "수치와 자존심",
+          "gloss": "실제로 그를 괴롭히는 것은 죄에 대한 양심의 가책이 아니라 상처받은 자존심과 수치심이라는 데서, 죄의식과 수"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "label": "lit-effort-ab-0901-adopted",
+  "runAt": "2026-09-01T08:44:47.483Z",
+  "book": "죄와 벌 1",
+  "nMemos": 13,
+  "results": [
+    {
+      "variant": "low500-서버준비-1",
+      "think": 500,
+      "tighten": false,
+      "usage": {
+        "model": "claude-sonnet-5",
+        "ms": 85672,
+        "apiMs": 78275,
+        "inputTokens": 2,
+        "outputTokens": 6154,
+        "cacheReadTokens": 28627,
+        "costUsd": 0.19037739999999997
+      },
+      "error": null,
+      "anchors": "",
+      "motifs": [
+        {
+          "name": "1아르신 위의 삶",
+          "gloss": "극한의 좁은 공간·조건에서도 사는 편이 죽는 것보다 낫다는 삶에 대한 원초적 집착으로 나타난다."
+        },
+        {
+          "name": "이론과 그 실패",
+          "gloss": "입법자들의 유혈을 정당화하는 논리, 거짓말이 진리보다 인간적이라는 궤변이 결국 '비열한 결과'로 무너지는 흐"
+        },
+        {
+          "name": "인간과 이(虱)",
+          "gloss": "자신을 죽인 대상보다 못한 존재인지, 아직은 사람인지를 스스로 판정하며 자수에 이르는 흐름이다."
+        },
+        {
+          "name": "수치와 자존심",
+          "gloss": "그를 무너뜨리는 것은 죄의식이 아니라 상처받은 자존심과 수치라는 인식이 반복된다."
+        }
+      ]
+    },
+    {
+      "variant": "low500-서버준비-2",
+      "think": 500,
+      "tighten": false,
+      "usage": {
+        "model": "claude-sonnet-5",
+        "ms": 59751,
+        "apiMs": 52277,
+        "inputTokens": 2,
+        "outputTokens": 3881,
+        "cacheReadTokens": 28627,
+        "costUsd": 0.1676474
+      },
+      "error": null,
+      "anchors": "",
+      "motifs": [
+        {
+          "name": "1아르신 위의 삶",
+          "gloss": "좁고 절망적인 공간이라도 존재 자체를 붙드는 것이 죽음보다 낫다는 극한의 생존 의지"
+        },
+        {
+          "name": "이냐 사람이냐",
+          "gloss": "입법자·초인 이론으로 살인을 정당화했던 논리가 실행 이후 '비열한 결과'로 붕괴하는 과정"
+        },
+        {
+          "name": "수치와 자존심",
+          "gloss": "죄의식보다 짓밟힌 자존심과 수치가 더 크게 그를 괴롭힌다는 관찰"
+        },
+        {
+          "name": "거짓말의 특권",
+          "gloss": "독창적으로 틀리는 것이 남의 진리를 앵무새처럼 따르는 것보다 낫다는 별개의 논변"
+        }
+      ]
+    }
+  ]
+}
